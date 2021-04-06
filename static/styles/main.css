@@ -1,0 +1,164 @@
+@import url('https://rsms.me/inter/inter.css');
+html { font-family: 'Inter', sans-serif; }
+
+.kbnTopNavMenu__wrapper {
+    display:none;
+}
+
+.inset-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.daterangepicker {
+    top: 38px !important;
+    font-family: 'Inter', sans-serif;
+}
+
+.daterangepicker th {
+    font-weight: 500 !important;
+    color: #1F2937;
+}
+
+.daterangepicker td.in-range {
+    background: #F3F4F6;
+}
+
+.daterangepicker .ranges li.active, .daterangepicker td.active {
+    background: #3B82F6;
+}
+
+.index-list li:nth-child(even) {
+    background: #fff;
+}
+
+.dataTable {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.dt-buttons {
+    float: right;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    outline: none;
+    padding: 0.25rem 0.5rem;
+    margin: 8px;
+}
+
+.dt-button {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.dt-button span {
+    color: #2563EB;
+    text-decoration: underline;
+}
+
+.dt-button:focus {
+    outline: none;
+}
+
+.dataTables_info {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+table.dataTable tbody tr.even {
+    background: #F9FAFB;
+}
+
+table.dataTable tbody tr.selected.even {
+    background: #DBEAFE;
+}
+
+table.dataTable tbody tr.selected {
+    background: #EFF6FF;
+}
+
+table.dataTable tbody tr.selected td:first-child {
+    border-left: 3px solid #93C5FD;
+}
+
+.dataTables_wrapper.no-footer .dataTables_scrollBody, table.dataTable thead th, table.dataTable thead td {
+    border-color: #D1D5DB;
+}
+
+.table-alt-full {
+    height: calc(100% - 24px);
+    max-height: calc(100% - 24px);
+    overflow: hidden;
+}
+
+.table-alt-full-sc {
+    height: calc(100% - 64px);
+    max-height: calc(100% - 64px);
+    overflow: hidden;
+}
+
+.select-info {
+    padding-left: 4px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    margin: 100px auto;
+    background-color: #10B981;
+
+    border-radius: 100%;
+    -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+    animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-scaleout {
+    0% { -webkit-transform: scale(0) }
+    100% {
+        -webkit-transform: scale(1.0);
+        opacity: 0;
+    }
+}
+
+@keyframes sk-scaleout {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    } 100% {
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+          opacity: 0;
+      }
+}
+
+
+
+.dataTables_scrollBody::-webkit-scrollbar, #tree::-webkit-scrollbar {
+    width: 4px;
+    cursor: pointer;
+    /*background-color: rgba(229, 231, 235, var(--bg-opacity));*/
+
+}
+.dataTables_scrollBody::-webkit-scrollbar-track, #tree::-webkit-scrollbar-track {
+    background-color: rgba(229, 231, 235, 255);
+    cursor: pointer;
+    /*background: red;*/
+}
+.dataTables_scrollBody::-webkit-scrollbar-thumb, #tree::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background-color: #a0aec0;
+    /*outline: 1px solid slategrey;*/
+}

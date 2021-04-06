@@ -1,0 +1,8 @@
+asgiref==3.3.1
+certifi==2020.12.5
+Django==3.1.5
+django-widget-tweaks==1.4.8
+elasticsearch==7.10.1
+pytz==2020.5
+sqlparse==0.4.1
+urllib3==1.26.3

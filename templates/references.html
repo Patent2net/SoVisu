@@ -1,0 +1,347 @@
+{% include "includes/header.html" with title="Références" %}
+
+<div class="h-full w-full flex">
+
+    {% include "includes/menu.html" with title="Références" %}
+
+    <div class="flex w-full h-full relative p-3" style="background: #fafbfd;">
+
+        <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
+            <div class="absolute inset-center text-sm flex">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Chargement des données
+            </div>
+        </div>
+
+
+        <div class="flex flex-col bg-white rounded h-full relative w-full" style="border: 1px solid rgb(211, 218, 230); padding: 6px 8px">
+
+            <div class="flex justify-between items-start">
+
+                <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+                    <a class="pl-0 px-2 pb-1
+                        {% if filter == -1 or filter == "all" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                        href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all"
+                    >Toutes les références</a>
+                    <a class="px-2 pb-1
+                        {% if filter == "uncomplete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                        href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=uncomplete"
+                    >Références à compléter</a>
+                    <a class="pr-0 px-2 pb-1
+                        {% if filter == "complete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                        href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=complete"
+                    >Références complètes</a>
+                </h1>
+
+            </div>
+
+            <div class="flex-1">
+
+                <table id="references" class="">
+
+                    <thead>
+                    <tr class="bg-gray-100 text-gray-700 text-xs" >
+                        <th>URL</th>
+                        <th>Année</th>
+
+                        {% if entity.ldapId %}
+                            <th>Citations</th>
+                            <th>Almetrics</th>
+                        {% endif %}
+
+                        <th>Titre</th>
+
+                        {% if entity.halStructId %}
+                            <th>Auteurs</th>
+                        {% endif %}
+
+                        <th>MDS</th>
+
+                        {% if filter == "uncomplete" %}
+                            <th>Texte complet</th>
+                        {% endif %}
+
+                        <th>label_bibtex</th>
+						
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for ref in references %}
+                        <tr>
+                            <td class="whitespace-nowrap">{{ ref.halId_s }}</td>
+
+                            <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
+
+                            {% if entity.ldapId %}
+                                <td><span class="__dimensions_badge_embed__" data-doi="{{ ref.doiId_s }}" data-hide-zero-citations="true" data-style="small_rectangle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
+                                </td>
+                                <td> <div data-badge-popover="right" data-badge-type="4" data-doi="{{ ref.doiId_s }}" data-hide-no-mentions="false" data-hide-less-than="1" class="altmetric-embed"></div>
+                                </td> <!-- from : https://api.altmetric.com/embeds.html -->
+                            {% endif %}
+
+
+                            <td>{{ ref.title_s.0 | safe }}</td>
+
+                            {% if entity.halStructId %}
+                                <td>{{ ref.authFullName_s | join:", " }}</td>
+                            {% endif %}
+
+                            <td>{{ ref.MDS|floatformat:'3' }}</td>
+
+							{% if filter == "uncomplete" %}
+                                <td>{{ ref.shouldBeOpen }}</td>
+                            {% endif %}
+
+                            <td>{{ ref.label_bibtex }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    $.fn.dataTable.ext.buttons.zotero = {
+        text: 'BibTex',
+        action: function ( e, dt, node, config ) {
+            var BibTex_export = ""
+            dt.data().map( function (row) {
+                BibTex_export += row[row.length - 1] + '\n'
+            });
+
+            function download(strData, strFileName, strMimeType) {
+                var D = document,
+                    a = D.createElement("a");
+                strMimeType= strMimeType || "application/octet-stream";
+
+
+                if (navigator.msSaveBlob) { // IE10
+                    return navigator.msSaveBlob(new Blob([strData], {type: strMimeType}), strFileName);
+                } /* end if(navigator.msSaveBlob) */
+
+
+                if ('download' in a) { //html5 A[download]
+                    a.href = "data:" + strMimeType + "," + encodeURIComponent(strData);
+                    a.setAttribute("download", strFileName);
+                    a.innerHTML = "downloading...";
+                    D.body.appendChild(a);
+                    setTimeout(function() {
+                        a.click();
+                        D.body.removeChild(a);
+                    }, 66);
+                    return true;
+                } /* end if('download' in a) */
+
+
+                //do iframe dataURL download (old ch+FF):
+                var f = D.createElement("iframe");
+                D.body.appendChild(f);
+                f.src = "data:" +  strMimeType   + "," + encodeURIComponent(strData);
+
+                setTimeout(function() {
+                    D.body.removeChild(f);
+                }, 333);
+                return true;
+            }
+
+            download(BibTex_export, "export.bib", "text");
+        }
+    };
+
+    /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
+
+    $(document).ready(function() {
+
+        init = 1;
+
+        if (getUrlParameter('type') == 'lab') {
+            if (getUrlParameter('filter') == 'uncomplete') {
+                v_columnDefs = [
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": [ 5 ],
+                        "render": function(data, type, row, meta){
+                            if (data == 'True') {
+                                data = 'À ajouter'
+                            } else if (data == 'False') {
+                                data = 'Sous embargo'
+                            } else {
+                                data = ''
+                            }
+                            return data;
+                        },
+						"visible": true,
+                        "className": "text-center",
+                        "orderable": false
+                    },
+					{
+                        "targets": [ 6 ],
+                        "visible": false,
+                    }
+                ]
+            } else {
+                v_columnDefs = [
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+					{
+                        "targets": [ 5 ],
+                        "visible": false,
+                    }
+                ]
+            }
+        } else {
+            if (getUrlParameter('filter') == 'uncomplete') {
+                v_columnDefs = [
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": [ 6 ],
+                        "render": function(data, type, row, meta){
+                            if (data == 'True') {
+                                data = 'À ajouter'
+                            } else if (data == 'False') {
+                                data = 'Sous embargo'
+                            } else {
+                                data = ''
+                            }
+                            return data;
+                        },
+						"visible": true,
+                        "className": "text-center",
+                        "orderable": false
+                    },
+					{
+                        "targets": [ 7 ],
+                        "visible": false,
+                    }
+                ]
+            } else {
+                v_columnDefs = [
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+					{
+                        "targets": [ 6 ],
+                        "visible": false,
+                    }
+                ]
+            }
+        }
+
+
+
+
+            var table = $('#references').DataTable(
+            {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                },
+                dom: 'Bfrtip',
+                select: false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        title: 'export'
+                    },
+                    {
+                        extend: 'zotero',
+                    }
+                ],
+                columnDefs: v_columnDefs,
+                scrollResize: true,
+                scrollY: 100,
+                scrollCollapse: true,
+                paging: false,
+            }
+        );
+
+        table.on( 'draw', function () {
+            $('.dataTables_scrollHeadInner').css('padding-right', 0);
+            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+
+            if(init == 1){
+                $('.dt-buttons').prepend('Exporter : ')
+                init = 2;
+            }
+
+            $('#references_filter').prepend($('.dt-buttons'));
+            $('#references_filter').addClass('flex items-center');
+            $('.dt-buttons').addClass('mr-4');
+        } );
+
+    } );
+
+
+
+
+
+</script>
+
+{% include "includes/footer.html" %}

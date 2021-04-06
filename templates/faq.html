@@ -1,0 +1,241 @@
+{% include "includes/header.html" with title="Foire aux questions" %} <!--Titre de la page et définit les options appliquées par menu.html-->
+      <style>
+         /* Tab content - closed */
+         .tab-content {
+         max-height: 0;
+         -webkit-transition: max-height .35s;
+         -o-transition: max-height .35s;
+         transition: max-height .35s;
+         }
+         /* :checked - resize to full height */
+         .tab input:checked ~ .tab-content {
+         max-height: 100vh;
+         }
+         /* Label formatting when open */
+         .tab input:checked + label{
+         /*@apply text-xl p-5 border-l-2 border-indigo-500 bg-gray-100 text-indigo*/
+         font-size: 1rem; /*.text-base*/
+         padding: 1.25rem; /*.p-5*/
+         border-left-width: 2px; /*.border-l-2*/
+         border-color: #6574cd; /*.border-indigo*/
+         background-color: #f8fafc; /*.bg-gray-100 */
+         color: #6574cd; /*.text-indigo*/
+         }
+         /* Icon */
+         .tab label::after {
+         float:right;
+         right: 0;
+         top: 0;
+         display: block;
+         width: 1.5em;
+         height: 1.5em;
+         line-height: 1.5;
+         font-size: 1rem;
+         text-align: center;
+         -webkit-transition: all .35s;
+         -o-transition: all .35s;
+         transition: all .35s;
+         }
+         /* Icon formatting - closed */
+         .tab input[type=checkbox] + label::after {
+         content: "+";
+         font-weight:bold; /*.font-bold*/
+         border-width: 1px; /*.border*/
+         border-radius: 9999px; /*.rounded-full */
+         border-color: #b8c2cc; /*.border-grey*/
+         }
+         .tab input[type=radio] + label::after {
+         content: "\25BE";
+         font-weight:bold; /*.font-bold*/
+         border-width: 1px; /*.border*/
+         border-radius: 9999px; /*.rounded-full */
+         border-color: #b8c2cc; /*.border-grey*/
+         }
+         /* Icon formatting - open */
+         .tab input[type=checkbox]:checked + label::after {
+         transform: rotate(315deg);
+         background-color: #6574cd; /*.bg-indigo*/
+         color: #f8fafc; /*.text-grey-lightest*/
+         }
+         .tab input[type=radio]:checked + label::after {
+         transform: rotateX(180deg);
+         background-color: #6574cd; /*.bg-indigo*/
+         color: #f8fafc; /*.text-grey-lightest*/
+         }
+      </style>
+<div class="h-full w-full flex">
+
+    {% include "includes/menu.html" with title="Foire aux questions" %} <!--permet à menu.html de repérer la section correspondante et white text-->
+
+    <div class="w-full h-full relative p-3" style="background: #fafbfd;">
+        <!--boutons accordeon -->
+        <div class="bg-white rounded w-full h-full">
+             <div class="shadow-md">
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0 " id="tab-solo-one" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-one">Que dit la loi pour une République Numérique ?</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">La loi pour une République Numérique a été proposée par Axelle Lemaire (secrétaire d'Etat chargée du numérique et de l'innovation jusqu'en février 2017) et
+									promulguée le 07 octobre 2016.<br> <a href="https://www.legifrance.gouv.fr/affichTexteArticle.do;jsessionid=7BC7330E0913825AA8B83D57B8AEFD70.tplgfr32s_2?idArticle=JORFARTI000033202841&amp;cidTexte=JORFTEXT000033202746&amp;dateTexte=29990101&amp;categorieLien=id" target="_blank" style="color:#1478B7">L'article 30</a> offre de nouvelles
+									possibilités aux chercheurs en exerçant le droit de diffusion de leurs articles scientifiques en libre accès après une période d'embargo. Cette mesure est également intégrée au <a href="https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006071190&amp;idArticle=LEGIARTI000033205794" target="_blank" style="color:#1478B7">Code de la Recherche.</a><br>
+									La loi permet à un auteur de mettre gratuitement dans un format ouvert, par voie numérique, son article même s'il existe un contrat avec un éditeur, que les droits ont été cédés et que le dépôt est interdit.<br>
+									Plusieurs conditions sont nécessaires :<br>
+									- seuls les écrits scientifiques publiés dans une revue paraissant au moins une fois par an sont concernés (articles, recensions, communications, compte rendus, interventions, commentaires, rapports) <br>
+									- les écrits scientifiques doivent être issus d'une activité de recherche financée au moins pour moitié par des fonds publics<br>
+									- il faut obtenir l'accord des coauteurs avant de déposer le texte intégral d'une publication<br>
+									- la version autorisée par la loi est la "version finale acceptée pour publication" (postprint)<br>
+									- si l’éditeur diffuse l’article gratuitement par voie numérique, le dépôt par le chercheur peut intervenir immédiatement. A défaut, il faut compter un délai de diffusion (embargo) qui est de maximum 6 mois après la date de première parution pour le domaine des sciences, de la technique et de la médécine, et 12 mois pour les SHS.<br>
+                    </p>
+                   </div>
+                </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-two" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-two">Quels sont les différents modèles de l'accès libre (Open Access) ? </label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">Il existe plusieurs voies de publication :<br>
+									- voie verte : voie de l’auto-archivage ou dépôt par l’auteur dans une archive ouverte<br>
+									- voie dorée : pour une transition vers l'accès libre. Le financement peut revêtir de plusieurs formes (APC, subvention, services complémentaires commercialisés, financement participatif, souscriptions)<br>
+									- voie diamant : les revues sont gérées par des communautés (ex: épi-revues).</p>
+                   </div>
+                </div>
+
+         <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-three" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-three">Suis-je obligé(e) de créer un idHAL ?</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">La création de l'identifiant unique généré par HAL n'est pas obligatoire mais vivement conseillée. Au même titre que les autres identifiants créés automatiquement et qu'il vous faut vérifier (VIAF, ISNI, idRef), il va vous permettre d'associer vos publications réelles tout en évitant les confusions liées à l'homonymie et ainsi construire votre identité numérique. Pour que d'autres institutions internationales puissent faire de même, nous vous recommandons de créer (puis d'associer) un identifiant <a href="https://orcid.org/register" target="_blank" style="color:#1478B7"> ORCid (Open Researcher and Contributor ID)</a>.<br>
+									Très souvent utilisé pour l'extraction des publications, il a permis le développement de nombreux plugins compatibles avec les sites institutionnels. Un fois l'idHAL créé, vous pouvez également construire votre CV de chercheur !<br><br>
+									D'une manière générale, presque tout le monde possède des identifiants de connexion pour HAL car ceux sont les mêmes que pour <a href="https://www.episciences.org/" target="_blank" style="color:#1478B7">Episciences.org</a> et <a href="https://www.sciencesconf.org/" target="_blank" style="color:#1478B7">Sciencesconf.org</a>. La création de l'identifiant HAL prend moins de 5 minutes : vous le renseignez (ex : "prenom-nom") et  vous sélectionnez les publications qui vous appartiennent!<br>
+									NB : vous pouvez également renseigner vos autres identifiants chercheur et les URLs de vos réseaux sociaux.</p>
+									
+                   </div>
+                </div>
+
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-four" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-four">Est-ce que HAL est reconnu à l'étranger ?</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">L'archive ouverte HAL est avant tout un projet national mais reconnue comme une des plus grandes archives institutionnelle. Vous pouvez déposer vos productions pour une plus large diffusion de vos travaux et contribuer à la science ouverte.</p>
+                   </div>
+            </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-five" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-five">Que faut-il savoir avant de déposer ?</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">Avant toute opération, vous devez :<br>
+									- connaître le type de dépôt (article, communication, ouvrage, chapitre d'ouvrage, brevet, autre publication, préprint ou document de travail, rapport, thèse, HDR, cours, image, carte, vidéo, son, logiciel). Les articles de presse ne sont pas mentionnés.<br>
+									- choisir si vous déposez une notice sèche ou avec texte intégral<br>
+									- demander l'accord des coauteurs si vous choisissez de déposer avec un document<br>
+									- savoir quelle version de la publication vous souhaitez déposer (preprint, postprint, version éditeur)<br>
+									- vérifier la politique de l'éditeur s'il y a eu signature d'un contrat. Vous pouvez trouver ces informations sur <a href="http://sherpa.ac.uk/romeo/search.php" target="_blank" style="color:#1478B7">Sherpa/Romeo</a> et <a href="https://heloise.ccsd.cnrs.fr/" target="_blank" style="color:#1478B7">Heloise</a><br>
+									- renseigner le plus de métadonnées possibles afin de bien référencer ses publications. <br><br>
+									Une fois le dépôt validé, celui-ci est soumis à vérification auprès des modérateurs de la plateforme, du portail et/ou de la collection. Ils peuvent décider de rejet votre dépôt si celui-ci ne convient pas aux règles (droit d'auteur, protection, etc.).<br>
+									Si vous voulez déposer un certain nombre de publication en une seule fois, c'est possible grâce à l'outil <a href="https://x2hal.inria.fr/homepage" target="_blank" style="color:#1478B7">X2HAL</a>.</p>
+                   </div>
+                </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-six" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-six">Quels sont les intérêts d'une archive ouverte ?</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">Il y a plus d'avantages que d'inconvénients ! Les archives ouvertes garantissent un accès libre et gratuit aux résultats de la recherche. Elles permettent d'augmenter l'impact de vos travaux grâce à un meilleur référencement et une meilleure citabilité. Le but d'une archive est de garantir la pérennité des fichiers déposés et des accès : il n'y a aucune suppression. Le dépôt en archive ouverte assure également une protection juridique et atteste de la paternité du déposant. Une archive ouverte ne se limite pas à un public restreint : vos recherches seront donc partagées et visibles de tous. De nombreus services existent aujourd'hui afin de bénéficier de la valeur ajoutée des archives ouvertes (rapports, statistiques, extraction...)<br><br>
+									Une archive ouverte peut être : disciplinaire, multidisciplinaire, institutionnelle, thématique et constituée par type de documents. Il existe des outils qui permettent de moissonner les ressources académiques en libre accès à travers le monde :<br>
+									- <a href="https://oaister.worldcat.org/" target="_blank" style="color:#1478B7">OAIster</a> : catalogue collectif de ressource en libre accès<br>
+									- <a href="https://www.base-search.net/" target="_blank" style="color:#1478B7">BASE</a> : développé par la Bibliothèque de l'Université de Bielefeld<br>
+									- <a href="http://roar.eprints.org/" target="_blank" style="color:#1478B7">ROAR</a> : registre des archives en libre accès<br>
+									- <a href="https://www.istex.fr/" target="_blank" style="color:#1478B7">ISTEX</a> : développé par l'INIST-CNRS <br>
+									- <a href="https://v2.sherpa.ac.uk/opendoar/" target="_blank" style="color:#1478B7">OpenDoar</a> : répertoire officiel des archives universitaires en libre accès.</p>
+                   </div>
+            </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-seven" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-seven">Pourquoi HAL et pas une autre archive ? </label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">Derrière HAL, il y a le Centre pour la communication scientifique directe (CCSD). La plateforme appartient au CNRS, à l'INRIA, à l'Université de Lyon et à l'INRA.<br>
+									C'est une archive pluridisciplinaire qui diffuse les documents publiés et non publiés. La plateforme promet une diffusion plus large : elle est indexée par les moteurs de recherche généraux (Google Scholar, ScanR, Isidore, etc) et moissonne des bases de données/archives ouvertes (OpenAIRE, PubMed, RePec, etc).<br>
+									<br>
+									Aujourd'hui, HAL est devenue la plateforme nationale la plus utilisée en France par les institutions : la quasi totalité des universités et établissements d'enseignement supérieur français disposent d'un portail institutionnel développé à partir de HAL.<br>
+									A cet effet, le directeur du CNRS (Antoine Petit) a demandé en novembre 209 le dépôt dans HAL de la production scientifique de chaque chercheur CNRS et se servira de l'archive notamment comme critère pour les recrutements à compter de 2020. Par exemple, le CCSD propose pour les chercheurs CNRS une interface pour tester les publications déposées dans HAL pour les campagnes CRAC (compte-rendu annuel d’activité).<br>
+									Les appels à projets européens (notamment dans le cadre de H2020) rendent obligatoire le libre accès aux publications financées et donc le dépôt sur HAL : c'est le moyen le moins coûteux de répondre à cette obligation.</p>
+                   </div>
+                </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-eight" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-eight">HAL, HAL-SHS, HAL-UTLN... Portail ou collection : je suis perdu(e) </label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">Pas de panique !<br>
+									HAL est l'archive ouverte générale où vous pouvez consulter et déposer les publications. Ensuite, vous avez les portails qui peuvent être par thématiques ou institutionnels. Pour vous donner une idée, vous pouvez consulter la <a href="https://hal.archives-ouvertes.fr/browse/portal" target="_blank" style="color:#1478B7">liste des portails</a> créés de 2002 à aujourd'hui. Ces portails permettent aux institutions (organisme de recherhce, université, communauté d'universités, grandes écoles, etc) de gérer la production de ses membres.<br>
+									<br>
+									A partir des portails, vous pouvez également trouver les collections. Elles concernent cette fois-ci les laboratoires et les équipes de recherche par exemple. C'est l'administrateur du portail qui décide ou non de créer une collection.<br>
+									<br>
+									Quand vous gérez un portail ou une collection, vous avez la main sur le contenu qui est déposé (rôle du modérateur) et vous avez le droit de "tamponner" ou "détamponner" des dépôts qui ne correspondent pas à vos critères.
+
+									<br>
+									Aujourd'hui, presque toutes les universités françaises ont créé leur archive ouverte institutionnelle sur HAL, en ajoutant pour la plupart d'entre elles les collections de leurs laboratoires et équipes de recherche (et c'est le cas pour Toulon !). De nombreux outils ont été développés à partir de l'archive ouverte pour permettre la visibilité de la production scientifique d'un laboratoire par exemple, à l'aide d'un plugin/extension (c'est le cas pour Wordpress).</p>
+                   </div>
+            </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-nine" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-nine">Je préfère utiliser les réseaux sociaux ResearchGate ou Academia.edu</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">42% des chercheurs français utilisent ces deux réseaux qui comptent 70 millions de profils dans le monde. Vous pouvez donc l'utiliser, mais correctement !<br>
+                          <a href="https://www.researchgate.net/" target="_blank" style="color:#1478B7">ResearchGate</a> et <a href="https://www.academia.edu/" target="_blank" style="color:#1478B7">Academia.eu</a> sont des réseaux sociaux académiques.
+                          Il est conseillé de les utiliser pour élargir votre réseau ou intégrer une communauté. Concernant le dépôt de vos publications, il faut savoir que ces entreprises sont privées et que la pérennité de vos données ne sont pas garanties.
+                          Il faut également veiller aux mentions concernant vos données personnelles et votre droit d'auteur sur ce type de plateforme. Vous pouvez intégrer des notices bibliographiques si vous le souhaitez, mais ne déposez pas le document qui va avec. Privilégiez HAL pour ça
+                      </p>
+                   </div>
+                </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-ten" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-ten">Et les données dans tout ça ?</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">On ne les a pas oubliées !<br>
+                          HAL permet de déposer plusieurs sortes de documents, et cela ne concerne pas que les publications scientifiques. En effet, vous pouvez tout à fait déposer des documents de travail, des rapports, des cours et d'autres données : brevet, image, carte, vidéo, son, logiciel.<br>
+                          Vous pouvez aussi choisir de les déposer dans des entrepôts spécifiques comme :
+                          <a href="https://www.re3data.org/" target="_blank" style="color:#1478B7">Re3data.org</a>. Vous avez une liste disponible sur <a href="https://cat.opidor.fr/index.php/Entrep%C3%B4t_de_donn%C3%A9es" target="_blank" style="color:#1478B7">Cat OPIDoR</a>.
+                      </p>
+                   </div>
+            </div>
+
+                <div class="tab w-full overflow-hidden border-t">
+                   <input class="absolute opacity-0" id="tab-solo-eleven" type="radio" name="tabs2">
+                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-eleven">Encore un outil de plus pour contrôler et évaluer les chercheurs !</label>
+                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                      <p class="p-5">Et non ! SOVisuHAL est avant tout un outil de gestion afin d'offrir à la communauté et à la gouvernance de l'UTLN une vision d'ensemble sur les différentes expertises des chercheurs de l'établissement.<br>
+									Son utilisation vous permettra d'obtenir une meilleure lisibilité, une plus grande visibilité. Ce faisant, vous contribuez aussi à la construction collective de la visibilité de votre laboratoire et de votre université.<br>
+									Les données utilisées par notre outil sont ouvertes et sont facilement consultables. SOVisuHAL n'est pas un outil bibliométrique et ne sera pas utilisé à des fins d'évaluation : nous n'affichons que ce qui est visible et déjà existant.<br>
+									De plus, si vous vous servez régulièrement de HAL pour alimenter votre compte/profil, vous n'aurez pratiquement rien à faire de plus. Juste checker les informations et les valider. Et on vous donne la main pour rectifier les erreurs !<br>
+									Au contraire, si vous n'utilisez pas HAL ou que vous n'avez toujours pas créé votre idHAL : C'EST L'OCCASION DE LE FAIRE !!!</p>
+                   </div>
+            </div>
+
+             </div>
+          </div>
+    </div>
+</div>
+
+<script>
+      /*Javascript to close the radio button version by clicking it again */
+      var myRadios = document.getElementsByName('tabs2');
+      var setCheck;
+      var x = 0;
+      for(x = 0; x < myRadios.length; x++){
+          myRadios[x].onclick = function(){
+              if(setCheck != this){
+                   setCheck = this;
+              }else{
+                  this.checked = false;
+                  setCheck = null;
+          }
+          };
+      }
+   </script>
+
+{% include "includes/footer.html" %}

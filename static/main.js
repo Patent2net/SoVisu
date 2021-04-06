@@ -1,0 +1,87 @@
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
+
+$(function() {
+
+    var end = moment();
+    var start = moment().set('year', $('.startDate').html().substring(0, 4)).startOf('year');
+
+    if (getUrlParameter('from') != undefined) {
+        start = moment(new Date(getUrlParameter('from')))
+    }
+
+    if (getUrlParameter('to') != undefined) {
+        end = moment(new Date(getUrlParameter('to')))
+    }
+
+    function cb(start, end) {
+        $('input[name="daterange"]').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
+
+    $('input[name="daterange"]').daterangepicker({
+        "autoApply": true,
+        "opens": "left",
+        "locale": {
+        "format": "DD/MM/YYYY",
+        "separator": " - ",
+        "applyLabel": "Appliquer",
+        "cancelLabel": "Annuler",
+        "fromLabel": "à",
+        "toLabel": "De",
+        "customRangeLabel": "Personnalisé",
+        "weekLabel": "S",
+        "daysOfWeek": [
+            "Dim",
+            "Lun",
+            "Mar",
+            "Mer",
+            "Jeu",
+            "Ven",
+            "Sam"
+        ],
+        "monthNames": [
+            "Janvier",
+            "Février",
+            "Mars",
+            "Avril",
+            "Mai",
+            "Juin",
+            "Juillet",
+            "Août",
+            "Septembre",
+            "Octobre",
+            "Novembre",
+            "Décembre"
+        ],
+        "firstDay": 1
+    },
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Année en cours': [moment().subtract(0, 'year').startOf('year'), moment()],
+            'Année dernière': [moment().subtract(1, 'year').startOf('year'),moment().subtract(0, 'year').startOf('year').subtract(1, 'day')],
+            'Toute la période': [moment().set('year', $('.startDate').html().substring(0, 4)).startOf('year'), moment()]
+        },
+
+    }, function(start, end, label) {
+        window.location.href = "/" + document.URL.split("/")[3] + "/?type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + "&from=" + start.format('YYYY-MM-DD') + "&to=" + end.format('YYYY-MM-DD');
+    });
+
+});
+
+
+$(document).ready(function () {
+    $('.loading-div').fadeOut(150);
+});
