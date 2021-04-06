@@ -10,7 +10,7 @@ from .forms import ContactForm
 
 from django.contrib import messages
 
-Mode = 'Prod'
+Mode = 'dev'
 def esConnector(mode = Mode):
     if mode == "Prod":
         with open("../../stackELK/secrets/secretEs.txt", "r") as fic:
