@@ -18,13 +18,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
+with open ('../../config/SoVisu/secretDjango', 'r') as fic:
+    SECRET_KEY = fic.read()
+    SECRET_KEY = SECRET_KEY .strip()
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
+#SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+#DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 ALLOWED_HOSTS = ['*']
 
 # Application definition
