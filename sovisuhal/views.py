@@ -10,6 +10,9 @@ from .forms import ContactForm
 
 from django.contrib import messages
 
+import sys
+sys.setrecursionlimit(1500)
+
 Mode = 'dev'
 def esConnector(mode = Mode):
     if mode == "Prod":
@@ -612,7 +615,6 @@ def check(request):
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 halId_i=entity['halId_i'],
                                                                                  idRef=entity['idRef']),
                                                   'startDate': start_date,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})

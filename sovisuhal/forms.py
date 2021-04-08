@@ -6,20 +6,17 @@ class validCredentials(forms.Form):
 
     def __init__(self,*args,**kwargs):
         halId_s = kwargs.pop('halId_s')
-        halId_i = kwargs.pop('halId_i')
         idRef = kwargs.pop('idRef')
 
         super(validCredentials,self).__init__(*args,**kwargs)
 
         self.fields['f_halId_s'].initial = halId_s
-        self.fields['f_halId_i'].initial = halId_i
         self.fields['f_IdRef'].initial = idRef
         self.fields['f_more'].initial = '0'
 
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label='ID HAL (texte)')
-    f_halId_i = forms.CharField(label='ID HAL (entier)')
     f_IdRef = forms.CharField(label='IdRef')
 
 
