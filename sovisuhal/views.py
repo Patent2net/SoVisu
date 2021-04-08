@@ -5,12 +5,14 @@ import json
 from . import forms
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from django.core.mail import mail_admins
+from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
 
 from django.contrib import messages
 
-Mode = 'Pr'
+Mode = 'dev'
+=======
+
 def esConnector(mode = Mode):
     if mode == "Prod":
         with open("../../stackELK/secrets/secretEs.txt", "r") as fic:
@@ -612,7 +614,6 @@ def check(request):
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 halId_i=entity['halId_i'],
                                                                                  idRef=entity['idRef']),
                                                   'startDate': start_date,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
@@ -1441,16 +1442,32 @@ def contact(request):
     if request.method == 'POST':
         f = ContactForm(request.POST)
         if f.is_valid():
+            # send message to admin
             name = f.cleaned_data['nom']
-            subject = "Vous avez reçu une demande de {}:<{}>".format(name, f.cleaned_data['email'])
+            usermail=[f.cleaned_data['email']]
+            subject = "Vous avez reçu une demande de {}:<{}>".format(name, usermail)
+
+
 
             message = "Objet: {}\n\nDate: {}\n\nMessage:\n\n {}".format(
                 dict(f.purpose_choices).get(f.cleaned_data['objet']),
-                datetime.now(),
+                datetime.now().isoformat(timespec='minutes'),
                 f.cleaned_data['message']
             )
 
             mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
+
+            # /
+
+            # send confirmation message to user
+
+            conf_subject ="Confirmation de reception du ticket:{}".format(dict(f.purpose_choices).get(f.cleaned_data['objet'])
+            )
+
+            conf_message="Bonjour {},\nCeci est un message automatisé pour vous informer que votre ticket a bien été reçu.\n\n{}".format(name,message)
+
+            send_mail(conf_subject,conf_message,'testsovis@gmail.com',usermail,fail_silently = False)
+            # /
 
             messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
             f = ContactForm()
