@@ -6,9 +6,7 @@
 
     <meta charset="utf-8">
 
-    <title>{{title}} {% if title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and \
-  title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" \
-  and title != "Ressources" %}:{%  endif %} {% if entity.ldapId %}
+    <title>{{title}} {% if title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" %}:{%  endif %} {% if entity.ldapId %}
         {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
     {%  endif %}
         {% if entity.halStructId %}
@@ -60,7 +58,7 @@
 
     <div class="flex flex-col w-full">
 
-        <div class="flex h-12 w-full bg-gray-700">
+        <div class="flex h-12 w-full bg-gray-700 flex-shrink-0">
 
             <div class="w-24 flex items-center pl-2 text-gray-400 text-sm font-semibold">
             </div>
