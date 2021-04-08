@@ -6,20 +6,17 @@ class validCredentials(forms.Form):
 
     def __init__(self,*args,**kwargs):
         halId_s = kwargs.pop('halId_s')
-        halId_i = kwargs.pop('halId_i')
         idRef = kwargs.pop('idRef')
 
         super(validCredentials,self).__init__(*args,**kwargs)
 
         self.fields['f_halId_s'].initial = halId_s
-        self.fields['f_halId_i'].initial = halId_i
         self.fields['f_IdRef'].initial = idRef
         self.fields['f_more'].initial = '0'
 
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label='ID HAL (texte)')
-    f_halId_i = forms.CharField(label='ID HAL (entier)')
     f_IdRef = forms.CharField(label='IdRef')
 
 
@@ -57,7 +54,7 @@ class setGuidingKeywords(forms.Form):
         self.fields['f_guidingKeywords'].initial = str
 
     # Set choices to an empty list as it is a required argument.
-    f_guidingKeywords = forms.CharField(label='Mot-clés directeurs', max_length=100, widget=forms.TextInput(attrs={'class' : 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
+    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(attrs={'class' : 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
 class search(forms.Form):

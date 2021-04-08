@@ -37,7 +37,7 @@
                     <a class="pr-0 px-2 pb-1
                         {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
-                    >Mots-clés directeurs</a>
+                    >Mots-clés orienteurs</a>
                 </h1>
 
 
@@ -220,7 +220,7 @@
 
         $(document).ready(function() {
 
-            extIds = {{ extIds |safe }};
+            /*extIds = {{ extIds |safe }};
             ext_l = extIds.length;
             j = 0;
 
@@ -275,7 +275,7 @@
                     }
                 }
 
-            });
+            });*/
 
         });
 
