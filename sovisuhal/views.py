@@ -10,10 +10,9 @@ from .forms import ContactForm
 
 from django.contrib import messages
 
-import sys
-sys.setrecursionlimit(1500)
-
 Mode = 'dev'
+=======
+
 def esConnector(mode = Mode):
     if mode == "Prod":
         with open("../../stackELK/secrets/secretEs.txt", "r") as fic:
