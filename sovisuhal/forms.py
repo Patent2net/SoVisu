@@ -54,7 +54,7 @@ class setGuidingKeywords(forms.Form):
         self.fields['f_guidingKeywords'].initial = str
 
     # Set choices to an empty list as it is a required argument.
-    f_guidingKeywords = forms.CharField(label='Mot-clés directeurs', max_length=100, widget=forms.TextInput(attrs={'class' : 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
+    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(attrs={'class' : 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
 class search(forms.Form):
