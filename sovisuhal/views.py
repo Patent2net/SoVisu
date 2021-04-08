@@ -11,7 +11,6 @@ from .forms import ContactForm
 from django.contrib import messages
 
 Mode = 'dev'
-=======
 
 def esConnector(mode = Mode):
     if mode == "Prod":
