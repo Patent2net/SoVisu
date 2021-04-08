@@ -24,7 +24,7 @@ def esConnector(mode = Mode):
             # ssl_context=context,
             timeout=10)
     else:
-        es = esConnector()
+        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     return es
 
 def index(request):
