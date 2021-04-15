@@ -613,10 +613,14 @@ def check(request):
     if data == "-1" or data == "credentials":
 
         if type == "rsr":
+            orcId = ''
+            if 'orcId' in entity:
+                orcId = entity['orcId']
+
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 idRef=entity['idRef']),
+                                                                                 idRef=entity['idRef'], orcId=orcId),
                                                   'startDate': start_date,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
