@@ -739,7 +739,7 @@ def search(request):
         search = request.POST.get("f_search")
 
         search_param = {
-            "query": {"query_string": {"query": search}}
+            "query":{"bool":{"must": [{"query_string": {"query": search}}],"filter":[{"match":{"validated":"true"}}]}}
         }
 
         p_res = es.count(index=index, body=search_param)
