@@ -979,8 +979,6 @@ def validateReferences(request):
     if request.method == 'POST':
         toValidate = request.POST.get("toValidate", "").split(",")
 
-
-
         for docid in toValidate:
             es.update(index="documents", refresh='wait_for', id=docid,
                       body={"doc": {"validated": True}})
