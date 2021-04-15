@@ -22,11 +22,7 @@
             <div class="flex justify-between items-start">
 
                 <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
-                    <a class="pl-0 px-2 pb-1
-                        {% if filter == -1 or filter == "all" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                        href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all"
-                    >Toutes les références</a>
-                    <a class="px-2 pb-1
+                    <a class="pl-0  px-2 pb-1
                         {% if filter == "uncomplete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=uncomplete"
                     >Références à compléter</a>
@@ -34,6 +30,10 @@
                         {% if filter == "complete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=complete"
                     >Références complètes</a>
+                <a class="px-2 pb-1
+                        {% if filter == -1 or filter == "all" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                        href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all"
+                    >Toutes les références</a>
                 </h1>
 
             </div>
