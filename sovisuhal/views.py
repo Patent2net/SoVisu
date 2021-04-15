@@ -11,6 +11,7 @@ from decouple import config
 from django.contrib import messages
 from ssl import create_default_context
 from elasticsearch.connection import create_ssl_context
+from uniauth.decorators import login_required
 
 Mode = 'dev'
 
@@ -29,6 +30,7 @@ def esConnector(mode = Mode):
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     return es
 
+@login_required
 def index(request):
     return redirect('dashboard')
 

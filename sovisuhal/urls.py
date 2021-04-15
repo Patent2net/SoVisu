@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
 
 from . import views
 
@@ -46,5 +47,6 @@ urlpatterns = [
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
     path('presentation/', views.presentation, name='presentation'),
-    path('unknown/', views.unknown, name='unknown')
+    path('unknown/', views.unknown, name='unknown'),
+    path('accounts/', include('uniauth.urls.cas_only', namespace='uniauth'))
 ]
