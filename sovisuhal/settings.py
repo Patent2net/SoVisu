@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
-
-
+mode = 'Prod'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,12 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #     SECRET_KEY = fic.read()
 #     SECRET_KEY = SECRET_KEY .strip()
 # SECURITY WARNING: keep the secret key used in production secret!
-
-SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
+if mode == 'Prod':
+    SECRET_KEY = config ['DjangoKey']
+else:
+    SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = False
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = config ['DJANGO_DEBUG'] != 'False'
 ALLOWED_HOSTS = ['*']
 
 # Application definition
