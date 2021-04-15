@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
+mode = 'Prod'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,10 +27,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
 
+if mode == 'Prod':
+    SECRET_KEY = config ('DjangoKey')
+else:
+    SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = False
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = config ('DJANGO_DEBUG') != 'False'
 ALLOWED_HOSTS = ['*']
+
+
+# Settings used by Uniauth
+LOGIN_URL = '/accounts/login/'
+PASSWORD_RESET_TIMEOUT_DAYS = 3
+UNIAUTH_ALLOW_SHARED_EMAILS = True
+UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
+UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
+UNIAUTH_LOGIN_DISPLAY_STANDARD = True
+UNIAUTH_LOGIN_DISPLAY_CAS = True
+UNIAUTH_LOGIN_REDIRECT_URL = '/dashboard/?type=rsr&id=' # + uniauth_profile.id
+UNIAUTH_LOGOUT_CAS_COMPLETELY = True
+UNIAUTH_LOGOUT_REDIRECT_URL = None
+UNIAUTH_MAX_LINKED_EMAILS = 20
+UNIAUTH_PERFORM_RECURSIVE_MERGING = True
+
 
 # Application definition
 
@@ -40,6 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
+    'uniauth'
 ]
 
 MIDDLEWARE = [
@@ -51,6 +75,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    #'django.contrib.auth.backends.ModelBackend',
+    'uniauth.backends.CASBackend',
+]
+
+LOGIN_URL = "/accounts/login/"
+UNIAUTH_LOGIN_DISPLAY_STANDARD = False
+UNIAUTH_LOGOUT_CAS_COMPLETELY = True
 
 ROOT_URLCONF = 'sovisuhal.urls'
 
