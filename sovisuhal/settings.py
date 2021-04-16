@@ -34,8 +34,8 @@ else:
     SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-#DEBUG = config ('DJANGO_DEBUG') != 'False'
+DEBUG = True
+# DEBUG = config ('DJANGO_DEBUG') != 'False'
 ALLOWED_HOSTS = ['*']
 
 

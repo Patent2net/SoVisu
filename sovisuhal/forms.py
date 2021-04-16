@@ -7,17 +7,20 @@ class validCredentials(forms.Form):
     def __init__(self,*args,**kwargs):
         halId_s = kwargs.pop('halId_s')
         idRef = kwargs.pop('idRef')
+        orcId = kwargs.pop('orcId')
 
         super(validCredentials,self).__init__(*args,**kwargs)
 
         self.fields['f_halId_s'].initial = halId_s
         self.fields['f_IdRef'].initial = idRef
+        self.fields['f_orcId'].initial = orcId
         self.fields['f_more'].initial = '0'
 
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label='ID HAL (texte)')
     f_IdRef = forms.CharField(label='IdRef')
+    f_orcId = forms.CharField(label='ORCID')
 
 
 class validLabCredentials(forms.Form):
