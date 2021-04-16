@@ -410,6 +410,11 @@ def references(request):
                                 "must": [
                                     {
                                         "match_phrase": {
+                                            "validated": True,
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
                                             ext_key: entity[key],
                                         }
                                     },
@@ -465,6 +470,11 @@ def references(request):
                         {
                             "bool": {
                                 "must": [
+                                    {
+                                        "match_phrase": {
+                                            "validated": True,
+                                        }
+                                    },
                                     {
                                         "match_phrase": {
                                             ext_key: entity[key]
@@ -1110,9 +1120,10 @@ def validateCredentials(request):
             halId_s = request.POST.get("f_halId_s")
             halId_i = request.POST.get("f_halId_i")
             idRef = request.POST.get("f_IdRef")
+            orcId = request.POST.get("f_orcId")
 
             es.update(index="researchers", refresh='wait_for', id=id,
-                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef}})
+                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef, "orcId": orcId}})
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
