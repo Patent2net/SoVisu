@@ -22,6 +22,12 @@
             <div class="flex justify-between items-start">
 
                 <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+                    {% if entity.halStructId %}
+                    <a class="pl-0 px-2 pb-1
+                        {% if data == "state" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
+                    >État du laboratoire</a>
+                    {% endif %}
                     <a class="pl-0 px-2 pb-1
                         {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
@@ -43,6 +49,48 @@
 
 
             </div>
+
+        {% if data == "state" %}
+
+            <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <p>Cet onglet vous permet de supprimer des domaines qui ne composeraient pas votre portefeuille d'expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
+
+                </div>
+
+                <div class="justify-end flex w-full">
+                    <div class="dt-buttons-rplc flex items-center text-xs">
+                    </div>
+                </div>
+
+                <div class="flex-1">
+
+                    <table id="state">
+
+                        <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-xs" >
+                            <th>Nom</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for rsr in researchers %}
+                            <tr class="text-gray-500">
+                                <td>{{ rsr.firstName }} {{ rsr.lastName }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+        {% endif %}
 
             {% if data == -1 or data == "credentials" %}
 
@@ -332,6 +380,35 @@
             $('.dt-buttons').addClass('mr-2');
             $('.dataTables_filter').prepend($('.dt-buttons'));
             $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+
+            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+        } );
+
+        var table3 = $('#state').DataTable(
+            {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                },
+                dom: 'Bfrtip',
+                select: false,
+                buttons: [
+                ],
+                "columnDefs": [
+                ],
+                scrollResize: true,
+                scrollY: 100,
+                scrollCollapse: true,
+                paging: false,
+            }
+        );
+
+        table3.on( 'draw', function () {
+            $('.dataTables_scrollHeadInner').css('padding-right', 0);
+            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+
+            $('.dataTables_filter').addClass('flex items-center');
+            $('.dataTables_filter').prepend($('.dt-buttons'));
 
             $('.dataTables_info').addClass('flex justify-between w-full pr-2');
         } );
