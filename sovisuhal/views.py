@@ -99,7 +99,6 @@ def cs_index(request):
 
     return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
 
-
 def dashboard(request):
     # Get parameters
     if 'type' in request.GET:
@@ -192,12 +191,12 @@ def dashboard(request):
     if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
-    # Get first publicationDate_tdate date
+    # Get first submittedDate_tdate date
     if type == "rsr":
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"authIdHal_s": entity['halId_s']}
@@ -207,7 +206,7 @@ def dashboard(request):
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"labStructId_i": entity['halStructId']}
@@ -215,7 +214,7 @@ def dashboard(request):
         }
 
     res = es.search(index="documents", body=start_date_param)
-    start_date = res['hits']['hits'][0]['_source']['publicationDate_tdate']
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
@@ -289,12 +288,12 @@ def references(request):
         entity = res['hits']['hits'][0]['_source']
     # /
 
-    # Get first publicationDate_tdate date
+    # Get first submittedDate_tdate date
     if type == "rsr":
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"authIdHal_s": entity['halId_s']}
@@ -304,7 +303,7 @@ def references(request):
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"labStructId_i": entity['halStructId']}
@@ -312,7 +311,7 @@ def references(request):
         }
 
     res = es.search(index="documents", body=start_date_param)
-    start_date = res['hits']['hits'][0]['_source']['publicationDate_tdate']
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
@@ -389,7 +388,7 @@ def references(request):
                     },
                     {
                         "range": {
-                            "publicationDate_tdate": {
+                            "submittedDate_tdate": {
                                 "gte": dateFrom,
                                 "lt": dateTo
                             }
@@ -410,12 +409,17 @@ def references(request):
                                 "must": [
                                     {
                                         "match_phrase": {
+                                            "validated": True,
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
                                             ext_key: entity[key],
                                         }
                                     },
                                     {
                                         "range": {
-                                            "publicationDate_tdate": {
+                                            "submittedDate_tdate": {
                                                 "gte": dateFrom,
                                                 "lt": dateTo
                                             }
@@ -467,12 +471,17 @@ def references(request):
                                 "must": [
                                     {
                                         "match_phrase": {
+                                            "validated": True,
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
                                             ext_key: entity[key]
                                         }
                                     },
                                     {
                                         "range": {
-                                            "publicationDate_tdate": {
+                                            "submittedDate_tdate": {
                                                 "gte": dateFrom,
                                                 "lt": dateTo
                                             }
@@ -571,12 +580,12 @@ def check(request):
         entity = res['hits']['hits'][0]['_source']
     # /
 
-    # Get first publicationDate_tdate date
+    # Get first submittedDate_tdate date
     if type == "rsr":
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"authIdHal_s": entity['halId_s']}
@@ -586,7 +595,7 @@ def check(request):
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"labStructId_i": entity['halStructId']}
@@ -595,7 +604,7 @@ def check(request):
 
     res = es.search(index="documents", body=start_date_param)
 
-    start_date = res['hits']['hits'][0]['_source']['publicationDate_tdate']
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
@@ -610,13 +619,40 @@ def check(request):
         dateTo = datetime.today().strftime('%Y-%m-%d')
     # /
 
+    if data == "state":
+        rsr_param = {
+            "query": {
+                "match": {
+                    "labHalId": id
+                }
+            }
+        }
+        count = es.count(index="researchers", body=rsr_param)['count']
+
+        rsrs = es.search(index="researchers", body=rsr_param, size=count)
+
+        rsrs_cleaned = []
+
+        for result in rsrs['hits']['hits']:
+            rsrs_cleaned.append(result['_source'])
+
+        return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                              'entity': entity,
+                                              'researchers': rsrs_cleaned,
+                                              'startDate': start_date,
+                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+
     if data == "-1" or data == "credentials":
 
         if type == "rsr":
+            orcId = ''
+            if 'orcId' in entity:
+                orcId = entity['orcId']
+
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 idRef=entity['idRef']),
+                                                                                 idRef=entity['idRef'], orcId=orcId),
                                                   'startDate': start_date,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -679,7 +715,7 @@ def check(request):
                         },
                         {
                             "range": {
-                                "publicationDate_tdate": {
+                                "submittedDate_tdate": {
                                     "gte": dateFrom,
                                     "lt": dateTo
                                 }
@@ -716,7 +752,7 @@ def search(request):
 
     date_param = {
         "aggs" : {
-           "min_date": {"min": {"field": "publicationDate_tdate"}},
+           "min_date": {"min": {"field": "submittedDate_tdate"}},
         }
     }
 
@@ -856,12 +892,12 @@ def terminology(request):
     if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
-    # Get first publicationDate_tdate date
+    # Get first submittedDate_tdate date
     if type == "rsr":
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"authIdHal_s": entity['halId_s']}
@@ -871,7 +907,7 @@ def terminology(request):
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"labStructId_i": entity['halStructId']}
@@ -879,7 +915,7 @@ def terminology(request):
         }
 
     res = es.search(index="documents", body=start_date_param)
-    start_date = res['hits']['hits'][0]['_source']['publicationDate_tdate']
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
@@ -1106,9 +1142,10 @@ def validateCredentials(request):
             halId_s = request.POST.get("f_halId_s")
             halId_i = request.POST.get("f_halId_i")
             idRef = request.POST.get("f_IdRef")
+            orcId = request.POST.get("f_orcId")
 
             es.update(index="researchers", refresh='wait_for', id=id,
-                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef}})
+                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef, "orcId": orcId}})
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
@@ -1258,12 +1295,12 @@ def wordcloud(request):
     if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
-    # Get first publicationDate_tdate date
+    # Get first submittedDate_tdate date
     if type == "rsr":
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"authIdHal_s": entity['halId_s']}
@@ -1273,7 +1310,7 @@ def wordcloud(request):
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"labStructId_i": entity['halStructId']}
@@ -1281,7 +1318,7 @@ def wordcloud(request):
         }
 
     res = es.search(index="documents", body=start_date_param)
-    start_date = res['hits']['hits'][0]['_source']['publicationDate_tdate']
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
@@ -1395,12 +1432,12 @@ def publicationboard(request):
     if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
-    # Get first publicationDate_tdate date
+    # Get first submittedDate_tdate date
     if type == "rsr":
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"authIdHal_s": entity['halId_s']}
@@ -1410,7 +1447,7 @@ def publicationboard(request):
         start_date_param = {
             "size": 1,
             "sort": [
-                {"publicationDate_tdate": {"order": "asc"}}
+                {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
                 "match_phrase": {"labStructId_i": entity['halStructId']}
@@ -1418,7 +1455,7 @@ def publicationboard(request):
         }
 
     res = es.search(index="documents", body=start_date_param)
-    start_date = res['hits']['hits'][0]['_source']['publicationDate_tdate']
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
