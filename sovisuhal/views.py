@@ -341,7 +341,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": False
+                                "validated": True
                             }
                         }
                     ]
@@ -361,7 +361,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": False
+                                "validated": True
                             }
                         }
                     ]
