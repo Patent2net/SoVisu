@@ -778,9 +778,18 @@ def search(request):
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
-        search_param = {
-            "query":{"bool":{"must": [{"query_string": {"query": search}}],"filter":[{"match":{"validated":"true"}}]}}
-        }
+        if index == 'documents':
+            search_param = {
+                "query":{"bool":{"must": [{"query_string": {"query": search}}],"filter":[{"match":{"validated":"true"}}]}}
+            }
+        elif index=='researchers':
+            search_param = {
+               "query": {"query_string": {"query": search}}
+            }
+        else:
+            search_param = {
+               "query": {"query_string": {"query": search}}
+            }
 
         p_res = es.count(index=index, body=search_param)
         res = es.search(index=index, body=search_param, size=p_res['count'])
@@ -789,7 +798,7 @@ def search(request):
 
         for result in res['hits']['hits']:
             res_cleaned.append(result['_source'])
-
+        messages.add_message(request, messages.INFO, 'Résultats de la recherche "{}" dans la collection "{}"'.format(search,index))
         return render(request, 'search.html', {'form': forms.search(val=search), 'count': p_res['count'], 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'", 'filter': search, 'index': index, 'search': search,'results': res_cleaned, 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'from': dateFrom, 'to': dateTo})
 
 
