@@ -340,7 +340,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": False
+                                "validated": True
                             }
                         }
                     ]
@@ -360,7 +360,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": False
+                                "validated": True
                             }
                         }
                     ]
@@ -668,18 +668,18 @@ def check(request):
     elif data == "expertise":
 
         concepts = []
-
-        for children in entity['concepts']['children']:
-            if 'state' not in children:
-                concepts.append({'id': children['id'], 'label_fr': children['label_fr']})
-            if 'children' in children:
-                for children1 in children['children']:
-                    if 'state' not in children1:
-                        concepts.append({'id': children1['id'], 'label_fr': children1['label_fr']})
-                    if 'children' in children1:
-                        for children2 in children1['children']:
-                            if 'state' not in children2:
-                                concepts.append({'id': children2['id'], 'label_fr': children2['label_fr']})
+        if 'children' in entity['concepts']:
+            for children in entity['concepts']['children']:
+                if 'state' not in children:
+                    concepts.append({'id': children['id'], 'label_fr': children['label_fr']})
+                if 'children' in children:
+                    for children1 in children['children']:
+                        if 'state' not in children1:
+                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr']})
+                        if 'children' in children1:
+                            for children2 in children1['children']:
+                                if 'state' not in children2:
+                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr']})
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
