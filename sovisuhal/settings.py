@@ -17,8 +17,8 @@ from decouple import config
 
 mode = 'dev'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR = Path(__file__).resolve().parent
+print (BASE_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 # with open ('../config/SoVisu/secretDjango', 'r') as fic:
@@ -27,32 +27,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
+DEBUG = config ('DJANGO_DEBUG') != 'False'
 
 if mode == 'Prod':
     SECRET_KEY = config ('DjangoKey')
+    # Settings used by Uniauth
+    LOGIN_URL = '/accounts/login/'
+    PASSWORD_RESET_TIMEOUT_DAYS = 3
+    UNIAUTH_ALLOW_SHARED_EMAILS = True
+    UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
+    UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
+    UNIAUTH_LOGIN_DISPLAY_STANDARD = True
+    UNIAUTH_LOGIN_DISPLAY_CAS = True
+    UNIAUTH_LOGIN_REDIRECT_URL = '/'  # + uniauth_profile.id
+    UNIAUTH_LOGOUT_CAS_COMPLETELY = True
+    UNIAUTH_LOGOUT_REDIRECT_URL = None
+    UNIAUTH_MAX_LINKED_EMAILS = 20
+    UNIAUTH_PERFORM_RECURSIVE_MERGING = True
 else:
     SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
+    DEBUG = 'True'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = config ('DJANGO_DEBUG') != 'False'
+
 ALLOWED_HOSTS = ['*']
-
-
-# Settings used by Uniauth
-LOGIN_URL = '/accounts/login/'
-PASSWORD_RESET_TIMEOUT_DAYS = 3
-UNIAUTH_ALLOW_SHARED_EMAILS = True
-UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
-UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
-UNIAUTH_LOGIN_DISPLAY_STANDARD = True
-UNIAUTH_LOGIN_DISPLAY_CAS = True
-UNIAUTH_LOGIN_REDIRECT_URL = '/dashboard/?type=rsr&id=' # + uniauth_profile.id
-UNIAUTH_LOGOUT_CAS_COMPLETELY = True
-UNIAUTH_LOGOUT_REDIRECT_URL = None
-UNIAUTH_MAX_LINKED_EMAILS = 20
-UNIAUTH_PERFORM_RECURSIVE_MERGING = True
-
 
 # Application definition
 
@@ -64,7 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'uniauth'
+    #'uniauth'
 ]
 
 MIDDLEWARE = [
@@ -78,13 +76,9 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    #'django.contrib.auth.backends.ModelBackend',
-    'uniauth.backends.CASBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    #'uniauth.backends.CASBackend',
 ]
-
-LOGIN_URL = "/accounts/login/"
-UNIAUTH_LOGIN_DISPLAY_STANDARD = False
-UNIAUTH_LOGOUT_CAS_COMPLETELY = True
 
 ROOT_URLCONF = 'sovisuhal.urls'
 
@@ -153,6 +147,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join('static'),)
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_ROOT = BASE_DIR
 
 # EMAIL Setup
 # https://docs.djangoproject.com/en/3.1/topics/email/
