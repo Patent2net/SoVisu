@@ -27,10 +27,11 @@ print (BASE_DIR)
 # SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
-DEBUG = config ('DJANGO_DEBUG') != 'False'
+
 
 if mode == 'Prod':
     SECRET_KEY = config ('DjangoKey')
+    DEBUG = config('DJANGO_DEBUG')
     # Settings used by Uniauth
     LOGIN_URL = '/accounts/login/'
     PASSWORD_RESET_TIMEOUT_DAYS = 3
