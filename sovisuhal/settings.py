@@ -33,18 +33,18 @@ if mode == 'Prod':
     SECRET_KEY = config ('DjangoKey')
     DEBUG = config('DJANGO_DEBUG')
     # Settings used by Uniauth
-    LOGIN_URL = '/accounts/login/'
-    PASSWORD_RESET_TIMEOUT_DAYS = 3
-    UNIAUTH_ALLOW_SHARED_EMAILS = True
-    UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
-    UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
-    UNIAUTH_LOGIN_DISPLAY_STANDARD = True
-    UNIAUTH_LOGIN_DISPLAY_CAS = True
-    UNIAUTH_LOGIN_REDIRECT_URL = '/'  # + uniauth_profile.id
-    UNIAUTH_LOGOUT_CAS_COMPLETELY = True
-    UNIAUTH_LOGOUT_REDIRECT_URL = None
-    UNIAUTH_MAX_LINKED_EMAILS = 20
-    UNIAUTH_PERFORM_RECURSIVE_MERGING = True
+    # LOGIN_URL = '/accounts/login/'
+    # PASSWORD_RESET_TIMEOUT_DAYS = 3
+    # UNIAUTH_ALLOW_SHARED_EMAILS = True
+    # UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
+    # UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
+    # UNIAUTH_LOGIN_DISPLAY_STANDARD = True
+    # UNIAUTH_LOGIN_DISPLAY_CAS = True
+    # UNIAUTH_LOGIN_REDIRECT_URL = '/'  # + uniauth_profile.id
+    # UNIAUTH_LOGOUT_CAS_COMPLETELY = True
+    # UNIAUTH_LOGOUT_REDIRECT_URL = None
+    # UNIAUTH_MAX_LINKED_EMAILS = 20
+    # UNIAUTH_PERFORM_RECURSIVE_MERGING = True
 else:
     SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
     DEBUG = 'True'
@@ -148,9 +148,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join('static'),)
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = BASE_DIR
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # EMAIL Setup
 # https://docs.djangoproject.com/en/3.1/topics/email/
