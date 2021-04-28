@@ -15,10 +15,10 @@ import os
 from decouple import config
 
 
-mode = 'dev'
+mode = 'Prod'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
-print (BASE_DIR)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 # with open ('../config/SoVisu/secretDjango', 'r') as fic:
