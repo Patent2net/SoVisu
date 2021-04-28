@@ -39,6 +39,7 @@ urlpatterns = [
 
     path('faq/', views.faq, name='faq'),
     path('ressources/', views.ressources, name='ressources'),
+    path('tools/', views.tools, name='tools'),
     path('contact/', views.contact, name='contact'),
 
 
