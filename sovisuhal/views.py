@@ -1210,6 +1210,9 @@ def faq(request):
 def ressources(request):
     return render(request, 'ressources.html')
 
+def tools(request):
+    return render(request, 'tools.html')
+
 def presentation(request):
     return render(request, 'presentation.html')
 
