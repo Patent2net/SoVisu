@@ -264,7 +264,7 @@
 
                 <div class="w-full" id="tree" style="overflow-y: scroll;"></div>
 
-                <div class="selected-doms flex justify-between absolute bottom-0 left-0 right-0 pl-2 pr-2">
+                <div class="selected-doms flex justify-between absolute bottom-0 right-0 pl-2 pr-2">
                     <div class="dt-bottom-infos-rplc flex justify-between items-center">
                         <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate-doms outline-none">Valider</button>
                     </div>
@@ -307,8 +307,6 @@
 
         function refreshHlPath() {
             for( var i = 0; i < entityDomainsFull.length; i++){
-                            console.log(entityDomainsFull[i])
-                            console.log($('path.' + entityDomainsFull[i]))
                             $('path.' + entityDomainsFull[i]).attr("stroke", "green");
                         }
         }
