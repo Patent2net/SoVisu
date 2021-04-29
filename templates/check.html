@@ -284,6 +284,34 @@
 
         var selectedDoms = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
         var entityDomains = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
+        entityDomains = entityDomains.filter(item => item);
+
+        var entityDomainsFull = [];
+
+        console.log(entityDomains)
+
+        for( var i = 0; i < entityDomains.length; i++){
+            entityDomainsTmp = entityDomains[i].split('.')
+
+            entityDomainsFull.push('to-' + entityDomainsTmp[0])
+            entityDomainsFull.push('to-' + entityDomains[i].replace('.', '_'))
+        }
+
+        function onlyUnique(value, index, self) {
+          return self.indexOf(value) === index;
+        }
+
+        var entityDomainsFull = entityDomainsFull.filter(onlyUnique);
+
+        console.log(entityDomainsFull)
+
+        function refreshHlPath() {
+            for( var i = 0; i < entityDomainsFull.length; i++){
+                            console.log(entityDomainsFull[i])
+                            console.log($('path.' + entityDomainsFull[i]))
+                            $('path.' + entityDomainsFull[i]).attr("stroke", "green");
+                        }
+        }
 
 
     {% if data == "guiding-domains" %}
