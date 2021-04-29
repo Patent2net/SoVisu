@@ -42,6 +42,7 @@ urlpatterns = [
     path('tools/', views.tools, name='tools'),
     path('contact/', views.contact, name='contact'),
 
+    path('help/', views.help, name='help'),
 
     path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
     path('validate_references/', views.validateReferences, name='validate_references'),

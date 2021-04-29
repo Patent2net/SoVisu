@@ -38,6 +38,9 @@ def index(request):
 def unknown(request):
     return render(request, '404.html')
 
+def help(request):
+    return render(request, 'help.html')
+
 # Pages
 
 def cs_index(request):
