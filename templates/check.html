@@ -282,8 +282,8 @@
 
 <script>
 
-        var selectedDoms = []
-        var entityDomains = ['chim.chem']
+        var selectedDoms = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
+        var entityDomains = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
 
 
     {% if data == "guiding-domains" %}
@@ -491,7 +491,7 @@
 
         $('.validate-doms').click( function () {
 
-            var form = $('<form action="/validate_domains/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+            var form = $('<form action="/validate_guiding-domains/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
                 '{% csrf_token %}' +
                 '<input type="text" name="toValidate" value="' + selectedDoms + '" />' +
                 '</form>');

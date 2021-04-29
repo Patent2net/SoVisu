@@ -46,6 +46,7 @@ urlpatterns = [
     path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
     path('validate_references/', views.validateReferences, name='validate_references'),
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
+    path('validate_guiding-domains/', views.validateGuidingDomains, name='validate_guiding-domains'),
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
