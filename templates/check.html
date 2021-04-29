@@ -23,10 +23,10 @@
 
                 <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
                     {% if entity.halStructId %}
-                    <a class="px-2 pb-1
+                        <a class="px-2 pb-1
                         {% if data == "state" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
-                    >État du laboratoire</a>
+                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
+                        >État du laboratoire</a>
                     {% endif %}
                     <a class="px-2 pb-1
                         {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -43,16 +43,20 @@
                     <a class="px-2 pb-1
                         {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
-                    >Vocabulaire orienteur</a>
+                    >Mots-clés orienteurs</a>
+                    <a class="px-2 pb-1
+                        {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
+                    >Domaines orienteurs</a>
                 </h1>
 
 
 
             </div>
 
-        {% if data == "state" %}
+            {% if data == "state" %}
 
-            <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -90,7 +94,7 @@
 
                 </div>
 
-        {% endif %}
+            {% endif %}
 
             {% if data == -1 or data == "credentials" %}
 
@@ -256,13 +260,247 @@
 
             {% endif %}
 
+            {% if data == "guiding-domains" %}
+
+                <div class="w-full" id="tree" style="overflow-y: scroll;"></div>
+
+                <div class="selected-doms flex justify-between absolute bottom-0 left-0 right-0 pl-2 pr-2">
+                    <div class="dt-bottom-infos-rplc flex justify-between items-center">
+                        <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate-doms outline-none">Valider</button>
+                    </div>
+                </div>
+
+            {% endif %}
+
         </div>
 
     </div>
 
 </div>
 
+
+
 <script>
+
+        var selectedDoms = []
+        var entityDomains = ['chim.chem']
+
+
+    {% if data == "guiding-domains" %}
+
+        function graph(rootData = root) {
+
+            // using the cell value for data, instead of passing as a variable
+            // to try out the "include with" style of templating
+            const root = rootData;
+
+            root.x0 = dy / 2;
+            root.y0 = 0;
+            root.descendants().forEach((d, i) => {
+                d.id = i;
+                d._children = d.children;
+                if (d.depth >= initDepth) d.children = null;
+                //if (d.depth && d.data.name.length !== 3) d.children = null;
+            });
+
+            const svg = d3
+                .select("#tree")
+                .append("svg")
+                .attr("viewbox", [-margin.left, -margin.top, width, dx])
+                .style("font", "11px sans-serif")
+                .style("user-select", "none");
+
+            const gLink = svg
+                .append("g")
+                .attr("fill", "none")
+                .attr("stroke", "#BFDBFE")
+                .attr("stroke-opacity", 0.4)
+                .attr("stroke-width", 1.5);
+
+            const gNode = svg
+                .append("g")
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+            function update(source) {
+                const duration = d3.event && d3.event.altKey ? 2500 : 250; // eh what?
+                const nodes = root.descendants().reverse();
+                const links = root.links();
+
+                // calc the new tree layout
+                tree(root);
+
+                let left = root;
+                let right = root;
+                root.eachBefore(node => {
+                    if (node.x < left.x) left = node;
+                    if (node.x > right.x) right = node;
+                });
+
+                const height = right.x - left.x + margin.top + margin.bottom;
+                // const height = $('#tree').height();
+
+                // transition the size of the viewbox, i think
+                const transition = svg
+                    .transition()
+                    .duration(duration)
+                    .attr("viewBox", [-margin.left, left.x - margin.top, width, height])
+                    .tween(
+                        "resize",
+                        window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
+                    );
+
+                // Update the nodes…
+                const node = gNode.selectAll("g").data(nodes, d => d.id);
+
+                // Enter any new nodes at the parent's previous position.
+                const nodeEnter = node
+                    .enter()
+                    .append("g")
+                    .attr("transform", d => `translate(${source.y0},${source.x0})`)
+                    .attr("fill-opacity", 0)
+                    .attr("stroke-opacity", 0)
+                    .on("click", d => {
+
+                        if (d.data.children.length == 0) {
+                            if ($('text.'+ d.data.id.replace('.','-')).hasClass('dom-selected')) {
+                                for( var i = 0; i < selectedDoms.length; i++){
+                                    if ( selectedDoms[i] === d.data.id) {
+                                        selectedDoms.splice(i, 1);
+                                    }
+                                }
+                                $('text.'+ d.data.id.replace('.','-')).removeClass('dom-selected')
+                            } else {
+                                selectedDoms.push(d.data.id);
+                                $('text.'+ d.data.id.replace('.','-')).addClass('dom-selected')
+                            }
+
+                        }
+
+                        d.children = d.children ? null : d._children;
+                        update(d);
+                    });
+
+                nodeEnter
+                    .append("circle")
+                    .attr("r", 2.5)
+                    .attr("fill", d => (d._children ? "#555" : "#bbb"))
+                    .attr("stroke-width", 10);
+
+                nodeEnter
+                    .append("text")
+                    .attr('class', d => {
+                        if (entityDomains.includes(d.data.id)) {
+                            return 'dom-selected ' + d.data.id.replace('.','-');
+                        }
+                        return d.data.id.replace('.','-');
+                    })
+                    .attr("dy", "0.31em")
+                    .attr("x", d => (d._children ? -6 : 6))
+                    .attr("text-anchor", d => (d._children ? "end" : "start"))
+                    .text(d => d.data.label_fr)
+                    .attr("fill", "#374151")
+                    .clone(true)
+                    .lower()
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-width", 3)
+                    .attr("stroke", "white");
+
+                // Transition nodes to their new position.
+                const nodeUpdate = node
+                    .merge(nodeEnter)
+                    .transition(transition)
+                    .attr("transform", d => `translate(${d.y},${d.x})`)
+                    .attr("fill-opacity", 1)
+                    .attr("font-style", d => (d._children ? "normal" : "italic"))
+                    .attr("stroke-opacity", 1);
+
+                // Transition exiting nodes to the parent's new position.
+                const nodeExit = node
+                    .exit()
+                    .transition(transition)
+                    .remove()
+                    .attr("transform", d => `translate(${source.y},${source.x})`)
+                    .attr("fill-opacity", 0)
+                    .attr("stroke-opacity", 0);
+
+                // Update the links…
+                const link = gLink.selectAll("path").data(links, d => d.target.id);
+
+                // Enter any new links at the parent's previous position.
+                const linkEnter = link
+                    .enter()
+                    .append("path")
+                    .attr("class", d => {
+                        return('to-' + d.target.data.id.split('.').join('_'))
+                    })
+                    .attr("d", d => {
+                        const o = { x: source.x0, y: source.y0 };
+                        return diagonal({ source: o, target: o });
+                    });
+
+                // Transition links to their new position.
+                link
+                    .merge(linkEnter)
+                    .transition(transition)
+                    .attr("d", diagonal);
+
+                // Transition exiting nodes to the parent's new position.
+                link
+                    .exit()
+                    .transition(transition)
+                    .remove()
+                    .attr("d", d => {
+                        const o = { x: source.x, y: source.y };
+                        return diagonal({ source: o, target: o });
+                    });
+
+                // Stash the old positions for transition.
+                root.eachBefore(d => {
+                    d.x0 = d.x;
+                    d.y0 = d.y;
+                });
+            }
+
+            update(root);
+            $('#tree').height($('#tree-up-details').height() + 12)
+            return svg.node();
+        }
+
+        width = $('#tree').width();
+
+        data = {% autoescape off %}{{ domains }}{% endautoescape %};
+        data["label"] = "Concepts"
+
+        if(data.length == 1) {
+            data = data[0]
+            data["label"] = "Concepts"
+        }
+
+        root = d3.hierarchy(data);
+        dx = 20
+        dy = width / 4
+        tree = d3.tree().nodeSize([dx, dy])
+        diagonal = d3
+            .linkHorizontal()
+            .x(d => d.y)
+            .y(d => d.x)
+        margin = ({ top: 12, right: 12, bottom: 12, left: 3 })
+        initDepth = 1
+        graph()
+
+        $('.validate-doms').click( function () {
+
+            var form = $('<form action="/validate_domains/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                '{% csrf_token %}' +
+                '<input type="text" name="toValidate" value="' + selectedDoms + '" />' +
+                '</form>');
+
+            form.appendTo('body').hide()
+            form.submit();
+        } );
+
+    {% endif %}
 
     /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
