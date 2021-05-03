@@ -295,13 +295,12 @@
 
         var entityDomainsFull = [];
 
-        console.log(entityDomains)
 
         for( var i = 0; i < entityDomains.length; i++){
             entityDomainsTmp = entityDomains[i].split('.')
 
             entityDomainsFull.push('to-' + entityDomainsTmp[0])
-            entityDomainsFull.push('to-' + entityDomains[i].replace('.', '_'))
+            entityDomainsFull.push('to-' + entityDomains[i].replaceAll('.', '_'))
         }
 
         function onlyUnique(value, index, self) {
@@ -309,8 +308,6 @@
         }
 
         var entityDomainsFull = entityDomainsFull.filter(onlyUnique);
-
-        console.log(entityDomainsFull)
 
         function refreshHlPath() {
             for( var i = 0; i < entityDomainsFull.length; i++){
@@ -396,16 +393,16 @@
                     .on("click", d => {
 
                         if (d.data.children.length == 0) {
-                            if ($('text.'+ d.data.id.replace('.','-')).hasClass('dom-selected')) {
+                            if ($('text.'+ d.data.id.replaceAll('.','-')).hasClass('dom-selected')) {
                                 for( var i = 0; i < selectedDoms.length; i++){
                                     if ( selectedDoms[i] === d.data.id) {
                                         selectedDoms.splice(i, 1);
                                     }
                                 }
-                                $('text.'+ d.data.id.replace('.','-')).removeClass('dom-selected')
+                                $('text.'+ d.data.id.replaceAll('.','-')).removeClass('dom-selected')
                             } else {
                                 selectedDoms.push(d.data.id);
-                                $('text.'+ d.data.id.replace('.','-')).addClass('dom-selected')
+                                $('text.'+ d.data.id.replaceAll('.','-')).addClass('dom-selected')
                             }
 
                         }
@@ -424,9 +421,9 @@
                     .append("text")
                     .attr('class', d => {
                         if (entityDomains.includes(d.data.id)) {
-                            return 'dom-selected ' + d.data.id.replace('.','-');
+                            return 'dom-selected ' + d.data.id.replaceAll('.','-');
                         }
-                        return d.data.id.replace('.','-');
+                        return d.data.id.replaceAll('.','-');
                     })
                     .attr("dy", "0.31em")
                     .attr("x", d => (d._children ? -6 : 6))
