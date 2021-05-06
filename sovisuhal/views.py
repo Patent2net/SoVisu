@@ -1165,10 +1165,12 @@ def invalidateConcept(request):
             }
         }
 
-        index = '*-researchers'
 
         res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
+
+        index = struct + '-' + entity['labHalId'] + '-researchers'
+
 
     elif type == "lab":
         scope_param = {
@@ -1183,6 +1185,8 @@ def invalidateConcept(request):
 
         res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
+
+        index = struct + '-' + id + 'laboratories'
     # /
 
     if request.method == 'POST':
