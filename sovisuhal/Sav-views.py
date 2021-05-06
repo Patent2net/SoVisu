@@ -5,18 +5,21 @@ import json
 from . import forms
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from django.core.mail import mail_admins
+from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
-
+from decouple import config
 from django.contrib import messages
+#from ssl import create_default_context
+#from elasticsearch.connection import create_ssl_context
+from uniauth.decorators import login_required
 
-Mode = 'Pr'
+Mode = 'Prod'
+
 def esConnector(mode = Mode):
     if mode == "Prod":
-        with open("../../stackELK/secrets/secretEs.txt", "r") as fic:
-            secret = fic.read()
-            secret = secret.strip()
-        #context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
+
+        secret = config ('ELASTIC_PASSWORD')
+        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
         es = Elasticsearch('localhost',
             http_auth=('elastic', secret),
             scheme="http",
@@ -27,6 +30,7 @@ def esConnector(mode = Mode):
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     return es
 
+#@login_required
 def index(request):
     return redirect('dashboard')
 
@@ -94,7 +98,6 @@ def cs_index(request):
     # /
 
     return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
-
 
 def dashboard(request):
     # Get parameters
@@ -337,7 +340,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": False
+                                "validated": True
                             }
                         }
                     ]
@@ -357,7 +360,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": False
+                                "validated": True
                             }
                         }
                     ]
@@ -404,6 +407,11 @@ def references(request):
                         {
                             "bool": {
                                 "must": [
+                                    {
+                                        "match_phrase": {
+                                            "validated": True,
+                                        }
+                                    },
                                     {
                                         "match_phrase": {
                                             ext_key: entity[key],
@@ -461,6 +469,11 @@ def references(request):
                         {
                             "bool": {
                                 "must": [
+                                    {
+                                        "match_phrase": {
+                                            "validated": True,
+                                        }
+                                    },
                                     {
                                         "match_phrase": {
                                             ext_key: entity[key]
@@ -606,14 +619,40 @@ def check(request):
         dateTo = datetime.today().strftime('%Y-%m-%d')
     # /
 
+    if data == "state":
+        rsr_param = {
+            "query": {
+                "match": {
+                    "labHalId": id
+                }
+            }
+        }
+        count = es.count(index="researchers", body=rsr_param)['count']
+
+        rsrs = es.search(index="researchers", body=rsr_param, size=count)
+
+        rsrs_cleaned = []
+
+        for result in rsrs['hits']['hits']:
+            rsrs_cleaned.append(result['_source'])
+
+        return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                              'entity': entity,
+                                              'researchers': rsrs_cleaned,
+                                              'startDate': start_date,
+                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+
     if data == "-1" or data == "credentials":
 
         if type == "rsr":
+            orcId = ''
+            if 'orcId' in entity:
+                orcId = entity['orcId']
+
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 halId_i=entity['halId_i'],
-                                                                                 idRef=entity['idRef']),
+                                                                                 idRef=entity['idRef'], orcId=orcId),
                                                   'startDate': start_date,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -629,18 +668,18 @@ def check(request):
     elif data == "expertise":
 
         concepts = []
-
-        for children in entity['concepts']['children']:
-            if 'state' not in children:
-                concepts.append({'id': children['id'], 'label_fr': children['label_fr']})
-            if 'children' in children:
-                for children1 in children['children']:
-                    if 'state' not in children1:
-                        concepts.append({'id': children1['id'], 'label_fr': children1['label_fr']})
-                    if 'children' in children1:
-                        for children2 in children1['children']:
-                            if 'state' not in children2:
-                                concepts.append({'id': children2['id'], 'label_fr': children2['label_fr']})
+        if 'children' in entity['concepts']:
+            for children in entity['concepts']['children']:
+                if 'state' not in children:
+                    concepts.append({'id': children['id'], 'label_fr': children['label_fr']})
+                if 'children' in children:
+                    for children1 in children['children']:
+                        if 'state' not in children1:
+                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr']})
+                        if 'children' in children1:
+                            for children2 in children1['children']:
+                                if 'state' not in children2:
+                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr']})
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
@@ -738,9 +777,18 @@ def search(request):
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
-        search_param = {
-            "query": {"query_string": {"query": search}}
-        }
+        if index == 'documents':
+            search_param = {
+                "query":{"bool":{"must": [{"query_string": {"query": search}}],"filter":[{"match":{"validated":"true"}}]}}
+            }
+        elif index=='researchers':
+            search_param = {
+               "query": {"query_string": {"query": search}}
+            }
+        else:
+            search_param = {
+               "query": {"query_string": {"query": search}}
+            }
 
         p_res = es.count(index=index, body=search_param)
         res = es.search(index=index, body=search_param, size=p_res['count'])
@@ -749,7 +797,7 @@ def search(request):
 
         for result in res['hits']['hits']:
             res_cleaned.append(result['_source'])
-
+        messages.add_message(request, messages.INFO, 'Résultats de la recherche "{}" dans la collection "{}"'.format(search,index))
         return render(request, 'search.html', {'form': forms.search(val=search), 'count': p_res['count'], 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'", 'filter': search, 'index': index, 'search': search,'results': res_cleaned, 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'from': dateFrom, 'to': dateTo})
 
 
@@ -1103,9 +1151,10 @@ def validateCredentials(request):
             halId_s = request.POST.get("f_halId_s")
             halId_i = request.POST.get("f_halId_i")
             idRef = request.POST.get("f_IdRef")
+            orcId = request.POST.get("f_orcId")
 
             es.update(index="researchers", refresh='wait_for', id=id,
-                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef}})
+                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef, "orcId": orcId}})
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
@@ -1159,6 +1208,9 @@ def faq(request):
 
 def ressources(request):
     return render(request, 'ressources.html')
+
+def tools(request):
+    return render(request, 'tools.html')
 
 def presentation(request):
     return render(request, 'presentation.html')
@@ -1441,16 +1493,32 @@ def contact(request):
     if request.method == 'POST':
         f = ContactForm(request.POST)
         if f.is_valid():
+            # send message to admin
             name = f.cleaned_data['nom']
-            subject = "Vous avez reçu une demande de {}:<{}>".format(name, f.cleaned_data['email'])
+            usermail=[f.cleaned_data['email']]
+            subject = "Vous avez reçu une demande de {}:<{}>".format(name, usermail)
+
+
 
             message = "Objet: {}\n\nDate: {}\n\nMessage:\n\n {}".format(
                 dict(f.purpose_choices).get(f.cleaned_data['objet']),
-                datetime.now(),
+                datetime.now().isoformat(timespec='minutes'),
                 f.cleaned_data['message']
             )
 
             mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
+
+            # /
+
+            # send confirmation message to user
+
+            conf_subject ="Confirmation de reception du ticket:{}".format(dict(f.purpose_choices).get(f.cleaned_data['objet'])
+            )
+
+            conf_message="Bonjour {},\nCeci est un message automatisé pour vous informer que votre ticket a bien été reçu.\n\n{}".format(name,message)
+
+            send_mail(conf_subject,conf_message,'testsovis@gmail.com',usermail,fail_silently = False)
+            # /
 
             messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
             f = ContactForm()
