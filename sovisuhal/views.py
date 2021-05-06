@@ -66,8 +66,8 @@ def cs_index(request):
             }
         }
 
-        count = es.count(index="*-laboratories", body=scope_param)['count']
-        res = es.search(index="*-laboratories", body=scope_param, size=count)
+        count = es.count(index=struct +"*-laboratories", body=scope_param)['count']
+        res = es.search(index= struct + "*-laboratories", body=scope_param, size=count)
         entities = res['hits']['hits']
 
     elif type == "rsr":
@@ -79,7 +79,7 @@ def cs_index(request):
                 }
             }
 
-            count = es.count(index="*-researchers", body=scope_param)['count']
+            count = es.count(index=struct +"*-researchers", body=scope_param)['count']
 
         else:
             scope_param = {
@@ -90,9 +90,9 @@ def cs_index(request):
                 }
             }
 
-            count = es.count(index="*-researchers", body=scope_param)['count']
+            count = es.count(index=struct +"*-researchers", body=scope_param)['count']
 
-        res = es.search(index="*-researchers", body=scope_param, size=count)
+        res = es.search(index=struct +"*-researchers", body=scope_param, size=count)
         entities = res['hits']['hits']
 
     cleaned_entities = []
@@ -132,7 +132,7 @@ def dashboard(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index=struct +"*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -147,7 +147,7 @@ def dashboard(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index=struct +"*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -1183,7 +1183,7 @@ def invalidateConcept(request):
 
         index = '*-laboratories'
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index=struct +"*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
         index = struct + '-' + id + 'laboratories'
@@ -1256,7 +1256,7 @@ def validateCredentials(request):
                 }
             }
 
-            res = es.search(index="*-researchers", body=scope_param)
+            res = es.search(index=struct +"*-researchers", body=scope_param)
             entity = res['hits']['hits'][0]['_source']
 
             print(struct + "-" + entity['labHalId'] + '-researchers')
@@ -1311,7 +1311,7 @@ def validateGuidingKeywords(request):
                 }
             }
 
-            res = es.search(index="*-researchers", body=scope_param)
+            res = es.search(index=struct +"*-researchers", body=scope_param)
             entity = res['hits']['hits'][0]['_source']
 
             es.update(index=struct + "-" +  entity['labHalId'] +  "-researchers", refresh='wait_for', id=id,
@@ -1363,7 +1363,7 @@ def wordcloud(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index=struct +"*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -1378,7 +1378,7 @@ def wordcloud(request):
         key = "halStructId"
         ext_key = "labStructId_i"
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index=struct +"*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -1449,7 +1449,7 @@ def wordcloud(request):
             }
         }
 
-    res = es.search(index="*-documents", body=start_date_param)
+    res = es.search(index=struct +"*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1500,7 +1500,7 @@ def publicationboard(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index=struct +"*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -1515,7 +1515,7 @@ def publicationboard(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index=struct +"*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -1586,7 +1586,7 @@ def publicationboard(request):
             }
         }
 
-    res = es.search(index="*-documents", body=start_date_param)
+    res = es.search(index=struct +"*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
