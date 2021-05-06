@@ -13,7 +13,7 @@ from django.contrib import messages
 #from elasticsearch.connection import create_ssl_context
 from uniauth.decorators import login_required
 
-Mode = 'DEV'
+Mode = config ('mode')
 
 struct = "198307662"
 
