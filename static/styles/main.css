@@ -144,7 +144,10 @@ table.dataTable tbody tr.selected td:first-child {
       }
 }
 
-
+.dom-selected {
+    fill: #DC2626;
+    font-weight: 600;
+}
 
 .dataTables_scrollBody::-webkit-scrollbar, #tree::-webkit-scrollbar {
     width: 4px;
