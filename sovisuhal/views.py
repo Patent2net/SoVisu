@@ -9,11 +9,11 @@ from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
 from decouple import config
 from django.contrib import messages
-from ssl import create_default_context
-from elasticsearch.connection import create_ssl_context
+#from ssl import create_default_context
+#from elasticsearch.connection import create_ssl_context
 from uniauth.decorators import login_required
 
-Mode = 'dev'
+Mode = 'DEV'
 
 struct = "198307662"
 
@@ -32,7 +32,7 @@ def esConnector(mode = Mode):
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     return es
 
-@login_required
+#@login_required
 def index(request):
     return redirect('dashboard')
 
@@ -103,7 +103,6 @@ def cs_index(request):
     # /
 
     return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
-
 
 def dashboard(request):
     # Get parameters
