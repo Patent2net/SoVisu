@@ -12,6 +12,7 @@ class validCredentials(forms.Form):
         super(validCredentials,self).__init__(*args,**kwargs)
 
         self.fields['f_halId_s'].initial = halId_s
+        self.fields['f_halId_s'].disabled = True
         self.fields['f_IdRef'].initial = idRef
         self.fields['f_orcId'].initial = orcId
         self.fields['f_more'].initial = '0'
@@ -33,6 +34,7 @@ class validLabCredentials(forms.Form):
 
         # Set choices from argument.
         self.fields['f_halStructId'].initial = halStructId
+        self.fields['f_halStructId'].disabled = True
         self.fields['f_rsnr'].initial = rsnr
         self.fields['f_IdRef'].initial = idRef
 
