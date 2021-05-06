@@ -1,0 +1,443 @@
+{% include "includes/header.html" with title="Vérification des données" %}
+{% load widget_tweaks %}
+
+<div class="h-full w-full flex">
+
+    {% include "includes/menu.html" with title="Vérification des données" %}
+
+    <div class="w-full h-full relative p-3" style="background: #fafbfd;">
+
+        <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
+            <div class="absolute inset-center text-sm flex">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Chargement des données
+            </div>
+        </div>
+
+        <div class="flex flex-col bg-white rounded h-full relative" style="border: 1px solid rgb(211, 218, 230); padding: 6px 8px">
+
+            <div class="flex justify-between items-start">
+
+                <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+                    <a class="pl-0 px-2 pb-1
+                        {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
+                    >Identifiants</a>
+                    <a class="px-2 pb-1
+                        {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
+                    >Références</a>
+                    <a class="px-2 pb-1
+                        {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise"
+                    >Expertise</a>
+                    <a class="pr-0 px-2 pb-1
+                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
+                    >Mots-clés orienteurs</a>
+                </h1>
+
+
+
+            </div>
+
+            {% if data == -1 or data == "credentials" %}
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <ul>
+                        <li>Dans cet onglet, vous devez vérifier renseigner ou corriger vos identifiants externes. Ces id seront utilisés pour la collecte de données. </li>
+                        <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le vérifier : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site prévu à cet effet</a></li>
+                        <li><strong>L'OrcId</strong> est un identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>.</li>
+                        <li>Enfin <strong>l'IdHal</strong> est <a href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline" target="_blank">l'identifiant sur l'archive nationnale Hal</a>. Ce dernier identifiant permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer les différentes formes auteur. Les trois sont à relier.</li>
+                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... vous pouvez les saisir dans le champ prévu à cet effet séparés par des point-virgules (<i> ; </i>). </li>
+
+                    </ul>
+
+                </div>
+
+                <form action="/validate_credentials/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
+                    {% csrf_token %}
+                    {% for field in form.visible_fields %}
+                        <div>
+                            {% if field.auto_id == "id_f_more" %}
+                                {% render_field field class="hidden" %}
+                            {% else %}
+                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+
+                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
+                </form>
+
+            {% endif %}
+
+            {% if data == "expertise" %}
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <p>Cet onglet vous permet de supprimer des domaines qui ne composeraient pas votre portefeuille d'expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
+
+                </div>
+
+                <div class="justify-end flex w-full">
+                    <div class="dt-buttons-rplc flex items-center text-xs">
+                    </div>
+                </div>
+
+                <div class="flex-1">
+
+                    <table id="concepts">
+
+                        <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-xs" >
+                            <th>ID</th>
+                            <th>Domaine</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for concept in concepts %}
+                            <tr class="text-gray-500">
+                                <td>{{ concept.id }}</td>
+                                <td>{{ concept.label_fr }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="dt-bottom-infos-rplc flex justify-between items-center">
+                    <button class="text-xs font-semibold py-1 px-2 rounded bg-red-600 my-2 text-white cursor-pointer delete outline-none">Supprimer</button>
+                </div>
+
+            {% endif %}
+
+            {% if data == -1 or data == "guiding-keywords" %}
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>Dans cet onglet, vous pouvez renseigner plusieurs mots-clés qui décrivent votre expertise. Les mots-clés sont à séparer par un point-virgule (<i> ; </i>). Cette terminologie servira à diriger et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
+                </div>
+
+                <form action="/validate_guiding-keywords/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
+                    {% csrf_token %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {% for field in form.visible_fields %}
+                        <div>
+                            <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                            {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                        </div>
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
+                </form>
+
+            {% endif %}
+
+
+            {% if data == "references" %}
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>Dans cet onglet, vous pouvez confirmer les références bibliographiques collectées à l'aide de vos identifiants. Par votre validation ces notices seront incluses dans le processus de traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.</p>
+                </div>
+
+                <div class="justify-end flex w-full">
+                    <div class="dt-buttons-rplc flex items-center text-xs">
+                    </div>
+                </div>
+
+                <div class="flex-1">
+
+                    <table id="references">
+
+                        <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-xs" >
+                            <th>URL</th>
+                            <th>Année</th>
+                            <th>Titre</th>
+                            <th>label_bibtex</th>
+                            <th>docid</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for ref in references %}
+                            <tr class="text-gray-500">
+                                <td class="whitespace-nowrap">{{ ref.halId_s }}</td>
+                                <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
+                                <td>{{ ref.title_s.0 | safe }}</td>
+                                <td>{{ ref.label_bibtex }}</td>
+                                <td>{{ ref.docid }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="dt-bottom-infos-rplc flex justify-between items-center">
+                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none">Valider</button>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    {% if data == -1 or data == "credentials" %}
+
+        $(document).ready(function() {
+
+            extIds = {{ extIds |safe }};
+            ext_l = extIds.length;
+            j = 0;
+
+            $('input[type="submit"]').before('<div class="mt-2"><label class="text-sm text-gray-700">Identifiants supplémentaires</label>' +
+                '<div id="ext-ids-l">' +
+                '<div class="flex">' +
+                '<select class="sel-ids mr-2 flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none">' +
+                '<option value="">Choisir une plateforme</option>' +
+                '</select>' +
+                '<input class="inp-ids flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none">' +
+                '</div>' +
+                '</div>' +
+                '<div><a id="more-ids" class="mt-2 cursor-pointer w-5 h-5 rounded-full flex border-gray-300 border items-center justify-center bg-gray-100">+</a></div>' +
+                '</div>')
+
+            for (let i = 0; i < extIds.length; i++) {
+                $(".sel-ids")[j].innerHTML += '<option value="' + extIds[i] + '">' + extIds[i] + '</option>'
+            }
+
+            function removeItemOnce(arr, value) {
+                var index = arr.indexOf(value);
+                if (index > -1) {
+                    arr.splice(index, 1);
+                }
+                return arr;
+            }
+
+            $( "#more-ids" ).click(function() {
+                j += 1
+
+                if (j < ext_l) {
+                    $('#ext-ids-l').append('<div class="flex mt-2">' +
+                        '<select class="sel-ids mr-2 flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none">' +
+                        '<option value="">Choisir une plateforme</option>' +
+                        '</select>' +
+                        '<input class="inp-ids flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none">' +
+                        '</div>')
+
+                    k = 0
+                    $('.sel-ids').each(function() {
+                        removeItemOnce(extIds, $(this).val());
+                        if (k == 0) { $(".sel-ids")[0].innerHTML = ' <option value="">Choisir une plateforme</option> <option selected value="' + $(this).val() + '">' + $(this).val() + '</option>'}
+                        k += 1;
+                    })
+
+                    for (let i = 0; i < extIds.length; i++) {
+                        $(".sel-ids")[j].innerHTML += '<option value="' + extIds[i] + '">' + extIds[i] + '</option>'
+                    }
+
+                    if (j == ext_l -1) {
+                        $( "#more-ids" ).hide();
+                    }
+                }
+
+            });
+
+        });
+
+    {% endif %}
+
+    /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
+
+    $(document).ready(function() {
+        var table = $('#references').DataTable(
+            {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                },
+                dom: 'Bfrtip',
+                select: true,
+                buttons: [
+                    {
+                        text: 'Tout sélectionner',
+                        action: function () {
+                            table.rows().select();
+                        }
+                    },
+                    {
+                        text: 'Rien sélectionner',
+                        action: function () {
+                            table.rows().deselect();
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": [ 2 ],
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 3 ],
+                        "visible": false
+                    },
+                    {
+                        "targets": [ 4 ],
+                        "visible": false
+                    }
+                ],
+                scrollResize: true,
+                scrollY: 100,
+                scrollCollapse: true,
+                paging: false,
+            }
+        );
+
+        table.on( 'draw', function () {
+            $('.dataTables_scrollHeadInner').css('padding-right', 0);
+            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+
+            $('.dataTables_filter').addClass('flex items-center');
+            $('.dt-buttons').addClass('mr-2');
+            $('.dataTables_filter').prepend($('.dt-buttons'));
+            $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+
+            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+        } );
+
+        var table2 = $('#concepts').DataTable(
+            {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                },
+                dom: 'Bfrtip',
+                select: true,
+                buttons: [
+                    {
+                        text: 'Tout sélectionner',
+                        action: function () {
+                            table.rows().select();
+                        }
+                    },
+                    {
+                        text: 'Rien sélectionner',
+                        action: function () {
+                            table.rows().deselect();
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {
+                        "targets": [ 0 ],
+                        "visible": false
+                    }
+                ],
+                scrollResize: true,
+                scrollY: 100,
+                scrollCollapse: true,
+                paging: false,
+            }
+        );
+
+        table2.on( 'draw', function () {
+            $('.dataTables_scrollHeadInner').css('padding-right', 0);
+            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+
+            $('.dataTables_filter').addClass('flex items-center');
+            $('.dt-buttons').addClass('mr-2');
+            $('.dataTables_filter').prepend($('.dt-buttons'));
+            $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+
+            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+        } );
+
+        $('.validate').click( function () {
+            toValidate = []
+            table.rows('.selected').data().map( function (row) {
+                toValidate.push(row[4])
+            });
+
+            var form = $('<form action="/validate_references/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                '{% csrf_token %}' +
+                '<input type="text" name="toValidate" value="' + toValidate + '" />' +
+                '</form>');
+
+            form.appendTo('body').hide()
+            form.submit();
+        } );
+
+        $('.delete').click( function () {
+            toInvalidate = []
+            table2.rows('.selected').data().map( function (row) {
+                toInvalidate.push(row[0])
+            });
+
+            var form = $('<form action="/invalidate_concepts/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                '{% csrf_token %}' +
+                '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' +
+                '</form>');
+
+            form.appendTo('body').hide()
+            form.submit();
+        } );
+
+
+    } );
+
+
+
+
+
+</script>
+
+{% include "includes/footer.html" %}
