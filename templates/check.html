@@ -534,6 +534,8 @@
 
     {% endif %}
 
+    {% if data == "references" or data == "expertise" or data == "state"%}
+
     /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
     $(document).ready(function() {
@@ -672,6 +674,8 @@
             }
         );
 
+
+
         table3.on( 'draw', function () {
             $('.dataTables_scrollHeadInner').css('padding-right', 0);
             $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
@@ -714,7 +718,11 @@
         } );
 
 
+
+
     } );
+
+    {% endif %}
 
 
 

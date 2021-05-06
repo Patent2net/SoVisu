@@ -15,17 +15,19 @@ from uniauth.decorators import login_required
 
 Mode = 'dev'
 
+struct = "198307662"
+
 def esConnector(mode = Mode):
     if mode == "Prod":
 
         secret = config ('ELASTIC_PASSWORD')
         # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
         es = Elasticsearch('localhost',
-            http_auth=('elastic', secret),
-            scheme="http",
-            port=9200,
-            # ssl_context=context,
-            timeout=10)
+                           http_auth=('elastic', secret),
+                           scheme="http",
+                           port=9200,
+                           # ssl_context=context,
+                           timeout=10)
     else:
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     return es
@@ -64,8 +66,8 @@ def cs_index(request):
             }
         }
 
-        count = es.count(index="documents", body=scope_param)['count']
-        res = es.search(index="laboratories", body=scope_param, size=count)
+        count = es.count(index="*-laboratories", body=scope_param)['count']
+        res = es.search(index="*-laboratories", body=scope_param, size=count)
         entities = res['hits']['hits']
 
     elif type == "rsr":
@@ -77,7 +79,7 @@ def cs_index(request):
                 }
             }
 
-            count = es.count(index="researchers", body=scope_param)['count']
+            count = es.count(index="*-researchers", body=scope_param)['count']
 
         else:
             scope_param = {
@@ -88,9 +90,9 @@ def cs_index(request):
                 }
             }
 
-            count = es.count(index="researchers", body=scope_param)['count']
+            count = es.count(index="*-researchers", body=scope_param)['count']
 
-        res = es.search(index="researchers", body=scope_param, size=count)
+        res = es.search(index="*-researchers", body=scope_param, size=count)
         entities = res['hits']['hits']
 
     cleaned_entities = []
@@ -129,9 +131,9 @@ def dashboard(request):
         }
 
         key = 'halId_s'
-        ext_key = "authIdHal_s"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -144,9 +146,9 @@ def dashboard(request):
         }
 
         key = "halStructId"
-        ext_key = "labStructId_i"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -192,7 +194,7 @@ def dashboard(request):
             }
         }
 
-    if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
@@ -203,7 +205,7 @@ def dashboard(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"authIdHal_s": entity['halId_s']}
+                "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
     elif type == "lab":
@@ -213,11 +215,11 @@ def dashboard(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"labStructId_i": entity['halStructId']}
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
 
-    res = es.search(index="documents", body=start_date_param)
+    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -271,9 +273,9 @@ def references(request):
         }
 
         key = 'halId_s'
-        ext_key = "authIdHal_s"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -286,9 +288,9 @@ def references(request):
         }
 
         key = "halStructId"
-        ext_key = "labStructId_i"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -300,7 +302,7 @@ def references(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"authIdHal_s": entity['halId_s']}
+                "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
     elif type == "lab":
@@ -310,11 +312,11 @@ def references(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"labStructId_i": entity['halStructId']}
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
 
-    res = es.search(index="documents", body=start_date_param)
+    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -339,7 +341,7 @@ def references(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
+                                "harvested_from_ids": entity['halId_s']
                             }
                         },
                         {
@@ -359,7 +361,7 @@ def references(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "labStructId_i": entity['halStructId']
+                                "harvested_from_ids": entity['halStructId']
                             }
                         },
                         {
@@ -372,7 +374,7 @@ def references(request):
             }
         }
 
-    if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get references
@@ -515,9 +517,9 @@ def references(request):
             }
         }
 
-    count = es.count(index="documents", body=ref_param)['count']
+    count = es.count(index="*-documents", body=ref_param)['count']
 
-    references = es.search(index="documents", body=ref_param, size=count)
+    references = es.search(index="*-documents", body=ref_param, size=count)
 
     references_cleaned = []
 
@@ -563,9 +565,9 @@ def check(request):
         }
 
         key = 'halId_s'
-        ext_key = "authIdHal_s"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -578,9 +580,9 @@ def check(request):
         }
 
         key = "halStructId"
-        ext_key = "labStructId_i"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -592,7 +594,7 @@ def check(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"authIdHal_s": entity['halId_s']}
+                "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
     elif type == "lab":
@@ -602,11 +604,11 @@ def check(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"labStructId_i": entity['halStructId']}
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
 
-    res = es.search(index="documents", body=start_date_param)
+    res = es.search(index="*-documents", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
@@ -631,9 +633,9 @@ def check(request):
                 }
             }
         }
-        count = es.count(index="researchers", body=rsr_param)['count']
+        count = es.count(index="*-researchers", body=rsr_param)['count']
 
-        rsrs = es.search(index="researchers", body=rsr_param, size=count)
+        rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
 
         rsrs_cleaned = []
 
@@ -746,9 +748,9 @@ def check(request):
             }
         }
 
-        count = es.count(index="documents", body=ref_param)['count']
+        count = es.count(index="*-documents", body=ref_param)['count']
 
-        references = es.search(index="documents", body=ref_param, size=count)
+        references = es.search(index="*-documents", body=ref_param, size=count)
 
         references_cleaned = []
 
@@ -772,7 +774,7 @@ def search(request):
 
     date_param = {
         "aggs" : {
-           "min_date": {"min": {"field": "submittedDate_tdate"}},
+            "min_date": {"min": {"field": "submittedDate_tdate"}},
         }
     }
 
@@ -803,11 +805,11 @@ def search(request):
             }
         elif index=='researchers':
             search_param = {
-               "query": {"query_string": {"query": search}}
+                "query": {"query_string": {"query": search}}
             }
         else:
             search_param = {
-               "query": {"query_string": {"query": search}}
+                "query": {"query_string": {"query": search}}
             }
 
         p_res = es.count(index=index, body=search_param)
@@ -855,9 +857,9 @@ def terminology(request):
         }
 
         key = 'halId_s'
-        ext_key = "authIdHal_s"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -870,9 +872,9 @@ def terminology(request):
         }
 
         key = "halStructId"
-        ext_key = "labStructId_i"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -885,7 +887,7 @@ def terminology(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
+                                "harvested_from_ids": entity['halId_s']
                             }
                         },
                         {
@@ -905,7 +907,7 @@ def terminology(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "labStructId_i": entity['halStructId']
+                                "harvested_from_ids": entity['halStructId']
                             }
                         },
                         {
@@ -918,7 +920,7 @@ def terminology(request):
             }
         }
 
-    if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
@@ -929,7 +931,7 @@ def terminology(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"authIdHal_s": entity['halId_s']}
+                "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
     elif type == "lab":
@@ -939,11 +941,11 @@ def terminology(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"labStructId_i": entity['halStructId']}
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
 
-    res = es.search(index="documents", body=start_date_param)
+    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1008,16 +1010,16 @@ def terminology(request):
 
     if export:
         return render(request, 'terminology_ext.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                                        'entity': entity,
+                                                        'hasToConfirm': hasToConfirm,
+                                                        'startDate': start_date,
+                                                        'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+    else:
+        return render(request, 'terminology.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                     'entity': entity,
                                                     'hasToConfirm': hasToConfirm,
                                                     'startDate': start_date,
                                                     'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
-    else:
-        return render(request, 'terminology.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                                  'entity': entity,
-                                                  'hasToConfirm': hasToConfirm,
-                                                  'startDate': start_date,
-                                                  'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 
 # Redirects
@@ -1044,11 +1046,41 @@ def validateReferences(request):
     # Connect to DB
     es = esConnector()
 
-    if request.method == 'POST':
-        toValidate = request.POST.get("toValidate", "").split(",")
-        for docid in toValidate:
-            es.update(index="documents", refresh='wait_for', id=docid,
-                      body={"doc": {"validated": True}})
+    if type == "rsr":
+        scope_param = {
+            "query": {
+                "match": {
+                    "_id": id
+                }
+            }
+        }
+
+        res = es.search(index="*-researchers", body=scope_param)
+        entity = res['hits']['hits'][0]['_source']
+
+        if request.method == 'POST':
+            toValidate = request.POST.get("toValidate", "").split(",")
+            for docid in toValidate:
+                es.update(index=struct + '-' + entity['labHalId'] + "-researchers-documents", refresh='wait_for', id=docid,
+                          body={"doc": {"validated": True}})
+
+    if type == "lab":
+        scope_param = {
+            "query": {
+                "match": {
+                    "_id": id
+                }
+            }
+        }
+
+        res = es.search(index="*-laboratories", body=scope_param)
+        entity = res['hits']['hits'][0]['_source']
+
+        if request.method == 'POST':
+            toValidate = request.POST.get("toValidate", "").split(",")
+            for docid in toValidate:
+                es.update(index=struct + '-' + id +  "-documents", refresh='wait_for', id=docid,
+                          body={"doc": {"validated": True}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
@@ -1075,8 +1107,27 @@ def validateGuidingDomains(request):
     es = esConnector()
 
     if request.method == 'POST':
+
         toValidate = request.POST.get("toValidate", "").split(',')
-        es.update(index="researchers", refresh='wait_for', id=id, body={"doc": {"guidingDomains": toValidate}})
+
+        if type == "rsr":
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": id
+                    }
+                }
+            }
+
+            res = es.search(index="*-researchers", body=scope_param)
+            entity = res['hits']['hits'][0]['_source']
+
+            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
+                      body={"doc": {"guidingDomains": toValidate}})
+
+        if type == "lab":
+            es.update(index=struct + "-" + id + "-laboratories", refresh='wait_for', id=id,
+                      body={"doc": {"guidingDomains": toValidate}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
@@ -1114,12 +1165,9 @@ def invalidateConcept(request):
             }
         }
 
-        key = 'halId_s'
-        ext_key = "authIdHal_s"
+        index = '*-researchers'
 
-        index = 'researchers'
-
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -1131,12 +1179,9 @@ def invalidateConcept(request):
             }
         }
 
-        index = 'laboratories'
+        index = '*-laboratories'
 
-        key = "halStructId"
-        ext_key = "labStructId_i"
-
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -1201,7 +1246,20 @@ def validateCredentials(request):
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
 
-            es.update(index="researchers", refresh='wait_for', id=id,
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": id
+                    }
+                }
+            }
+
+            res = es.search(index="*-researchers", body=scope_param)
+            entity = res['hits']['hits'][0]['_source']
+
+            print(struct + "-" + entity['labHalId'] + '-researchers')
+
+            es.update(index=struct + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
                       body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef, "orcId": orcId}})
 
         if type == "lab":
@@ -1209,7 +1267,7 @@ def validateCredentials(request):
             rsnr = request.POST.get("f_rsnr")
             idRef = request.POST.get("f_IdRef")
 
-            es.update(index="laboratories", refresh='wait_for', id=id,
+            es.update(index=struct + "-" +  id +  "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"halStructId": halStructId, "rsnr": rsnr, "idRef": idRef}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
@@ -1242,11 +1300,23 @@ def validateGuidingKeywords(request):
         guidingKeywords = request.POST.get("f_guidingKeywords").split(";")
 
         if type == "rsr":
-            es.update(index="researchers", refresh='wait_for', id=id,
-                      body={"doc": {"guidingKeywords": guidingKeywords}})
+
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": id
+                    }
+                }
+            }
+
+            res = es.search(index="*-researchers", body=scope_param)
+            entity = res['hits']['hits'][0]['_source']
+
+            es.update(index=struct + "-" +  entity['labHalId'] +  "-researchers", refresh='wait_for', id=id,
+                  body={"doc": {"guidingKeywords": guidingKeywords}})
 
         if type == "lab":
-            es.update(index="laboratories", refresh='wait_for', id=id,
+            es.update(index=struct + "-" +  id +  "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
@@ -1289,9 +1359,9 @@ def wordcloud(request):
         }
 
         key = 'halId_s'
-        ext_key = "authIdHal_s"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -1306,7 +1376,7 @@ def wordcloud(request):
         key = "halStructId"
         ext_key = "labStructId_i"
 
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -1319,7 +1389,7 @@ def wordcloud(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
+                                "harvested_from_ids": entity['halId_s']
                             }
                         },
                         {
@@ -1339,7 +1409,7 @@ def wordcloud(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "labStructId_i": entity['halStructId']
+                                "harvested_from_ids": entity['halStructId']
                             }
                         },
                         {
@@ -1352,7 +1422,7 @@ def wordcloud(request):
             }
         }
 
-    if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
@@ -1363,7 +1433,7 @@ def wordcloud(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"authIdHal_s": entity['halId_s']}
+                "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
     elif type == "lab":
@@ -1373,11 +1443,11 @@ def wordcloud(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"labStructId_i": entity['halStructId']}
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
 
-    res = es.search(index="documents", body=start_date_param)
+    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1426,9 +1496,9 @@ def publicationboard(request):
         }
 
         key = 'halId_s'
-        ext_key = "authIdHal_s"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="researchers", body=scope_param)
+        res = es.search(index="*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -1441,9 +1511,9 @@ def publicationboard(request):
         }
 
         key = "halStructId"
-        ext_key = "labStructId_i"
+        ext_key = "harvested_from_ids"
 
-        res = es.search(index="laboratories", body=scope_param)
+        res = es.search(index="*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -1456,7 +1526,7 @@ def publicationboard(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
+                                "harvested_from_ids": entity['halId_s']
                             }
                         },
                         {
@@ -1476,7 +1546,7 @@ def publicationboard(request):
                     "must": [
                         {
                             "match_phrase": {
-                                "labStructId_i": entity['halStructId']
+                                "harvested_from_ids": entity['halStructId']
                             }
                         },
                         {
@@ -1489,7 +1559,7 @@ def publicationboard(request):
             }
         }
 
-    if es.count(index="documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
@@ -1500,7 +1570,7 @@ def publicationboard(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"authIdHal_s": entity['halId_s']}
+                "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
     elif type == "lab":
@@ -1510,11 +1580,11 @@ def publicationboard(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"labStructId_i": entity['halStructId']}
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
 
-    res = es.search(index="documents", body=start_date_param)
+    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1531,11 +1601,11 @@ def publicationboard(request):
     # /
 
     return render(request, 'publicationboard.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'hasToConfirm': hasToConfirm,
-                                              'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
-                                              'startDate': start_date,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+                                                     'entity': entity,
+                                                     'hasToConfirm': hasToConfirm,
+                                                     'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
+                                                     'startDate': start_date,
+                                                     'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 def contact(request):
     if request.method == 'POST':
@@ -1561,7 +1631,7 @@ def contact(request):
             # send confirmation message to user
 
             conf_subject ="Confirmation de reception du ticket:{}".format(dict(f.purpose_choices).get(f.cleaned_data['objet'])
-            )
+                                                                          )
 
             conf_message="Bonjour {},\nCeci est un message automatisé pour vous informer que votre ticket a bien été reçu.\n\n{}".format(name,message)
 
