@@ -345,7 +345,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": True
+                                "validated": False
                             }
                         }
                     ]
@@ -365,7 +365,7 @@ def references(request):
                         },
                         {
                             "match": {
-                                "validated": True
+                                "validated": False
                             }
                         }
                     ]
@@ -777,7 +777,7 @@ def search(request):
         }
     }
 
-    min_date = es.search(index="documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
+    min_date = es.search(index="*-documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
 
     # Get parameters
     if 'from' in request.GET:
@@ -968,44 +968,45 @@ def terminology(request):
 
     entity['concepts'] = json.loads(entity['concepts'])
 
-    for children in list(entity['concepts']['children']):
-        if 'state' in children:
-            entity['concepts']['children'].remove(children)
-
-        if 'researchers' in children:
-            state = 'invalidated'
-            for rsr in children['researchers']:
-                if 'state' not in rsr:
-                    state = None
-            if state:
+    if 'children' in list(entity['concepts']):
+        for children in list(entity['concepts']['children']):
+            if 'state' in children:
                 entity['concepts']['children'].remove(children)
 
-        if 'children' in children:
-            for children1 in list(children['children']):
-                if 'state' in children1:
-                    children['children'].remove(children1)
+            if 'researchers' in children:
+                state = 'invalidated'
+                for rsr in children['researchers']:
+                    if 'state' not in rsr:
+                        state = None
+                if state:
+                    entity['concepts']['children'].remove(children)
 
-                if 'researchers' in children1:
-                    state = 'invalidated'
-                    for rsr in children1['researchers']:
-                        if 'state' not in rsr:
-                            state = None
-                    if state:
+            if 'children' in children:
+                for children1 in list(children['children']):
+                    if 'state' in children1:
                         children['children'].remove(children1)
 
-                if 'children' in children1:
-                    for children2 in list(children1['children']):
+                    if 'researchers' in children1:
+                        state = 'invalidated'
+                        for rsr in children1['researchers']:
+                            if 'state' not in rsr:
+                                state = None
+                        if state:
+                            children['children'].remove(children1)
 
-                        if 'state' in children2:
-                            children1['children'].remove(children2)
+                    if 'children' in children1:
+                        for children2 in list(children1['children']):
 
-                        if 'researchers' in children2:
-                            state = 'invalidated'
-                            for rsr in children2['researchers']:
-                                if 'state' not in rsr:
-                                    state = None
-                            if state:
+                            if 'state' in children2:
                                 children1['children'].remove(children2)
+
+                            if 'researchers' in children2:
+                                state = 'invalidated'
+                                for rsr in children2['researchers']:
+                                    if 'state' not in rsr:
+                                        state = None
+                                if state:
+                                    children1['children'].remove(children2)
 
     if export:
         return render(request, 'terminology_ext.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
@@ -1240,8 +1241,6 @@ def validateCredentials(request):
     if request.method == 'POST':
 
         if type == "rsr":
-            halId_s = request.POST.get("f_halId_s")
-            halId_i = request.POST.get("f_halId_i")
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
 
@@ -1259,7 +1258,7 @@ def validateCredentials(request):
             print(struct + "-" + entity['labHalId'] + '-researchers')
 
             es.update(index=struct + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
-                      body={"doc": {"halId_s": halId_s, "halId_i": halId_i, "idRef": idRef, "orcId": orcId}})
+                      body={"doc": {"idRef": idRef, "orcId": orcId}})
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
