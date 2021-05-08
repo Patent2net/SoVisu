@@ -193,7 +193,7 @@ def dashboard(request):
             }
         }
 
-    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index=struct  + "*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
@@ -207,6 +207,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
+        res = es.search(index="*-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -217,8 +218,8 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
+        res = es.search(index="*-documents", body=start_date_param)
 
-    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -274,7 +275,7 @@ def references(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index= struct  +"-*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -289,7 +290,7 @@ def references(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index= struct  +"-" + id+ "-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -304,6 +305,7 @@ def references(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
+        res = es.search(index=struct + "-" + id+ "-researchers-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -314,8 +316,8 @@ def references(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
+        res = es.search(index=struct + "-" + id+ "-laboratories-documents", body=start_date_param)
 
-    res = es.search(index="*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -352,7 +354,8 @@ def references(request):
                 }
             }
         }
-
+        if es.count(index=struct + "-" + id+ "-researchers-documents", body=hasToConfirm_param)['count'] > 0:
+            hasToConfirm = True
     if type == "lab":
         hasToConfirm_param = {
             "query": {
@@ -373,8 +376,8 @@ def references(request):
             }
         }
 
-    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
+        if es.count(index=struct + "-" + id+ "-laboratories-documents", body=hasToConfirm_param)['count'] > 0:
+            hasToConfirm = True
 
     # Get references
     ref_param = {
@@ -516,9 +519,13 @@ def references(request):
             }
         }
 
-    count = es.count(index="*-documents", body=ref_param)['count']
+    if type == "rsr":  # I hope this is a focused search :-/
+        count = es.count(index=struct + "-" + id+ "-researchers-documents", body=ref_param)['count']
+        references = es.search(index=struct + "-" + id+ "-researchers-documents", body=ref_param, size=count)
 
-    references = es.search(index="*-documents", body=ref_param, size=count)
+    if type == "lab":
+        count = es.count(index=struct + "-" + id+ "-laboratories-documents", body=ref_param)['count']
+        references = es.search(index=struct + "-" + id+ "-laboratories-documents", body=ref_param, size=count)
 
     references_cleaned = []
 
@@ -566,7 +573,7 @@ def check(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index= struct  +"-*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -581,7 +588,7 @@ def check(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index= struct  +"-*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -607,7 +614,7 @@ def check(request):
             }
         }
 
-    res = es.search(index="*-documents", body=start_date_param)
+    res = es.search(index= struct  +"-*-documents", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
@@ -632,9 +639,9 @@ def check(request):
                 }
             }
         }
-        count = es.count(index="*-researchers", body=rsr_param)['count']
+        count = es.count(index=struct  +"*-researchers", body=rsr_param)['count']
 
-        rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
+        rsrs = es.search(index= struct  +"-*-researchers", body=rsr_param, size=count)
 
         rsrs_cleaned = []
 
@@ -747,9 +754,9 @@ def check(request):
             }
         }
 
-        count = es.count(index="*-documents", body=ref_param)['count']
+        count = es.count(index=struct  +"*-documents", body=ref_param)['count']
 
-        references = es.search(index="*-documents", body=ref_param, size=count)
+        references = es.search(index= struct  +"*-documents", body=ref_param, size=count)
 
         references_cleaned = []
 
@@ -777,7 +784,7 @@ def search(request):
         }
     }
 
-    min_date = es.search(index="*-documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
+    min_date = es.search(index= struct  +"-*-documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
 
     # Get parameters
     if 'from' in request.GET:
@@ -858,7 +865,7 @@ def terminology(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index= struct  +"-*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
@@ -873,7 +880,7 @@ def terminology(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index= struct  +"-*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -944,7 +951,7 @@ def terminology(request):
             }
         }
 
-    res = es.search(index="*-documents", body=start_date_param)
+    res = es.search(index= struct  +"-*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1055,7 +1062,7 @@ def validateReferences(request):
             }
         }
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index= struct  +"-*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
         if request.method == 'POST':
@@ -1073,7 +1080,7 @@ def validateReferences(request):
             }
         }
 
-        res = es.search(index="*-laboratories", body=scope_param)
+        res = es.search(index= struct  +"-*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
         if request.method == 'POST':
@@ -1119,7 +1126,7 @@ def validateGuidingDomains(request):
                 }
             }
 
-            res = es.search(index="*-researchers", body=scope_param)
+            res = es.search(index= struct  +"-*-researchers", body=scope_param)
             entity = res['hits']['hits'][0]['_source']
 
             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
@@ -1166,7 +1173,7 @@ def invalidateConcept(request):
         }
 
 
-        res = es.search(index="*-researchers", body=scope_param)
+        res = es.search(index= struct  +"-*-researchers", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
         index = struct + '-' + entity['labHalId'] + '-researchers'
