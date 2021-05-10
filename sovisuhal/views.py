@@ -11,7 +11,7 @@ from decouple import config
 from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
-from uniauth.decorators import login_required
+# from uniauth.decorators import login_required
 
 try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -87,7 +87,7 @@ def cs_index(request):
             }
 
             count = es.count(index=structId +"*-researchers", body=scope_param)['count']
-
+            res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
         else:
             scope_param = {
                 "query": {
@@ -97,9 +97,9 @@ def cs_index(request):
                 }
             }
 
-            count = es.count(index=structId +"-" + str(id)  +"-researchers", body=scope_param)['count']
+            count = es.count(index=structId +"-" + id  +"-researchers", body=scope_param)['count']
 
-        res = es.search(index=structId +"-" + str(id) +"-researchers", body=scope_param, size=count)
+            res = es.search(index=structId +"-" + id +"-researchers", body=scope_param, size=count)
         entities = res['hits']['hits']
 
     cleaned_entities = []
@@ -155,7 +155,7 @@ def dashboard(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index=structId +"-"+ str(id)  +"-laboratories", body=scope_param)
+        res = es.search(index=structId +"-"+ id  +"-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -302,7 +302,7 @@ def references(request):
         key = "halStructId"
         ext_key = "harvested_from_ids"
 
-        res = es.search(index= structId  +"-" + str(id) + "-laboratories", body=scope_param)
+        res = es.search(index= structId  +"-" + id + "-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
     # /
 
@@ -317,7 +317,7 @@ def references(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId + "-" + str(id) + "-researchers-"+entity['ldapId']+"-documents", body=start_date_param) # ldapId est-il là ?
+        res = es.search(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=start_date_param) # ldapId est-il là ?
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -328,7 +328,7 @@ def references(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
-        res = es.search(index=structId + "-" + str(id) + "-laboratories-documents", body=start_date_param)
+        res = es.search(index=structId + "-" + id + "-laboratories-documents", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
@@ -366,7 +366,7 @@ def references(request):
                 }
             }
         }
-        if es.count(index=structId + "-" + str(id) + "-researchers-"+entity['ldapId']+"-documents", body=hasToConfirm_param)['count'] > 0:
+        if es.count(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=hasToConfirm_param)['count'] > 0:
             hasToConfirm = True
     if type == "lab":
         hasToConfirm_param = {
@@ -388,7 +388,7 @@ def references(request):
             }
         }
 
-        if es.count(index=structId + "-" + str(id) + "-laboratories-documents", body=hasToConfirm_param)['count'] > 0:
+        if es.count(index=structId + "-" + id + "-laboratories-documents", body=hasToConfirm_param)['count'] > 0:
             hasToConfirm = True
 
     # Get references
@@ -532,12 +532,12 @@ def references(request):
         }
 
     if type == "rsr":  # I hope this is a focused search :-/
-        count = es.count(index=structId + "-" + str(id) + "-researchers-"+entity['ldapId']+"-documents", body=ref_param)['count']
-        references = es.search(index=structId + "-" + str(id) + "-researchers-"+entity['ldapId']+"-documents", body=ref_param, size=count)
+        count = es.count(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=ref_param)['count']
+        references = es.search(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=ref_param, size=count)
 
     if type == "lab":
-        count = es.count(index=structId + "-" + str(id) + "-laboratories-documents", body=ref_param)['count']
-        references = es.search(index=structId + "-" + str(id) + "-laboratories-documents", body=ref_param, size=count)
+        count = es.count(index=structId + "-" + id + "-laboratories-documents", body=ref_param)['count']
+        references = es.search(index=structId + "-" + id + "-laboratories-documents", body=ref_param, size=count)
 
     references_cleaned = []
 
@@ -1099,10 +1099,10 @@ def validateReferences(request):
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
-                es.update(index=structId + '-' + str(id)  +  "-documents", refresh='wait_for', id=docid,
+                es.update(index=structId + '-' + id  +  "-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
 
-    return redirect('/check/?type=' + type + '&id=' + str(id)  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 def validateGuidingDomains(request):
     # Get parameters
@@ -1146,10 +1146,10 @@ def validateGuidingDomains(request):
                       body={"doc": {"guidingDomains": toValidate}})
 
         if type == "lab":
-            es.update(index=structId + "-" + str(id)  + "-laboratories", refresh='wait_for', id=id,
+            es.update(index=structId + "-" + id  + "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingDomains": toValidate}})
 
-    return redirect('/check/?type=' + type + '&id=' + str(id)  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def invalidateConcept(request):
@@ -1203,10 +1203,10 @@ def invalidateConcept(request):
 
         index = '*-laboratories'
 
-        res = es.search(index=struct +"*-laboratories", body=scope_param)
+        res = es.search(index=structId +"*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
-        index = structId + '-' + str(id)  + 'laboratories'
+        index = structId + '-' + id  + 'laboratories'
     # /
 
     if request.method == 'POST':
@@ -1235,7 +1235,7 @@ def invalidateConcept(request):
         es.update(index=index, refresh='wait_for', id=entity['ldapId'],
                   body={"doc": {"concepts": entity['concepts']}})
 
-    return redirect('/check/?type=' + type + '&id=' + str(id)  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 
@@ -1292,7 +1292,7 @@ def validateCredentials(request):
             es.update(index=structId + "-" +  id +  "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"halStructId": halStructId, "rsnr": rsnr, "idRef": idRef}})
 
-    return redirect('/check/?type=' + type + '&id=' + str(id)  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def validateGuidingKeywords(request):
@@ -1341,7 +1341,7 @@ def validateGuidingKeywords(request):
             es.update(index=structId + "-" +  str(id)  +  "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
 
-    return redirect('/check/?type=' + type + '&id=' + str(id)  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 def faq(request):
     return render(request, 'faq.html')
