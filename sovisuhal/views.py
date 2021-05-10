@@ -24,7 +24,7 @@ except:
 
 #struct = "198307662"
 
-def esConnector(mode = Mode):
+def esConnector(mode = mode):
     if mode == "Prod":
 
         secret = config ('ELASTIC_PASSWORD')
