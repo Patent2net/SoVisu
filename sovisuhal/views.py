@@ -207,7 +207,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index="*-documents", body=start_date_param)
+        res = es.search(index=struct +"*-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -218,7 +218,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
-        res = es.search(index="*-documents", body=start_date_param)
+        res = es.search(index=struct + "*-documents", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
@@ -805,11 +805,11 @@ def search(request):
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
-        if index == 'documents':
+        if "documents" in index: # == 'documents':
             search_param = {
                 "query":{"bool":{"must": [{"query_string": {"query": search}}],"filter":[{"match":{"validated":"true"}}]}}
             }
-        elif index=='researchers':
+        elif "researchers" in index: #=='researchers':
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
@@ -1431,7 +1431,7 @@ def wordcloud(request):
             }
         }
 
-    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index= struct + "*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
