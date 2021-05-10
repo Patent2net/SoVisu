@@ -317,7 +317,7 @@ def references(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId + "-" + entity['halStructId'] + "-researchers-"+entity['ldapId']+"-documents", body=start_date_param) # ldapId est-il là ?
+        res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-"+entity['ldapId']+"-documents", body=start_date_param) # ldapId est-il là ?
     elif type == "lab":
         start_date_param = {
             "size": 1,
