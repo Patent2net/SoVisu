@@ -532,12 +532,12 @@ def references(request):
         }
 
     if type == "rsr":  # I hope this is a focused search :-/
-        count = es.count(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=ref_param)['count']
-        references = es.search(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=ref_param, size=count)
+        count = es.count(index=structId + "-" + entity ["labHalId"] + "-researchers-"+entity['ldapId']+"-documents", body=ref_param)['count']
+        references = es.search(index=structId + "-" + entity ["labHalId"] + "-researchers-"+entity['ldapId']+"-documents", body=ref_param, size=count)
 
     if type == "lab":
-        count = es.count(index=structId + "-" + id + "-laboratories-documents", body=ref_param)['count']
-        references = es.search(index=structId + "-" + id + "-laboratories-documents", body=ref_param, size=count)
+        count = es.count(index=structId + "-" + entity ["halStructId"] + "-laboratories-documents", body=ref_param)['count']
+        references = es.search(index=structId + "-" + entity ["halStructId"] + "-laboratories-documents", body=ref_param, size=count)
 
     references_cleaned = []
 
