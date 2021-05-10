@@ -366,7 +366,7 @@ def references(request):
                 }
             }
         }
-        if es.count(index=structId + "-" + id + "-researchers-"+entity['ldapId']+"-documents", body=hasToConfirm_param)['count'] > 0:
+        if es.count(index=structId + "-" + entity['labHalId'] + "-researchers-"+entity['ldapId']+"-documents", body=hasToConfirm_param)['count'] > 0:
             hasToConfirm = True
     if type == "lab":
         hasToConfirm_param = {
@@ -388,7 +388,7 @@ def references(request):
             }
         }
 
-        if es.count(index=structId + "-" + id + "-laboratories-documents", body=hasToConfirm_param)['count'] > 0:
+        if es.count(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=hasToConfirm_param)['count'] > 0:
             hasToConfirm = True
 
     # Get references
