@@ -615,7 +615,7 @@ def check(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId + "-"+entity['labHalId']+"-laboratories-" + entity['halId_s'] + "-documents", body=start_date_param)
+        res = es.search(index=structId + "-"+entity['labHalId']+"-laboratories-" + id + "-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
