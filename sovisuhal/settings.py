@@ -15,7 +15,15 @@ import os
 from decouple import config
 
 
-mode = config ('mode')
+try:
+    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+except:
+    mode = "Dev"
+try:
+    structId = config("structId")
+except:
+    structId = "198307662"  # UTLN
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
