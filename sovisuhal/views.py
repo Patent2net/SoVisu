@@ -585,7 +585,7 @@ def check(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index= structId  +"-*-researchers", body=scope_param)
+        res = es.search(index= structId  + "-*-researchers*", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
     elif type == "lab":
