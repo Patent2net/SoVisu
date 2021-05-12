@@ -1081,7 +1081,7 @@ def validateReferences(request):
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
-                es.update(index=structId + '-' + entity['labHalId'] + "-researchers-documents", refresh='wait_for', id=docid,
+                es.update(index=structId + '-' + entity['labHalId'] + "-researchers-"+ entity['ldapId']+"-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
 
     if type == "lab":
@@ -1093,13 +1093,13 @@ def validateReferences(request):
             }
         }
 
-        res = es.search(index= structId  +"-*-laboratories", body=scope_param)
+        res = es.search(index=structId+"-*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
-                es.update(index=structId + '-' + id  +  "-documents", refresh='wait_for', id=docid,
+                es.update(index=structId + '-' + entity["halStructId"]+"-laboratories-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
 
     return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
