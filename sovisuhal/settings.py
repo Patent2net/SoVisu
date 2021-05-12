@@ -15,7 +15,11 @@ import os
 from decouple import config
 
 
-mode = "dev"
+try:
+    mode = config ("mode")
+except:
+    mode = "Dev"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
