@@ -767,9 +767,19 @@ def check(request):
             }
         }
 
-        count = es.count(index=structId  +"*-documents", body=ref_param)['count']
+        if type == "rsr":  # I hope this is a focused search :-/
+            count = \
+            es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+                     body=ref_param)['count']
+            references = es.search(
+                index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+                body=ref_param, size=count)
 
-        references = es.search(index= structId  +"*-documents", body=ref_param, size=count)
+        if type == "lab":
+            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
+                'count']
+            references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
+                                   body=ref_param, size=count)
 
         references_cleaned = []
 
@@ -1082,6 +1092,8 @@ def validateReferences(request):
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
                 es.update(index=structId + '-' + entity['labHalId'] + "-researchers-"+ entity['ldapId']+"-documents", refresh='wait_for', id=docid,
+                          body={"doc": {"validated": True}})
+                es.update(index=structId + '-' + entity["labHalId"]+"-laboratories-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
 
     if type == "lab":
