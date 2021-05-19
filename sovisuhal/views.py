@@ -695,16 +695,16 @@ def check(request):
         concepts = []
         if 'children' in entity['concepts']:
             for children in entity['concepts']['children']:
-                if 'state' not in children:
-                    concepts.append({'id': children['id'], 'label_fr': children['label_fr']})
+                if children['state'] == 'invalidated':
+                    concepts.append({'id': children['id'], 'label_fr': children['label_fr'], 'state': 'invalidated'})
                 if 'children' in children:
                     for children1 in children['children']:
-                        if 'state' not in children1:
-                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr']})
+                        if children1['state'] == 'invalidated':
+                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr'], 'state': 'invalidated'})
                         if 'children' in children1:
                             for children2 in children1['children']:
-                                if 'state' not in children2:
-                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr']})
+                                if children2['state'] == 'invalidated':
+                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'], 'state': 'invalidated'})
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
@@ -990,7 +990,7 @@ def terminology(request):
 
     if 'children' in list(entity['concepts']):
         for children in list(entity['concepts']['children']):
-            if 'state' in children:
+            if children['state'] == 'invalidated':
                 entity['concepts']['children'].remove(children)
 
             if 'researchers' in children:
@@ -1003,7 +1003,7 @@ def terminology(request):
 
             if 'children' in children:
                 for children1 in list(children['children']):
-                    if 'state' in children1:
+                    if children1['state'] == 'invalidated':
                         children['children'].remove(children1)
 
                     if 'researchers' in children1:
@@ -1215,21 +1215,21 @@ def invalidateConcept(request):
             #to-do : désactiver les concepts
             for children in entity['concepts']['children']:
                 if children['id'] == conceptId:
-                    children['state'] = 'invalidated'
+                    children['state'] = 'validated'
                 if 'children' in children:
                     for children1 in children['children']:
                         if children1['id'] == conceptId:
                             if len(children['children']) == 1:
-                                children['state'] = 'invalidated'
-                            children1['state'] = 'invalidated'
+                                children['state'] = 'validated'
+                            children1['state'] = 'validated'
                         if 'children' in children1:
                             for children2 in children1['children']:
                                 if children2['id'] == conceptId:
                                     if len(children['children']) == 1:
-                                        children['state'] = 'invalidated'
+                                        children['state'] = 'validated'
                                     if len(children1['children']) == 1:
-                                        children1['state'] = 'invalidated'
-                                    children2['state'] = 'invalidated'
+                                        children1['state'] = 'validated'
+                                    children2['state'] = 'validated'
 
 
         es.update(index=index, refresh='wait_for', id=entity['ldapId'],
