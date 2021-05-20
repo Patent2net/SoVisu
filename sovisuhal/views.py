@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 import json
-from . import forms
+from . import forms, settings
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from django.core.mail import mail_admins, send_mail
@@ -12,6 +12,7 @@ from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
 from uniauth.decorators import login_required
+from .settings import LOGIN_URL
 
 try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -42,19 +43,62 @@ def esConnector(mode = mode):
 @login_required
 def index(request):
     if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+        return redirect('%s?next=%s' % (LOGIN_URL, '/'))
     else:
         gugusse = request.user.get_username()
+        if gugusse == 'admin':
+            return redirect('/admin/')
+        elif gugusse == 'adminlab':
+            return redirect("/index/?type=lab")
+        elif gugusse == 'visiteur':
+            return redirect("/index/?type=rsr")
+        else:
+            # gugusse = request.user.get_username()
+            gugusse = gugusse.replace('cas-utln-', '')
+            return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
 
-        gugusse = gugusse.replace('cas-utln-', '')
-
-        return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
-
+    return redirect('loggedin')
 
 @login_required
+def loggedin(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (LOGIN_URL, ''))
+    elif request.user.is_authenticated:
+        gugusse = request.user.get_username()
+        if gugusse == 'admin':
+            return redirect('/admin/')
+        elif gugusse == 'adminlab':
+            return redirect("/index/?type=lab")
+        elif gugusse == 'visiteur':
+            return redirect("/index/?type=rsr")
+        else:
+            #gugusse = request.user.get_username()
+            gugusse = gugusse.replace('cas-utln-', '')
+            return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+    else:
+        #heu ?
+        print ("cas raté")
+        return render(request, '404.html')
+
+#@login_required
 def unknown(request):
-    return redirect('/accounts/login/')
-    #return render(request, '404.html')
+    # if not request.user.is_authenticated:
+    #     return redirect('%s?next=%s' % (LOGIN_URL, "/check"))
+    # elif request.user.is_authenticated:
+    #     gugusse = request.user.get_username()
+    #     if gugusse == 'admin':
+    #         return redirect('/admin/')
+    #     elif gugusse == 'adminlab':
+    #         return redirect("/index/?type=lab")
+    #     elif gugusse == 'guest':
+    #         return redirect("/index/?type=rsr")
+    #     else:
+    #         gugusse = request.user.get_username()
+    #         gugusse = gugusse.replace('cas-utln-', '')
+    #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+    # else:
+    #return redirect('/accounts/login/')
+        return render(request, '404.html')
 
 def help(request):
     return render(request, 'help.html')
@@ -65,7 +109,8 @@ def cs_index(request):
     # Get parameters
     if 'type' in request.GET:
         type = request.GET['type']
-
+    else:
+        type = -1
     if 'id' in request.GET:
         id = request.GET['id']
     else:
