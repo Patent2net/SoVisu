@@ -37,9 +37,9 @@ if mode == 'Prod':
     UNIAUTH_ALLOW_SHARED_EMAILS = True
     UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
     UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
-    UNIAUTH_LOGIN_DISPLAY_STANDARD = False
+    UNIAUTH_LOGIN_DISPLAY_STANDARD = True
     UNIAUTH_LOGIN_DISPLAY_CAS = True
-    UNIAUTH_LOGIN_REDIRECT_URL = '/dashboard/?type=rsr&id=dreymond' # +  uniauth_profile.accounts
+    UNIAUTH_LOGIN_REDIRECT_URL = '/' # +  uniauth_profile.accounts
     UNIAUTH_LOGOUT_CAS_COMPLETELY = True
     UNIAUTH_LOGOUT_REDIRECT_URL = None
     UNIAUTH_MAX_LINKED_EMAILS = 20
