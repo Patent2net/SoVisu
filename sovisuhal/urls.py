@@ -51,5 +51,5 @@ urlpatterns = [
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
-    # path('accounts/', include('uniauth.urls.cas_only', namespace='uniauth'))
+    path('accounts/', include('uniauth.urls.cas_only', namespace='uniauth'))
 ]
