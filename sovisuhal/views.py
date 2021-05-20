@@ -41,11 +41,20 @@ def esConnector(mode = mode):
 
 @login_required
 def index(request):
-    return redirect('dashboard')
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        gugusse = request.user.get_username()
+
+        gugusse = gugusse.replace('cas-utln-', '')
+
+        return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
 
 
+@login_required
 def unknown(request):
-    return render(request, '404.html')
+    return redirect('/accounts/login/')
+    #return render(request, '404.html')
 
 def help(request):
     return render(request, 'help.html')
