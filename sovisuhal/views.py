@@ -7,15 +7,18 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
-from decouple import config
+
 from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
 from uniauth.decorators import login_required
-from .settings import LOGIN_URL
+
 
 try:
+
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+    from uniauth.decorators import login_required
+    from decouple import config
 except:
     mode = "Dev"
 try:
@@ -43,7 +46,7 @@ def esConnector(mode = mode):
 @login_required
 def index(request):
     if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (LOGIN_URL, '/'))
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
         gugusse = request.user.get_username()
         if gugusse == 'admin':
@@ -62,7 +65,7 @@ def index(request):
 @login_required
 def loggedin(request):
     if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (LOGIN_URL, ''))
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, ''))
     elif request.user.is_authenticated:
         gugusse = request.user.get_username()
         if gugusse == 'admin':
@@ -193,7 +196,7 @@ def dashboard(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index=structId +"*-researchers", body=scope_param) # on pointe sur index générique car pas de LabHalId
+        res = es.search(index=structId +"*-researchers", body=scope_param) # on pointe sur index générique car pas de LabHalId ?
 
         entity = res['hits']['hits'][0]['_source']
 
@@ -640,7 +643,15 @@ def check(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index= structId  + "-*-researchers*", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        entity = res['hits']['hits'][0]['_source'] # plante si id pas présente
+         # idée: création d'une entite "inconnu" {ldapid : * # tous ceux qui n'ont pas de halid, idref, orcid
+        #                                         idref: none
+        #                                         idhal: none
+        #                                         orcid: none}
+        # si le champs idhal est "vide" alors:
+        # ouverture cette page avec édition des champs de l'"entité inconnue"
+        # la validation lance "insert entities_bis" adapté pour màj ces valeurs
+        #                     puis collecte_mon_hal qui ne collecte que les données de ce nouvel hal id
 
     elif type == "lab":
         scope_param = {
@@ -749,16 +760,16 @@ def check(request):
         concepts = []
         if 'children' in entity['concepts']:
             for children in entity['concepts']['children']:
-                if 'state' not in children:
-                    concepts.append({'id': children['id'], 'label_fr': children['label_fr']})
+                if children['state'] == 'invalidated':
+                    concepts.append({'id': children['id'], 'label_fr': children['label_fr'], 'state': 'invalidated'})
                 if 'children' in children:
                     for children1 in children['children']:
-                        if 'state' not in children1:
-                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr']})
+                        if children1['state'] == 'invalidated':
+                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr'], 'state': 'invalidated'})
                         if 'children' in children1:
                             for children2 in children1['children']:
-                                if 'state' not in children2:
-                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr']})
+                                if children2['state'] == 'invalidated':
+                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'], 'state': 'invalidated'})
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
@@ -821,9 +832,18 @@ def check(request):
             }
         }
 
-        count = es.count(index=structId  +"*-documents", body=ref_param)['count']
+        if type == "rsr":  # I hope this is a focused search :-/
+            count = \
+            es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+                     body=ref_param)['count']
+            references = es.search(
+                index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+                body=ref_param, size=count)
 
-        references = es.search(index= structId  +"*-documents", body=ref_param, size=count)
+        if type == "lab":
+            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
+            references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
+                                   body=ref_param, size=count)
 
         references_cleaned = []
 
@@ -1044,7 +1064,7 @@ def terminology(request):
 
     if 'children' in list(entity['concepts']):
         for children in list(entity['concepts']['children']):
-            if 'state' in children:
+            if children['state'] == 'invalidated':
                 entity['concepts']['children'].remove(children)
 
             if 'researchers' in children:
@@ -1057,7 +1077,7 @@ def terminology(request):
 
             if 'children' in children:
                 for children1 in list(children['children']):
-                    if 'state' in children1:
+                    if children1['state'] == 'invalidated':
                         children['children'].remove(children1)
 
                     if 'researchers' in children1:
@@ -1135,7 +1155,9 @@ def validateReferences(request):
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
-                es.update(index=structId + '-' + entity['labHalId'] + "-researchers-documents", refresh='wait_for', id=docid,
+                es.update(index=structId + '-' + entity['labHalId'] + "-researchers-"+ entity['ldapId']+"-documents", refresh='wait_for', id=docid,
+                          body={"doc": {"validated": True}})
+                es.update(index=structId + '-' + entity["labHalId"]+"-laboratories-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
 
     if type == "lab":
@@ -1153,7 +1175,7 @@ def validateReferences(request):
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
-                es.update(index=structId + '-' + id  +  "-documents", refresh='wait_for', id=docid,
+                es.update(index=structId + '-' + entity["halStructId"]+"-laboratories-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
 
     return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
@@ -1269,21 +1291,22 @@ def invalidateConcept(request):
             #to-do : désactiver les concepts
             for children in entity['concepts']['children']:
                 if children['id'] == conceptId:
-                    children['state'] = 'invalidated'
+                    children['state'] = 'validated'
                 if 'children' in children:
                     for children1 in children['children']:
                         if children1['id'] == conceptId:
                             if len(children['children']) == 1:
-                                children['state'] = 'invalidated'
-                            children1['state'] = 'invalidated'
+                                children['state'] = 'validated'
+                            children1['state'] = 'validated'
                         if 'children' in children1:
                             for children2 in children1['children']:
                                 if children2['id'] == conceptId:
                                     if len(children['children']) == 1:
-                                        children['state'] = 'invalidated'
+                                        children['state'] = 'validated'
                                     if len(children1['children']) == 1:
-                                        children1['state'] = 'invalidated'
-                                    children2['state'] = 'invalidated'
+                                        children1['state'] = 'validated'
+                                    children2['state'] = 'validated'
+
 
 
         es.update(index=index, refresh='wait_for', id=entity['ldapId'],
@@ -1336,7 +1359,7 @@ def validateCredentials(request):
             print(structId + "-" + entity['labHalId'] + '-researchers')
 
             es.update(index=structId + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
-                      body={"doc": {"idRef": idRef, "orcId": orcId}})
+                      body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True}})
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
@@ -1344,7 +1367,7 @@ def validateCredentials(request):
             idRef = request.POST.get("f_IdRef")
 
             es.update(index=structId + "-" +  id +  "-laboratories", refresh='wait_for', id=id,
-                      body={"doc": {"halStructId": halStructId, "rsnr": rsnr, "idRef": idRef}})
+                      body={"doc": {"halStructId": halStructId, "rsnr": rsnr, "idRef": idRef, "validated": True}})
 
     return redirect('/check/?type=' + type + '&id=' + id  + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
