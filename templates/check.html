@@ -35,7 +35,7 @@
                     <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
-                    >Références</a>
+                    >Notices HAL</a>
                     <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise"
@@ -61,7 +61,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
 
-                    <p>Cet onglet vous permet de supprimer des domaines qui ne composeraient pas votre portefeuille d'expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
+                    <p>Cet onglet vous permet de supprimer des domaines qui se situeraient en marge seulement de votre portefeuille d'expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
 
                 </div>
 
@@ -140,7 +140,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
 
-                    <p>Cet onglet vous permet de supprimer des domaines qui ne composeraient pas votre portefeuille d'expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
+                    <p>Cet onglet vous permet de supprimer des domaines à la marge de votre expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
 
                 </div>
 
@@ -187,7 +187,7 @@
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p>Dans cet onglet, vous pouvez renseigner plusieurs mots-clés qui décrivent votre expertise. Les mots-clés sont à séparer par un point-virgule (<i> ; </i>). Cette terminologie servira à diriger et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
+                    <p>Dans cet onglet, vous pouvez renseigner plusieurs mots-clés qui complètent votre expertise. Les mots-clés sont à séparer par un point-virgule (<i> ; </i>). Cette terminologie servira à diriger et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
                 </div>
 
                 <form action="/validate_guiding-keywords/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
@@ -213,7 +213,7 @@
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p>Dans cet onglet, vous pouvez confirmer les références bibliographiques collectées à l'aide de vos identifiants. Par votre validation ces notices seront incluses dans le processus de traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.</p>
+                    <p>Dans cet onglet, vous pouvez intégrer les références bibliographiques collectées à l'aide de vos identifiants à la base de connaissance. Par votre validation ces notices seront incluses dans le processus de traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.</p>
                 </div>
 
                 <div class="justify-end flex w-full">
@@ -266,7 +266,7 @@
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p>Dans cet onglet, vous pouvez sélectionner un ou plusieurs domaine(s) qui décrivent votre expertise. Cette terminologie servira à diriger et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
+                    <p>Dans cet onglet, vous pouvez sélectionner un ou plusieurs domaine(s) qui décrivent ou complètent votre expertise. Cette terminologie servira à diriger et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
                 </div>
 
                 <div class="w-full" id="tree" style="overflow-y: scroll;"></div>
