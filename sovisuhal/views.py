@@ -117,9 +117,8 @@ def CreateCredentials(request):
 
     es = esConnector()
     ldapId = request.GET['ldapid']
-    idhal = request.POST.get['halId_s']
-    structId = request.POST.get['structId']
-
+    idhal = request.POST.get ('halId_s')
+    structId = request.POST.get ('structId')
     # resultat
     Chercheur = dict()
     server = Server('ldap.univ-tln.fr', get_info=ALL)
