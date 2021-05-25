@@ -73,7 +73,7 @@ def index(request):
             if count >0:
                 return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
             else:
-                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&IdRef=nullNone')
+                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
             # return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
 
@@ -107,7 +107,7 @@ def loggedin(request):
             if count >0:
                 return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
             else:
-                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&IdRef=nullNone')
+                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
     else:
         #heu ?
         print ("cas raté")
@@ -202,8 +202,10 @@ def CreateCredentials(request):
 @login_required
 def create(request):
     ldapid  = request.GET['ldapid'] # ldapid
-
-    return render(request, 'check.html', {'data': "create", #'type': type,
+    if len(request.GET['halId_s']) >0 and len(request.GET['orcId']) >0:
+        return CreateCredentials (request)
+    else:
+        return render(request, 'check.html', {'data': "create", #'type': type,
                                           'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
                                           #'entity': entity, #'extIds': ['a', 'b', 'c'],
                                           'halId_s':'',
