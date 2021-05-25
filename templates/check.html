@@ -114,7 +114,7 @@
 
                 </div>
 
-                <form action="/create/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
+                <form action="/CreateCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
                         <div>
