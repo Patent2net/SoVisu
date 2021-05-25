@@ -3,11 +3,11 @@ from django.forms import models
 
 class CreateCredentials(forms.Form):
     def __init__(self, *args, **kwargs):
-        halId_s = kwargs.pop('halId_s')
-        idRef = kwargs.pop('idRef')
-        orcId = kwargs.pop('orcId')
-
-        super(CreateCredentials,self).__init__(*args,**kwargs)
+        # halId_s = kwargs.pop('halId_s')
+        # idRef = kwargs.pop('idRef')
+        # orcId = kwargs.pop('orcId')
+        #
+        # super(CreateCredentials,self).__init__(*args,**kwargs)
         self.fields['f_halId_s'].initial = "renseigner svp"
         self.fields['f_IdRef'].initial = "renseigner svp"
         self.fields['f_orcId'].initial = "renseigner svp"
