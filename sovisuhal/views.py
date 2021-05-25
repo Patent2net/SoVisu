@@ -60,7 +60,22 @@ def index(request):
         else:
             # gugusse = request.user.get_username()
             gugusse = gugusse.replace('cas-utln-', '')
-            return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
+            # check présence gugusse
+            es = esConnector()
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": id
+                    }
+                }
+            }
+            count = es.count (index=structId + "*-researchers", body=scope_param)['count']
+            if count >0:
+                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+            else:
+                return redirect('create/?id=' + gugusse)
+
+            # return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
 
     return redirect('loggedin')
 
@@ -88,7 +103,7 @@ def loggedin(request):
                     }
                 }
             }
-            count = es.count(index=structId + "*-researchers", body=scope_param)['count']
+            count = es.count (index=structId + "*-researchers", body=scope_param)['count']
             if count >0:
                 return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
             else:
@@ -111,7 +126,7 @@ def create(request):
 
 def createCredentials(request):
 
-
+    es = esConnector()
     ldapId = request.GET['ldapId']
     idhal = request.POST.GET['halId_s']
     structId = request.POST.get['structId']
@@ -740,6 +755,14 @@ def check(request):
         data = -1
 
     # /
+    # if data == 'create':
+    #     return render(request, 'check.html', {'data': data, #'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+    #                                           #'entity': entity, 'extIds': ['a', 'b', 'c'],
+    #                                           'form': forms.CreateCredentials (),
+    #                                           #'startDate': start_date,
+    #                                           #timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"
+    #                   }
+    #                  )
 
     # Get scope informations
     if type == "rsr":
