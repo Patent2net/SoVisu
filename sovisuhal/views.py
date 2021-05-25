@@ -117,7 +117,7 @@ def create(request):
     ldapid  = request.get('id') # ldapid
 
     return render(request, 'check.html', {'data': "create", #'type': type,
-                                          'id': ldapid,#'from': dateFrom, 'to': dateTo,
+                                          'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
                                           #'entity': entity, #'extIds': ['a', 'b', 'c'],
                                           'halId_s':'',
                                           'idRef':'',
