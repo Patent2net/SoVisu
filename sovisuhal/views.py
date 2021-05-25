@@ -119,8 +119,7 @@ def createCredentials(request):
     # resultat
     Chercheur = dict()
     server = Server('ldap.univ-tln.fr', get_info=ALL)
-    conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto-bind=True)
-                      # recup des données ldap
+    conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
     conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +')', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
     dico = json.loads(conn .entry_to_json())
 
