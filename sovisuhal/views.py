@@ -116,7 +116,7 @@ def loggedin(request):
 def CreateCredentials(request):
 
     es = esConnector()
-    ldapId = request.GET['ldapId']
+    ldapId = request.GET['ldapid']
     idhal = request.POST.GET['halId_s']
     structId = request.POST.get['structId']
 
