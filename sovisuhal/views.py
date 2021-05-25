@@ -201,7 +201,7 @@ def CreateCredentials(request):
 @login_required
 def create(request):
     ldapid  = request.GET['ldapid'] # ldapid
-    if len(request.GET['halId_s']) >0 and len(request.GET['orcId']) >0:
+    if len(request.GET['halId_s'] .replace('nullNone', '')) >0 and len(request.GET['orcId'] .replace('nullNone', '')) >0:
         return CreateCredentials (request)
     else:
         return render(request, 'check.html', {'data': "create", #'type': type,
