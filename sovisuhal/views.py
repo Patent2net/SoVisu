@@ -117,7 +117,7 @@ def CreateCredentials(request):
 
     es = esConnector()
     ldapId = request.GET['ldapid']
-    idhal = request.POST.GET['halId_s']
+    idhal = request.POST.get['halId_s']
     structId = request.POST.get['structId']
 
     # resultat
