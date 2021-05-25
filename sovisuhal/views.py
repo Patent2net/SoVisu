@@ -107,7 +107,7 @@ def loggedin(request):
             if count >0:
                 return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
             else:
-                return redirect('create/?ldapid=' + gugusse)
+                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&IdRef=nullNone')
     else:
         #heu ?
         print ("cas raté")
