@@ -114,10 +114,10 @@ def loggedin(request):
         return render(request, '404.html')
 
 def create(request):
-    id  = request.get('id') # ldapid
+    ldapid  = request.get('id') # ldapid
 
     return render(request, 'check.html', {'data': "create", #'type': type,
-                                          'id': id,#'from': dateFrom, 'to': dateTo,
+                                          'id': ldapid,#'from': dateFrom, 'to': dateTo,
                                           #'entity': entity, #'extIds': ['a', 'b', 'c'],
                                           'halId_s':'',
                                           'idRef':'',
@@ -129,7 +129,7 @@ def create(request):
                                           #'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
                 )
 
-def createCredentials(request):
+def CreateCredentials(request):
 
     es = esConnector()
     ldapId = request.GET['ldapId']
