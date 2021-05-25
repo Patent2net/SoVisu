@@ -96,44 +96,6 @@
 
             {% endif %}
 
-            {% if data == -1 or data == "credentials" %}
-
-                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-
-                    <ul>
-                        <li>Dans cet onglet, vous devez vérifier renseigner ou corriger vos identifiants externes. Ces id seront utilisés pour la collecte de données. </li>
-                        <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le vérifier : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site prévu à cet effet</a></li>
-                        <li><strong>L'OrcId</strong> est un identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>.</li>
-                        <li>Enfin <strong>l'IdHal</strong> est <a href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline" target="_blank">l'identifiant sur l'archive nationnale Hal</a>. Ce dernier identifiant permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer les différentes formes auteur. Les trois sont à relier.</li>
-                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... vous pouvez les saisir dans le champ prévu à cet effet séparés par des point-virgules (<i> ; </i>). </li>
-
-                    </ul>
-
-                </div>
-
-                <form action="/validate_credentials/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
-                    {% csrf_token %}
-                    {% for field in form.visible_fields %}
-                        <div>
-                            {% if field.auto_id == "id_f_more" %}
-                                {% render_field field class="hidden" %}
-                            {% else %}
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
-                </form>
-
-            {% endif %}
-
-
             {% if data == "create" %}
 
                 <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
@@ -153,6 +115,43 @@
                 </div>
 
                 <form action="/create/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
+                    {% csrf_token %}
+                    {% for field in form.visible_fields %}
+                        <div>
+                            {% if field.auto_id == "id_f_more" %}
+                                {% render_field field class="hidden" %}
+                            {% else %}
+                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+
+                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
+                </form>
+
+            {% endif %}
+
+            {% if data == -1 or data == "credentials" %}
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <ul>
+                        <li>Dans cet onglet, vous devez vérifier renseigner ou corriger vos identifiants externes. Ces id seront utilisés pour la collecte de données. </li>
+                        <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le vérifier : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site prévu à cet effet</a></li>
+                        <li><strong>L'OrcId</strong> est un identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>.</li>
+                        <li>Enfin <strong>l'IdHal</strong> est <a href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline" target="_blank">l'identifiant sur l'archive nationnale Hal</a>. Ce dernier identifiant permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer les différentes formes auteur. Les trois sont à relier.</li>
+                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... vous pouvez les saisir dans le champ prévu à cet effet séparés par des point-virgules (<i> ; </i>). </li>
+
+                    </ul>
+
+                </div>
+
+                <form action="/validate_credentials/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
                         <div>
