@@ -8,10 +8,10 @@ class CreateCredentials(forms.Form):
         # orcId = kwargs.pop('orcId')
         #
         # super(CreateCredentials,self).__init__(*args,**kwargs)
-        self.fields['f_halId_s'].initial = "renseigner svp"
-        self.fields['f_IdRef'].initial = "renseigner svp"
-        self.fields['f_orcId'].initial = "renseigner svp"
-        self.fields['f_more'].initial = '0'
+        # self.fields['f_halId_s'].initial = "renseigner svp"
+        # self.fields['f_IdRef'].initial = "renseigner svp"
+        # self.fields['f_orcId'].initial = "renseigner svp"
+        # self.fields['f_more'].initial = '0'
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label='ID HAL (texte)')
