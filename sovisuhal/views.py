@@ -65,7 +65,7 @@ def index(request):
             scope_param = {
                 "query": {
                     "match": {
-                        "_id": id
+                        "_id": gugusse
                     }
                 }
             }
@@ -99,7 +99,7 @@ def loggedin(request):
             scope_param = {
                 "query": {
                     "match": {
-                        "_id": id
+                        "_id": gugusse
                     }
                 }
             }
