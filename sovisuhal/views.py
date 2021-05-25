@@ -201,7 +201,7 @@ def CreateCredentials(request):
 
 @login_required
 def create(request):
-    ldapid  = request.GET('id') # ldapid
+    ldapid  = request.GET('ldapid') # ldapid
 
     return render(request, 'check.html', {'data': "create", #'type': type,
                                           'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
