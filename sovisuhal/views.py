@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 from . import forms, settings
 from django.views.decorators.clickjacking import xframe_options_exempt
-from ldap3 import Server, Connection, ALL
+
 import json
 from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
@@ -21,6 +21,7 @@ try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
     from uniauth.decorators import login_required
     from decouple import config
+    from ldap3 import Server, Connection, ALL
 except:
     mode = "Dev"
 try:
@@ -123,11 +124,15 @@ def CreateCredentials(request):
     Chercheur = dict()
     server = Server('ldap.univ-tln.fr', get_info=ALL)
     conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
-    conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +')', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
-    dico = json.loads(conn .entry_to_json())
+    conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +'))', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
+    dico = json.loads(conn .response_to_json()) ['entries'] [0]
+    if len(dico ['attributes']['labo']) >0:
+        labo = dico ['attributes']['labo']
+    else:
+        labo =  dico['attributes']['supannAffectation'][0]
+    # je crains que l'on ait des surprises ici.... Un nouveau tour dans check pour valider et/ou choisir un labo
 
-    labo = dico ['attributes']['labo']
-    connaitLab = labo [0]  # premier labo (au cas où) ???
+    connaitLab = labo # premier labo (au cas où) ???
 
     extrait = dico['dn'].split('uid=')[1].split(',')
     typeGus = extrait[1].replace('ou=', '')
@@ -174,8 +179,7 @@ def CreateCredentials(request):
     else:
         if not es.indices.exists(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents"):
             es.indices.create(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
-    # integration contenus
-    archivesOuvertesData = getConceptsAndKeywords(idhal)
+
 
     Chercheur ["structSirene"] = structId
     Chercheur["labHalId"] = connaitLab
@@ -184,8 +188,13 @@ def CreateCredentials(request):
 
     #New step ?
 
-    if hal_id != '':
-        aureHal = getAureHal(hal_id)
+    if idhal != '':
+        aureHal = getAureHal(idhal)
+        # integration contenus
+        archivesOuvertesData = getConceptsAndKeywords(idhal)
+    else:
+        pass
+        #retourne sur check() ?
     Chercheur["halId_s"] = idhal
 
     Chercheur["aurehalId"] = aureHal  # heu ?
@@ -207,10 +216,10 @@ def create(request):
         return render(request, 'check.html', {'data': "create", #'type': type,
                                           'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
                                           #'entity': entity, #'extIds': ['a', 'b', 'c'],
-                                          'halId_s':'',
-                                          'idRef':'',
-                                          'orcId':'',
-                                          'autres':'',
+                                          'halId_s':'nullNone',
+                                          'idRef':'nullNone',
+                                          'orcId':'nullNone',
+                                          'autres':'nullNone',
                                           'form': forms.CreateCredentials()
                                           }
                                           #"'startDate': start_date,
