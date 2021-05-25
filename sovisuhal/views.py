@@ -1157,8 +1157,11 @@ def validateReferences(request):
             for docid in toValidate:
                 es.update(index=structId + '-' + entity['labHalId'] + "-researchers-"+ entity['ldapId']+"-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
-                es.update(index=structId + '-' + entity["labHalId"]+"-laboratories-documents", refresh='wait_for', id=docid,
+                try:
+                    es.update(index=structId + '-' + entity["labHalId"]+"-laboratories-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
+                except:
+                    pass # doc du chercheur pas dans le labo
 
     if type == "lab":
         scope_param = {
