@@ -9,7 +9,7 @@ import json
 from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
 from .libsElastichal  import getAureHal
-import .archivesOuvertes
+from sovisuhal.archivesOuvertes import *
 from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
@@ -172,7 +172,7 @@ def createCredentials(request):
         if not es.indices.exists(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents"):
             es.indices.create(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
     # integration contenus
-    archivesOuvertesData = archivesOuvertes.getConceptsAndKeywords(idhal)
+    archivesOuvertesData = getConceptsAndKeywords(idhal)
 
     Chercheur ["structSirene"] = structId
     Chercheur["labHalId"] = connaitLab
