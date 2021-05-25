@@ -51,6 +51,7 @@ urlpatterns = [
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
+    path('create/', views.unknown, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
     path('loggedin/', views.loggedin, name='loggued')
 ]

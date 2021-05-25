@@ -1,6 +1,19 @@
 from django import forms
 from django.forms import models
 
+class CreateCredentials(forms.Form):
+    def __init__(self, *args, **kwargs):
+        halId_s = kwargs.pop('halId_s')
+        idRef = kwargs.pop('idRef')
+        orcId = kwargs.pop('orcId')
+        #self.fields['f_halId_s'].initial = "renseigner "
+        #self.fields['f_IdRef'].initial = "renseigner "
+        #self.fields['f_orcId'].initial = "renseigner "
+    # Set choices to an empty list as it is a required argument.
+    f_more = forms.CharField()
+    f_halId_s = forms.CharField(label='ID HAL (texte)')
+    f_IdRef = forms.CharField(label='IdRef')
+    f_orcId = forms.CharField(label='ORCID')
 
 class validCredentials(forms.Form):
 
