@@ -4,10 +4,12 @@ from datetime import datetime
 import json
 from . import forms, settings
 from django.views.decorators.clickjacking import xframe_options_exempt
-
+from ldap3 import Server, Connection, ALL
+import json
 from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
-
+from libsElastichal  import getAureHal
+import archivesOuvertes
 from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
@@ -77,11 +79,122 @@ def loggedin(request):
         else:
             #gugusse = request.user.get_username()
             gugusse = gugusse.replace('cas-utln-', '')
-            return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+            # check présence gugusse
+            es = esConnector()
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": id
+                    }
+                }
+            }
+            count = es.count(index=structId + "*-researchers", body=scope_param)['count']
+            if count >0:
+                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+            else:
+                return redirect('create/?id=' + gugusse)
     else:
         #heu ?
         print ("cas raté")
         return render(request, '404.html')
+
+def create(request):
+    id  = request.get('id') # ldapid
+
+    return render(request, 'check.html', {'data': "create", #'type': type,
+                                          'id': id,#'from': dateFrom, 'to': dateTo,
+                                          #'entity': entity, #'extIds': ['a', 'b', 'c'],
+                                          'form': forms.CreateCredentials()}
+                                          #"'startDate': start_date,
+                                          #'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
+                )
+
+def createCredentials(request):
+
+
+    ldapId = request.GET['ldapId']
+    idhal = request.POST.GET['halId_s']
+    structId = request.POST.get['structId']
+
+    # resultat
+    Chercheur = dict()
+    server = Server('ldap.univ-tln.fr', get_info=ALL)
+    conn = Connection(server, ' cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ['ldappass'], auto-bind=True)
+                      # recup des données ldap
+    conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +')', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
+    dico = json.loads(conn .entry_to_json())
+
+    labo = dico ['attributes']['labo']
+    connaitLab = labo [0]  # premier labo (au cas où) ???
+
+    extrait = dico['dn'].split('uid=')[1].split(',')
+    typeGus = extrait[1].replace('ou=', '')
+    suppanId = extrait[0]
+    if suppanId != ldapId:
+        print ("aille", ldapId, ' --> ', ldapId)
+    nom = dico['attributes']['displayName']
+    Emploi = dico['attributes']['typeEmploi']
+    mail = dico['attributes']['mail']
+    if 'supannAffectation' in dico['attributes'].keys():
+        supannAffect = dico['attributes']['supannAffectation']
+    if 'supannEntiteAffectationPrincipale' in dico['attributes'].keys():
+        supannPrinc = dico['attributes']['supannEntiteAffectationPrincipale']
+    else:
+        supannPrinc = []
+        if not len(nom)>0:
+            nom = ['']
+        elif not len(Emploi) >0:
+            Emploi = ['']
+        elif not len (mail)  >0:
+            mail = ['']
+
+    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
+
+    # as-t-on besoin des 3 derniers champs ???
+    Chercheur ["name"] = nom[0]
+    Chercheur["type"] = typeGus
+    Chercheur["function"] = Emploi[0]
+    Chercheur["mail"] = mail[0]
+    Chercheur["lab"] = ";".join(labo)
+    Chercheur["supannAffectation"] = ";".join(supannAffect)
+    Chercheur["supannEntiteAffectationPrincipale"] = ";".join(supannPrinc)
+    Chercheur["firstName"] = Chercheur['name'].split(' ')[1]
+    Chercheur["lastName"] = Chercheur['name'].split(' ')[0]
+    # Chercheur["aurehalId"]
+
+    # creation des index
+
+    if not es.indices.exists(index=structId + "-structures"):
+        es.indices.create(index=structId + "-structures")
+    if not es.indices.exists(index=structId + "-" + connaitLab + "-researchers"):
+        es.indices.create(index=structId + "-" + connaitLab + "-researchers")
+        es.indices.create(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents
+    else:
+        if not es.indices.exists(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents"):
+            es.indices.create(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+    # integration contenus
+    archivesOuvertesData = archivesOuvertes.getConceptsAndKeywords(idhal)
+
+    Chercheur ["structSirene"] = structId
+    Chercheur["labHalId"] = connaitLab
+    Chercheur["validated"] = False
+    Chercheur["ldapId"] = ldapId
+
+    #New step ?
+
+    if hal_id != '':
+        aureHal = getAureHal(hal_id)
+    Chercheur["halId_s"] = idhal
+
+    Chercheur["aurehalId"] = aureHal  # heu ?
+    Chercheur["concepts"] = archivesOuvertesData['concepts']
+    Chercheur["guidingKeywords"] = []
+
+    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
+
+    res = es.index(index= Chercheur ["structSirene"]+ "-" + Chercheur["labHalId"] + "-researchers", id=Chercheur["ldapId"],
+                   body=json.dumps(Chercheur))
+
 
 #@login_required
 def unknown(request):
