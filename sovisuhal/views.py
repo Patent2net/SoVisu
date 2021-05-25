@@ -119,7 +119,12 @@ def create(request):
     return render(request, 'check.html', {'data': "create", #'type': type,
                                           'id': id,#'from': dateFrom, 'to': dateTo,
                                           #'entity': entity, #'extIds': ['a', 'b', 'c'],
-                                          'form': forms.CreateCredentials()}
+                                          'halId_s':'',
+                                          'idRef':'',
+                                          'orcId':'',
+                                          'autres':'',
+                                          'form': forms.CreateCredentials()
+                                          }
                                           #"'startDate': start_date,
                                           #'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
                 )
