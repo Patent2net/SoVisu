@@ -8,8 +8,8 @@ from ldap3 import Server, Connection, ALL
 import json
 from django.core.mail import mail_admins, send_mail
 from .forms import ContactForm
-from libsElastichal  import getAureHal
-import archivesOuvertes
+from .libsElastichal  import getAureHal
+import .archivesOuvertes
 from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
