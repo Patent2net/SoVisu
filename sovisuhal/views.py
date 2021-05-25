@@ -113,22 +113,6 @@ def loggedin(request):
         print ("cas raté")
         return render(request, '404.html')
 
-def create(request):
-    ldapid  = request.get('id') # ldapid
-
-    return render(request, 'check.html', {'data': "create", #'type': type,
-                                          'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
-                                          #'entity': entity, #'extIds': ['a', 'b', 'c'],
-                                          'halId_s':'',
-                                          'idRef':'',
-                                          'orcId':'',
-                                          'autres':'',
-                                          'form': forms.CreateCredentials()
-                                          }
-                                          #"'startDate': start_date,
-                                          #'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
-                )
-
 def CreateCredentials(request):
 
     es = esConnector()
@@ -215,7 +199,23 @@ def CreateCredentials(request):
                    body=json.dumps(Chercheur))
 
 
-#@login_required
+@login_required
+def create(request):
+    ldapid  = request.get('id') # ldapid
+
+    return render(request, 'check.html', {'data': "create", #'type': type,
+                                          'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
+                                          #'entity': entity, #'extIds': ['a', 'b', 'c'],
+                                          'halId_s':'',
+                                          'idRef':'',
+                                          'orcId':'',
+                                          'autres':'',
+                                          'form': forms.CreateCredentials()
+                                          }
+                                          #"'startDate': start_date,
+                                          #'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
+                )
+
 def unknown(request):
     # if not request.user.is_authenticated:
     #     return redirect('%s?next=%s' % (LOGIN_URL, "/check"))
