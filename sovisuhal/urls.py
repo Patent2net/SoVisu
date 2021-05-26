@@ -14,9 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import include
-
+from django.urls import re_path, include
 from . import views
 
 urlpatterns = [
@@ -53,6 +53,6 @@ urlpatterns = [
     path('unknown/', views.unknown, name='unknown'),
     path('create/', views.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
-    path('loggedin/', views.loggedin, name='loggued')
-
+    path('loggedin/', views.loggedin, name='loggued'),
+    path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
 ]
