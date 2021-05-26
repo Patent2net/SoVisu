@@ -123,7 +123,12 @@ def CreateCredentials(request):
     idRef = request.POST.get ('f_IdRef')
     idhal = request.POST.get ('f_halId_s')
     structId = request.POST.get ('structId')
-    labo = request.POST.get ('f_labo') [0] # halid
+    tempoLab = request.POST.get ('f_labo') # chaine de caractère
+    tempoLab = tempoLab.replace ("'", "")
+    tempoLab = tempoLab.replace('(','')
+    tempoLab = tempoLab.replace(')', '')
+    tempoLab = tempoLab.split(',')
+    labo = tempoLab [0] .strip() # halid
     # resultat
     Chercheur = dict()
     if mode =="Prod":
@@ -167,10 +172,10 @@ def CreateCredentials(request):
     # as-t-on besoin des 3 derniers champs ???
     Chercheur ["name"] = nom
     Chercheur["type"] = typeGus
-    Chercheur["function"] = Emploi[0]
+    Chercheur["function"] = Emploi
     Chercheur["mail"] = mail[0]
 
-    Chercheur["lab"] = request.POST.get ('f_labo') [1] # acronyme
+    Chercheur["lab"] = tempoLab [1]. strip() # acronyme
     Chercheur["supannAffectation"] = ";".join(supannAffect)
     Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
     Chercheur["firstName"] = Chercheur['name'].split(' ')[1]
@@ -204,16 +209,17 @@ def CreateCredentials(request):
         pass
         #retourne sur check() ?
     Chercheur["halId_s"] = idhal
-
+    Chercheur["validated"] = False
     Chercheur["aurehalId"] = aureHal  # heu ?
     Chercheur["concepts"] = archivesOuvertesData['concepts']
     Chercheur["guidingKeywords"] = []
-
+    Chercheur["idRef"] = idRef
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
     res = es.index(index= Chercheur ["structSirene"]+ "-" + Chercheur["labHalId"] + "-researchers", id=Chercheur["ldapId"],
                    body=json.dumps(Chercheur))
-    return redirect('/check/?type=rsr&id=' + ldapId +'&from=1990-01-01&to=2021-05-20')
+
+    return redirect('/check/?type=rsr&id=' + ldapId +'&from=1990-01-01&to=2021-05-20&data=credentials')
 
 @login_required
 def create(request):
