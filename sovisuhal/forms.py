@@ -54,7 +54,7 @@ class CreateCredentials(forms.Form):
     res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
     entities = res['hits']['hits']
     ##harvested_from_label.keyword
-    labos = [(truc ['fields']['acronym'] [0], truc ['fields']['label'][0]) for truc in entities]
+    labos = [((truc ['fields']['halStructId'] [0], truc ['fields']['acronym'] [0]), truc ['fields']['label'][0]) for truc in entities]
 
     f_labo = forms.CharField(label='Labo', widget=forms.Select (choices=labos))
 

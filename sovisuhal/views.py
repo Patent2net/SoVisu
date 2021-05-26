@@ -17,19 +17,19 @@ from django.contrib import messages
 
 
 try:
-
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-    from uniauth.decorators import login_required
     from decouple import config
     from ldap3 import Server, Connection, ALL
-
+    from uniauth.decorators import login_required
+    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+    structId = config("structId")
 except:
     from django.contrib.auth.decorators import login_required
     mode = "Dev"
-try:
-    structId = config("structId")
-except:
-    structId = "198307662"  # UTLN
+    structId = "198307662"# UTLN
+
+
+
+
 
 #struct = "198307662"
 
@@ -120,20 +120,24 @@ def CreateCredentials(request):
 
     es = esConnector()
     ldapId = request.GET['ldapid']
-    idhal = request.POST.get ('halId_s')
+    idRef = request.POST.get ('f_IdRef')
+    idhal = request.POST.get ('f_halId_s')
     structId = request.POST.get ('structId')
-    labo = request.POST.get ('labo')
+    labo = request.POST.get ('f_labo') [0] # halid
     # resultat
     Chercheur = dict()
-    server = Server('ldap.univ-tln.fr', get_info=ALL)
-    conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
-    conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +'))', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
-    dico = json.loads(conn .response_to_json()) ['entries'] [0]
-    # if len(dico ['attributes']['labo']) >0:
-    #     labo = dico ['attributes']['labo']
-    # else:
-    #     labo =  dico['attributes']['supannAffectation'][0]
-    # je crains que l'on ait des surprises ici.... Un nouveau tour dans check pour valider et/ou choisir un labo ?
+    if mode =="Prod":
+        server = Server('ldap.univ-tln.fr', get_info=ALL)
+        conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
+        conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +'))', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
+        dico = json.loads(conn .response_to_json()) ['entries'] [0]
+    else:
+        dico = {'attributes': {'displayName': 'REYMOND David', 'labo': [], 'mail': ['david.reymond@univ-tln.fr'],
+                               'supannAffectation': ['IMSIC', 'IUT TC'], 'supannEntiteAffectationPrincipale': 'IUTTCO',
+                               'supanncodeentite': [], 'typeEmploi': 'Enseignant Chercheur Titulaire', 'ustvStatus': ['OFFI']},
+                                'dn': 'uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr'}
+        structId = "198307662"
+        ldapId = 'dreymond'
 
     connaitLab = labo # premier labo (au cas où) ???
 
@@ -151,23 +155,24 @@ def CreateCredentials(request):
         supannPrinc = dico['attributes']['supannEntiteAffectationPrincipale']
     else:
         supannPrinc = []
-        if not len(nom)>0:
-            nom = ['']
-        elif not len(Emploi) >0:
-            Emploi = ['']
-        elif not len (mail)  >0:
-            mail = ['']
+    if not len(nom)>0:
+        nom = ['']
+    elif not len(Emploi) >0:
+        Emploi = ['']
+    elif not len (mail)  >0:
+        mail = ['']
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
     # as-t-on besoin des 3 derniers champs ???
-    Chercheur ["name"] = nom[0]
+    Chercheur ["name"] = nom
     Chercheur["type"] = typeGus
     Chercheur["function"] = Emploi[0]
     Chercheur["mail"] = mail[0]
-    Chercheur["lab"] = ";".join(labo)
+
+    Chercheur["lab"] = request.POST.get ('f_labo') [1] # acronyme
     Chercheur["supannAffectation"] = ";".join(supannAffect)
-    Chercheur["supannEntiteAffectationPrincipale"] = ";".join(supannPrinc)
+    Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
     Chercheur["firstName"] = Chercheur['name'].split(' ')[1]
     Chercheur["lastName"] = Chercheur['name'].split(' ')[0]
     # Chercheur["aurehalId"]
@@ -176,16 +181,16 @@ def CreateCredentials(request):
 
     if not es.indices.exists(index=structId + "-structures"):
         es.indices.create(index=structId + "-structures")
-    if not es.indices.exists(index=structId + "-" + connaitLab + "-researchers"):
-        es.indices.create(index=structId + "-" + connaitLab + "-researchers")
-        es.indices.create(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents
+    if not es.indices.exists(index=structId + "-" + labo  + "-researchers"):
+        es.indices.create(index=structId + "-" + labo + "-researchers")
+        es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents
     else:
-        if not es.indices.exists(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents"):
-            es.indices.create(index=structId + "-" + connaitLab + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+        if not es.indices.exists(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents"):
+            es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
 
 
     Chercheur ["structSirene"] = structId
-    Chercheur["labHalId"] = connaitLab
+    Chercheur["labHalId"] = labo
     Chercheur["validated"] = False
     Chercheur["ldapId"] = ldapId
 
@@ -208,7 +213,7 @@ def CreateCredentials(request):
 
     res = es.index(index= Chercheur ["structSirene"]+ "-" + Chercheur["labHalId"] + "-researchers", id=Chercheur["ldapId"],
                    body=json.dumps(Chercheur))
-
+    return redirect('/check/?type=rsr&id=' + ldapId +'&from=1990-01-01&to=2021-05-20')
 
 @login_required
 def create(request):
