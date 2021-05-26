@@ -223,7 +223,7 @@ def collecte_docs(self,  Chercheur):
     res = helpers.bulk(
         es,
         docs,
-        index= Chercheur["structSirene"]  + "-" + Chercheur["halId_s"] + "-researchers-" + Chercheur["ldapId"] + "-documents",
+        index= Chercheur["structSirene"]  + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents",
         # -researchers" + row["ldapId"] + "-documents
             )
     return docs # pas utile...
