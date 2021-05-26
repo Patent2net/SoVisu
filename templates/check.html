@@ -1,9 +1,10 @@
 {% include "includes/header.html" with title="Vérification des données" %}
 {% load widget_tweaks %}
-
+{% load static %}
 <div class="h-full w-full flex">
 
     {% include "includes/menu.html" with title="Vérification des données" %}
+<script src="{% static 'celery_progress/celery_progress.js' %}"></script>
 
     <div class="w-full h-full relative p-3" style="background: #fafbfd;">
 
@@ -53,6 +54,7 @@
 
 
             </div>
+
 
             {% if data == "state" %}
 
@@ -128,11 +130,55 @@
 
                             {% endif %}
                         </div>
-                    {% endfor %}
-                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="j'ai fini !">
+                        {% endfor %}
+                                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="j'ai fini !">
                 </form>
+                {% block progress %}
+                {% load static %}
+                        <div class='progress-wrapper' style="padding-top: 10px;">
+
+                            <div id='progress-bar' class='progress-bar progress-bar-striped' role='progressbar' style="height:30px; width: 0%; border-radius: 5px">&nbsp;</div>
+                            </div>
+                            <div id="celery-result"> </div>
+                            <div id="progress-bar-message">En attente des données saisies...</div>
+
+                {% endblock progress %}
+
+                {% block progress_bar_js %}
+                   {% if task_id %}
+
+                        <script type="text/javascript">
+                            function processProgress(progressBarElement, progressBarMessageElement, progress) {
+                                    progressBarElement.style.width = progress.percent + "%";
+                                    var description = progress.description || "Starting download";
+                                        progressBarMessageElement.innerHTML = description;
+                            }
+
+                        function processResult(resultElement, result) {
+                            if (result.includes("successful")) {
+                                    $( resultElement ).append($('<br>'));
+                                    $( resultElement ).append(
+                                        $('<p class="text-center">').text(result)
+                                            );
+                                        }
+                                }
+
+                        // Progress Bar (JQuery)
+                        $(function () {
+                            var progressUrl = "{% url 'celery_progress:task_status' task_id %}";
+                            CeleryProgressBar.initProgressBar(progressUrl, {
+                            onProgress: processProgress,
+                            onResult: processResult,
+                            })
+                            });
+                        </script>
+
+                   {% endif %}
+                {% endblock progress_bar_js %}
+
 
             {% endif %}
+
 
             {% if data == -1 or data == "credentials" %}
 

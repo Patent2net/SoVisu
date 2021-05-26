@@ -204,7 +204,7 @@ def getConceptsAndKeywords(halId_i):
     sujets, domaines = extraitSujetsDomaines(data)
     Domains = []
 
-
+    print (sujets, domaines)
     try:
 
         for dom in domaines:

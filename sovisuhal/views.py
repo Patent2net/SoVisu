@@ -1,16 +1,15 @@
-from django.shortcuts import render, redirect
-from elasticsearch import Elasticsearch, helpers
+import json
 from datetime import datetime
-import json
-from . import forms, settings
-from django.views.decorators.clickjacking import xframe_options_exempt
 
-import json
-from django.core.mail import mail_admins, send_mail
-from .forms import ContactForm
-from .libsElastichal  import getAureHal
-from sovisuhal.archivesOuvertes import *
 from django.contrib import messages
+from django.core.mail import mail_admins, send_mail
+from django.shortcuts import render, redirect
+from django.views.decorators.clickjacking import xframe_options_exempt
+from elasticsearch import Elasticsearch, helpers
+from .elasticHal import indexe_chercheur, collecte_docs
+from . import forms, settings
+from .forms import ContactForm
+
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
 # from uniauth.decorators import login_required
@@ -29,9 +28,8 @@ except:
 
 
 
-
-
 #struct = "198307662"
+
 
 def esConnector(mode = mode):
     if mode == "Prod":
@@ -85,7 +83,7 @@ def index(request):
 @login_required
 def loggedin(request):
     if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, ''))
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, ))
     elif request.user.is_authenticated:
         gugusse = request.user.get_username()
         if gugusse == 'admin':
@@ -117,12 +115,10 @@ def loggedin(request):
         return render(request, '404.html')
 
 def CreateCredentials(request):
-
-    es = esConnector()
     ldapId = request.GET['ldapid']
     idRef = request.POST.get ('f_IdRef')
     idhal = request.POST.get ('f_halId_s')
-    structId = request.POST.get ('structId')
+    # structId = request.POST.get ('structId')
     tempoLab = request.POST.get ('f_labo') # chaine de caractère
     tempoLab = tempoLab.replace ("'", "")
     tempoLab = tempoLab.replace('(','')
@@ -130,96 +126,22 @@ def CreateCredentials(request):
     tempoLab = tempoLab.split(',')
     labo = tempoLab [0] .strip() # halid
     # resultat
-    Chercheur = dict()
-    if mode =="Prod":
-        server = Server('ldap.univ-tln.fr', get_info=ALL)
-        conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
-        conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +'))', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
-        dico = json.loads(conn .response_to_json()) ['entries'] [0]
-    else:
-        dico = {'attributes': {'displayName': 'REYMOND David', 'labo': [], 'mail': ['david.reymond@univ-tln.fr'],
-                               'supannAffectation': ['IMSIC', 'IUT TC'], 'supannEntiteAffectationPrincipale': 'IUTTCO',
-                               'supanncodeentite': [], 'typeEmploi': 'Enseignant Chercheur Titulaire', 'ustvStatus': ['OFFI']},
-                                'dn': 'uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr'}
-        structId = "198307662"
-        ldapId = 'dreymond'
+    Chercheur = indexe_chercheur(ldapId, tempoLab, idhal, idRef)
 
-    connaitLab = labo # premier labo (au cas où) ???
-
-    extrait = dico['dn'].split('uid=')[1].split(',')
-    typeGus = extrait[1].replace('ou=', '')
-    suppanId = extrait[0]
-    if suppanId != ldapId:
-        print ("aille", ldapId, ' --> ', ldapId)
-    nom = dico['attributes']['displayName']
-    Emploi = dico['attributes']['typeEmploi']
-    mail = dico['attributes']['mail']
-    if 'supannAffectation' in dico['attributes'].keys():
-        supannAffect = dico['attributes']['supannAffectation']
-    if 'supannEntiteAffectationPrincipale' in dico['attributes'].keys():
-        supannPrinc = dico['attributes']['supannEntiteAffectationPrincipale']
-    else:
-        supannPrinc = []
-    if not len(nom)>0:
-        nom = ['']
-    elif not len(Emploi) >0:
-        Emploi = ['']
-    elif not len (mail)  >0:
-        mail = ['']
+    docs = collecte_docs (Chercheur)
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-
-    # as-t-on besoin des 3 derniers champs ???
-    Chercheur ["name"] = nom
-    Chercheur["type"] = typeGus
-    Chercheur["function"] = Emploi
-    Chercheur["mail"] = mail[0]
-
-    Chercheur["lab"] = tempoLab [1]. strip() # acronyme
-    Chercheur["supannAffectation"] = ";".join(supannAffect)
-    Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
-    Chercheur["firstName"] = Chercheur['name'].split(' ')[1]
-    Chercheur["lastName"] = Chercheur['name'].split(' ')[0]
-    # Chercheur["aurehalId"]
-
-    # creation des index
-
-    if not es.indices.exists(index=structId + "-structures"):
-        es.indices.create(index=structId + "-structures")
-    if not es.indices.exists(index=structId + "-" + labo  + "-researchers"):
-        es.indices.create(index=structId + "-" + labo + "-researchers")
-        es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents
-    else:
-        if not es.indices.exists(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents"):
-            es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
-
-
-    Chercheur ["structSirene"] = structId
-    Chercheur["labHalId"] = labo
-    Chercheur["validated"] = False
-    Chercheur["ldapId"] = ldapId
-
-    #New step ?
-
-    if idhal != '':
-        aureHal = getAureHal(idhal)
-        # integration contenus
-        archivesOuvertesData = getConceptsAndKeywords(idhal)
-    else:
-        pass
-        #retourne sur check() ?
-    Chercheur["halId_s"] = idhal
-    Chercheur["validated"] = False
-    Chercheur["aurehalId"] = aureHal  # heu ?
-    Chercheur["concepts"] = archivesOuvertesData['concepts']
-    Chercheur["guidingKeywords"] = []
-    Chercheur["idRef"] = idRef
-    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-
-    res = es.index(index= Chercheur ["structSirene"]+ "-" + Chercheur["labHalId"] + "-researchers", id=Chercheur["ldapId"],
-                   body=json.dumps(Chercheur))
 
     return redirect('/check/?type=rsr&id=' + ldapId +'&from=1990-01-01&to=2021-05-20&data=credentials')
+
+def get_progress(request, task_id):
+    result = AsyncResult(task_id)
+    response_data = {
+        'state': result.state,
+        'details': result.info,
+    }
+    return HttpResponse(json.dumps(response_data), content_type='application/json')
+
 
 @login_required
 def create(request):
@@ -784,14 +706,14 @@ def check(request):
         data = -1
 
     # /
-    # if data == 'create':
-    #     return render(request, 'check.html', {'data': data, #'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-    #                                           #'entity': entity, 'extIds': ['a', 'b', 'c'],
-    #                                           'form': forms.CreateCredentials (),
-    #                                           #'startDate': start_date,
-    #                                           #timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"
-    #                   }
-    #                  )
+    if data == -1:
+         return render(request, 'check.html', {'data': create, #'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                               #'entity': entity, 'extIds': ['a', 'b', 'c'],
+                                               'form': forms.CreateCredentials (),
+                                               #'startDate': start_date,
+                                               #timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"
+                       }
+                      )
 
     # Get scope informations
     if type == "rsr":
