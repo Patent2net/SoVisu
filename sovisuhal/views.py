@@ -13,7 +13,7 @@ from sovisuhal.archivesOuvertes import *
 from django.contrib import messages
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
-from uniauth.decorators import login_required
+# from uniauth.decorators import login_required
 
 
 try:
@@ -22,7 +22,9 @@ try:
     from uniauth.decorators import login_required
     from decouple import config
     from ldap3 import Server, Connection, ALL
+
 except:
+    from django.contrib.auth.decorators import login_required
     mode = "Dev"
 try:
     structId = config("structId")
@@ -120,17 +122,18 @@ def CreateCredentials(request):
     ldapId = request.GET['ldapid']
     idhal = request.POST.get ('halId_s')
     structId = request.POST.get ('structId')
+    labo = request.POST.get ('labo')
     # resultat
     Chercheur = dict()
     server = Server('ldap.univ-tln.fr', get_info=ALL)
     conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
     conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +'))', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
     dico = json.loads(conn .response_to_json()) ['entries'] [0]
-    if len(dico ['attributes']['labo']) >0:
-        labo = dico ['attributes']['labo']
-    else:
-        labo =  dico['attributes']['supannAffectation'][0]
-    # je crains que l'on ait des surprises ici.... Un nouveau tour dans check pour valider et/ou choisir un labo
+    # if len(dico ['attributes']['labo']) >0:
+    #     labo = dico ['attributes']['labo']
+    # else:
+    #     labo =  dico['attributes']['supannAffectation'][0]
+    # je crains que l'on ait des surprises ici.... Un nouveau tour dans check pour valider et/ou choisir un labo ?
 
     connaitLab = labo # premier labo (au cas où) ???
 
@@ -211,7 +214,7 @@ def CreateCredentials(request):
 def create(request):
     ldapid  = request.GET['ldapid'] # ldapid
     if len(request.GET['halId_s'] .replace('nullNone', '')) >0 and len(request.GET['orcId'] .replace('nullNone', '')) >0:
-        return CreateCredentials (request)
+        return InitCredentials (request)
     else:
         return render(request, 'check.html', {'data': "create", #'type': type,
                                           'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,

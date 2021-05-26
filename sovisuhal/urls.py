@@ -43,7 +43,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
 
     path('help/', views.help, name='help'),
-
+    path('create_credentials/', views.CreateCredentials, name='credentials'),
     path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
     path('validate_references/', views.validateReferences, name='validate_references'),
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
@@ -54,4 +54,5 @@ urlpatterns = [
     path('create/', views.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
     path('loggedin/', views.loggedin, name='loggued')
+
 ]
