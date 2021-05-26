@@ -96,6 +96,40 @@
 
             {% endif %}
 
+            {% if data == "init" %}
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <ul>
+                        <li>Dans quel labo êtes vous associé principalement ?</li>
+                    </ul>
+
+                </div>
+
+                <form action="/InitCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
+                    {% csrf_token %}
+                    {% for field in form.visible_fields %}
+                        <div>
+                            {% if field.auto_id == "id_f_labo" %}
+                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none flex-direction: column;" %}
+                            {% else %}
+                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+
+                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="j'ai fini !">
+                </form>
+
+            {% endif %}
+
+
             {% if data == "create" %}
 
                 <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
@@ -118,8 +152,9 @@
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
                         <div>
-                            {% if field.auto_id == "id_f_more" %}
-                                {% render_field field class="hidden" %}
+                              {% if field.auto_id == "id_f_labo" %}
+                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none flex-direction: column;" %}
                             {% else %}
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
 
