@@ -43,7 +43,7 @@ def esConnector(mode = mode):
 
 
 @shared_task(bind=True)
-def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef, orcId):
+def indexe_chercheur (self, ldapId, laboAccro, labHalId, idhal, idRef, orcId):
     es = esConnector()
     progress_recorder = ProgressRecorder(self)
     progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
@@ -60,7 +60,7 @@ def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef, orcId):
                                 'dn': 'uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr'}
         structId = "198307662"
         ldapId = 'dreymond'
-    labo = tempoLab [0]
+    labo = labHalId
     connaitLab = labo # premier labo (au cas où) ???
 
     extrait = dico['dn'].split('uid=')[1].split(',')
@@ -92,7 +92,7 @@ def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef, orcId):
     Chercheur["function"] = Emploi
     Chercheur["mail"] = mail[0]
     Chercheur ["orcId"] = orcId
-    Chercheur["lab"] = tempoLab [1]. strip() # acronyme
+    Chercheur["lab"] = laboAccro # acronyme
     Chercheur["supannAffectation"] = ";".join(supannAffect)
     Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
     Chercheur["firstName"] = Chercheur['name'].split(' ')[1]

@@ -36,6 +36,8 @@ class CreateCredentials(forms.Form):
     f_IdRef = forms.CharField(label='IdRef - identifiant de la notice')
     f_orcId = forms.CharField(label='ORCID (numéro par ex: 0000-0003-2071-6594')
     f_more = forms.CharField(label='autres')
+
+
     es = esConnector()
 
     scope_param = {
@@ -58,6 +60,8 @@ class CreateCredentials(forms.Form):
 
     f_labo = forms.CharField(label='Labo', widget=forms.Select (choices=labos))
 
+    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'), ('visiteur', 'visiteur')]
+    f_role = forms.CharField(label='Role', widget=forms.Select (choices=roles))
 
 
 class validCredentials(forms.Form):
