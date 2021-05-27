@@ -53,6 +53,6 @@ urlpatterns = [
     path('unknown/', views.unknown, name='unknown'),
     path('create/', views.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
-    path('loggedin/', views.loggedin, name='loggued'),
-    path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
+    path('loggedin/', views.loggedin, name='loggued')#,
+    # path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
 ]
