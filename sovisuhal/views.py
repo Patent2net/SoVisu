@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch, helpers
 from .elasticHal import indexe_chercheur, collecte_docs
 from . import forms, settings
 from .forms import ContactForm
+# from celery.result import AsyncResult
 
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
@@ -136,13 +137,13 @@ def CreateCredentials(request):
 
     return redirect('/check/?type=rsr&id=' + ldapId +'&orcId='+ orcId +'&from=1990-01-01&to=2021-05-20&data=credentials')
 
-def get_progress(request, task_id):
-    result = AsyncResult(task_id)
-    response_data = {
-        'state': result.state,
-        'details': result.info,
-    }
-    return HttpResponse(json.dumps(response_data), content_type='application/json')
+# def get_progress(request, task_id):
+#     result = AsyncResult(task_id)
+#     response_data = {
+#         'state': result.state,
+#         'details': result.info,
+#     }
+#     return HttpResponse(json.dumps(response_data), content_type='application/json')
 
 
 @login_required
