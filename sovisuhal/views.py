@@ -118,6 +118,7 @@ def CreateCredentials(request):
     ldapId = request.GET['ldapid']
     idRef = request.POST.get ('f_IdRef')
     idhal = request.POST.get ('f_halId_s')
+    orcId = request.POST.get ('orcId')
     # structId = request.POST.get ('structId')
     tempoLab = request.POST.get ('f_labo') # chaine de caractère
     tempoLab = tempoLab.replace ("'", "")
@@ -126,13 +127,13 @@ def CreateCredentials(request):
     tempoLab = tempoLab.split(',')
     labo = tempoLab [0] .strip() # halid
     # resultat
-    Chercheur = indexe_chercheur(ldapId, tempoLab, idhal, idRef)
+    Chercheur = indexe_chercheur(ldapId, tempoLab, idhal, idRef, orcId)
 
     docs = collecte_docs (Chercheur)
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
-    return redirect('/check/?type=rsr&id=' + ldapId +'&from=1990-01-01&to=2021-05-20&data=credentials')
+    return redirect('/check/?type=rsr&id=' + ldapId +'&orcId='+ orcid +'&from=1990-01-01&to=2021-05-20&data=credentials')
 
 def get_progress(request, task_id):
     result = AsyncResult(task_id)
@@ -708,10 +709,8 @@ def check(request):
     # /
     if data == -1:
          return render(request, 'check.html', {'data': create, #'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                               #'entity': entity, 'extIds': ['a', 'b', 'c'],
                                                'form': forms.CreateCredentials (),
-                                               #'startDate': start_date,
-                                               #timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"
+
                        }
                       )
 
@@ -730,14 +729,6 @@ def check(request):
 
         res = es.search(index= structId  + "-*-researchers*", body=scope_param)
         entity = res['hits']['hits'][0]['_source'] # plante si id pas présente
-         # idée: création d'une entite "inconnu" {ldapid : * # tous ceux qui n'ont pas de halid, idref, orcid
-        #                                         idref: none
-        #                                         idhal: none
-        #                                         orcid: none}
-        # si le champs idhal est "vide" alors:
-        # ouverture cette page avec édition des champs de l'"entité inconnue"
-        # la validation lance "insert entities_bis" adapté pour màj ces valeurs
-        #                     puis collecte_mon_hal qui ne collecte que les données de ce nouvel hal id
 
     elif type == "lab":
         scope_param = {
