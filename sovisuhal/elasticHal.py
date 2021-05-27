@@ -12,7 +12,7 @@ try:
     from ldap3 import Server, Connection, ALL
     from uniauth.decorators import login_required
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-    structId = config("structId")
+
 except:
     from django.contrib.auth.decorators import login_required
     mode = "Dev"
@@ -52,7 +52,7 @@ def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
         conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
         conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid='+ ldapId +'))', attributes = ['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation', 'supanncodeentite','supannEntiteAffectationPrincipale',  'labo'])
         dico = json.loads(conn .response_to_json()) ['entries'] [0]
-
+        structId = config("structId")
     else:
         dico = {'attributes': {'displayName': 'REYMOND David', 'labo': [], 'mail': ['david.reymond@univ-tln.fr'],
                                'supannAffectation': ['IMSIC', 'IUT TC'], 'supannEntiteAffectationPrincipale': 'IUTTCO',
