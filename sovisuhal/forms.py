@@ -32,6 +32,11 @@ def esConnector(mode = mode):
 class CreateCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
         # f_more = forms.CharField()
+
+    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'),
+             ('visiteur', 'visiteur')]
+    f_role = forms.CharField(label='Role', widget=forms.Select(choices=roles))
+
     f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
     f_IdRef = forms.CharField(label='IdRef - identifiant de la notice')
     f_orcId = forms.CharField(label='ORCID (numéro par ex: 0000-0003-2071-6594')
@@ -56,12 +61,11 @@ class CreateCredentials(forms.Form):
     res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
     entities = res['hits']['hits']
     ##harvested_from_label.keyword
+
     labos = [((truc ['fields']['halStructId'] [0], truc ['fields']['acronym'] [0]), truc ['fields']['label'][0]) for truc in entities]
 
     f_labo = forms.CharField(label='Labo', widget=forms.Select (choices=labos))
 
-    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'), ('visiteur', 'visiteur')]
-    f_role = forms.CharField(label='Role', widget=forms.Select (choices=roles))
 
 
 class validCredentials(forms.Form):

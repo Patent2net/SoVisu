@@ -60,6 +60,7 @@ def index(request):
         elif gugusse == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
+            print(gugusse)
             # gugusse = request.user.get_username()
             gugusse = gugusse.replace('cas-utln-', '')
             # check présence gugusse
@@ -73,7 +74,7 @@ def index(request):
             }
             count = es.count (index= "*-researchers", body=scope_param)['count']
             if count >0:
-                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20&data=credentials')
             else:
                 return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
