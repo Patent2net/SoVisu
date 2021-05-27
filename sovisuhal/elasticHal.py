@@ -43,7 +43,7 @@ def esConnector(mode = mode):
 
 
 @shared_task(bind=True)
-def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef):
+def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef, orcId):
     es = esConnector()
     progress_recorder = ProgressRecorder(self)
     progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
@@ -91,7 +91,7 @@ def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef):
     Chercheur["type"] = typeGus
     Chercheur["function"] = Emploi
     Chercheur["mail"] = mail[0]
-
+    Chercheur ["orcId"] = orcId
     Chercheur["lab"] = tempoLab [1]. strip() # acronyme
     Chercheur["supannAffectation"] = ";".join(supannAffect)
     Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
@@ -121,7 +121,7 @@ def indexe_chercheur (self, ldapId, tempoLab, idhal, idRef):
     if idhal != '':
         aureHal = getAureHal(idhal)
         # integration contenus
-        archivesOuvertesData = getConceptsAndKeywords(idhal)
+        archivesOuvertesData = getConceptsAndKeywords(aureHal)
     else:
         pass
         #retourne sur check() ?
@@ -159,6 +159,7 @@ def collecte_docs(self,  Chercheur):
         #     doc["harvested_from_label"].append("non-labo")
 
         doc["harvested_from_ids"].append(Chercheur['halId_s'])
+
         # historique d'appartenance du docId
         # pour attribuer les bons docs aux chercheurs
         # harvet_history.append({'docid': doc['docid'], 'from': row['halId_s']})
