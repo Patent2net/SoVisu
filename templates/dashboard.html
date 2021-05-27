@@ -46,6 +46,12 @@
 
         </div>
         {% endif %}
+
+        <div class="absolute bottom-10 right-10" style="background: #fafbfd;">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+               <a href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=uncomplete"> Mettre à jour mes références</a>
+            </button>
+        </div>
     </div>
 
 {% include "includes/footer.html" %}
