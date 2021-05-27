@@ -108,7 +108,7 @@ def loggedin(request):
             }
             count = es.count (index=structId + "*-researchers", body=scope_param)['count']
             if count >0:
-                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20&data=credentials')
             else:
                 return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
     else:
