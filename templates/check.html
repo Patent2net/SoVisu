@@ -4,7 +4,7 @@
 <div class="h-full w-full flex">
 
     {% include "includes/menu.html" with title="Vérification des données" %}
-{% comment %}
+    {% comment %}
 <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
 {% endcomment %}
 
@@ -121,25 +121,23 @@
                 <form action="/CreateCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
-                        <div>
                             {% if field.auto_id == "id_f_role" %}
+                            <div>
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
                                 {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
-                            {% else %} {% comment %} possible que la suite apparaisse si  field.id_f_labo == "chercheur" ? {% endcomment %}
-                              {% if field.auto_id == "id_f_labo" %}
+                            </div>
+                            {% elif field.auto_id == "id_f_labo" %}<div class="role-trigerred">
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
                                 {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
-                              {% else %}
+                                </div>
+                            {% else %}<div class="role-trigerred">
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-
                                 {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="j'ai fini !">
+                            </div>{% endif %}
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="J'ai fini !">
                 </form>
- {% comment %}               {% block progress %}
+                {% comment %}               {% block progress %}
                 {% load static %}
                         <div class='progress-wrapper' style="padding-top: 10px;">
 
@@ -380,6 +378,38 @@
 
 <script>
 
+{% if data == "create" %}
+
+$(document).ready(function() {
+
+    var slides = document.getElementsByClassName("role-trigerred");
+
+    sel_role = document.querySelector('#id_f_role')
+    sel_role.addEventListener("change", function() {
+        if (sel_role.value == 'chercheur') {
+            console.log('a')
+            console.log(slides.length)
+            for (var i = 0; i < slides.length; i++) {
+                console.log(slides.item(i));
+                slides.item(i).style.display = "block";
+            }
+        } else {
+            console.log('b')
+            console.log(slides.length)
+            for (var i = 0; i < slides.length; i++) {
+                console.log(slides.item(i));
+                slides.item(i).style.display = "none";
+            }
+        }
+    });
+
+});
+
+
+{% endif %}
+
+
+
     {% if data == "guiding-domains" %}
 
         var selectedDoms = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
@@ -397,15 +427,15 @@
         }
 
         function onlyUnique(value, index, self) {
-          return self.indexOf(value) === index;
+            return self.indexOf(value) === index;
         }
 
         var entityDomainsFull = entityDomainsFull.filter(onlyUnique);
 
         function refreshHlPath() {
             for( var i = 0; i < entityDomainsFull.length; i++){
-                            $('path.' + entityDomainsFull[i]).attr("stroke", "green");
-                        }
+                $('path.' + entityDomainsFull[i]).attr("stroke", "green");
+            }
         }
 
 
@@ -627,191 +657,191 @@
 
     {% if data == "references" or data == "expertise" or data == "state"%}
 
-    /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
+        /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
-    $(document).ready(function() {
-        var table = $('#references').DataTable(
-            {
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
-                },
-                dom: 'Bfrtip',
-                select: true,
-                buttons: [
-                    {
-                        text: 'Tout sélectionner',
-                        action: function () {
-                            table.rows().select();
-                        }
+        $(document).ready(function() {
+            var table = $('#references').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
                     },
-                    {
-                        text: 'Rien sélectionner',
-                        action: function () {
-                            table.rows().deselect();
-                        }
-                    }
-                ],
-                "columnDefs": [
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
-                    },
-                    {
-                        "targets": [ 2 ],
-                        "orderable": false
-                    },
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                    dom: 'Bfrtip',
+                    select: true,
+                    buttons: [
+                        {
+                            text: 'Tout sélectionner',
+                            action: function () {
+                                table.rows().select();
                             }
-                            return data;
                         },
-                        "className": "text-center",
-                        "orderable": false
-                    },
-                    {
-                        "targets": [ 3 ],
-                        "visible": false
-                    },
-                    {
-                        "targets": [ 4 ],
-                        "visible": false
-                    }
-                ],
-                scrollResize: true,
-                scrollY: 100,
-                scrollCollapse: true,
-                paging: false,
-            }
-        );
-
-        table.on( 'draw', function () {
-            $('.dataTables_scrollHeadInner').css('padding-right', 0);
-            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
-
-
-            $('.dataTables_filter').addClass('flex items-center');
-            $('.dt-buttons').addClass('mr-2');
-            $('.dataTables_filter').prepend($('.dt-buttons'));
-            $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
-
-            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
-        } );
-
-        var table2 = $('#concepts').DataTable(
-            {
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
-                },
-                dom: 'Bfrtip',
-                select: true,
-                buttons: [
-                    {
-                        text: 'Tout sélectionner',
-                        action: function () {
-                            table.rows().select();
+                        {
+                            text: 'Rien sélectionner',
+                            action: function () {
+                                table.rows().deselect();
+                            }
                         }
-                    },
-                    {
-                        text: 'Rien sélectionner',
-                        action: function () {
-                            table.rows().deselect();
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": [ 1 ],
+                            "className": "text-center",
+                        },
+                        {
+                            "targets": [ 2 ],
+                            "orderable": false
+                        },
+                        {
+                            "targets": [ 0 ],
+                            "render": function(data, type, row, meta){
+                                if(type === 'display'){
+                                    data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                                }
+                                return data;
+                            },
+                            "className": "text-center",
+                            "orderable": false
+                        },
+                        {
+                            "targets": [ 3 ],
+                            "visible": false
+                        },
+                        {
+                            "targets": [ 4 ],
+                            "visible": false
                         }
-                    }
-                ],
-                "columnDefs": [
-                    {
-                        "targets": [ 0 ],
-                        "visible": false
-                    }
-                ],
-                scrollResize: true,
-                scrollY: 100,
-                scrollCollapse: true,
-                paging: false,
-            }
-        );
+                    ],
+                    scrollResize: true,
+                    scrollY: 100,
+                    scrollCollapse: true,
+                    paging: false,
+                }
+            );
 
-        table2.on( 'draw', function () {
-            $('.dataTables_scrollHeadInner').css('padding-right', 0);
-            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+            table.on( 'draw', function () {
+                $('.dataTables_scrollHeadInner').css('padding-right', 0);
+                $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
 
 
-            $('.dataTables_filter').addClass('flex items-center');
-            $('.dt-buttons').addClass('mr-2');
-            $('.dataTables_filter').prepend($('.dt-buttons'));
-            $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+                $('.dataTables_filter').addClass('flex items-center');
+                $('.dt-buttons').addClass('mr-2');
+                $('.dataTables_filter').prepend($('.dt-buttons'));
+                $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
 
-            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+                $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            } );
+
+            var table2 = $('#concepts').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                    },
+                    dom: 'Bfrtip',
+                    select: true,
+                    buttons: [
+                        {
+                            text: 'Tout sélectionner',
+                            action: function () {
+                                table.rows().select();
+                            }
+                        },
+                        {
+                            text: 'Rien sélectionner',
+                            action: function () {
+                                table.rows().deselect();
+                            }
+                        }
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": [ 0 ],
+                            "visible": false
+                        }
+                    ],
+                    scrollResize: true,
+                    scrollY: 100,
+                    scrollCollapse: true,
+                    paging: false,
+                }
+            );
+
+            table2.on( 'draw', function () {
+                $('.dataTables_scrollHeadInner').css('padding-right', 0);
+                $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+
+                $('.dataTables_filter').addClass('flex items-center');
+                $('.dt-buttons').addClass('mr-2');
+                $('.dataTables_filter').prepend($('.dt-buttons'));
+                $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+
+                $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            } );
+
+            var table3 = $('#state').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                    },
+                    dom: 'Bfrtip',
+                    select: false,
+                    buttons: [
+                    ],
+                    "columnDefs": [
+                    ],
+                    scrollResize: true,
+                    scrollY: 100,
+                    scrollCollapse: true,
+                    paging: false,
+                }
+            );
+
+
+
+            table3.on( 'draw', function () {
+                $('.dataTables_scrollHeadInner').css('padding-right', 0);
+                $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+
+                $('.dataTables_filter').addClass('flex items-center');
+                $('.dataTables_filter').prepend($('.dt-buttons'));
+
+                $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            } );
+
+            $('.validate').click( function () {
+                toValidate = []
+                table.rows('.selected').data().map( function (row) {
+                    toValidate.push(row[4])
+                });
+
+                var form = $('<form action="/validate_references/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                    '{% csrf_token %}' +
+                    '<input type="text" name="toValidate" value="' + toValidate + '" />' +
+                    '</form>');
+
+                form.appendTo('body').hide()
+                form.submit();
+            } );
+
+            $('.delete').click( function () {
+                toInvalidate = []
+                table2.rows('.selected').data().map( function (row) {
+                    toInvalidate.push(row[0])
+                });
+
+                var form = $('<form action="/invalidate_concepts/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                    '{% csrf_token %}' +
+                    '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' +
+                    '</form>');
+
+                form.appendTo('body').hide()
+                form.submit();
+            } );
+
+
+
+
         } );
-
-        var table3 = $('#state').DataTable(
-            {
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
-                },
-                dom: 'Bfrtip',
-                select: false,
-                buttons: [
-                ],
-                "columnDefs": [
-                ],
-                scrollResize: true,
-                scrollY: 100,
-                scrollCollapse: true,
-                paging: false,
-            }
-        );
-
-
-
-        table3.on( 'draw', function () {
-            $('.dataTables_scrollHeadInner').css('padding-right', 0);
-            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
-
-
-            $('.dataTables_filter').addClass('flex items-center');
-            $('.dataTables_filter').prepend($('.dt-buttons'));
-
-            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
-        } );
-
-        $('.validate').click( function () {
-            toValidate = []
-            table.rows('.selected').data().map( function (row) {
-                toValidate.push(row[4])
-            });
-
-            var form = $('<form action="/validate_references/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
-                '{% csrf_token %}' +
-                '<input type="text" name="toValidate" value="' + toValidate + '" />' +
-                '</form>');
-
-            form.appendTo('body').hide()
-            form.submit();
-        } );
-
-        $('.delete').click( function () {
-            toInvalidate = []
-            table2.rows('.selected').data().map( function (row) {
-                toInvalidate.push(row[0])
-            });
-
-            var form = $('<form action="/invalidate_concepts/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
-                '{% csrf_token %}' +
-                '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' +
-                '</form>');
-
-            form.appendTo('body').hide()
-            form.submit();
-        } );
-
-
-
-
-    } );
 
     {% endif %}
 
