@@ -126,8 +126,9 @@ def CreateCredentials(request):
     tempoLab = tempoLab.replace(')', '')
     tempoLab = tempoLab.split(',')
     labo = tempoLab [0] .strip() # halid
+    accroLab =  tempoLab [1] .strip()
     # resultat
-    Chercheur = indexe_chercheur(ldapId, tempoLab, idhal, idRef, orcId)
+    Chercheur = indexe_chercheur(ldapId, accroLab, labo, idhal, idRef, orcId)
 
     docs = collecte_docs (Chercheur)
 
