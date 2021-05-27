@@ -58,7 +58,7 @@
                             <th>Auteurs</th>
                         {% endif %}
 
-                        <th>MDS</th>
+                        <th class="defaultSort">MDS</th>
 
                         {% if filter == "uncomplete" %}
                             <th>Texte complet</th>
@@ -295,10 +295,12 @@
         }
 
 
-
-
-            var table = $('#references').DataTable(
+        var table = $('#references').DataTable(
             {
+                order: [[
+                    $('th.defaultSort').index(),
+                    'asc'
+                ]],
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
                 },
