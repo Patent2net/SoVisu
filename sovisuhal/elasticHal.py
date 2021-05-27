@@ -43,7 +43,7 @@ def esConnector(mode = mode):
 
 
 #@shared_task(bind=True)
-def indexe_chercheur (self, ldapId, laboAccro, labHalId, idhal, idRef, orcId):
+def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
     es = esConnector()
  #   progress_recorder = ProgressRecorder(self)
  #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
@@ -139,7 +139,7 @@ def indexe_chercheur (self, ldapId, laboAccro, labHalId, idhal, idRef, orcId):
     return Chercheur
 
 # @shared_task(bind=True)
-def collecte_docs(self,  Chercheur):
+def collecte_docs( Chercheur): #self,
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
   #  progress_recorder = ProgressRecorder(self)
   #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
