@@ -123,7 +123,7 @@
                             {% if field.auto_id == "id_f_role" %}
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
                                 {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
-                            {% else %}
+                            {% else %} {% comment %} possible que la suite apparaisse si  field.id_f_labo == "chercheur" ? {% endcomment %}
                               {% if field.auto_id == "id_f_labo" %}
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
                                 {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
@@ -137,7 +137,7 @@
                         {% endfor %}
                                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="j'ai fini !">
                 </form>
-                {% block progress %}
+ {% comment %}               {% block progress %}
                 {% load static %}
                         <div class='progress-wrapper' style="padding-top: 10px;">
 
@@ -179,7 +179,7 @@
 
                    {% endif %}
                 {% endblock progress_bar_js %}
-
+{% endcomment %}
 
             {% endif %}
 

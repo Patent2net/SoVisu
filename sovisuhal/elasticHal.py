@@ -18,8 +18,8 @@ except:
     mode = "Dev"
     structId = "198307662"# UTLN
 
-from celery import shared_task
-from celery_progress.backend import ProgressRecorder
+# from celery import shared_task
+# from celery_progress.backend import ProgressRecorder
 
 
 #struct = "198307662"
@@ -42,11 +42,11 @@ def esConnector(mode = mode):
 
 
 
-@shared_task(bind=True)
+#@shared_task(bind=True)
 def indexe_chercheur (self, ldapId, laboAccro, labHalId, idhal, idRef, orcId):
     es = esConnector()
-    progress_recorder = ProgressRecorder(self)
-    progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
+ #   progress_recorder = ProgressRecorder(self)
+ #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
     if mode =="Prod":
         server = Server('ldap.univ-tln.fr', get_info=ALL)
         conn = Connection (server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config ('ldappass'), auto_bind=True)# recup des données ldap
@@ -100,7 +100,7 @@ def indexe_chercheur (self, ldapId, laboAccro, labHalId, idhal, idRef, orcId):
     # Chercheur["aurehalId"]
 
     # creation des index
-    progress_recorder.set_progress(5, 10, description='creation des index')
+  #  progress_recorder.set_progress(5, 10, description='creation des index')
     if not es.indices.exists(index=structId + "-structures"):
         es.indices.create(index=structId + "-structures")
     if not es.indices.exists(index=structId + "-" + labo  + "-researchers"):
@@ -135,17 +135,17 @@ def indexe_chercheur (self, ldapId, laboAccro, labHalId, idhal, idRef, orcId):
     res = es.index(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers",
                    id=Chercheur["ldapId"],
                    body=json.dumps(Chercheur))
-    progress_recorder.set_progress(10, 10)
+   # progress_recorder.set_progress(10, 10)
     return Chercheur
 
-@shared_task(bind=True)
+# @shared_task(bind=True)
 def collecte_docs(self,  Chercheur):
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
-    progress_recorder = ProgressRecorder(self)
-    progress_recorder.set_progress(0, 10, description='récupération des données HAL')
+  #  progress_recorder = ProgressRecorder(self)
+  #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
     for num, doc in enumerate(docs):
-        progress_recorder.set_progress(num, len(docs))
+   #     progress_recorder.set_progress(num, len(docs))
         doc["_id"] = doc['docid']
         doc["validated"] = False
 
