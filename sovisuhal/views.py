@@ -354,7 +354,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId +"*-documents", body=start_date_param)
+        res = es.search(index=structId +"-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -365,7 +365,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
-        res = es.search(index=structId + "*-documents", body=start_date_param)
+        res = es.search(index=structId + '-' + id +"-laboratories-documents", body=start_date_param)
         # peut-on pointer sur index plus précis
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
