@@ -118,7 +118,7 @@ def CreateCredentials(request):
     ldapId = request.GET['ldapid']
     idRef = request.POST.get ('f_IdRef')
     idhal = request.POST.get ('f_halId_s')
-    orcId = request.POST.get ('orcId')
+    orcId = request.POST.get ('f_orcId')
     # structId = request.POST.get ('structId')
     tempoLab = request.POST.get ('f_labo') # chaine de caractère
     tempoLab = tempoLab.replace ("'", "")
@@ -133,7 +133,7 @@ def CreateCredentials(request):
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
-    return redirect('/check/?type=rsr&id=' + ldapId +'&orcId='+ orcid +'&from=1990-01-01&to=2021-05-20&data=credentials')
+    return redirect('/check/?type=rsr&id=' + ldapId +'&orcId='+ orcId +'&from=1990-01-01&to=2021-05-20&data=credentials')
 
 def get_progress(request, task_id):
     result = AsyncResult(task_id)
@@ -147,10 +147,7 @@ def get_progress(request, task_id):
 @login_required
 def create(request):
     ldapid  = request.GET['ldapid'] # ldapid
-    if len(request.GET['halId_s'] .replace('nullNone', '')) >0 and len(request.GET['orcId'] .replace('nullNone', '')) >0:
-        return InitCredentials (request)
-    else:
-        return render(request, 'check.html', {'data': "create", #'type': type,
+    return render(request, 'check.html', {'data': "create", #'type': type,
                                           'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
                                           #'entity': entity, #'extIds': ['a', 'b', 'c'],
                                           'halId_s':'nullNone',
@@ -815,6 +812,8 @@ def check(request):
             orcId = ''
             if 'orcId' in entity:
                 orcId = entity['orcId']
+            if 'orcId' in request.GET:
+                orcId = request.GET['orcId']
 
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
