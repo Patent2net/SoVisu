@@ -923,6 +923,7 @@ def check(request):
                 body=ref_param, size=count)
 
         if type == "lab":
+
             count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
             references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
                                    body=ref_param, size=count)
@@ -1254,7 +1255,7 @@ def validateReferences(request):
             }
         }
 
-        res = es.search(index= structId  +"-*-laboratories", body=scope_param)
+        res = es.search(index=structId+"-*-laboratories", body=scope_param)
         entity = res['hits']['hits'][0]['_source']
 
         if request.method == 'POST':
@@ -1391,7 +1392,6 @@ def invalidateConcept(request):
                                     if len(children1['children']) == 1:
                                         children1['state'] = 'validated'
                                     children2['state'] = 'validated'
-
 
 
         es.update(index=index, refresh='wait_for', id=entity['ldapId'],
