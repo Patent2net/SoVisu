@@ -389,6 +389,8 @@ def dashboard(request):
     return render(request, 'dashboard.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
+                                              'ext_key': ext_key,
+                                              'key': entity[key],
                                               'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
