@@ -354,7 +354,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId +"-documents", body=start_date_param)
+        res = es.search(index=structId +"*researchers-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
