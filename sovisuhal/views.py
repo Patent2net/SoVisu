@@ -1,28 +1,36 @@
-from django.shortcuts import render, redirect
-from elasticsearch import Elasticsearch, helpers
-from datetime import datetime
 import json
-from . import forms
-from django.views.decorators.clickjacking import xframe_options_exempt
+from datetime import datetime
 
-from django.core.mail import mail_admins, send_mail
-from .forms import ContactForm
-from decouple import config
 from django.contrib import messages
+from django.core.mail import mail_admins, send_mail
+from django.shortcuts import render, redirect
+from django.views.decorators.clickjacking import xframe_options_exempt
+from elasticsearch import Elasticsearch, helpers
+from .elasticHal import indexe_chercheur, collecte_docs
+from . import forms, settings
+from .forms import ContactForm
+# from celery.result import AsyncResult
+
 #from ssl import create_default_context
 #from elasticsearch.connection import create_ssl_context
 # from uniauth.decorators import login_required
 
+
 try:
+    from decouple import config
+    from ldap3 import Server, Connection, ALL
+    from uniauth.decorators import login_required
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-except:
-    mode = "Dev"
-try:
     structId = config("structId")
 except:
-    structId = "198307662"  # UTLN
+    from django.contrib.auth.decorators import login_required
+    mode = "Dev"
+    structId = "198307662"# UTLN
+
+
 
 #struct = "198307662"
+
 
 def esConnector(mode = mode):
     if mode == "Prod":
@@ -39,13 +47,140 @@ def esConnector(mode = mode):
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     return es
 
-#@login_required
+@login_required
 def index(request):
-    return redirect('dashboard')
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
+    else:
+        gugusse = request.user.get_username()
+        if gugusse == 'admin':
+            return redirect('/admin/')
+        elif gugusse == 'adminlab':
+            return redirect("/index/?type=lab")
+        elif gugusse == 'visiteur':
+            return redirect("/index/?type=rsr")
+        else:
+            print(gugusse)
+            # gugusse = request.user.get_username()
+            gugusse = gugusse.replace('cas-utln-', '')
+            # check présence gugusse
+            es = esConnector()
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": gugusse
+                    }
+                }
+            }
+            count = es.count (index= "*-researchers", body=scope_param)['count']
+            if count >0:
+                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20&data=credentials')
+            else:
+                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
+            # return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
+
+    return redirect('loggedin')
+
+@login_required
+def loggedin(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, ))
+    elif request.user.is_authenticated:
+        gugusse = request.user.get_username()
+        if gugusse == 'admin':
+            return redirect('/admin/')
+        elif gugusse == 'adminlab':
+            return redirect("/index/?type=lab")
+        elif gugusse == 'visiteur':
+            return redirect("/index/?type=rsr")
+        else:
+            #gugusse = request.user.get_username()
+            gugusse = gugusse.replace('cas-utln-', '')
+            # check présence gugusse
+            es = esConnector()
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": gugusse
+                    }
+                }
+            }
+            count = es.count (index=structId + "*-researchers", body=scope_param)['count']
+            if count >0:
+                return redirect('check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20&data=credentials')
+            else:
+                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
+    else:
+        #heu ?
+        print ("cas raté")
+        return render(request, '404.html')
+
+def CreateCredentials(request):
+    ldapId = request.GET['ldapid']
+    idRef = request.POST.get ('f_IdRef')
+    idhal = request.POST.get ('f_halId_s')
+    orcId = request.POST.get ('f_orcId')
+    # structId = request.POST.get ('structId')
+    tempoLab = request.POST.get ('f_labo') # chaine de caractère
+    tempoLab = tempoLab.replace ("'", "")
+    tempoLab = tempoLab.replace('(','')
+    tempoLab = tempoLab.replace(')', '')
+    tempoLab = tempoLab.split(',')
+    labo = tempoLab [0] .strip() # halid
+    accroLab =  tempoLab [1] .strip()
+    # resultat
+    Chercheur = indexe_chercheur(ldapId, accroLab, labo, idhal, idRef, orcId)
+
+    docs = collecte_docs (Chercheur)
+
+    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
+
+    return redirect('/check/?type=rsr&id=' + ldapId +'&orcId='+ orcId +'&from=1990-01-01&to=2021-05-20&data=credentials')
+
+# def get_progress(request, task_id):
+#     result = AsyncResult(task_id)
+#     response_data = {
+#         'state': result.state,
+#         'details': result.info,
+#     }
+#     return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+@login_required
+def create(request):
+    ldapid  = request.GET['ldapid'] # ldapid
+    return render(request, 'check.html', {'data': "create", #'type': type,
+                                          'ldapid' : ldapid,#'from': dateFrom, 'to': dateTo,
+                                          #'entity': entity, #'extIds': ['a', 'b', 'c'],
+                                          'halId_s':'nullNone',
+                                          'idRef':'nullNone',
+                                          'orcId':'nullNone',
+                                          'autres':'nullNone',
+                                          'form': forms.CreateCredentials()
+                                          }
+                                          #"'startDate': start_date,
+                                          #'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
+                )
 
 def unknown(request):
-    return render(request, '404.html')
+    # if not request.user.is_authenticated:
+    #     return redirect('%s?next=%s' % (LOGIN_URL, "/check"))
+    # elif request.user.is_authenticated:
+    #     gugusse = request.user.get_username()
+    #     if gugusse == 'admin':
+    #         return redirect('/admin/')
+    #     elif gugusse == 'adminlab':
+    #         return redirect("/index/?type=lab")
+    #     elif gugusse == 'guest':
+    #         return redirect("/index/?type=rsr")
+    #     else:
+    #         gugusse = request.user.get_username()
+    #         gugusse = gugusse.replace('cas-utln-', '')
+    #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+    # else:
+    #return redirect('/accounts/login/')
+        return render(request, '404.html')
 
 def help(request):
     return render(request, 'help.html')
@@ -56,7 +191,8 @@ def cs_index(request):
     # Get parameters
     if 'type' in request.GET:
         type = request.GET['type']
-
+    else:
+        type = -1
     if 'id' in request.GET:
         id = request.GET['id']
     else:
@@ -139,7 +275,7 @@ def dashboard(request):
         key = 'halId_s'
         ext_key = "harvested_from_ids"
 
-        res = es.search(index=structId +"*-researchers", body=scope_param) # on pointe sur index générique car pas de LabHalId
+        res = es.search(index=structId +"*-researchers", body=scope_param) # on pointe sur index générique car pas de LabHalId ?
 
         entity = res['hits']['hits'][0]['_source']
 
@@ -215,10 +351,13 @@ def dashboard(request):
                 {"submittedDate_tdate": {"order": "asc"}}
             ],
             "query": {
-                "match_phrase": {"harvested_from_ids": entity['halId_s']}
+                "match_all": {}
             }
+            # "query": {
+            #     "match_phrase": {"harvested_from_ids": entity['halId_s']}
+            # }
         }
-        res = es.search(index=structId +"*-documents", body=start_date_param)
+        res = es.search(index=structId +'-' +entity['labHalId'] +"-researchers-"+ entity['ldapId']+ "-documents", body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -229,7 +368,7 @@ def dashboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
-        res = es.search(index=structId + "*-documents", body=start_date_param)
+        res = es.search(index=structId + '-' + id +"-laboratories-documents", body=start_date_param)
         # peut-on pointer sur index plus précis
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -571,6 +710,12 @@ def check(request):
         data = -1
 
     # /
+    if data == -1:
+         return render(request, 'check.html', {'data': create, #'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                               'form': forms.CreateCredentials (),
+
+                       }
+                      )
 
     # Get scope informations
     if type == "rsr":
@@ -586,7 +731,7 @@ def check(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index= structId  + "-*-researchers*", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        entity = res['hits']['hits'][0]['_source'] # plante si id pas présente
 
     elif type == "lab":
         scope_param = {
@@ -673,6 +818,8 @@ def check(request):
             orcId = ''
             if 'orcId' in entity:
                 orcId = entity['orcId']
+            if 'orcId' in request.GET:
+                orcId = request.GET['orcId']
 
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a','b','c'],
@@ -776,8 +923,8 @@ def check(request):
                 body=ref_param, size=count)
 
         if type == "lab":
-            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
-                'count']
+
+            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
             references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
                                    body=ref_param, size=count)
 
@@ -1093,8 +1240,11 @@ def validateReferences(request):
             for docid in toValidate:
                 es.update(index=structId + '-' + entity['labHalId'] + "-researchers-"+ entity['ldapId']+"-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
-                es.update(index=structId + '-' + entity["labHalId"]+"-laboratories-documents", refresh='wait_for', id=docid,
+                try:
+                    es.update(index=structId + '-' + entity["labHalId"]+"-laboratories-documents", refresh='wait_for', id=docid,
                           body={"doc": {"validated": True}})
+                except:
+                    pass # doc du chercheur pas dans le labo
 
     if type == "lab":
         scope_param = {

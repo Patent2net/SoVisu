@@ -1,0 +1,11 @@
+python manage.py migrate
+
+python manage.py add_institution utln https://cas.univ-utln.fr/cas/login
+python .\manage.py createsuperuser
+
+# la dernière commande permet de rajouter un admin qui permettra de rajouter les utilisateurs pour s'authentifier sur sovisu:
+adminlab
+visiteur
+qui vous voudrez (prendre le ldapid pour simuler)
+
+

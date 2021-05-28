@@ -14,9 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import include
-
+from django.urls import re_path, include
 from . import views
 
 urlpatterns = [
@@ -43,7 +43,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
 
     path('help/', views.help, name='help'),
-
+    path('CreateCredentials/', views.CreateCredentials, name='credentials'),
     path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
     path('validate_references/', views.validateReferences, name='validate_references'),
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
@@ -51,5 +51,8 @@ urlpatterns = [
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
-    # path('accounts/', include('uniauth.urls.cas_only', namespace='uniauth'))
+    path('create/', views.create, name='creation'),
+    path('accounts/', include('uniauth.urls', namespace='uniauth')),
+    path('loggedin/', views.loggedin, name='loggued')#,
+    # path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
 ]
