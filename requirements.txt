@@ -19,6 +19,11 @@ pytz==2020.5
 requests==2.25.1
 six==1.15.0
 sqlparse==0.4.1
-uniauth==0.0.2
+# uniauth==0.0.2
 urllib3==1.26.3
 pybso==1.1.0
+networkx==2.5.1
+bs4==0.0.1
+SPARQLWrapper==1.8.5
+unidecode==1.2.0
+matplotlib==3.4.2

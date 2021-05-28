@@ -1,5 +1,71 @@
 from django import forms
 from django.forms import models
+from elasticsearch import Elasticsearch
+from decouple import config
+
+try:
+    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+    from decouple import config
+except:
+    mode = "Dev"
+try:
+    structId = config("structId")
+except:
+    structId = "198307662"  # UTLN
+
+#struct = "198307662"
+
+def esConnector(mode = mode):
+    if mode == "Prod":
+        secret = config ('ELASTIC_PASSWORD')
+        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
+        es = Elasticsearch('localhost',
+                           http_auth=('elastic', secret),
+                           scheme="http",
+                           port=9200,
+                           # ssl_context=context,
+                           timeout=10)
+    else:
+        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    return es
+
+class CreateCredentials(forms.Form):
+    # Set choices to an empty list as it is a required argument.
+        # f_more = forms.CharField()
+
+    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'),
+             ('visiteur', 'visiteur')]
+    f_role = forms.CharField(label='Role', widget=forms.Select(choices=roles))
+
+    f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
+    f_IdRef = forms.CharField(label='IdRef - identifiant de la notice')
+    f_orcId = forms.CharField(label='ORCID (numéro par ex: 0000-0003-2071-6594')
+    f_more = forms.CharField(label='autres')
+
+
+    es = esConnector()
+
+    scope_param = {
+        "query": {
+            "match_all": {}
+        }
+    }
+
+    count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
+    scope_param = {
+        "query": {
+            "match_all": {}
+        },
+        "fields": [ 'acronym', "label", "idRef", "halStructId"]
+    }
+    res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
+    entities = res['hits']['hits']
+    ##harvested_from_label.keyword
+
+    labos = [((truc ['fields']['halStructId'] [0], truc ['fields']['acronym'] [0]), truc ['fields']['label'][0]) for truc in entities]
+
+    f_labo = forms.CharField(label='Labo', widget=forms.Select (choices=labos))
+
 
 
 class validCredentials(forms.Form):

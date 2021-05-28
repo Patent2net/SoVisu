@@ -14,15 +14,7 @@ from pathlib import Path
 import os
 from decouple import config
 
-
-try:
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-except:
-    mode = "Dev"
-try:
-    structId = config("structId")
-except:
-    structId = "198307662"  # UTLN
+mode = config ('mode')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,18 +33,18 @@ if mode == 'Prod':
     SECRET_KEY = config ('DjangoKey')
     DEBUG = config('DJANGO_DEBUG')
     # Settings used by Uniauth
-    # LOGIN_URL = '/accounts/login/'
+    LOGIN_URL = '/accounts/login/'
     # PASSWORD_RESET_TIMEOUT_DAYS = 3
-    # UNIAUTH_ALLOW_SHARED_EMAILS = True
-    # UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
-    # UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
-    # UNIAUTH_LOGIN_DISPLAY_STANDARD = True
-    # UNIAUTH_LOGIN_DISPLAY_CAS = True
-    # UNIAUTH_LOGIN_REDIRECT_URL = '/'  # + uniauth_profile.id
-    # UNIAUTH_LOGOUT_CAS_COMPLETELY = True
-    # UNIAUTH_LOGOUT_REDIRECT_URL = None
-    # UNIAUTH_MAX_LINKED_EMAILS = 20
-    # UNIAUTH_PERFORM_RECURSIVE_MERGING = True
+    UNIAUTH_ALLOW_SHARED_EMAILS = True
+    UNIAUTH_ALLOW_STANDALONE_ACCOUNTS = True
+    UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
+    UNIAUTH_LOGIN_DISPLAY_STANDARD = True
+    UNIAUTH_LOGIN_DISPLAY_CAS = True
+    UNIAUTH_LOGIN_REDIRECT_URL = '/' # +  uniauth_profile.accounts
+    UNIAUTH_LOGOUT_CAS_COMPLETELY = True
+    UNIAUTH_LOGOUT_REDIRECT_URL = None
+    UNIAUTH_MAX_LINKED_EMAILS = 20
+    UNIAUTH_PERFORM_RECURSIVE_MERGING = True
 else:
     SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
     DEBUG = 'True'
@@ -71,7 +63,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    #'uniauth'
+    'uniauth'#,
+    #'celery',
+    #'celery_progress'
 ]
 
 MIDDLEWARE = [
@@ -86,7 +80,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    #'uniauth.backends.CASBackend',
+    'uniauth.backends.CASBackend',
 ]
 
 ROOT_URLCONF = 'sovisuhal.urls'
@@ -156,7 +150,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join('static'),)
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Pas sûr sur çà... J'ai l'impression qu'il y a deux zones de fichiers statiques
+# j'ai eu un stock de "Found another file with the destination path"
+STATIC_ROOT = '/data/SoVisu/staticfiles/'
 
 # EMAIL Setup
 # https://docs.djangoproject.com/en/3.1/topics/email/
