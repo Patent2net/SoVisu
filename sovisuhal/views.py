@@ -1761,11 +1761,11 @@ def publicationboard(request):
         }
         res = es.search(index=structId + '-' + entity['labHalId']+ "-researchers-" + id +"-documents", body=start_date_param)
         # Première visu : entrée de l'annuaire
-        filtreA = 'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"',
+        filtreA = 'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"'
         # Deuxième visu : données du labo
-        filtreB = 'halStructId.keyword:"' + entity["labHalId"] #+ 'ldapId.keyword :"' + id + '"'
+        filtreB = 'halStructId.keyword:"' + entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
         # Troisième visu : données éditeurs et revues de l'individu et validées
-        filtreC = "harvested_from_ids" + ':"' + entity["halId_s"] + '" AND validated:true',
+        filtreC = "harvested_from_ids" + ':"' + entity["halId_s"] + '" AND validated:true'
     elif type == "lab":
         start_date_param = {
             "size": 1,
