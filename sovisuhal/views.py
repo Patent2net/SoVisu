@@ -1791,8 +1791,8 @@ def publicationboard(request):
     return render(request, 'publicationboard.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                      'entity': entity,
                                                      'hasToConfirm': hasToConfirm,
-                                                     'filter': "harvested_from_ids" + ':"' + entity[key] + '" AND validated:true',
-                                                     'filterlab': 'halStructId:"' + entity["labHalId"]+'"',
+                                                     'filter': "harvested_from_ids" + ':"' + entity["labHalId"] + '" AND validated:true',
+                                                     'filterlab': 'halStructId:"' + entity["labHalId"]+ '" AND ldapId.keyword :' + id + '"',
                                                      'filterlab2': 'labHalId.keyword:"' + entity["labHalId"]+'"',
                                                      'startDate': start_date,
                                                      'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
