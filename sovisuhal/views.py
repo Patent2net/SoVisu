@@ -1777,9 +1777,9 @@ def publicationboard(request):
             }
         }
         # Première visu : entrée de l'annuaire
-        filtreA = 'halStructId.keyword:"' + id #entity["labHalId"] # + '" AND ldapId.keyword :"' + id + '"'
+        filtreA = 'halStructId.keyword:"' + id + '"' #entity["labHalId"] # + '" AND ldapId.keyword :"' + id
         # Deuxième visu : données du labo
-        filtreB = 'halStructId.keyword:"' + id # entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
+        filtreB = 'halStructId.keyword:"' + id  + '"'# entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
         # Troisième visu : données éditeurs et revues de l'individu et validées
         filtreC = "harvested_from_ids" + ':"' + entity["halStructId"] + '" AND validated:true'
         res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents*", body=start_date_param)
