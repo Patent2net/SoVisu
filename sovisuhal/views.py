@@ -1781,7 +1781,7 @@ def publicationboard(request):
         # Deuxième visu : données du labo
         filtreB = 'halStructId.keyword:"' + id # entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
         # Troisième visu : données éditeurs et revues de l'individu et validées
-        filtreC = "harvested_from_ids" + ':"' + entity["halId_s"] + '" AND validated:true'
+        filtreC = "harvested_from_ids" + ':"' + entity["halStructId"] + '" AND validated:true'
         res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents*", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
