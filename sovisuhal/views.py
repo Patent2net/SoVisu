@@ -1792,7 +1792,7 @@ def publicationboard(request):
                                                      'entity': entity,
                                                      'hasToConfirm': hasToConfirm,
                                                      'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
-                                                     'filterlab': '',
+                                                     'filterlab': 'halStructId:"' + entity["halStructId"],
                                                      'startDate': start_date,
                                                      'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
