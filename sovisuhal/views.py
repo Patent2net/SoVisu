@@ -1759,7 +1759,7 @@ def publicationboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId + '-' + entity['labHalId']+ '-' + id +"-documents", body=start_date_param)
+        res = es.search(index=structId + '-' + entity['labHalId']+ "-researchers-" + id +"-documents", body=start_date_param)
 
     elif type == "lab":
         start_date_param = {
@@ -1772,7 +1772,7 @@ def publicationboard(request):
             }
         }
 
-        res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents", body=start_date_param)
+        res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents*", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
