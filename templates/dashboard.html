@@ -42,8 +42,8 @@
             <div class="w-full h-full">
             <!--<iframe src="http://127.0.0.1:5601/app/dashboards#/view/833d6e00-627c-11eb-ac2c-f3a0bab1e132?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>-->
             <!--<iframe src="http://127.0.0.1:5601/app/dashboards#/view/833d6e00-627c-11eb-ac2c-f3a0bab1e132?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="100%" width="100%"></iframe>-->
-            <iframe src="/kibana/app/dashboards#/view/ac288850-bece-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'{{ key }}',key:{{ ext_key }},params:(query:{{ key }}),type:phrase),query:(match_phrase:({{ ext_key }}:{{ key }}))),(meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))" height="100%" width="100%"></iframe>
-
+           <!-- <iframe src="/kibana/app/dashboards#/view/ac288850-bece-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'{{ key }}',key:{{ ext_key }},params:(query:{{ key }}),type:phrase),query:(match_phrase:({{ ext_key }}:{{ key }}))),(meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))" height="100%" width="100%"></iframe>-->
+<iframe src="/kibana/app/dashboards#/view/3426d960-c1fd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'{{ key }}',key:{{ ext_key }},params:(query:{{ key }}),type:phrase),query:(match_phrase:({{ ext_key }}:{{ key }}))),(meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))" height="100%" width="100%"></iframe>
         </div>
         {% endif %}
 
