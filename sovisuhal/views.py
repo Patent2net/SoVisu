@@ -1776,7 +1776,12 @@ def publicationboard(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
-
+        # Première visu : entrée de l'annuaire
+        filtreA = 'halStructId.keyword:"' + entity["labHalId"] # + '" AND ldapId.keyword :"' + id + '"'
+        # Deuxième visu : données du labo
+        filtreB = 'halStructId.keyword:"' + entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
+        # Troisième visu : données éditeurs et revues de l'individu et validées
+        filtreC = "harvested_from_ids" + ':"' + entity["halId_s"] + '" AND validated:true'
         res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents*", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
