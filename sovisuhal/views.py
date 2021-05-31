@@ -369,8 +369,8 @@ def dashboard(request):
             }
         }
         res = es.search(index=structId + '-' + id +"-laboratories-documents", body=start_date_param)
-        # peut-on pointer sur index plus précis
 
+        filtrelab  = 'harvested_from_ids.keywords: "' + id + '"'
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -392,6 +392,7 @@ def dashboard(request):
                                               'ext_key': ext_key,
                                               'key': entity[key],
                                               'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
+                                              'filterlab': filtrelab,
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -1777,16 +1778,17 @@ def publicationboard(request):
             }
         }
         # Première visu : entrée de l'annuaire
-        filtreA = 'halStructId.keyword:"' + id + '"' #entity["labHalId"] # + '" AND ldapId.keyword :"' + id
+        filtreA = 'labHalId.keyword:"' + id + '"' #entity["labHalId"] # + '" AND ldapId.keyword :"' + id
         # Deuxième visu : données du labo
-        filtreB = 'halStructId.keyword:"' + id  + '"'# entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
+        filtreB = 'halStructId.keyword:"' + entity["halStructId"]  + '"'# entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
         # Troisième visu : données éditeurs et revues de l'individu et validées
-        filtreC = "harvested_from_ids" + ':"' + entity["halStructId"] + '" AND validated:true'
+        filtreC = "harvested_from_ids" + ':"' + entity["halStructId"] #+ '" AND validated:true'
         res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents*", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
+    # Get parameters
     # Get parameters
     if 'from' in request.GET:
         dateFrom = request.GET['from']
