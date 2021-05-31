@@ -1793,6 +1793,7 @@ def publicationboard(request):
                                                      'hasToConfirm': hasToConfirm,
                                                      'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
                                                      'filterlab': 'halStructId:"' + entity["labHalId"]+'"',
+                                                     'filterlab2': '"labHalId.keyword:"' + entity["labHalId"]+'"',
                                                      'startDate': start_date,
                                                      'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
