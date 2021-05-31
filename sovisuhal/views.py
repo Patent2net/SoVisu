@@ -1760,7 +1760,12 @@ def publicationboard(request):
             }
         }
         res = es.search(index=structId + '-' + entity['labHalId']+ "-researchers-" + id +"-documents", body=start_date_param)
-
+        # Première visu : entrée de l'annuaire
+        filtreA = 'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"',
+        # Deuxième visu : données du labo
+        filtreB = 'halStructId.keyword:"' + entity["labHalId"] #+ 'ldapId.keyword :"' + id + '"'
+        # Troisième visu : données éditeurs et revues de l'individu et validées
+        filtreC = "harvested_from_ids" + ':"' + entity["halId_s"] + '" AND validated:true',
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -1773,6 +1778,7 @@ def publicationboard(request):
         }
 
         res = es.search(index=structId  + '-' + entity['halStructId']+ '-' +"laboratories-documents*", body=start_date_param)
+
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1791,9 +1797,9 @@ def publicationboard(request):
     return render(request, 'publicationboard.html', {'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                      'entity': entity,
                                                      'hasToConfirm': hasToConfirm,
-                                                     'filter': "harvested_from_ids" + ':"' + entity["labHalId"] + '" AND validated:true',
-                                                     'filterlab': 'halStructId:"' + entity["labHalId"]+ '" AND ldapId.keyword :' + id + '"',
-                                                     'filterlab2': 'labHalId.keyword:"' + entity["labHalId"]+'"',
+                                                     'filterA': filtreA,#"harvested_from_ids" + ':"' + entity["labHalId"] + '" AND validated:true',
+                                                     'filterB': filtreB,#'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"',
+                                                     'filterC': filtreC,#'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"',
                                                      'startDate': start_date,
                                                      'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
