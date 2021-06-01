@@ -846,16 +846,21 @@ def check(request):
         concepts = []
         if 'children' in entity['concepts']:
             for children in entity['concepts']['children']:
-                if children['state'] == 'invalidated':
-                    concepts.append({'id': children['id'], 'label_fr': children['label_fr'], 'state': 'invalidated'})
+                if "state" in children.keys():
+                    if children['state'] == 'invalidated':
+                        concepts.append({'id': children['id'], 'label_fr': children['label_fr'], 'state': 'invalidated'})
                 if 'children' in children:
                     for children1 in children['children']:
-                        if children1['state'] == 'invalidated':
-                            concepts.append({'id': children1['id'], 'label_fr': children1['label_fr'], 'state': 'invalidated'})
+                        if "state" in children1. keys():
+                            if children1['state'] == 'invalidated':
+                                concepts.append({'id': children1['id'], 'label_fr': children1['label_fr'], 'state': 'invalidated'})
+                            else:
+                                print (children1)
                         if 'children' in children1:
                             for children2 in children1['children']:
-                                if children2['state'] == 'invalidated':
-                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'], 'state': 'invalidated'})
+                                if "state" in children2.keys():
+                                    if children2['state'] == 'invalidated':
+                                       concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'], 'state': 'invalidated'})
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
