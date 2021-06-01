@@ -141,7 +141,7 @@ class search(forms.Form):
     # Set choices to an empty list as it is a required argument.
 
     indexes = (
-        (structId + "-*-documents", "références"),
+        (structId + "-*-researchers-*-doc*", "références"),
         (structId + "-*-researchers", "chercheurs"),
         (structId + "-*-laboratories", "laboratoires")
     )
