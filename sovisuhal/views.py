@@ -358,6 +358,7 @@ def dashboard(request):
             # }
         }
         res = es.search(index=structId +'-' +entity['labHalId'] +"-researchers-"+ entity['ldapId']+ "-documents", body=start_date_param)
+        filtrelab =''
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -370,7 +371,7 @@ def dashboard(request):
         }
         res = es.search(index=structId + '-' + id +"-laboratories-documents", body=start_date_param)
 
-        filtrelab  = 'harvested_from_ids.keywords: "' + id + '"'
+        filtrelab  = 'harvested_from_ids: "' + id + '"'
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -957,7 +958,7 @@ def search(request):
         }
     }
 
-    min_date = es.search(index= structId  +"-*-documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
+    min_date = es.search(index= "*-documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
 
     # Get parameters
     if 'from' in request.GET:
