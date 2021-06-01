@@ -1155,45 +1155,26 @@ def terminology(request):
     entity['concepts'] = json.loads(entity['concepts'])
 
     if type == "rsr":
+
+        print(entity['concepts'])
+
         if 'children' in list(entity['concepts']):
             for children in list(entity['concepts']['children']):
                 if children['state'] == 'invalidated':
                     entity['concepts']['children'].remove(children)
-
-                if 'researchers' in children:
-                    state = 'invalidated'
-                    for rsr in children['researchers']:
-                        if rsr['state'] == 'validated':
-                            state = None
-                    if state:
-                        entity['concepts']['children'].remove(children)
 
                 if 'children' in children:
                     for children1 in list(children['children']):
                         if children1['state'] == 'invalidated':
                             children['children'].remove(children1)
 
-                        if 'researchers' in children1:
-                            state = 'invalidated'
-                            for rsr in children1['researchers']:
-                                if rsr['state'] == 'validated':
-                                    state = None
-                            if state:
-                                children['children'].remove(children1)
-
                         if 'children' in children1:
                             for children2 in list(children1['children']):
-
-                                if 'state' in children2:
+                                print(children2)
+                                if children2['state'] == 'invalidated':
                                     children1['children'].remove(children2)
 
-                                if 'researchers' in children2:
-                                    state = 'invalidated'
-                                    for rsr in children2['researchers']:
-                                        if rsr['state'] == 'validated':
-                                            state = None
-                                    if state:
-                                        children1['children'].remove(children2)
+        print(entity['concepts'])
 
     if type == "lab":
         if 'children' in list(entity['concepts']):
