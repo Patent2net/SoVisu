@@ -49,6 +49,7 @@ urlpatterns = [
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
     path('validate_guiding-domains/', views.validateGuidingDomains, name='validate_guiding-domains'),
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
+    path('force-update_references/', views.forceUpdateReference, name='force-update_references'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
     path('create/', views.create, name='creation'),
