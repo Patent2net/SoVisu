@@ -36,11 +36,14 @@
                     >Toutes les références</a>
                 </h1>
 
+            {% if type == "rsr" %}
                 <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
-                        {% if filter == -1 or filter == "all" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                        text-gray-600 "
                         href="/force-update_references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all"
                     >Mettre à jour les références</a>
-                </h1>
+
+            {% endif %}
+
 
 
 
