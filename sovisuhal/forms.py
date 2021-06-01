@@ -55,15 +55,17 @@ class CreateCredentials(forms.Form):
     scope_param = {
         "query": {
             "match_all": {}
-        },
-        "fields": [ 'acronym', "label", "idRef", "halStructId"]
+        } # ,  "fields": [ "acronym", "label", "idRef", "halStructId"]
     }
     res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
     entities = res['hits']['hits']
     ##harvested_from_label.keyword
-
-    labos = [((truc ['fields']['halStructId'] [0], truc ['fields']['acronym'] [0]), truc ['fields']['label'][0]) for truc in entities]
-
+    # labos = []
+    # for truc in entities:
+    #     if 'halStructId' in truc ['fields'].keys():
+    #         labos.append(truc ['fields']['halStructId'] [0])
+    # labos = [((truc ['fields']['halStructId'] [0], truc ['fields']['acronym'] [0]), truc ['fields']['label'][0]) for truc in entities]
+    labos = [((truc['_source']['halStructId'], truc ['_source']['acronym']), truc['_source']['label']) for truc in entities]
     f_labo = forms.CharField(label='Labo', widget=forms.Select (choices=labos))
 
 
