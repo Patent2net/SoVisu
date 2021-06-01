@@ -979,7 +979,7 @@ def search(request):
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
-        if (structId + "-*-documents") in index: # == 'documents':
+        if (structId + "-*-researchers-*-doc*") in index: # == 'documents':
             search_param = {
                 "query":{"bool":{"must": [{"query_string": {"query": search}}],"filter":[{"match":{"validated":"true"}}]}}
             }
