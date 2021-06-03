@@ -8,9 +8,11 @@
 
         <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
             <div class="absolute inset-center text-sm flex">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Chargement des données
             </div>
@@ -33,32 +35,37 @@
         </div>-->
 
         {% if type == "rsr" %}
-        <div class="w-full h-full">
-            <!--<iframe src="http://127.0.0.1:5601/app/dashboards#/view/833d6e00-627c-11eb-ac2c-f3a0bab1e132?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>-->
-            <iframe src="/kibana/app/dashboards#/view/1258c4c0-c1de-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterA }}')))" height="55%" width="100%"></iframe>
+            <div class="w-full h-full">
+                <!--<iframe src="http://127.0.0.1:5601/app/dashboards#/view/833d6e00-627c-11eb-ac2c-f3a0bab1e132?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>-->
+                <iframe src="/kibana/app/dashboards#/view/1258c4c0-c1de-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterA }}')))"
+                        height="55%" width="100%"></iframe>
 
-            <iframe src="/kibana/app/dashboards#/view/80193180-c1dd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterB }}')))" height="15%" width="100%"></iframe>
+                <iframe src="/kibana/app/dashboards#/view/80193180-c1dd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterB }}')))"
+                        height="15%" width="100%"></iframe>
 
-            <iframe src="/kibana/app/dashboards#/view/fb0a1da0-c1ce-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterC }}')))" height="70%" width="100%"></iframe>
-           <!-- <!--use : share => snapshot in kibana 7cd9ec60-7fef-11eb-9a48-c57422245e8a -->
-            <!--<iframe src="/kibana/app/dashboards#/view/33642270-bf88-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>
+                <iframe src="/kibana/app/dashboards#/view/fb0a1da0-c1ce-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterC }}')))"
+                        height="70%" width="100%"></iframe>
+                <!-- use : share => snapshot in kibana 7cd9ec60-7fef-11eb-9a48-c57422245e8a -->
+                <!--<iframe src="/kibana/app/dashboards#/view/33642270-bf88-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>
  -->
-        </div>
+            </div>
         {% else %}
-                    <div class="w-full h-full">
-            <!--<iframe src="http://127.0.0.1:5601/app/dashboards#/view/833d6e00-627c-11eb-ac2c-f3a0bab1e132?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>-->
-            <!-- données OA du labo -->
-           <!-- <iframe src="/kibana/app/dashboards#/view/3426d960-c1fd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterC }}')))" height="30%" width="100%"></iframe>
-            <!-- Annuaire -->
-            <iframe src="/kibana/app/dashboards#/view/80193180-c1dd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterB }}')))" height="12%" width="100%"></iframe>
-                 <!--  -->
-            <iframe src="/kibana/app/dashboards#/view/1258c4c0-c1de-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterA }}')))" height="80%" width="100%"></iframe>
+            <div class="w-full h-full">
+                <!--<iframe src="http://127.0.0.1:5601/app/dashboards#/view/833d6e00-627c-11eb-ac2c-f3a0bab1e132?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>-->
+                <!-- données OA du labo -->
+                <!-- <iframe src="/kibana/app/dashboards#/view/3426d960-c1fd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterC }}')))" height="30%" width="100%"></iframe>-->
+                <!-- Annuaire -->
+                <iframe src="/kibana/app/dashboards#/view/80193180-c1dd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterB }}')))"
+                        height="12%" width="100%"></iframe>
+                <!--  -->
+                <iframe src="/kibana/app/dashboards#/view/1258c4c0-c1de-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterA }}')))"
+                        height="80%" width="100%"></iframe>
 
-            <!-- <iframe src="/kibana/app/dashboards#/view/fb0a1da0-c1ce-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterC }}')))" height="70%" width="100%"></iframe>
-           <!-- <!--use : share => snapshot in kibana 7cd9ec60-7fef-11eb-9a48-c57422245e8a -->
-            <!--<iframe src="/kibana/app/dashboards#/view/33642270-bf88-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>
+                <!-- <iframe src="/kibana/app/dashboards#/view/fb0a1da0-c1ce-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterC }}')))" height="70%" width="100%"></iframe> -->
+                <!--use : share => snapshot in kibana 7cd9ec60-7fef-11eb-9a48-c57422245e8a -->
+                <!--<iframe src="/kibana/app/dashboards#/view/33642270-bf88-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter }}')))" height="100%" width="100%"></iframe>
  -->
-        </div>
+            </div>
         {% endif %}
     </div>
 </div>
