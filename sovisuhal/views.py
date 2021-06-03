@@ -248,7 +248,7 @@ def cs_index(request):
     return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
 
 def dashboard(request):
-    """
+
     # Get parameters
     if 'type' in request.GET:
         type = request.GET['type']
@@ -258,13 +258,9 @@ def dashboard(request):
         id = request.GET['id']
     else:
         return redirect('unknown')
-    """
-    # Get parameters
-    if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
 
-    elif request.user.is_authenticated:
+    # Get parameters
+    if request.user.is_authenticated:
         id = request.user.get_username()
         if id =='adminlab':
             type = "lab"
