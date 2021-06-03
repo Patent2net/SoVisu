@@ -697,6 +697,8 @@ def references(request):
 
 def check(request):
     # Connect to DB
+
+
     es = esConnector()
 
     # Get parameters
@@ -706,6 +708,8 @@ def check(request):
         return redirect('unknown')
     if 'id' in request.GET:
         id = request.GET['id']
+        if id == 'visiteur':
+            return redirect('unknown')
     else:
         return redirect('unknown')
     if 'data' in request.GET:
