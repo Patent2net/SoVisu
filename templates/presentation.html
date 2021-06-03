@@ -1,130 +1,157 @@
 {% include "includes/header.html" with title="Présentation" %} <!--Titre de la page et définit les options appliquées par menu.html-->
-      <style>
-         /* Tab content - closed */
-         .tab-content {
-         max-height: 0;
-         -webkit-transition: max-height .35s;
-         -o-transition: max-height .35s;
-         transition: max-height .35s;
-         }
-         /* :checked - resize to full height */
-         .tab input:checked ~ .tab-content {
-         max-height: 100vh;
-         }
-         /* Label formatting when open */
-         .tab input:checked + label{
-         /*@apply text-xl p-5 border-l-2 border-indigo-500 bg-gray-100 text-indigo*/
-         font-size: 1rem; /*.text-base*/
-         padding: 1.25rem; /*.p-5*/
-         border-left-width: 2px; /*.border-l-2*/
-         border-color: #6574cd; /*.border-indigo*/
-         background-color: #f8fafc; /*.bg-gray-100 */
-         color: #6574cd; /*.text-indigo*/
-         }
-         /* Icon */
-         .tab label::after {
-         float:right;
-         right: 0;
-         top: 0;
-         display: block;
-         width: 1.5em;
-         height: 1.5em;
-         line-height: 1.5;
-         font-size: 1rem;
-         text-align: center;
-         -webkit-transition: all .35s;
-         -o-transition: all .35s;
-         transition: all .35s;
-         }
-         /* Icon formatting - closed */
-         .tab input[type=checkbox] + label::after {
-         content: "+";
-         font-weight:bold; /*.font-bold*/
-         border-width: 1px; /*.border*/
-         border-radius: 9999px; /*.rounded-full */
-         border-color: #b8c2cc; /*.border-grey*/
-         }
-         .tab input[type=radio] + label::after {
-         content: "\25BE";
-         font-weight:bold; /*.font-bold*/
-         border-width: 1px; /*.border*/
-         border-radius: 9999px; /*.rounded-full */
-         border-color: #b8c2cc; /*.border-grey*/
-         }
-         /* Icon formatting - open */
-         .tab input[type=checkbox]:checked + label::after {
-         transform: rotate(315deg);
-         background-color: #6574cd; /*.bg-indigo*/
-         color: #f8fafc; /*.text-grey-lightest*/
-         }
-         .tab input[type=radio]:checked + label::after {
-         transform: rotateX(180deg);
-         background-color: #6574cd; /*.bg-indigo*/
-         color: #f8fafc; /*.text-grey-lightest*/
-         }
-      </style>
+<style>
+    /* Tab content - closed */
+    .tab-content {
+        max-height: 0;
+        -webkit-transition: max-height .35s;
+        -o-transition: max-height .35s;
+        transition: max-height .35s;
+    }
+
+    /* :checked - resize to full height */
+    .tab input:checked ~ .tab-content {
+        max-height: 100vh;
+    }
+
+    /* Label formatting when open */
+    .tab input:checked + label {
+        /*@apply text-xl p-5 border-l-2 border-indigo-500 bg-gray-100 text-indigo*/
+        font-size: 1rem; /*.text-base*/
+        padding: 1.25rem; /*.p-5*/
+        border-left-width: 2px; /*.border-l-2*/
+        border-color: #6574cd; /*.border-indigo*/
+        background-color: #f8fafc; /*.bg-gray-100 */
+        color: #6574cd; /*.text-indigo*/
+    }
+
+    /* Icon */
+    .tab label::after {
+        float: right;
+        right: 0;
+        top: 0;
+        display: block;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.5;
+        font-size: 1rem;
+        text-align: center;
+        -webkit-transition: all .35s;
+        -o-transition: all .35s;
+        transition: all .35s;
+    }
+
+    /* Icon formatting - closed */
+    .tab input[type=checkbox] + label::after {
+        content: "+";
+        font-weight: bold; /*.font-bold*/
+        border-width: 1px; /*.border*/
+        border-radius: 9999px; /*.rounded-full */
+        border-color: #b8c2cc; /*.border-grey*/
+    }
+
+    .tab input[type=radio] + label::after {
+        content: "\25BE";
+        font-weight: bold; /*.font-bold*/
+        border-width: 1px; /*.border*/
+        border-radius: 9999px; /*.rounded-full */
+        border-color: #b8c2cc; /*.border-grey*/
+    }
+
+    /* Icon formatting - open */
+    .tab input[type=checkbox]:checked + label::after {
+        transform: rotate(315deg);
+        background-color: #6574cd; /*.bg-indigo*/
+        color: #f8fafc; /*.text-grey-lightest*/
+    }
+
+    .tab input[type=radio]:checked + label::after {
+        transform: rotateX(180deg);
+        background-color: #6574cd; /*.bg-indigo*/
+        color: #f8fafc; /*.text-grey-lightest*/
+    }
+</style>
 <div class="h-full w-full flex">
 
-    {% include "includes/menu.html" with title="Présentation" %} <!--permet à menu.html de repérer la section correspondante et white text-->
+    {% include "includes/menu.html" with title="Présentation" %}
+    <!--permet à menu.html de repérer la section correspondante et white text-->
 
     <div class="w-full h-full relative p-3" style="background: #fafbfd;">
         <!--boutons accordeon -->
         <div class="bg-white rounded w-full h-full">
-             <div class="shadow-md">
+            <div class="shadow-md">
                 <div class="tab w-full overflow-hidden border-t">
-                   <input class="absolute opacity-0 " id="tab-solo-one" type="radio" name="tabs2">
-                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-one">A quoi sert SoVisu ?</label>
-                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                      <p class="p-5">SoVisu est fait pour vous aider à contrôler votre image publique construite par les infrastructures de la Science Ouverte sur la base de vos publications.<br> 
-					  <br>Une fois vos identifiants renseignés, l'outil vous présente l'état de vos publications signalées sur HAL (qui rassemble nombre d'archives), évalue le degré de renseignement des métadonnées (mots-clés, résumé) et vous affiche celles qui pourraient être complétées via un lien.</br>
-					  <br>Nous attendons aussi que vous associez les publications à votre profil d'expertise que l'outil recrée à l'aide des données extraites de celles-ci. Vous validez ainsi les mots-clés et thématiques associées à vos travaux et pouvez les compléter.</br>
-					  <br>Enfin, ces validations conduiront à indexer votre profil à ces domaines et mots clés pour que l'on puisse vous retrouver sur ce que vous aurez validé. \`A terme, ces données remonterons pour minimiser les erreurs de traitement.</br>
-                    </p>
-                   </div>
+                    <input class="absolute opacity-0 " id="tab-solo-one" type="radio" name="tabs2">
+                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-one">A quoi sert SoVisu
+                        ?</label>
+                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                        <p class="p-5">SoVisu est fait pour vous aider à contrôler votre image publique construite par
+                            les infrastructures de la Science Ouverte sur la base de vos publications.<br>
+                            <br>Une fois vos identifiants renseignés, l'outil vous présente l'état de vos publications
+                            signalées sur HAL (qui rassemble nombre d'archives), évalue le degré de renseignement des
+                            métadonnées (mots-clés, résumé) et vous affiche celles qui pourraient être complétées via un
+                            lien.</br>
+                            <br>Nous attendons aussi que vous associez les publications à votre profil d'expertise que
+                            l'outil recrée à l'aide des données extraites de celles-ci. Vous validez ainsi les mots-clés
+                            et thématiques associées à vos travaux et pouvez les compléter.</br>
+                            <br>Enfin, ces validations conduiront à indexer votre profil à ces domaines et mots clés
+                            pour que l'on puisse vous retrouver sur ce que vous aurez validé. \`A terme, ces données
+                            remonterons pour minimiser les erreurs de traitement.</br>
+                        </p>
+                    </div>
                 </div>
 
                 <div class="tab w-full overflow-hidden border-t">
-                   <input class="absolute opacity-0" id="tab-solo-two" type="radio" name="tabs2">
-                   <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-two">Etapes </label>
-                   <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                      <p class="p-5">Vous devez vérifier vos identifiants et vos publications<br>
-									<ul>
-									<li> Depuis l'onglet "Vérification des données" vous saisissez ou vérifiez : </li>
-										<ul>
-											<li>Votre identifiant IdRef (existe entre autre si vous avez soutenu une thèse)</li>
-											<li>Vos identifiants chercheur : OrcID, researchgate, VIAF, ISNI...</li>
-											<li>Votre identifiant d'archive sur Hal : l'idHAL.</li>
-											
-									<li>Le lendemain, vous pourrez accéder au tableau de bord pour :</li>
-										<ul><li>Intégrer vos publications à votre profil d'expert</li>
-										<li>Valider les thématiques et les mots-clés associés</li>
-										</ul>
-									<li>Cette étape sera à réaliser jusqu'à ce que les machines y arrivent pour vous mais seulement sur vos dernières publications. Pour le moment, le manque d'information (par ex. le degré de participation à une publication, contexte disciplinaire, etc.) font que les algorithmes d'extraction d'information à partir de vos publications échouent le plus souvent. Ce petit travail constitue un apport informationel que nous enregistrons et qui permettra de faire évoluer ces mécanismes. <br>
-									\`A terme, nous espérons pouvoir utiliser ces informations que vous validez pour proposer des informations ciblées sur votre profil (appels, publications, auteurs...).</li>
-									<ul>
-                   </div>
+                    <input class="absolute opacity-0" id="tab-solo-two" type="radio" name="tabs2">
+                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-two">Etapes </label>
+                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
+                        <p class="p-5">Vous devez vérifier vos identifiants et vos publications<br>
+                        <ul>
+                            <li> Depuis l'onglet "Vérification des données" vous saisissez ou vérifiez :</li>
+                            <ul>
+                                <li>Votre identifiant IdRef (existe entre autre si vous avez soutenu une thèse)</li>
+                                <li>Vos identifiants chercheur : OrcID, researchgate, VIAF, ISNI...</li>
+                                <li>Votre identifiant d'archive sur Hal : l'idHAL.</li>
+
+                                <li>Le lendemain, vous pourrez accéder au tableau de bord pour :</li>
+                                <ul>
+                                    <li>Intégrer vos publications à votre profil d'expert</li>
+                                    <li>Valider les thématiques et les mots-clés associés</li>
+                                </ul>
+                                <li>Cette étape sera à réaliser jusqu'à ce que les machines y arrivent pour vous mais
+                                    seulement sur vos dernières publications. Pour le moment, le manque d'information
+                                    (par ex. le degré de participation à une publication, contexte disciplinaire, etc.)
+                                    font que les algorithmes d'extraction d'information à partir de vos publications
+                                    échouent le plus souvent. Ce petit travail constitue un apport informationel que
+                                    nous enregistrons et qui permettra de faire évoluer ces mécanismes. <br>
+                                    \`A terme, nous espérons pouvoir utiliser ces informations que vous validez pour
+                                    proposer des informations ciblées sur votre profil (appels, publications,
+                                    auteurs...).
+                                </li>
+                            </ul>
+                        </ul>
+                    </div>
                 </div>
 
-             </div>
-          </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-      /*Javascript to close the radio button version by clicking it again */
-      var myRadios = document.getElementsByName('tabs2');
-      var setCheck;
-      var x = 0;
-      for(x = 0; x < myRadios.length; x++){
-          myRadios[x].onclick = function(){
-              if(setCheck != this){
-                   setCheck = this;
-              }else{
-                  this.checked = false;
-                  setCheck = null;
-          }
-          };
-      }
-   </script>
+    /*Javascript to close the radio button version by clicking it again */
+    var myRadios = document.getElementsByName('tabs2');
+    var setCheck;
+    var x = 0;
+    for (x = 0; x < myRadios.length; x++) {
+        myRadios[x].onclick = function () {
+            if (setCheck != this) {
+                setCheck = this;
+            } else {
+                this.checked = false;
+                setCheck = null;
+            }
+        };
+    }
+</script>
 
 {% include "includes/footer.html" %}
