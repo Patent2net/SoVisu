@@ -248,6 +248,7 @@ def cs_index(request):
     return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
 
 def dashboard(request):
+    """
     # Get parameters
     if 'type' in request.GET:
         type = request.GET['type']
@@ -257,6 +258,21 @@ def dashboard(request):
         id = request.GET['id']
     else:
         return redirect('unknown')
+    """
+    # Get parameters
+    if 'type' in request.GET and 'id' in request.GET:
+        type = request.GET['type']
+        id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        if id =='adminlab':
+            type = "lab"
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type="rsr"
+    else:
+        return redirect('unknown')
+
     # /
 
     # Connect to DB
@@ -399,19 +415,26 @@ def dashboard(request):
 
 
 def references(request):
+
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        if id =='adminlab':
+            type = "lab"
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type="rsr"
     else:
         return redirect('unknown')
+
     if 'filter' in request.GET:
         filter = request.GET['filter']
     else:
         filter = -1
+
     # /
 
     # Connect to DB
@@ -696,6 +719,7 @@ def references(request):
 
 
 def check(request):
+
     # Connect to DB
     if request.user.is_authenticated:
         if request.user.get_username() == 'visiteur':
@@ -704,20 +728,26 @@ def check(request):
     es = esConnector()
 
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        if id =='adminlab':
+            type = "lab"
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type="rsr"
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
-
     # /
+
+
     if data == -1:
          return render(request, 'check.html', {'data': create, #'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                'form': forms.CreateCredentials (),
@@ -1017,19 +1047,26 @@ def search(request):
 
 @xframe_options_exempt
 def terminology(request):
+
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
+        id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        if id =='adminlab':
+            type = "lab"
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type="rsr"
     else:
         return redirect('unknown')
+
     if 'export' in request.GET:
         export = request.GET['export']
     else:
         export = False
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
+
     # /
 
     # Connect to DB
@@ -1544,17 +1581,22 @@ def presentation(request):
     return render(request, 'presentation.html')
 
 def wordcloud(request):
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    # /
 
+    # Get parameters
+    if 'type' in request.GET and 'id' in request.GET:
+        type = request.GET['type']
+        id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        if id =='adminlab':
+            type = "lab"
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type="rsr"
+    else:
+        return redirect('unknown')
+
+    # /
     # Connect to DB
     es = esConnector()
 
@@ -1681,15 +1723,21 @@ def wordcloud(request):
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 def publicationboard(request):
+
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        if id =='adminlab':
+            type = "lab"
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type="rsr"
     else:
         return redirect('unknown')
+
     # /
 
     # Connect to DB
