@@ -697,6 +697,11 @@ def references(request):
 
 def check(request):
     # Connect to DB
+
+    if request.user.is_authenticated:
+        if request.user.get_username() == 'visiteur':
+            return redirect('unknown')
+
     es = esConnector()
 
     # Get parameters
