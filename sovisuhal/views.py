@@ -2142,6 +2142,7 @@ def terminology(request):
 
     elif request.user.is_authenticated:                                     # si l'ancien système ne sais pas quoi faire
         id = request.user.get_username()                                     # check si l'utilisateur est log
+        id = id.replace(patternCas, '')
         if id == 'adminlab':                                                 # si id adminlab on considère que son type par défaut est lab
             type = "lab"
             base_url = reverse('index')
@@ -2702,6 +2703,7 @@ def wordcloud(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
+        id = id.replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -2867,6 +2869,7 @@ def publicationboard(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
+        id = id.replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
