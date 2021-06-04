@@ -83,6 +83,7 @@
                         <thead>
                         <tr class="bg-gray-100 text-gray-700 text-xs" >
                             <th>Nom</th>
+                            <th>IDs validés</th>
                         </tr>
                         </thead>
 
@@ -91,6 +92,7 @@
                         {% for rsr in researchers %}
                             <tr class="text-gray-500">
                                 <td>{{ rsr.firstName }} {{ rsr.lastName }}</td>
+                                <td>{{ rsr.validated }}</td>
                             </tr>
                         {% endfor %}
 
@@ -789,6 +791,19 @@ $(document).ready(function() {
                     buttons: [
                     ],
                     "columnDefs": [
+                                                {
+                            "targets": [ 1 ],
+                            "render": function(data, type, row, meta){
+                                if(data === 'True'){
+                                    data = 'Oui';
+                                } else {
+                                    data = 'Non';
+                                }
+                                return data;
+                            },
+                            "className": "text-center",
+                            "orderable": false
+                        }
                     ],
                     scrollResize: true,
                     scrollY: 100,
