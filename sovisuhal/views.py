@@ -60,6 +60,7 @@ def index(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
         gugusse = request.user.get_username()
+
         if gugusse == 'admin':
             return redirect('/admin/')
         elif gugusse == 'adminlab':
@@ -96,6 +97,7 @@ def loggedin(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL,))
     elif request.user.is_authenticated:
         gugusse = request.user.get_username()
+        gugusse = gugusse.replace(patternCas, '')
         if gugusse == 'admin':
             return redirect('/admin/')
         elif gugusse == 'adminlab':
@@ -104,7 +106,7 @@ def loggedin(request):
             return redirect("/index/?type=rsr")
         else:
             # gugusse = request.user.get_username()
-            gugusse = gugusse.replace(patternCas, '')
+
             # check présence gugusse
             es = esConnector()
             scope_param = {
@@ -469,6 +471,7 @@ def references(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
+        id = id.replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -817,6 +820,7 @@ def check(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
+        id = id.replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
