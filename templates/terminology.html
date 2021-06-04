@@ -44,8 +44,16 @@
 <script>
 
    function copy() {
+       url =  window.location.href;
+       if(getUrlParameter('id') === undefined) {
+           type = "{{ type }}"
+           id = "{{ id  }}"
+           url = url + 'type=' + type + '&id=' + id
+           console.log(url);
+       }
+
       const copyText = document.createElement('textarea');
-      copyText.value = '<iframe title="Expertise" src="' + window.location.href + '&export=True" frameborder="0" style="width: 100%; height: 350px;"></iframe>'
+      copyText.value = '<iframe title="Expertise" src="' + url + '&export=True" frameborder="0" style="width: 100%; height: 350px;"></iframe>'
       document.body.appendChild(copyText);
       copyText.select();
       copyText.setSelectionRange(0, 99999);
