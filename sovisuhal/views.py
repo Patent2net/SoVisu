@@ -27,6 +27,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
     structId = config("structId")
+    patternCas = 'cas-utln-' # motif à enlever aux identifiants CAS
 except:
     from django.contrib.auth.decorators import login_required
 
@@ -68,7 +69,7 @@ def index(request):
         else:
             print(gugusse)
             # gugusse = request.user.get_username()
-            gugusse = gugusse.replace('cas-utln-', '')
+            gugusse = gugusse.replace(patternCas, '')
             # check présence gugusse
             es = esConnector()
             scope_param = {
@@ -103,7 +104,7 @@ def loggedin(request):
             return redirect("/index/?type=rsr")
         else:
             # gugusse = request.user.get_username()
-            gugusse = gugusse.replace('cas-utln-', '')
+            gugusse = gugusse.replace(patternCas, '')
             # check présence gugusse
             es = esConnector()
             scope_param = {
@@ -187,7 +188,7 @@ def unknown(request):
     #         return redirect("/index/?type=rsr")
     #     else:
     #         gugusse = request.user.get_username()
-    #         gugusse = gugusse.replace('cas-utln-', '')
+    #         gugusse = gugusse.replace(patternCas, '')
     #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
     # else:
     # return redirect('/accounts/login/')
@@ -281,6 +282,7 @@ def dashboard(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
+        id = id .replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
