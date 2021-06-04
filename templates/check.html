@@ -35,10 +35,18 @@
                         {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
                     >Identifiants</a>
+                    {% if type == "rsr" %}
+                    <a class="px-2 pb-1
+                        {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
+                    >Notices HAL</a>
+                    {% endif %}
+                    {% if type == "lab" %}
                     <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
                     >Notices HAL du labo</a>
+                    {% endif %}
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
