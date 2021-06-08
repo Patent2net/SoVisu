@@ -3,102 +3,135 @@
 <!-- Page-specific headers -->
 {% block head %}
 
-<title>SoVisu | Connexion</title>
+    <title>SoVisu | Connexion</title>
 
-<style>
-    .simple-subtitle {
-    color: #4c5667;
-    font-size: 18px;
-    font-weight: 400;
-}
-</style>
+    <style>
+        .simple-subtitle {
+            color: #4c5667;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .hr-line-dashed_title {
+            margin-bottom: 15px;
+            margin-top: 1px;
+            border-top: 1px dashed #e7eaec;
+            color: #ffffff;
+            background-color: #ffffff;
+            height: 1px;
+        }
+    </style>
 
 {% endblock %}
 
 <!-- Page Content -->
 {% block content %}
 
-<div id="login-form-spacer" class="spacer {% if not display_standard %}only-cas-login{% endif %}"></div>
+    <div id="login-form-spacer" class="spacer {% if not display_standard %}only-cas-login{% endif %}"></div>
 
-<div id="login-form-wrapper" class="uniauth-wrapper wrapper wrapper-content {% if not display_standard %}only-cas-login{% endif %}">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="ibox float-e-margins shadow-lg">
-                <div class="ibox-content">
+    <div id="login-form-wrapper"
+         class="uniauth-wrapper wrapper wrapper-content {% if not display_standard %}only-cas-login{% endif %}">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins shadow-lg">
+                    <div class="ibox-content">
 
-                    {% if form and form.non_field_errors %}
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group has-error">
+                        {% if form and form.non_field_errors %}
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group has-error">
                                     <span id="error-text" class="form-error help-block">
                                         {{ form.non_field_errors.as_text|slice:"2:" }}
                                     </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <span id="login-title" class="simple-title">Se connecter à <span
+                                            id="header-uniauth-text">SoVisu</span></span>
                                 </div>
                             </div>
                         </div>
-                    {% endif %}
+                        <div class="hr-line-dashed_title"></div>
+                        {% if display_cas %}
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div id="cas-select-container" class="simple-subtitle">
+                                        {% if display_standard %}Connexion avec{% else %}Choose CAS Server:{% endif %}
+                                        {% if num_institutions == 1 %}
+                                            <a id="cas-link" href="{{ institutions.0.2 }}{{ query_params }}">
+                                                <img src="../../static/logo-UTLN.png">
+                                            </a>
+                                        {% else %}
+                                            <select id="cas-select"
+                                                    class="form-control input-block {% if not display_standard %}only-cas-login{% endif %}"
+                                                    onchange="tmp=this.value;this.value='';location=tmp;">
+                                                <option value="" selected="selected" disabled="disabled"
+                                                        hidden="hidden">(Select Institution)
+                                                </option>
+                                                {% for institution in institutions %}
+                                                    <option value="
 
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <span id="login-title" class="simple-title">Se connecter à <span id="header-uniauth-text">SoVisu</span></span>
+
+                                                            {{ institution.2 }}{{ query_params }}">{{ institution.0 }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
+
+                        <div class="hr-line-dashed"></div>
+
+                        {% if display_standard %}
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <form method="POST" class="post-form">
+                                        {% csrf_token %}
+                                        <div>
+                                            Connexion en tant qu'adminlab ou visiteur :
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <input id="id_username" name="username" type="text"
+                                                       placeholder="identifiant" class="form-control input-block"
+                                                       value="{{ form.username.value|default_if_none:"" }}"
+                                                       autocapitalize="off" autocorrect="off" autofocus required/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <input id="id_password" name="password" type="password"
+                                                       placeholder="mot de passe" class="form-control input-block"
+                                                       value="{{ form.password.value|default_if_none:"" }}" required/>
+                                            </div>
+                                        </div>
+
+                                        <button id="submit-btn" type="submit" class="save btn btn-action">Se
+                                            connecter!
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+
                     </div>
-                    <div class="hr-line-dashed"></div>
-                    {% if display_cas %}
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div id="cas-select-container" class="simple-subtitle">
-                                    {% if display_standard %}Connexion avec{% else %}Choose CAS Server:{% endif %}
-                                    {% if num_institutions == 1 %}
-                                        <a id="cas-link" href="{{ institutions.0.2 }}{{ query_params }}">{{ institutions.0.0 }} CAS</a>
-                                    {% else %}
-                                        <select id="cas-select" class="form-control input-block {% if not display_standard %}only-cas-login{% endif %}" onchange="tmp=this.value;this.value='';location=tmp;">
-                                            <option value="" selected="selected" disabled="disabled" hidden="hidden">(Select Institution)</option>
-                                            {% for institution in institutions %}
-                                            <option value="{{ institution.2 }}{{ query_params }}">{{ institution.0 }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <div class="hr-line-dashed"></div>
-
-                    {% if display_standard %}
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <form method="POST" class="post-form">
-                                    {% csrf_token %}
-                                    <div>
-                                        Connexion en tant qu'Adminlab ou visiteur :
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <input id="id_username" name="username" type="text" placeholder="identifiant" class="form-control input-block" value="{{ form.username.value|default_if_none:"" }}" autocapitalize="off" autocorrect="off" autofocus required />
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <input id="id_password" name="password" type="password" placeholder="mot de passe" class="form-control input-block" value="{{ form.password.value|default_if_none:"" }}" required />
-                                        </div>
-                                    </div>
-
-                                    <button id="submit-btn" type="submit" class="save btn btn-action">Se connecter!</button>
-                                </form>
-                            </div>
-                        </div>
-                    {% endif %}
-
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock %}
 
