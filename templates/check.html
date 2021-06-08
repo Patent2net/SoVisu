@@ -35,10 +35,18 @@
                         {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
                     >Identifiants</a>
+                    {% if type == "rsr" %}
+                    <a class="px-2 pb-1
+                        {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
+                    >Notices HAL</a>
+                    {% endif %}
+                    {% if type == "lab" %}
                     <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
                     >Notices HAL du labo</a>
+                    {% endif %}
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -112,9 +120,9 @@
                     </svg>
 
                     <ul>
-                        <li>Dans cet onglet, vous devez renseigner vos identifiants externes. Ces id seront utilisés pour la collecte de données. </li>
-                        <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez récupérer : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site IdRef - Identifiants et Référentiels pour l'ESR</a></li>
-                        <li><strong>L'OrcId</strong> est l'identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>.</li>
+                        <li>Dans cet onglet, si vous êtes enseignant chercheur de l'établissement, vous devez renseigner vos identifiants externes. Ces id seront utilisés pour la collecte de données. </li>
+                        <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le récupérer là : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site IdRef - Identifiants et Référentiels pour l'ESR</a></li>
+                        <li><strong>L'OrcId</strong> est l'identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>. Vous avez une petite procédure réalisée par l'UMR 5206  <a href="http://triangle.ens-lyon.fr/spip.php?article8796" class="underline" target="_blank"> sur ce lien.</a></li>
                         <li>Enfin <strong>l'IdHal</strong> est <a href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline" target="_blank">l'identifiant sur l'archive nationale Hal</a>. Ce dernier identifiant permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer les différentes formes auteur. Les trois sont à relier.</li>
                         <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... les moissoneurs se chargeront de publier vos notices sur ces réseaux si nécessaire (<i> ; </i>). </li>
 
@@ -198,10 +206,10 @@
                     <ul>
                         <li>Dans cet onglet, vous devez vérifier renseigner ou corriger vos identifiants externes. Ces id seront utilisés pour la collecte de données. </li>
                         <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le vérifier : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site prévu à cet effet</a></li>
-                        <li><strong>L'OrcId</strong> est un identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>.</li>
-                        <li>Enfin <strong>l'IdHal</strong> est <a href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline" target="_blank">l'identifiant sur l'archive nationnale Hal</a>. Ce dernier identifiant permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer les différentes formes auteur. Les trois sont à relier.</li>
-                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... vous pouvez les saisir dans le champ prévu à cet effet séparés par des point-virgules (<i> ; </i>). </li>
-
+                        <li><strong>L'OrcId</strong> est un identifiant chercheur international. <a href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en créer un</a>.  Vous avez une petite procédure réalisée par l'UMR 5206  <a href="http://triangle.ens-lyon.fr/spip.php?article8796" class="underline" target="_blank"> sur ce lien.</a></li>
+                        <li>Enfin <strong>l'IdHal</strong> est <a href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline" target="_blank">l'identifiant sur l'archive nationale Hal</a>. Ce dernier identifiant permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer les différentes formes auteur. Les trois sont à relier via HAL.  Vous avez une petite procédure réalisée par l'UMR 5206  <a href="http://triangle.ens-lyon.fr/spip.php?article8796" class="underline" target="_blank"> sur ce lien.</a></li>
+                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... les moissoneurs se chargeront de publier automatiquement vos notices sur ces médias si nécessaire (<i> ; </i>). </li>
+                        <li> Le champ autre (s'il apparait) est libre mais la fonctionnalité n'est pas activée.</li>
                     </ul>
 
                 </div>
@@ -233,8 +241,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
 
-                    <p>Cet onglet vous permet de valider des domaines à la marge de votre expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</p>
-
+                    <br>Cet onglet vous permet de supprimer des domaines à la marge de votre expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.</br>
+                    <br>Restent ici les expertises identifiées à travaux vos travaux qui proviennent d'erreurs ou de collaborations.</p>
                 </div>
 
                 <div class="justify-end flex w-full">
@@ -269,7 +277,7 @@
                 </div>
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
-                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer delete outline-none">Valider</button>
+                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer delete outline-none">Supprimer</button>
                 </div>
 
             {% endif %}
@@ -306,7 +314,10 @@
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p>Dans cet onglet, vous intégrez les références bibliographiques collectées à l'aide de vos identifiants aux index. Par votre validation ces notices seront incluses dans le processus de traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.</p>
+                    <p>Dans cet onglet, vous intégrez les références bibliographiques collectées à l'aide de vos identifiants aux index. Par votre validation ces notices seront incluses dans le processus de traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.
+                        <br>Restent ici les publications "annexes" ou qui ne seraient pas de vous par erreur...
+                    <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le bouton "Mettre à jour les références" sert à les importer ici (Notez que Hal prend un délai d'indexation de quelques heures et les nouvelles notices ne sont pas immédiatement dispobibles.). </p>
+
                 </div>
 
                 <div class="justify-end flex w-full">
