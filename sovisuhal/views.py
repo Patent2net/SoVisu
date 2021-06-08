@@ -35,7 +35,7 @@ except:
 
     mode = "Dev"
     structId = "198307662"  # UTLN
-
+    patternCas = ''   # motif à enlever aux identifiants CAS
 
 # struct = "198307662"
 
