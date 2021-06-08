@@ -138,6 +138,67 @@ def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
    # progress_recorder.set_progress(10, 10)
     return Chercheur
 
+def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
+    #for row in csv_reader:
+        row = dict()
+        # print(row['acronym'])
+        es = esConnector(mode)
+        rsr_param = {
+            "query": {
+                "match": {
+                    "labHalId": labHalId# row["halStructId"]
+                }
+            }
+        }
+        res = es.search(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers", body=rsr_param)
+        # tous ces champs (lignes qui suit) sont là (ligne précédente à adapter) ou dans structSirene + "-" +labHalId + "-" + ldapId +"-researchers" ?
+        # structSirene, ldapId, name, type, function, mail, lab, supannAffectation, supannEntiteAffectationPrincipale, halId_s, labHalId, idRef, structDomain, firstName, lastName, aurehalId
+
+        # car il faudrait que l'update ne (cf. ligne 196)
+        # après le reste devrait rouler même si je ne comprends pas pourquoi ce matin
+        # j'ai dû modifier views pour cause de l'abscence de state dans la boucle équivalent pour l'affichage 'labo' ?
+        row['guidingKeywords'] = []
+
+
+        # Build laboratory skills
+        tree = {'id': 'Concepts', 'children': []}
+
+        for rsr in res['hits']['hits']:
+
+            concept = rsr['_source']['concepts']
+
+            if len(concept) > 0:
+
+                for child in concept['children']:
+
+                    if child['state'] == 'invalidated':
+                        tree = utils.appendToTree(child, rsr['_source'], tree, 'invalidated')
+                    else:
+                        tree = utils.appendToTree(child, rsr['_source'], tree)
+                    if 'children' in child:
+                        for child1 in child['children']:
+
+                            if child1['state'] == 'invalidated':
+                                tree = utils.appendToTree(child1, rsr['_source'], tree, 'invalidated')
+                            else:
+                                tree = utils.appendToTree(child1, rsr['_source'], tree)
+
+                            if 'children' in child1:
+                                for child2 in child1['children']:
+
+                                    if child2['state'] == 'invalidated':
+                                        tree = utils.appendToTree(child2, rsr['_source'], tree, 'invalidated')
+                                    else:
+                                        tree = utils.appendToTree(child2, rsr['_source'], tree)
+
+        row['concepts'] = tree
+
+        # Insert laboratory data
+        # est-ce que update est destructeur ?
+        res = es.index(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories", id=row['halStructId'],
+                       body=json.dumps(row))
+
+
 # @shared_task(bind=True)
 def collecte_docs( Chercheur): #self,
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
