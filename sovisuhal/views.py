@@ -10,7 +10,8 @@ from .elasticHal import indexe_chercheur, collecte_docs
 from . import forms, settings
 from .forms import ContactForm
 
-from .libs import utils
+from urllib.parse import urlencode
+from django.urls import reverse
 
 # from celery.result import AsyncResult
 
@@ -26,6 +27,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
     structId = config("structId")
+    patternCas = 'cas-utln-' # motif à enlever aux identifiants CAS
 except:
     from django.contrib.auth.decorators import login_required
 
@@ -58,6 +60,7 @@ def index(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
         gugusse = request.user.get_username()
+
         if gugusse == 'admin':
             return redirect('/admin/')
         elif gugusse == 'adminlab':
@@ -67,7 +70,7 @@ def index(request):
         else:
             print(gugusse)
             # gugusse = request.user.get_username()
-            gugusse = gugusse.replace('cas-utln-', '')
+            gugusse = gugusse.replace(patternCas, '')
             # check présence gugusse
             es = esConnector()
             scope_param = {
@@ -94,6 +97,7 @@ def loggedin(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL,))
     elif request.user.is_authenticated:
         gugusse = request.user.get_username()
+        gugusse = gugusse.replace(patternCas, '')
         if gugusse == 'admin':
             return redirect('/admin/')
         elif gugusse == 'adminlab':
@@ -102,7 +106,7 @@ def loggedin(request):
             return redirect("/index/?type=rsr")
         else:
             # gugusse = request.user.get_username()
-            gugusse = gugusse.replace('cas-utln-', '')
+
             # check présence gugusse
             es = esConnector()
             scope_param = {
@@ -186,7 +190,7 @@ def unknown(request):
     #         return redirect("/index/?type=rsr")
     #     else:
     #         gugusse = request.user.get_username()
-    #         gugusse = gugusse.replace('cas-utln-', '')
+    #         gugusse = gugusse.replace(patternCas, '')
     #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
     # else:
     # return redirect('/accounts/login/')
@@ -274,20 +278,28 @@ def dashboard(request):
      # /
      """
     # Get parameters
-
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
+        id = id .replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect (url)
+
         elif not id == 'adminlab' and not id == 'visiteur':
             type = "rsr"
+            base_url = reverse('dashboard')
+            query_string = urlencode({'type': type, 'id': id})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
         else:
             return redirect('unknown')
-
     else:
         return redirect('unknown')
 
@@ -435,7 +447,6 @@ def dashboard(request):
 
 
 def references(request):
-
     """
     # Get parameters
     if 'type' in request.GET:
@@ -460,10 +471,22 @@ def references(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        if id =='adminlab':
+        id = id.replace(patternCas, '')
+        if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         elif not id == 'adminlab' and not id == 'visiteur':
-            type="rsr"
+            type = "rsr"
+            base_url = reverse('references')
+            default_filter = 'uncomplete'
+            query_string = urlencode({'type': type, 'id': id, 'filter':default_filter})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         else:
             return redirect('unknown')
     else:
@@ -797,10 +820,22 @@ def check(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        if id =='adminlab':
+        id = id.replace(patternCas, '')
+        if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         elif not id == 'adminlab' and not id == 'visiteur':
-            type="rsr"
+            type = "rsr"
+            default_data = "credentials"
+            base_url = reverse('check')
+            query_string = urlencode({'type': type, 'id': id, 'data': default_data})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         else:
             return redirect('unknown')
     else:
@@ -2101,19 +2136,30 @@ def terminology(request):
     # /
     """
     # Get parameters
-    if 'type' in request.GET and 'id' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:                           # réutilisation de l'ancien système
         type = request.GET['type']
         id = request.GET['id']
 
-    elif request.user.is_authenticated:
-        id = request.user.get_username()
-        if id =='adminlab':
+    elif request.user.is_authenticated:                                     # si l'ancien système ne sais pas quoi faire
+        id = request.user.get_username()                                     # check si l'utilisateur est log
+        id = id.replace(patternCas, '')
+        if id == 'adminlab':                                                 # si id adminlab on considère que son type par défaut est lab
             type = "lab"
-        elif not id == 'adminlab' and not id == 'visiteur':
-            type="rsr"
-        else:
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
+        elif not id == 'adminlab' and not id == 'visiteur':                 # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
+            type = "rsr"
+            base_url = reverse('terminology')
+            query_string = urlencode({'type': type, 'id': id})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
+        else:                                                             # sinon il est inconnu et doit aller dans l'index pour faire ses choix car on ne peut pas le suivre
             return redirect('unknown')
-    else:
+    else:                                                                 # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
 
     if 'export' in request.GET:
@@ -2277,8 +2323,12 @@ def terminology(request):
                 if 'researchers' in children:
                     state = 'invalidated'
                     for rsr in children['researchers']:
-                        if rsr['state'] == 'validated':
-                            state = None
+                        if 'state' in rsr.keys():
+                            if rsr['state'] == 'validated':
+                                state = None
+                        else:
+                            pass
+                            # pas sûr de bien comprendre ce qu'il y a à faire là ^_^
                     if state:
                         entity['concepts']['children'].remove(children)
 
@@ -2287,8 +2337,12 @@ def terminology(request):
                         if 'researchers' in children:
                             state = 'invalidated'
                             for rsr in children1['researchers']:
-                                if rsr['state'] == 'validated':
-                                    state = None
+                                if 'state' in rsr.keys():
+                                    if rsr['state'] == 'validated':
+                                        state = None
+                                else:
+                                    #idem
+                                    pass
                             if state:
                                 children['children'].remove(children1)
 
@@ -2297,8 +2351,12 @@ def terminology(request):
                                 if 'researchers' in children:
                                     state = 'invalidated'
                                     for rsr in children2['researchers']:
-                                        if rsr['state'] == 'validated':
-                                            state = None
+                                        if 'state' in rsr.keys():
+                                            if rsr['state'] == 'validated':
+                                                state = None
+                                        else:
+                                            pass
+                                        #idem ter
                                     if state:
                                         children1['children'].remove(children2)
 
@@ -2435,7 +2493,6 @@ def validateGuidingDomains(request):
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
-# qui du coup valide les concepts ^^
 def invalidateConcept(request):
     # Get parameters
     if 'type' in request.GET:
@@ -2472,57 +2529,49 @@ def invalidateConcept(request):
         entity = res['hits']['hits'][0]['_source']
 
         index = structId + '-' + entity['labHalId'] + '-researchers'
-        lab_index = structId + '-' + entity['labHalId'] + '-laboratories'
 
-        # get tree from lab
-        lab_scope_param = {
+
+    elif type == "lab":
+        scope_param = {
             "query": {
                 "match": {
-                    "_id": entity['labHalId']
+                    "halStructId": id
                 }
             }
         }
 
-        res = es.search(index=structId + "*-laboratories", body=lab_scope_param)
-        entity_lab = res['hits']['hits'][0]['_source']
+        index = '*-laboratories'
 
-        lab_tree = entity_lab['concepts']
+        res = es.search(index=structId + "*-laboratories", body=scope_param)
+        entity = res['hits']['hits'][0]['_source']
 
-        if request.method == 'POST':
-            toInvalidate = request.POST.get("toInvalidate", "").split(",")
-            for conceptId in toInvalidate:
-                # to-do : désactiver les concepts
-                for children in entity['concepts']['children']:
-                    if children['id'] == conceptId:
-                        lab_tree = utils.appendToTree(children, entity, lab_tree)
-                        children['state'] = 'validated'
-                    if 'children' in children:
-                        for children1 in children['children']:
-                            if children1['id'] == conceptId:
-                                if len(children['children']) == 1:
-                                    lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                    children['state'] = 'validated'
-                                lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                children1['state'] = 'validated'
-                            if 'children' in children1:
-                                for children2 in children1['children']:
-                                    if children2['id'] == conceptId:
-                                        if len(children['children']) == 1:
-                                            lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                            children['state'] = 'validated'
-                                        if len(children1['children']) == 1:
-                                            lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                            children1['state'] = 'validated'
-                                        lab_tree = utils.appendToTree(children2, entity, lab_tree)
-                                        children2['state'] = 'validated'
+        index = structId + '-' + id + 'laboratories'
+    # /
 
-            es.update(index=index, refresh='wait_for', id=entity['ldapId'],
-                      body={"doc": {"concepts": entity['concepts']}})
+    if request.method == 'POST':
+        toInvalidate = request.POST.get("toInvalidate", "").split(",")
+        for conceptId in toInvalidate:
+            # to-do : désactiver les concepts
+            for children in entity['concepts']['children']:
+                if children['id'] == conceptId:
+                    children['state'] = 'validated'
+                if 'children' in children:
+                    for children1 in children['children']:
+                        if children1['id'] == conceptId:
+                            if len(children['children']) == 1:
+                                children['state'] = 'validated'
+                            children1['state'] = 'validated'
+                        if 'children' in children1:
+                            for children2 in children1['children']:
+                                if children2['id'] == conceptId:
+                                    if len(children['children']) == 1:
+                                        children['state'] = 'validated'
+                                    if len(children1['children']) == 1:
+                                        children1['state'] = 'validated'
+                                    children2['state'] = 'validated'
 
-            es.update(index=lab_index, refresh='wait_for', id=entity['labHalId'],
-                      body={"doc": {"concepts": lab_tree}})
-
-
+        es.update(index=index, refresh='wait_for', id=entity['ldapId'],
+                  body={"doc": {"concepts": entity['concepts']}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
@@ -2570,7 +2619,6 @@ def validateCredentials(request):
 
             es.update(index=structId + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
                       body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True}})
-
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
@@ -2667,10 +2715,19 @@ def wordcloud(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        if id =='adminlab':
+        id = id.replace(patternCas, '')
+        if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect (url)
         elif not id == 'adminlab' and not id == 'visiteur':
-            type="rsr"
+            type = "rsr"
+            base_url = reverse('wordcloud')
+            query_string = urlencode({'type': type, 'id': id})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
         else:
             return redirect('unknown')
     else:
@@ -2824,10 +2881,20 @@ def publicationboard(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        if id =='adminlab':
+        id = id.replace(patternCas, '')
+        if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect (url)
+
         elif not id == 'adminlab' and not id == 'visiteur':
-            type="rsr"
+            type = "rsr"
+            base_url = reverse('publicationboard')
+            query_string = urlencode({'type': type, 'id': id})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
         else:
             return redirect('unknown')
     else:
@@ -3006,7 +3073,7 @@ def contact(request):
 
             conf_subject = "Confirmation de reception du ticket:{}".format(
                 dict(f.purpose_choices).get(f.cleaned_data['objet'])
-                )
+            )
 
             conf_message = "Bonjour {},\nCeci est un message automatisé pour vous informer que votre ticket a bien été reçu.\n\n{}".format(
                 name, message)
