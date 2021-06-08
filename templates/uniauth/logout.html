@@ -1,0 +1,45 @@
+{% extends 'uniauth/base-site.html' %}
+
+<!-- Page-specific headers -->
+{% block head %}
+
+<title>SoVisu | Déconnexion</title>
+
+<style>
+
+#logout-form-wrapper {
+    left: calc(50% - 140px);
+    width: 300px;
+}
+</style>
+
+{% endblock %}
+
+<!-- Page Content -->
+{% block content %}
+
+<div id="logout-form-spacer" class="spacer"></div>
+
+<div id="logout-form-wrapper" class="uniauth-wrapper wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins shadow-lg">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <span class="simple-title">Déconnexion réussie</span>
+                            <br/><br/>
+                            <span class="simple-followup"><a href="/">cliquez ici</a> pour retourner à la page d'authentification.</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+<!-- Page specific JS -->
+{% block script %}
+{% endblock %}
