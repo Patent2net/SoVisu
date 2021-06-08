@@ -2323,8 +2323,12 @@ def terminology(request):
                 if 'researchers' in children:
                     state = 'invalidated'
                     for rsr in children['researchers']:
-                        if rsr['state'] == 'validated':
-                            state = None
+                        if 'state' in rsr.keys():
+                            if rsr['state'] == 'validated':
+                                state = None
+                        else:
+                            pass
+                            # pas sûr de bien comprendre ce qu'il y a à faire là ^_^
                     if state:
                         entity['concepts']['children'].remove(children)
 
@@ -2333,8 +2337,12 @@ def terminology(request):
                         if 'researchers' in children:
                             state = 'invalidated'
                             for rsr in children1['researchers']:
-                                if rsr['state'] == 'validated':
-                                    state = None
+                                if 'state' in rsr.keys():
+                                    if rsr['state'] == 'validated':
+                                        state = None
+                                else:
+                                    #idem
+                                    pass
                             if state:
                                 children['children'].remove(children1)
 
@@ -2343,8 +2351,12 @@ def terminology(request):
                                 if 'researchers' in children:
                                     state = 'invalidated'
                                     for rsr in children2['researchers']:
-                                        if rsr['state'] == 'validated':
-                                            state = None
+                                        if 'state' in rsr.keys():
+                                            if rsr['state'] == 'validated':
+                                                state = None
+                                        else:
+                                            pass
+                                        #idem ter
                                     if state:
                                         children1['children'].remove(children2)
 
