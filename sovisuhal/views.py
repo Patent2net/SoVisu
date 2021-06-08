@@ -10,6 +10,8 @@ from .elasticHal import indexe_chercheur, collecte_docs
 from . import forms, settings
 from .forms import ContactForm
 
+from .libs import utils
+
 # from celery.result import AsyncResult
 
 # from ssl import create_default_context
@@ -2433,6 +2435,7 @@ def validateGuidingDomains(request):
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
+# qui du coup valide les concepts ^^
 def invalidateConcept(request):
     # Get parameters
     if 'type' in request.GET:
@@ -2469,49 +2472,57 @@ def invalidateConcept(request):
         entity = res['hits']['hits'][0]['_source']
 
         index = structId + '-' + entity['labHalId'] + '-researchers'
+        lab_index = structId + '-' + entity['labHalId'] + '-laboratories'
 
-
-    elif type == "lab":
-        scope_param = {
+        # get tree from lab
+        lab_scope_param = {
             "query": {
                 "match": {
-                    "halStructId": id
+                    "_id": entity['labHalId']
                 }
             }
         }
 
-        index = '*-laboratories'
+        res = es.search(index=structId + "*-laboratories", body=lab_scope_param)
+        entity_lab = res['hits']['hits'][0]['_source']
 
-        res = es.search(index=structId + "*-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        lab_tree = entity_lab['concepts']
 
-        index = structId + '-' + id + 'laboratories'
-    # /
+        if request.method == 'POST':
+            toInvalidate = request.POST.get("toInvalidate", "").split(",")
+            for conceptId in toInvalidate:
+                # to-do : désactiver les concepts
+                for children in entity['concepts']['children']:
+                    if children['id'] == conceptId:
+                        lab_tree = utils.appendToTree(children, entity, lab_tree)
+                        children['state'] = 'validated'
+                    if 'children' in children:
+                        for children1 in children['children']:
+                            if children1['id'] == conceptId:
+                                if len(children['children']) == 1:
+                                    lab_tree = utils.appendToTree(children, entity, lab_tree)
+                                    children['state'] = 'validated'
+                                lab_tree = utils.appendToTree(children1, entity, lab_tree)
+                                children1['state'] = 'validated'
+                            if 'children' in children1:
+                                for children2 in children1['children']:
+                                    if children2['id'] == conceptId:
+                                        if len(children['children']) == 1:
+                                            lab_tree = utils.appendToTree(children, entity, lab_tree)
+                                            children['state'] = 'validated'
+                                        if len(children1['children']) == 1:
+                                            lab_tree = utils.appendToTree(children1, entity, lab_tree)
+                                            children1['state'] = 'validated'
+                                        lab_tree = utils.appendToTree(children2, entity, lab_tree)
+                                        children2['state'] = 'validated'
 
-    if request.method == 'POST':
-        toInvalidate = request.POST.get("toInvalidate", "").split(",")
-        for conceptId in toInvalidate:
-            # to-do : désactiver les concepts
-            for children in entity['concepts']['children']:
-                if children['id'] == conceptId:
-                    children['state'] = 'validated'
-                if 'children' in children:
-                    for children1 in children['children']:
-                        if children1['id'] == conceptId:
-                            if len(children['children']) == 1:
-                                children['state'] = 'validated'
-                            children1['state'] = 'validated'
-                        if 'children' in children1:
-                            for children2 in children1['children']:
-                                if children2['id'] == conceptId:
-                                    if len(children['children']) == 1:
-                                        children['state'] = 'validated'
-                                    if len(children1['children']) == 1:
-                                        children1['state'] = 'validated'
-                                    children2['state'] = 'validated'
+            es.update(index=index, refresh='wait_for', id=entity['ldapId'],
+                      body={"doc": {"concepts": entity['concepts']}})
 
-        es.update(index=index, refresh='wait_for', id=entity['ldapId'],
-                  body={"doc": {"concepts": entity['concepts']}})
+            es.update(index=lab_index, refresh='wait_for', id=entity['labHalId'],
+                      body={"doc": {"concepts": lab_tree}})
+
+
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
@@ -2559,6 +2570,7 @@ def validateCredentials(request):
 
             es.update(index=structId + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
                       body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True}})
+
 
         if type == "lab":
             halStructId = request.POST.get("f_halStructId")
