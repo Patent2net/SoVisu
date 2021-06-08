@@ -108,16 +108,9 @@ def calculateMDS(doc):
     return score * 100 / (0.8 + 0.2 + 1 + 0.8 + 0.4 + 0.6)
 
 
-def appendToTree(scope, rsr, tree, state = None):
+def appendToTree(scope, rsr, tree, state = 'validated'):
 
-    if state:
-        rsrData = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': 'invalidated'}
-    else:
-        rsrData = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName']}
-
-    if state:
-        print(state)
-        print(rsrData)
+    rsrData = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
 
     sid = scope['id'].split('.')
 

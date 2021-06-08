@@ -68,9 +68,10 @@
 
 
     function displayDetails(details) {
+        console.log(details);
         $('#tree-details').empty();
         for (const e of details) {
-            if (!('state' in e)) {
+            if ((e['state'] == "validated")) {
                 $('#tree-details').append('<li class="leading-4 w-full bg-gray-50 py-1 px-2">'+
                     ' <a class="text-blue-700 text-sm" href="#">' +
                     e.firstName + " " + e.lastName +
