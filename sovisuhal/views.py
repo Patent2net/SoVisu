@@ -325,7 +325,10 @@ def dashboard(request):
         res = es.search(index=structId + "*-researchers",
                         body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
     elif type == "lab":
         scope_param = {
@@ -340,7 +343,10 @@ def dashboard(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
     # /
 
     hasToConfirm = False
@@ -517,8 +523,10 @@ def references(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
-
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
     elif type == "lab":
         scope_param = {
             "query": {
@@ -532,7 +540,10 @@ def references(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
     # /
 
     # Get first submittedDate_tdate date
@@ -870,7 +881,10 @@ def check(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-*-researchers*", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']  # plante si id pas présente
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown') # plante si id pas présente ?
 
     elif type == "lab":
         scope_param = {
@@ -885,7 +899,10 @@ def check(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-*-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
     # /
 
     # Get first submittedDate_tdate date
@@ -2188,7 +2205,10 @@ def terminology(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
     elif type == "lab":
         scope_param = {
@@ -2203,7 +2223,10 @@ def terminology(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "-*-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
     # /
 
     hasToConfirm = False
@@ -2410,7 +2433,10 @@ def validateReferences(request):
         }
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
@@ -2435,7 +2461,10 @@ def validateReferences(request):
         }
 
         res = es.search(index=structId + "-*-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
         if request.method == 'POST':
             toValidate = request.POST.get("toValidate", "").split(",")
@@ -2483,7 +2512,10 @@ def validateGuidingDomains(request):
             }
 
             res = es.search(index=structId + "-*-researchers", body=scope_param)
-            entity = res['hits']['hits'][0]['_source']
+            try:
+                entity = res['hits']['hits'][0]['_source']
+            except:
+                return redirect('unknown')
 
             es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
                       body={"doc": {"guidingDomains": toValidate}})
@@ -2529,7 +2561,10 @@ def invalidateConcept(request):
         }
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
         index = structId + '-' + entity['labHalId'] + '-researchers'
         lab_index = structId + '-' + entity['labHalId'] + '-laboratories'
@@ -2624,7 +2659,10 @@ def validateCredentials(request):
             }
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
-            entity = res['hits']['hits'][0]['_source']
+            try:
+                entity = res['hits']['hits'][0]['_source']
+            except:
+                return redirect('unknown')
 
             print(structId + "-" + entity['labHalId'] + '-researchers')
 
@@ -2678,7 +2716,10 @@ def validateGuidingKeywords(request):
             }
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
-            entity = res['hits']['hits'][0]['_source']
+            try:
+                entity = res['hits']['hits'][0]['_source']
+            except:
+                return redirect('unknown')
 
             es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
@@ -2763,7 +2804,10 @@ def wordcloud(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "*-researchers", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
     elif type == "lab":
         scope_param = {
@@ -2778,8 +2822,10 @@ def wordcloud(request):
         ext_key = "labStructId_i"
 
         res = es.search(index=structId + "*-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
-    # /
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')    # /
 
     hasToConfirm = False
 
@@ -2930,7 +2976,10 @@ def publicationboard(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "*-researchers", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
 
     elif type == "lab":
         scope_param = {
@@ -2945,8 +2994,10 @@ def publicationboard(request):
         ext_key = "harvested_from_ids"
 
         res = es.search(index=structId + "*-laboratories", body=scope_param)
-        entity = res['hits']['hits'][0]['_source']
-    # /
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')    # /
 
     hasToConfirm = False
 
@@ -3137,8 +3188,10 @@ def forceUpdateReference(request):
             }
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
-            entity = res['hits']['hits'][0]['_source']
-
+            try:
+                entity = res['hits']['hits'][0]['_source']
+            except:
+                return redirect('unknown')
             collecte_docs(entity)
 
     return redirect(
