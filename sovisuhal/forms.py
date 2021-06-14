@@ -33,7 +33,7 @@ class CreateCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
         # f_more = forms.CharField()
 
-    roles = [('visiteur', 'visiteur'), ('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire')
+    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'), ('visiteur', 'visiteur')
              ]
     f_role = forms.CharField(label='Role', widget=forms.Select(choices=roles))
 
