@@ -176,5 +176,5 @@ SERVER_EMAIL = EMAIL_HOST_USER
 
 ADMINS = (
     ('Sovisuhal', 'esteban-bara@etud.univ-tln.fr'),
-    ('Sovisuhal1', '')
+    ('Sovisuhal1', 'dreymond@univ-tln.fr')
 )
