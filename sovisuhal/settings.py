@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from decouple import config
 
-mode = config ('mode')
+mode = config('mode')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,9 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
 
-
 if mode == 'Prod':
-    SECRET_KEY = config ('DjangoKey')
+    SECRET_KEY = config('DjangoKey')
     DEBUG = config('DJANGO_DEBUG')
     # Settings used by Uniauth
     LOGIN_URL = '/accounts/login/'
@@ -40,7 +39,7 @@ if mode == 'Prod':
     UNIAUTH_FROM_EMAIL = 'sovisu@univ-tln.fr'
     UNIAUTH_LOGIN_DISPLAY_STANDARD = True
     UNIAUTH_LOGIN_DISPLAY_CAS = True
-    UNIAUTH_LOGIN_REDIRECT_URL = '/' # +  uniauth_profile.accounts
+    UNIAUTH_LOGIN_REDIRECT_URL = '/'  # +  uniauth_profile.accounts
     UNIAUTH_LOGOUT_CAS_COMPLETELY = True
     UNIAUTH_LOGOUT_REDIRECT_URL = None
     UNIAUTH_MAX_LINKED_EMAILS = 20
@@ -63,9 +62,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'uniauth'#,
-    #'celery',
-    #'celery_progress'
+    'uniauth'  # ,
+    # 'celery',
+    # 'celery_progress'
 ]
 
 MIDDLEWARE = [
@@ -175,6 +174,9 @@ EMAIL_HOST_PASSWORD = 'ckpfbawohpgrhykz'
 SERVER_EMAIL = EMAIL_HOST_USER
 
 ADMINS = (
-    ('Sovisuhal', 'esteban-bara@etud.univ-tln.fr'),
-    ('Sovisuhal1', 'dreymond@univ-tln.fr')
+    ('Sovisuhal', 'dreymond@univ-tln.fr'),
+    #pour rajouter un profil:
+    #('role utilisateur', 'mail'),
+    ('Sovisuhal1', '')
 )
+#Attention! La liste Admin a besoin d'avoir un minimum de 2 profil renseignés. Dans le cas ou un seul admin est présent pour le système, merci de laisser le 2ème profil sans adresse mail renseignée.
