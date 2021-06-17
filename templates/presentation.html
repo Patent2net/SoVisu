@@ -80,7 +80,7 @@
         <div class="bg-white rounded w-full h-full">
             <div class="shadow-md">
                 <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0 " id="tab-solo-one" type="radio" name="tabs2">
+                    <input class="absolute opacity-0 " id="tab-solo-one" type="radio" name="tabs3">
                     <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-one">A quoi sert SoVisu
                         ?</label>
                     <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
@@ -89,46 +89,53 @@
                             <br>Une fois vos identifiants renseignés, l'outil vous présente l'état de vos publications
                             signalées sur HAL (qui rassemble nombre d'archives), évalue le degré de renseignement des
                             métadonnées (mots-clés, résumé) et vous affiche celles qui pourraient être complétées via un
-                            lien.</br>
+                            lien.<br>
                             <br>Nous attendons aussi que vous associez les publications à votre profil d'expertise que
                             l'outil recrée à l'aide des données extraites de celles-ci. Vous validez ainsi les mots-clés
-                            et thématiques associées à vos travaux et pouvez les compléter.</br>
+                            et thématiques associées à vos travaux et pouvez les compléter.<br>
                             <br>Enfin, ces validations conduiront à indexer votre profil à ces domaines et mots clés
                             pour que l'on puisse vous retrouver sur ce que vous aurez validé. \`A terme, ces données
-                            remonterons pour minimiser les erreurs de traitement.</br>
+                            remonterons pour minimiser les erreurs de traitement.<br>
                         </p>
                     </div>
                 </div>
+                <!--
+                                <div class="tab w-full overflow-hidden border-t">
+                                    <input class="absolute opacity-0 " id="tab-solo-two" type="radio" name="tabs3">
+                                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-two">
+                                        Présentation de l'interface
+                                    </label>
+                                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
 
+                                    </div>
+                                </div>
+                -->
                 <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-two" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-two">Etapes </label>
+                    <input class="absolute opacity-0" id="tab-solo-three" type="radio" name="tabs3">
+                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-three">Étapes </label>
                     <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
                         <p class="p-5">Vous devez vérifier vos identifiants et vos publications<br>
-                        <ul>
-                            <li> Depuis l'onglet "Vérification des données" vous saisissez ou vérifiez :</li>
-                            <ul>
-                                <li>Votre identifiant IdRef (existe entre autre si vous avez soutenu une thèse)</li>
-                                <li>Vos identifiants chercheur : OrcID, researchgate, VIAF, ISNI...</li>
-                                <li>Votre identifiant d'archive sur Hal : l'idHAL.</li>
 
-                                <li>Le lendemain, vous pourrez accéder au tableau de bord pour :</li>
-                                <ul>
-                                    <li>Intégrer vos publications à votre profil d'expert</li>
-                                    <li>Valider les thématiques et les mots-clés associés</li>
-                                </ul>
-                                <li>Cette étape sera à réaliser jusqu'à ce que les machines y arrivent pour vous mais
-                                    seulement sur vos dernières publications. Pour le moment, le manque d'information
-                                    (par ex. le degré de participation à une publication, contexte disciplinaire, etc.)
-                                    font que les algorithmes d'extraction d'information à partir de vos publications
-                                    échouent le plus souvent. Ce petit travail constitue un apport informationel que
-                                    nous enregistrons et qui permettra de faire évoluer ces mécanismes. <br>
-                                    \`A terme, nous espérons pouvoir utiliser ces informations que vous validez pour
-                                    proposer des informations ciblées sur votre profil (appels, publications,
-                                    auteurs...).
-                                </li>
-                            </ul>
-                        </ul>
+                        <p class="p-5"> Depuis l'onglet "Vérification des données" vous saisissez ou vérifiez :<br>
+                            - Votre identifiant IdRef (existe entre autre si vous avez soutenu une
+                            thèse)<br>
+                            - Vos identifiants chercheur : OrcID, researchgate, VIAF, ISNI...<br>
+                            - Votre identifiant d'archive sur Hal : l'idHAL.</p>
+                        <br>
+                        <p class="p-5">Le lendemain, vous pourrez accéder au tableau de bord pour :<br>
+                            - Intégrer vos publications à votre profil d'expert <br>
+                            - Valider les thématiques et les mots-clés associés</p>
+
+                        <p class="p-5">Cette étape sera à réaliser jusqu'à ce que les machines y arrivent pour vous mais
+                            seulement sur vos dernières publications. Pour le moment, le manque d'information
+                            (par ex. le degré de participation à une publication, contexte disciplinaire, etc.)
+                            font que les algorithmes d'extraction d'information à partir de vos publications
+                            échouent le plus souvent. Ce petit travail constitue un apport informationel que
+                            nous enregistrons et qui permettra de faire évoluer ces mécanismes.</p>
+                        <p class="p-5">À terme, nous espérons pouvoir utiliser ces informations que vous validez pour
+                            proposer des informations ciblées sur votre profil (appels, publications,
+                            auteurs...).
+                        </p>
                     </div>
                 </div>
 
@@ -139,7 +146,7 @@
 
 <script>
     /*Javascript to close the radio button version by clicking it again */
-    var myRadios = document.getElementsByName('tabs2');
+    var myRadios = document.getElementsByName('tabs3');
     var setCheck;
     var x = 0;
     for (x = 0; x < myRadios.length; x++) {
