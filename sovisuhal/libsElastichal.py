@@ -29,9 +29,16 @@ def getAureHal(idHal):
     aureHal = [truc for truc in results['results']['bindings'] if
                truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
 
-    print(aureHal[0]['o']['value'].split('/')[-1])
+    ret_aureHal = -1
 
-    return aureHal[0]['o']['value'].split('/')[-1]
+    for id in aureHal:
+        print(id['o']['value'])
+        res = requests.get(id['o']['value'])
+
+        if 'Ressource inexistante' not in res.text:
+            ret_aureHal = id['o']['value'].split('/')[-1]
+
+    return ret_aureHal
 
 
 def findIdRef(name):
