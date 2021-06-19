@@ -172,6 +172,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'testsovis@gmail.com'
 EMAIL_HOST_PASSWORD = 'ckpfbawohpgrhykz'
 SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_SUBJECT_PREFIX = '[SoVisu]'
 
 ADMINS = (
     ('Sovisuhal', 'dreymond@univ-tln.fr'),
