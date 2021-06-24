@@ -157,14 +157,17 @@ class ContactForm(forms.Form):
     FEEDBACK = 'fb'
     NEW_FEATURE = 'nf'
     OTHER = 'o'
+    PUBLICATION = 'tb'
     purpose_choices = (
+        (PUBLICATION,'Problème avec une publication'),
         (NEW_FEATURE, 'Rajout de fonctionnalité'),
         (BUG, 'Signaler une erreur'),
         (FEEDBACK, 'Feedback'),
         (OTHER, 'Autre'),
     )
 
-    nom = forms.CharField()
-    email = forms.EmailField()
-    objet = forms.ChoiceField(choices=purpose_choices)
-    message = forms.CharField(widget=forms.Textarea(attrs={'cols': 40, 'rows': 5}))
+    objet = forms.ChoiceField(label='Catégorie',choices=purpose_choices)
+    nom = forms.CharField(widget=forms.TextInput(attrs={'size': '36','placeholder': 'Votre Nom'}))
+    email = forms.EmailField(widget=forms.TextInput(attrs={'size': '36','placeholder': 'Votre Email'}))
+    sujet = forms.CharField(max_length=100,widget=forms.TextInput(attrs={'size': '36','placeholder': '100 caractères max'}))
+    message = forms.CharField(label='Description',widget=forms.Textarea(attrs={'cols': 40, 'rows': 5,'size': '80','placeholder': 'Décrivez votre problème'}))
