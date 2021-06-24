@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from django.contrib import messages
-from django.core.mail import mail_admins, send_mail
+from django.core.mail import mail_admins,mail_managers, send_mail
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
 from elasticsearch import Elasticsearch, helpers
@@ -3116,37 +3116,43 @@ def contact(request):
     if request.method == 'POST':
         f = ContactForm(request.POST)
         if f.is_valid():
-            # send message to admin
-            name = f.cleaned_data['nom']
-            usermail = [f.cleaned_data['email']]
-            subject = "Vous avez reçu une demande de {}:<{}>".format(name, usermail)
+                #create mail content
+                name = f.cleaned_data['nom']
+                usermail = [f.cleaned_data['email']]
+                sujet = f.cleaned_data['sujet']
+                subject = "{} : {}".format(dict(f.purpose_choices).get(f.cleaned_data['objet']), sujet)
 
-            message = "Objet: {}\n\nDate: {}\n\nMessage:\n\n {}".format(
-                dict(f.purpose_choices).get(f.cleaned_data['objet']),
-                datetime.now().isoformat(timespec='minutes'),
-                f.cleaned_data['message']
-            )
+                message = "Date: {}\n\nCatégorie: {}\n\nNom d'utilisateur: {}\n\nMail de contact: {}\n\nSujet: {}\n\nDescription:\n\n {}".format(
+                    datetime.now().isoformat(timespec='minutes'),
+                    dict(f.purpose_choices).get(f.cleaned_data['objet']),
+                    name,
+                    usermail[0],
+                    sujet,
+                    f.cleaned_data['message']
+                )
+                if f.cleaned_data['objet'] == 'tb': # send mail to registered MANAGERS in settings.py
+                    mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
+                else: # send mail to registered ADMINS in settings.py
+                    mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
-            mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
+                # /
 
-            # /
+                # send confirmation message to user
 
-            # send confirmation message to user
+                conf_subject = "Confirmation de reception :{}".format(
+                    dict(f.purpose_choices).get(f.cleaned_data['objet'])
+                )
 
-            conf_subject = "Confirmation de reception du ticket:{}".format(
-                dict(f.purpose_choices).get(f.cleaned_data['objet'])
-            )
+                conf_message = "Bonjour {},\nVotre requête a bien été reçue et sera examinée dans les plus brefs délais\nVeuillez trouvez ci dessous un résumé des informations renseignées:\n\n{}".format(
+                    name, message)
 
-            conf_message = "Bonjour {},\nCeci est un message automatisé pour vous informer que votre ticket a bien été reçu.\n\n{}".format(
-                name, message)
+                send_mail(conf_subject, conf_message, 'testsovis@gmail.com', usermail, fail_silently=False)
+                # /
 
-            send_mail(conf_subject, conf_message, 'testsovis@gmail.com', usermail, fail_silently=False)
-            # /
+                messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
+                f = ContactForm()
 
-            messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
-            f = ContactForm()
-
-            return render(request, 'contact.html', {'form': f})
+                return render(request, 'contact.html', {'form': f})
 
     else:
         f = ContactForm()
