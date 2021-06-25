@@ -182,7 +182,7 @@ ADMINS = (
 )
 
 MANAGERS = (
-    ('BU','pruzoimeffaqui-7715@yopmail.com'), #changer l'adresse jetable par une adresse valide
+    ('BU','dreymond@univ-tln.fr'), #changer l'adresse
     ('BU_1','')
 )
 #Attention! La liste Admin a besoin d'avoir un minimum de 2 profil renseignés. Dans le cas ou un seul admin est présent pour le système, merci de laisser le 2ème profil sans adresse mail renseignée.
