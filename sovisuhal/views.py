@@ -400,20 +400,27 @@ def dashboard(request):
 
     # Get first submittedDate_tdate date
     if type == "rsr":
-        start_date_param = {
-            "size": 1,
-            "sort": [
-                {"submittedDate_tdate": {"order": "asc"}}
-            ],
-            "query": {
-                "match_all": {}
+        try:
+            start_date_param = {
+                "size": 1,
+                "sort": [
+                    {"submittedDate_tdate": {"order": "asc"}}
+                ],
+                "query": {
+                    "match_all": {}
+                }
+                # "query": {
+                #     "match_phrase": {"harvested_from_ids": entity['halId_s']}
+                # }
             }
-            # "query": {
-            #     "match_phrase": {"harvested_from_ids": entity['halId_s']}
-            # }
-        }
-        res = es.search(index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+            res = es.search(index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                         body=start_date_param)
+        except:
+            start_date_param .pop("sort")
+            res = es.search(
+                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+                body=start_date_param)
+
         filtrelab = ''
     elif type == "lab":
         start_date_param = {
@@ -428,7 +435,10 @@ def dashboard(request):
         res = es.search(index=structId + '-' + id + "-laboratories-documents", body=start_date_param)
 
         filtrelab = 'harvested_from_ids: "' + id + '"'
-    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
+    try:
+        start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
+    except:
+        start_date = "2000"
     # /
 
     # Get parameters
