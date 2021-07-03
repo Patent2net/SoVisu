@@ -6,7 +6,7 @@ from sovisuhal.libs.unpaywall import getOa
 from sovisuhal.libs import utils, hal, unpaywall
 from elasticsearch import Elasticsearch, helpers
 import json
-
+import datetime
 try:
     from decouple import config
     from ldap3 import Server, Connection, ALL
@@ -97,18 +97,19 @@ def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
     Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
     Chercheur["firstName"] = Chercheur['name'].split(' ')[1]
     Chercheur["lastName"] = Chercheur['name'].split(' ')[0]
+
     # Chercheur["aurehalId"]
 
     # creation des index
   #  progress_recorder.set_progress(5, 10, description='creation des index')
     if not es.indices.exists(index=structId + "-structures"):
-        es.indices.create(index=structId + "-structures")
+        es.indices.create(index=structId + "-structures", timestamp=datetime.datetime.now().isoformat())
     if not es.indices.exists(index=structId + "-" + labo  + "-researchers"):
-        es.indices.create(index=structId + "-" + labo + "-researchers")
-        es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents
+        es.indices.create(index=structId + "-" + labo + "-researchers", timestamp=datetime.datetime.now().isoformat())
+        es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents", timestamp=datetime.datetime.now().isoformat())  # -researchers" + row["ldapId"] + "-documents
     else:
         if not es.indices.exists(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents"):
-            es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+            es.indices.create(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents", timestamp=datetime.datetime.now().isoformat())  # -researchers" + row["ldapId"] + "-documents" ?
 
 
     Chercheur ["structSirene"] = structId
@@ -134,7 +135,8 @@ def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
 
     res = es.index(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers",
                    id=Chercheur["ldapId"],
-                   body=json.dumps(Chercheur))
+                   body=json.dumps(Chercheur),
+                   timestamp=datetime.datetime.now().isoformat()) #pour le suvi
    # progress_recorder.set_progress(10, 10)
     return Chercheur
 
@@ -196,7 +198,8 @@ def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
         # Insert laboratory data
         # est-ce que update est destructeur ?
         res = es.index(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories", id=row['halStructId'],
-                       body=json.dumps(row))
+                       body=json.dumps(row),
+                       timestamp=datetime.datetime.now().isoformat())
 
 
 # @shared_task(bind=True)
@@ -287,6 +290,6 @@ def collecte_docs( Chercheur): #self,
         docs,
         index= Chercheur["structSirene"]  + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents",
         # -researchers" + row["ldapId"] + "-documents
-            )
+        timestamp=datetime.datetime.now().isoformat())
     return docs # pas utile...
 
