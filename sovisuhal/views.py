@@ -3183,7 +3183,7 @@ def forceUpdateReference(request):
     if 'filter' in request.GET:
         data = request.GET['filter']
     else:
-        data = -1
+        data = "references"
     if 'from' in request.GET:
         dateFrom = request.GET['from']
     if 'to' in request.GET:
@@ -3211,4 +3211,4 @@ def forceUpdateReference(request):
             collecte_docs(entity)
 
     return redirect(
-        '/references/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&filter=' + data)
+        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&filter=' + data)
