@@ -233,6 +233,19 @@
                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Modifier ou valider les identifiants">
                 </form>
 
+                {% if entity.aureHalId == -1 %}
+
+                    <hr class="mb-4 mt-4"/>
+
+                                    <form action="/refresh-aurehal-id/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
+{% csrf_token %}
+                    <p class="text-sm">
+                    En cas de soucis avec la récupération de l'identifiant AuréHal, déclenchez manuellement un nouvel essai en cliquant sur le bouton ci-dessous.
+                    </p>
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none w-64" type="submit" value="Mettre à jour l'ID AuréHAL (automatique)">
+                                    </form>
+                {% endif %}
+
             {% endif %}
 
 

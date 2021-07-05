@@ -5,6 +5,7 @@ import lxml.etree
 from SPARQLWrapper import SPARQLWrapper, JSON
 import requests
 from bs4 import BeautifulSoup
+from .libs import hal
 import time
 
 def convertIdHalToStr(idHal_i):

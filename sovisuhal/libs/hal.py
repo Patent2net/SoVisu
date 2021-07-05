@@ -1,4 +1,5 @@
 import requests
+import random
 
 
 def findPublications(idHal, field, increment=0):
@@ -34,3 +35,15 @@ def findPublications(idHal, field, increment=0):
     else:
         print('Error : can not reach HAL API endpoint')
         return articles
+
+def findRandomPublication(idHal, field):
+
+    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idHal))
+    if req.status_code == 200:
+        data = req.json()
+        if "response" in data.keys():
+            data = data['response']
+
+            return random.choice(data['docs'])
+
+    return -1
