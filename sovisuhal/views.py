@@ -13,6 +13,9 @@ from .forms import ContactForm
 from urllib.parse import urlencode
 from django.urls import reverse
 
+from . import libsElastichal
+from sovisuhal.archivesOuvertes import getConceptsAndKeywords
+
 from .libs import utils
 
 # from celery.result import AsyncResult
@@ -2737,6 +2740,51 @@ def validateGuidingKeywords(request):
         if type == "lab":
             es.update(index=structId + "-" + str(id) + "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
+
+    return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+
+def refreshAureHalId(request):
+    # Get parameters
+    if 'type' in request.GET:
+        type = request.GET['type']
+    else:
+        return redirect('unknown')
+    if 'id' in request.GET:
+        id = request.GET['id']
+    else:
+        return redirect('unknown')
+    if 'data' in request.GET:
+        data = request.GET['data']
+    else:
+        data = -1
+    if 'from' in request.GET:
+        dateFrom = request.GET['from']
+    if 'to' in request.GET:
+        dateTo = request.GET['to']
+
+    # Connect to DB
+    es = esConnector()
+
+    scope_param = {
+        "query": {
+            "match": {
+                "_id": id
+            }
+        }
+    }
+
+    res = es.search(index=structId + "*-researchers", body=scope_param)
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
+
+    aurehalId = libsElastichal.getAureHal(entity['halId_s'])
+    if aurehalId != -1:
+        archivesOuvertesData = getConceptsAndKeywords(entity['aurehalId'])
+        concepts = utils.filterConcepts(archivesOuvertesData['concepts'], validated_ids=[])
+
+    es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id, body={"doc": {"aurehalId": aurehalId, 'concepts': concepts}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 

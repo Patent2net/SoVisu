@@ -45,6 +45,7 @@ urlpatterns = [
     path('help/', views.help, name='help'),
     path('CreateCredentials/', views.CreateCredentials, name='credentials'),
     path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
+    path('refresh-aurehal-id/', views.refreshAureHalId, name='refresh-aurehal-id'),
     path('validate_references/', views.validateReferences, name='validate_references'),
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
     path('validate_guiding-domains/', views.validateGuidingDomains, name='validate_guiding-domains'),
