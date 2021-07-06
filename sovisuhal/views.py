@@ -2788,7 +2788,7 @@ def refreshAureHalId(request):
 
     aurehalId = libsElastichal.getAureHal(entity['halId_s'])
     if aurehalId != -1:
-        archivesOuvertesData = getConceptsAndKeywords(entity['aurehalId'])
+        archivesOuvertesData = getConceptsAndKeywords(aurehalId)
         concepts = utils.filterConcepts(archivesOuvertesData['concepts'], validated_ids=[])
 
     es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id, body={"doc": {"aurehalId": aurehalId, 'concepts': concepts}})
