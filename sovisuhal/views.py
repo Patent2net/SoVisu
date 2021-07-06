@@ -933,10 +933,12 @@ def check(request):
 
             res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
                         body=start_date_param)
+            start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
         except:
             start_date_param .pop("sort")
             res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
                             body=start_date_param)
+            start_date = "2000"
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -949,7 +951,6 @@ def check(request):
         }
         res = es.search(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=start_date_param)
 
-    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
     # Get parameters
