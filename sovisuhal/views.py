@@ -3266,4 +3266,4 @@ def forceUpdateReference(request):
             collecte_docs(entity)
 
     return redirect(
-        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&filter=' + data)
+        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=references')
