@@ -929,8 +929,14 @@ def check(request):
                 "match_phrase": {"harvested_from_ids": entity['halId_s']}
             }
         }
-        res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
+        try:
+
+            res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
                         body=start_date_param)
+        except:
+            start_date_param .pop("sort")
+            res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
+                            body=start_date_param)
     elif type == "lab":
         start_date_param = {
             "size": 1,
@@ -3231,7 +3237,7 @@ def forceUpdateReference(request):
     if 'filter' in request.GET:
         data = request.GET['filter']
     else:
-        data = "references"
+        data = -1 #"references"
     if 'from' in request.GET:
         dateFrom = request.GET['from']
     if 'to' in request.GET:
