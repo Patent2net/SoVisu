@@ -39,7 +39,7 @@ class CreateCredentials(forms.Form):
 
     f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
     f_IdRef = forms.CharField(label='IdRef - identifiant de la notice')
-    f_orcId = forms.CharField(label='ORCID (numéro par ex: 0000-0003-2071-6594')
+    f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594')
     f_more = forms.CharField(label='autres')
 
 
