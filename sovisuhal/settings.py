@@ -48,20 +48,25 @@ if mode == 'Prod':
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
-            'file': {
+            'filedeb': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
                 'filename': '/data/logs/django/debug.log',
             },
+            'fileinf': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/data/logs/django/debuginf.log',
+            },
         },
         'loggers': {
             'django': {
-                'handlers': ['file'],
+                'handlers': ['filedeb'],
                 'level': 'DEBUG',
                 'propagate': True,
             },
     'django.template': {
-        'handlers': ['file'],
+        'handlers': ['fileinf'],
         'level': 'INFO',
         'propagate': True,
     },
