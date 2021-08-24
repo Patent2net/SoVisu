@@ -3247,9 +3247,10 @@ def forceUpdateReference(request):
     # Connect to DB
     es = esConnector()
 
-    if request.method == 'POST':
-
-        if type == "rsr":
+    #if request.method == 'POST':
+    # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
+    
+    if type == "rsr":
             scope_param = {
                 "query": {
                     "match": {
