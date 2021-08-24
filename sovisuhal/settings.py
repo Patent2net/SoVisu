@@ -60,6 +60,11 @@ if mode == 'Prod':
                 'level': 'DEBUG',
                 'propagate': True,
             },
+    'django.template': {
+        'handlers': ['file'],
+        'level': 'INFO',
+        'propagate': True,
+    },
         },
     }
 else:
