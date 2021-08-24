@@ -44,6 +44,24 @@ if mode == 'Prod':
     UNIAUTH_LOGOUT_REDIRECT_URL = None
     UNIAUTH_MAX_LINKED_EMAILS = 20
     UNIAUTH_PERFORM_RECURSIVE_MERGING = True
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/data/logs/django/debug.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
 else:
     SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
     DEBUG = 'True'
