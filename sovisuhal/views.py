@@ -3249,7 +3249,7 @@ def forceUpdateReference(request):
 
     #if request.method == 'POST':
     # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
-    
+
     if type == "rsr":
             scope_param = {
                 "query": {

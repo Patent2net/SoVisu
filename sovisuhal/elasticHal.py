@@ -256,7 +256,7 @@ def collecte_docs( Chercheur): #self,
                 doc['isOaExtra'] = False
         except:
             print('publicationDate_tdate error ?')
-
+        doc ['timestamp'] = datetime.datetime.now().isoformat()
         # if not init:
         #
         #     doc_param = {
@@ -288,8 +288,8 @@ def collecte_docs( Chercheur): #self,
     res = helpers.bulk(
         es,
         docs,
-        index= Chercheur["structSirene"]  + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents",
+        index= Chercheur["structSirene"]  + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents"
         # -researchers" + row["ldapId"] + "-documents
-        timestamp=datetime.datetime.now().isoformat())
-    return docs # pas utile...
-
+        )
+    #return docs # pas utile...
+    return Chercheur # au cas où
