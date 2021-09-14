@@ -1,0 +1,120 @@
+DELETE indexName
+
+# utile pour recevoir plus de résultats
+PUT _settings
+{
+  "index.max_result_window": 20000
+}
+# contenu d'un labo
+GET 198307662-numLabo-laboratories/_search
+
+POST 198307662-numLabo-researchers/_delete_by_query
+{
+    "query": {
+              "match": {
+      "ldapId": "ldapId"
+    }
+            }
+}
+
+GET 198307662-numLabo-researchers/_search
+{
+    "query": {
+                "query_string": {
+                    "query": "ldapId"
+                }
+            }
+}
+
+
+GET 198307662-*-documents/_count
+{
+        "query" : {
+             "field": "submittedDate_tdate"
+        }
+}
+
+GET 198307662-*-documents/_search?size=0
+{
+  "aggs": {
+    "a1": {
+      "missing": {
+        "field": "submittedDate_tdate"
+      }
+    },
+    "a2": {
+      "filter": {
+        "exists": {
+          "field": "submittedDate_tdate"
+        }
+      }
+    }
+  }
+}
+
+GET 198307662-numLabo-researchers/_search
+GET 198307662-*-documents/_search
+{
+    "query": {
+                "query_string": {
+                    "query": ""
+                }
+            }
+}
+
+GET /_search
+{
+    "size": 1026,
+    "query": {
+                "match_phrase": "no abstract"
+            }
+}
+
+GET *-researchers/_search
+{
+    "size": 1026,
+    "query": {
+                "match_phrase": {
+                    "ldapId": "ldapId"
+                }
+            }
+}
+
+GET *-documents/_search
+{
+    "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                "harvested_from_ids": "idHal"
+                            }
+                        },
+                        {
+                            "match": {
+                                "validated": false
+                            }
+                        }
+                    ]
+                }
+            }
+}
+
+GET documents
+
+GET documents/_search
+{
+  "size": 0,
+  "aggs": {
+    "prices": {
+      "histogram": {
+        "field": "MDS",
+        "interval": 10,
+        "extended_bounds": {
+          "min": 0,
+          "max": 1
+        }
+      }
+    }
+  }
+}
