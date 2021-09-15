@@ -949,7 +949,16 @@ def check(request):
                 "match_phrase": {"harvested_from_ids": entity['halStructId']}
             }
         }
-        res = es.search(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=start_date_param)
+        
+        try:
+
+            res = es.search(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=start_date_param)
+            start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
+        except:
+            start_date_param .pop("sort")
+            res = es.search(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=start_date_param)
+            start_date = "2000"
+        
 
     # /
 
