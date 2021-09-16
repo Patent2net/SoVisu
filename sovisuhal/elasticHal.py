@@ -135,9 +135,22 @@ def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
 
     res = es.index(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers",
                    id=Chercheur["ldapId"],
-                   body=json.dumps(Chercheur),
-                   timestamp=datetime.datetime.now().isoformat()) #pour le suvi
-   # progress_recorder.set_progress(10, 10)
+                   body=json.dumps(Chercheur))
+                   #timestamp=datetime.datetime.now().isoformat()) #pour le suvi modification de ingest plutôt
+    # #cf. https://kb.objectrocket.com/elasticsearch/how-to-create-a-timestamp-field-for-an-elasticsearch-index-275
+   #  PUT / _ingest / pipeline / timestamp
+   #  {
+   #      "description": "Creates a timestamp when a document is initially indexed",
+   #      "processors": [
+   #          {
+   #              "set": {
+   #                  "field": "_source.timestamp",
+   #                  "value": "{{_ingest.timestamp}}"
+   #              }
+   #          }
+   #      ]
+   #  }
+   # # progress_recorder.set_progress(10, 10)
     return Chercheur
 
 def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
