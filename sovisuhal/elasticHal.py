@@ -203,12 +203,12 @@ def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
                                         tree = utils.appendToTree(child2, rsr['_source'], tree)
 
         row['concepts'] = tree
-
+        row["Created"] = datetime.datetime.now().isoformat()
         # Insert laboratory data
         # est-ce que update est destructeur ?
         res = es.index(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories", id=row['halStructId'],
-                       body=json.dumps(row),
-                       timestamp=datetime.datetime.now().isoformat())
+                       body=json.dumps(row))
+                       #timestamp=datetime.datetime.now().isoformat())
 
 
 # @shared_task(bind=True)
@@ -265,7 +265,7 @@ def collecte_docs( Chercheur): #self,
                 doc['isOaExtra'] = False
         except:
             print('publicationDate_tdate error ?')
-        doc ['timestamp'] = datetime.datetime.now().isoformat()
+        doc ['Created'] = datetime.datetime.now().isoformat()
         # if not init:
         #
         #     doc_param = {
