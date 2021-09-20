@@ -133,15 +133,15 @@ def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
     Chercheur["concepts"] = archivesOuvertesData['concepts']
     Chercheur["guidingKeywords"] = []
     Chercheur["idRef"] = idRef
-    Chercheur["mappings"]: {
-        "_default_": {
-            "_timestamp": {
-                "enabled": "true",
-                "store": "true",
-                "path": "plugins.time_stamp.string",
-                "format": "yyyy-MM-dd HH:m:ss"
-            }
-        }}
+    # Chercheur["mappings"]: {
+    #     "_default_": {
+    #         "_timestamp": {
+    #             "enabled": "true",
+    #             "store": "true",
+    #             "path": "plugins.time_stamp.string",
+    #             "format": "yyyy-MM-dd HH:m:ss"
+    #         }
+    #     }}
     res = es.index(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers",
                    id=Chercheur["ldapId"],
                    body=json.dumps(Chercheur))#,
