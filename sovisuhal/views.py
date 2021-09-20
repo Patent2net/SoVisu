@@ -64,7 +64,7 @@ def index(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
-        gugusse = request.user.get_username()
+        gugusse = request.user.get_username().lower()
 
         if gugusse == 'admin':
             return redirect('/admin/')
@@ -75,7 +75,7 @@ def index(request):
         else:
             print(gugusse)
             # gugusse = request.user.get_username()
-            gugusse = gugusse.replace(patternCas, '')
+            gugusse = gugusse.replace(patternCas, '').lower()
             # check présence gugusse
             es = esConnector()
             scope_param = {
@@ -102,7 +102,7 @@ def loggedin(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL,))
     elif request.user.is_authenticated:
         gugusse = request.user.get_username()
-        gugusse = gugusse.replace(patternCas, '')
+        gugusse = gugusse.replace(patternCas, '').lower()
         if gugusse == 'admin':
             return redirect('/admin/')
         elif gugusse == 'adminlab':
@@ -289,7 +289,7 @@ def dashboard(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id .replace(patternCas, '')
+        id = id .replace(patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -492,7 +492,7 @@ def references(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '')
+        id = id.replace(patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -846,7 +846,7 @@ def check(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '')
+        id = id.replace(patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -2190,7 +2190,7 @@ def terminology(request):
 
     elif request.user.is_authenticated:                                     # si l'ancien système ne sais pas quoi faire
         id = request.user.get_username()                                     # check si l'utilisateur est log
-        id = id.replace(patternCas, '')
+        id = id.replace(patternCas, '').lower()
         if id == 'adminlab':                                                 # si id adminlab on considère que son type par défaut est lab
             type = "lab"
             base_url = reverse('index')
