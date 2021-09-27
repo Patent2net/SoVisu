@@ -87,11 +87,11 @@ def index(request):
             }
             count = es.count(index="*-researchers", body=scope_param)['count']
             if count > 0:
-                return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
+                return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
             else:
                 return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
-            # return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
+            # return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
 
     return redirect('loggedin')
 
@@ -123,7 +123,7 @@ def loggedin(request):
             }
             count = es.count(index=structId + "*-researchers", body=scope_param)['count']
             if count > 0:
-                return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=2021-05-20&data=credentials')
+                return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
             else:
                 return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
     else:
@@ -153,7 +153,7 @@ def CreateCredentials(request):
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
     return redirect(
-        '/check/?type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=2021-05-20&data=credentials')
+        '/check/?type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=now&data=credentials')
 
 
 # def get_progress(request, task_id):
@@ -196,7 +196,7 @@ def unknown(request):
     #     else:
     #         gugusse = request.user.get_username()
     #         gugusse = gugusse.replace(patternCas, '')
-    #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=2021-05-20')
+    #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=now')
     # else:
     # return redirect('/accounts/login/')
     return render(request, '404.html')
