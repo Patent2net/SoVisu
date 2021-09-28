@@ -2699,12 +2699,11 @@ def validateCredentials(request):
                       body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True}})
 
         if type == "lab":
-            halStructId = request.POST.get("f_halStructId")
             rsnr = request.POST.get("f_rsnr")
             idRef = request.POST.get("f_IdRef")
 
             es.update(index=structId + "-" + id + "-laboratories", refresh='wait_for', id=id,
-                      body={"doc": {"halStructId": halStructId, "rsnr": rsnr, "idRef": idRef, "validated": True}})
+                      body={"doc": {"rsnr": rsnr, "idRef": idRef, "validated": True}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
