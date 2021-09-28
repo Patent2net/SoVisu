@@ -5,6 +5,8 @@
     {% load static %}
 
     <meta charset="utf-8">
+    <meta name="google-site-verification" content="tWOEM_g9-lB_hXbgHVWrOMOlrSeEwfGwi3yKTj1jY0s" />
+    <meta name="robots" content="noindex">
 
     <title>{{title}} {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" %}:{%  endif %} {% if entity.ldapId %}
         {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
