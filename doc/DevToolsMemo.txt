@@ -8,6 +8,7 @@ PUT _settings
 # contenu d'un labo
 GET 198307662-numLabo-laboratories/_search
 
+#détruire une entrée de chercheur
 POST 198307662-numLabo-researchers/_delete_by_query
 {
     "query": {
@@ -15,6 +16,19 @@ POST 198307662-numLabo-researchers/_delete_by_query
       "ldapId": "ldapId"
     }
             }
+}
+
+# modifier un champ d'un index chercheur
+# le champ halStructId est aussi le numlabo
+# il est mis à jour ci-dessous
+POST /198307662-numLabo-laboratories/_update/numLabo
+{"script" : 
+  {"source" : "ctx._source.halStructId = params.halStructId",
+    "lang": "painless",
+    "params" : {
+      "halStructId" : "numLabo"
+    }
+  }
 }
 
 GET 198307662-numLabo-researchers/_search
@@ -61,6 +75,11 @@ GET 198307662-*-documents/_search
                 }
             }
 }
+
+
+
+
+
 
 GET /_search
 {
