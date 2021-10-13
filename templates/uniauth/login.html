@@ -26,12 +26,32 @@
             background-color: #ffffff;
             height: 1px;
         }
+        div.uniauth-wrapper.wrapper.wrapper-content {
+            box-shadow: none !important;
+            border-color: #e7eaec;
+            border-style: solid solid solid solid;
+            border-width: 1px;
+        }
+        .skin-3 .ibox-content:last-child {
+            border: none;
+        }
     </style>
 
 {% endblock %}
 
 <!-- Page Content -->
 {% block content %}
+
+    <script>
+    function toggleAdminForm() {
+  var x = document.getElementById("adminForm");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+};
+</script>
 
     <div id="login-form-spacer" class="spacer {% if not display_standard %}only-cas-login{% endif %}"></div>
 
@@ -64,14 +84,21 @@
                         </div>
                         <div class="hr-line-dashed_title"></div>
                         {% if display_cas %}
-                            <div class="row">
+                            <div class="row text-center">
                                 <div class="col-lg-12">
                                     <div id="cas-select-container" class="simple-subtitle">
-                                        {% if display_standard %}Agents de l'université, via CAS (cliquez ci dessous sur le logo) {% else %}Choose CAS Server:{% endif %}
+                                        <!--{% if display_standard %}Agents de l'université, via CAS (cliquez ci dessous sur le logo) {% else %}Choose CAS Server:{% endif %}-->
                                         {% if num_institutions == 1 %}
-                                            <a id="cas-link" href="{{ institutions.0.2 }}{{ query_params }}">
-                                                <img src="../../static/logo-UTLN.png">
-                                            </a>
+                                            <div style="">
+                                                <a class="d-flex align-items-center flex-column" href="{{ institutions.0.2 }}{{ query_params }}">
+                                                    <div><img class="" src="../../static/logo-UTLN.png"></div>
+                                                    <div style="font-size: 14px; color: #ffffff; background: #60A5FA; border-radius: 4px; padding: 8px 12px; margin-top: 12px;">
+                                                        Connexion via le portail de l'université de Toulon <svg xmlns="http://www.w3.org/2000/svg" style="vertical-align: -2px; width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+</svg>
+                                                    </div>
+                                                </a>
+                                            </div>
                                         {% else %}
                                             <select id="cas-select"
                                                     class="form-control input-block {% if not display_standard %}only-cas-login{% endif %}"
@@ -97,11 +124,10 @@
                         {% if display_standard %}
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <form method="POST" class="post-form">
+                                    <div class="text-center"><a id="showAdminForm" href="#" onclick="toggleAdminForm()">Accès administrateur</a></div>
+                                    <form method="POST" id="adminForm" class="post-form" style="display: none; margin-top: 8px;">
                                         {% csrf_token %}
-                                        <div>
-                                            Connexion en tant qu'adminlab ou visiteur :
-                                        </div>
+
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <input id="id_username" name="username" type="text"
@@ -119,8 +145,7 @@
                                             </div>
                                         </div>
 
-                                        <button id="submit-btn" type="submit" class="save btn btn-action">Se
-                                            connecter!
+                                        <button id="submit-btn" type="submit" class="save btn btn-action">Connexion
                                         </button>
                                     </form>
                                 </div>
@@ -136,5 +161,6 @@
 {% endblock %}
 
 <!-- Page specific JS -->
+
 {% block script %}
 {% endblock %}
