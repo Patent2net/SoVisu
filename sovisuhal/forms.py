@@ -2,6 +2,7 @@ from django import forms
 from django.forms import models
 from elasticsearch import Elasticsearch
 from decouple import config
+from tinymce.widgets import TinyMCE
 
 try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -126,7 +127,19 @@ class setGuidingKeywords(forms.Form):
         self.fields['f_guidingKeywords'].initial = str
 
     # Set choices to an empty list as it is a required argument.
-    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(attrs={'class' : 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none','size':80}))
+    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(attrs={ 'class' : 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none','size':80}))
+
+
+class setResearchDescription(forms.Form):
+    def __init__(self,*args,**kwargs):
+        researchDescription = kwargs.pop('researchDescription')
+
+        super(setResearchDescription,self).__init__(*args,**kwargs)
+
+        self.fields['f_researchDescription'].initial = researchDescription
+
+    # Set choices to an empty list as it is a required argument.
+    f_researchDescription = forms.CharField(widget=TinyMCE(attrs={'rows': 24}))
 
 
 class search(forms.Form):

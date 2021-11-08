@@ -90,7 +90,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'uniauth'  # ,
+    'uniauth',
+    'tinymce'
     # 'celery',
     # 'celery_progress'
 ]

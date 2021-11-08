@@ -50,11 +50,14 @@ urlpatterns = [
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
     path('validate_guiding-domains/', views.validateGuidingDomains, name='validate_guiding-domains'),
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
+    path('validate_research-description/', views.validateResearchDescription, name='validate_research-description'),
     path('force-update_references/', views.forceUpdateReference, name='force-update_references'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
     path('create/', views.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
-    path('loggedin/', views.loggedin, name='loggued')#,
+    path('loggedin/', views.loggedin, name='loggued'),
+
+    path('tinymce/', include('tinymce.urls')),
     # path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
 ]
