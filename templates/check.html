@@ -61,6 +61,12 @@
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
                     >Domaines orienteurs</a>
+                    {% if type == "rsr" %}
+                    <a class="px-2 pb-1
+                        {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
+                    >Descriptif de recherche</a>
+                    {% endif %}
                 </h1>
 
 
@@ -314,6 +320,41 @@
                     {% for field in form.visible_fields %}
                         <div>
                             <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                            {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                        </div>
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
+                </form>
+
+            {% endif %}
+
+            {% if data == "research-description" %}
+
+                <script src='https://cdn.tiny.cloud/1/ptoqz8svct6s4mbrens2dcb8fejbla16xuvuaa15ayqwps0i/tinymce/5/tinymce.min.js' referrerpolicy="origin">
+                </script>
+                <script>
+                    tinymce.init({
+                        language : 'fr_FR',
+                        selector: 'textarea',
+                        plugins: 'export formatpainter linkchecker autolink lists checklist media mediaembed pageembed permanentpen powerpaste table advtable',
+                        toolbar_mode: 'floating',
+                    });
+                </script>
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>Dans cet onglet, vous pouvez renseigner un descriptif plus ou moins long présentant vos recherches. Vous pouvez utiliser les outils de mise en forme, glisser déposer une image, etc.</p>
+                </div>
+
+                <form action="/validate_research-description/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
+                    {% csrf_token %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {% for field in form.visible_fields %}
+                        <div>
                             {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
                         </div>
                     {% endfor %}

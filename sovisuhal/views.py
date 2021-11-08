@@ -1022,6 +1022,19 @@ def check(request):
                                                   'startDate': start_date,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
+    elif data == "research-description":
+
+        if 'researchDescription' not in entity:
+            researchDescription = ''
+        else:
+            researchDescription = entity['researchDescription']
+
+        return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                              'entity': entity, 'extIds': ['a', 'b', 'c'],
+                                              'form': forms.setResearchDescription(researchDescription=researchDescription),
+                                              'startDate': start_date,
+                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+
     elif data == "expertise":
 
         concepts = []
@@ -2755,6 +2768,56 @@ def validateGuidingKeywords(request):
         if type == "lab":
             es.update(index=structId + "-" + str(id) + "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
+
+    return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+
+def validateResearchDescription(request):
+    # Get parameters
+    if 'type' in request.GET:
+        type = request.GET['type']
+    else:
+        return redirect('unknown')
+    if 'id' in request.GET:
+        id = request.GET['id']
+    else:
+        return redirect('unknown')
+    if 'data' in request.GET:
+        data = request.GET['data']
+    else:
+        data = -1
+    if 'from' in request.GET:
+        dateFrom = request.GET['from']
+    if 'to' in request.GET:
+        dateTo = request.GET['to']
+
+    # Connect to DB
+    es = esConnector()
+
+    if request.method == 'POST':
+
+        researchDescription = request.POST.get("f_researchDescription")
+
+        if type == "rsr":
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": id
+                    }
+                }
+            }
+
+            res = es.search(index=structId + "*-researchers", body=scope_param)
+            try:
+                entity = res['hits']['hits'][0]['_source']
+            except:
+                return redirect('unknown')
+
+            es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
+                      body={"doc": {"researchDescription": researchDescription}})
+
+        if type == "lab":
+            es.update(index=structId + "-" + str(id) + "-laboratories", refresh='wait_for', id=id,
+                      body={"doc": {"researchDescription": researchDescription}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
