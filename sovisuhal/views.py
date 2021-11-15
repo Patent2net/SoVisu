@@ -2797,6 +2797,10 @@ def validateResearchDescription(request):
 
         researchDescription = request.POST.get("f_researchDescription")
 
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(researchDescription, 'html.parser')
+        researchDescriptionRaw = soup.getText().replace("\n", " ")
+
         if type == "rsr":
             scope_param = {
                 "query": {
@@ -2813,11 +2817,7 @@ def validateResearchDescription(request):
                 return redirect('unknown')
 
             es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
-                      body={"doc": {"researchDescription": researchDescription}})
-
-        if type == "lab":
-            es.update(index=structId + "-" + str(id) + "-laboratories", refresh='wait_for', id=id,
-                      body={"doc": {"researchDescription": researchDescription}})
+                      body={"doc": {"researchDescription": researchDescription, "researchDescriptionRaw": researchDescriptionRaw}})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
