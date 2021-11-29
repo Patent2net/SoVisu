@@ -36,22 +36,22 @@
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
                     >Identifiants</a>
                     {% if type == "rsr" %}
-                    <a class="px-2 pb-1
+                        <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
-                    >Notices HAL</a>
+                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
+                        >Notices HAL</a>
                     {% endif %}
                     {% if type == "lab" %}
-                    <a class="px-2 pb-1
+                        <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
-                    >Notices HAL du labo</a>
+                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references"
+                        >Notices HAL du labo</a>
                     {% endif %}
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise"
-                    >Expertise</a>
+                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise"
+                        >Expertise</a>
                     {% endif %}
                     <a class="px-2 pb-1
                         {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -62,10 +62,10 @@
                        href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
                     >Domaines orienteurs</a>
                     {% if type == "rsr" %}
-                    <a class="px-2 pb-1
+                        <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
-                    >Descriptif de recherche</a>
+                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
+                        >Descriptifs de recherche</a>
                     {% endif %}
                 </h1>
 
@@ -140,19 +140,19 @@
                 <form action="/CreateCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
-                            {% if field.auto_id == "id_f_role" %}
+                        {% if field.auto_id == "id_f_role" %}
                             <div>
                                 <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
                                 {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
                             </div>
-                            {% elif field.auto_id == "id_f_labo" %}<div class="role-trigerred">
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
-                                </div>
-                            {% else %}<div class="role-trigerred">
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-                            </div>{% endif %}
+                        {% elif field.auto_id == "id_f_labo" %}<div class="role-trigerred">
+                            <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                            {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
+                        </div>
+                        {% else %}<div class="role-trigerred">
+                            <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                            {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                        </div>{% endif %}
                     {% endfor %}
                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="J'ai fini !">
                 </form>
@@ -243,13 +243,13 @@
 
                     <hr class="mb-4 mt-4"/>
 
-                     <form action="/refresh-aurehal-id/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
-{% csrf_token %}
-                    <p class="text-sm">
-                    En cas de soucis avec la récupération de l'identifiant AuréHal, déclenchez manuellement un nouvel essai en cliquant sur le bouton ci-dessous.
-                    </p>
-                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none w-64" type="submit" value="Mettre à jour l'ID AuréHAL (automatique)">
-                                    </form>
+                    <form action="/refresh-aurehal-id/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
+                        {% csrf_token %}
+                        <p class="text-sm">
+                            En cas de soucis avec la récupération de l'identifiant AuréHal, déclenchez manuellement un nouvel essai en cliquant sur le bouton ci-dessous.
+                        </p>
+                        <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none w-64" type="submit" value="Mettre à jour l'ID AuréHAL (automatique)">
+                    </form>
                 {% endif %}
 
             {% endif %}
@@ -263,7 +263,7 @@
                     </svg>
 
                     <p>Cet onglet vous permet de valider des domaines à la marge de votre expertise. Les raccourcis de sélection Shift et CTRL fonctionnent.
-                    <br>Restent ici les expertises identifiées à travaux vos travaux qui proviennent d'erreurs ou de collaborations.</p>
+                        <br>Restent ici les expertises identifiées à travaux vos travaux qui proviennent d'erreurs ou de collaborations.</p>
                 </div>
 
                 <div class="justify-end flex w-full">
@@ -339,11 +339,22 @@
                     <p>Dans cet onglet, vous pouvez renseigner un descriptif plus ou moins long présentant vos recherches. Vous pouvez utiliser la barre d'outil pour mettre en forme votre texte, ajouter des images, etc.</p>
                 </div>
 
-                                <!-- Include the Quill library -->
+                <!-- Include the Quill library -->
                 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-                <div id="editor">
-                    {{ researchDescription | safe }}
+                <h4 class="text-xs font-semibold pb-2">Résumé des travaux :</h4>
+                <div id="research_summary">
+                    {{ research_summary | safe }}
+                </div>
+
+                <h4 class="text-xs font-semibold pb-2 mt-4">Projets (porteurs) en cours :</h4>
+                <div id="research_projectsInProgress">
+                    {{ research_projectsInProgress | safe }}
+                </div>
+
+                <h4 class="text-xs font-semibold pb-2 mt-4">Projets et financements :</h4>
+                <div id="research_projectsAndFundings">
+                    {{ research_projectsAndFundings | safe }}
                 </div>
 
 
@@ -360,32 +371,82 @@
                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
                 </form>
 
-                                <script>
-                  var quill = new Quill('#editor', {modules: {
-    toolbar: [
-      ['bold', 'italic'],
-      ['link', 'image'],
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-        [{ 'align': ['', 'center', 'right', 'justify'] }],
-      [{ list: 'ordered' }, { list: 'bullet' }]
-    ]
-  },
-                    theme: 'snow'
-                  })
+                <script>
+                    options = [
+                        ['bold', 'italic'],
+                        ['link', 'image'],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'align': ['', 'center', 'right', 'justify'] }],
+                        [{ list: 'ordered' }, { list: 'bullet' }]
+                    ];
 
-                  var myElement = document.getElementById('editor');
-if(window.addEventListener) {
-   // Normal browsers
-   myElement.addEventListener('DOMSubtreeModified', contentChanged, false);
-} else
-   if(window.attachEvent) {
-      // IE
-      myElement.attachEvent('DOMSubtreeModified', contentChanged);
-   }
+                    var quill1 = new Quill('#research_summary', {modules: {
+                            toolbar: options
+                        },
+                        theme: 'snow'
+                    });
 
-function contentChanged() {
-   document.getElementById('id_f_researchDescription').value = myElement.innerHTML;
-}
+                    var quill2 = new Quill('#research_projectsInProgress', {modules: {
+                            toolbar: options
+                        },
+                        theme: 'snow'
+                    });
+
+                    var quill3 = new Quill('#research_projectsAndFundings', {modules: {
+                            toolbar: options
+                        },
+                        theme: 'snow'
+                    });
+
+                    // tttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+                    var myElement1 = document.getElementById('research_summary');
+                    if(window.addEventListener) {
+                        // Normal browsers
+                        myElement1.addEventListener('DOMSubtreeModified', contentChanged1, false);
+                    } else
+                    if(window.attachEvent) {
+                        // IE
+                        myElement1.attachEvent('DOMSubtreeModified', contentChanged1);
+                    }
+
+                    function contentChanged1() {
+                        document.getElementById('id_f_research_summary').value = myElement1.innerHTML;
+                    }
+
+                    // ttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+                    var myElement2 = document.getElementById('research_projectsInProgress');
+                    if(window.addEventListener) {
+                        // Normal browsers
+                        myElement2.addEventListener('DOMSubtreeModified', contentChanged2, false);
+                    } else
+                    if(window.attachEvent) {
+                        // IE
+                        myElement2.attachEvent('DOMSubtreeModified', contentChanged2);
+                    }
+
+                    function contentChanged2() {
+                        document.getElementById('id_f_research_projectsInProgress').value = myElement2.innerHTML;
+                    }
+
+                    // ttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+                    var myElement3 = document.getElementById('research_projectsAndFundings');
+                    if(window.addEventListener) {
+                        // Normal browsers
+                        myElement3.addEventListener('DOMSubtreeModified', contentChanged3, false);
+                    } else
+                    if(window.attachEvent) {
+                        // IE
+                        myElement3.attachEvent('DOMSubtreeModified', contentChanged3);
+                    }
+
+                    function contentChanged3() {
+                        document.getElementById('id_f_research_projectsAndFundings').value = myElement3.innerHTML;
+                    }
+
+
                 </script>
 
             {% endif %}
@@ -399,19 +460,19 @@ function contentChanged() {
                     </svg>
                     <p>Dans cet onglet, vous intégrez les références bibliographiques collectées à l'aide de vos identifiants aux index. Par votre validation ces notices seront incluses dans le processus de traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.
                         <br>Restent ici les publications "annexes" ou qui ne seraient pas de vous par erreur...
-                    <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le bouton "Mettre à jour les références" sert à les importer ici (Notez que Hal prend un délai d'indexation de quelques heures et les nouvelles notices ne sont pas immédiatement dispobibles.). </p>
+                        <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le bouton "Mettre à jour les références" sert à les importer ici (Notez que Hal prend un délai d'indexation de quelques heures et les nouvelles notices ne sont pas immédiatement dispobibles.). </p>
 
                 </div>
 
                 <div class="justify-end flex w-full">
                     <div class="dt-buttons-rplc flex items-center text-xs">
                         {% if type == "rsr" %}
-                <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
+                            <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
                         text-gray-600 "
-                        href="/force-update_references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all"
-                    >Mettre à jour les références</a>
+                               href="/force-update_references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all"
+                            >Mettre à jour les références</a>
 
-            {% endif %}
+                        {% endif %}
 
                     </div>
                 </div>
@@ -484,35 +545,35 @@ function contentChanged() {
 
 <script>
 
-{% if data == "create" %}
+    {% if data == "create" %}
 
-$(document).ready(function() {
+        $(document).ready(function() {
 
-    var slides = document.getElementsByClassName("role-trigerred");
+            var slides = document.getElementsByClassName("role-trigerred");
 
-    sel_role = document.querySelector('#id_f_role')
-    sel_role.addEventListener("change", function() {
-        if (sel_role.value == 'chercheur') {
-            console.log('a')
-            console.log(slides.length)
-            for (var i = 0; i < slides.length; i++) {
-                console.log(slides.item(i));
-                slides.item(i).style.display = "block";
-            }
-        } else {
-            console.log('b')
-            console.log(slides.length)
-            for (var i = 0; i < slides.length; i++) {
-                console.log(slides.item(i));
-                slides.item(i).style.display = "none";
-            }
-        }
-    });
+            sel_role = document.querySelector('#id_f_role')
+            sel_role.addEventListener("change", function() {
+                if (sel_role.value == 'chercheur') {
+                    console.log('a')
+                    console.log(slides.length)
+                    for (var i = 0; i < slides.length; i++) {
+                        console.log(slides.item(i));
+                        slides.item(i).style.display = "block";
+                    }
+                } else {
+                    console.log('b')
+                    console.log(slides.length)
+                    for (var i = 0; i < slides.length; i++) {
+                        console.log(slides.item(i));
+                        slides.item(i).style.display = "none";
+                    }
+                }
+            });
 
-});
+        });
 
 
-{% endif %}
+    {% endif %}
 
 
 
@@ -893,7 +954,7 @@ $(document).ready(function() {
                     buttons: [
                     ],
                     "columnDefs": [
-                                                {
+                        {
                             "targets": [ 1 ],
                             "render": function(data, type, row, meta){
                                 if(data === 'True'){

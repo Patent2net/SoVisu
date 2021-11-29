@@ -1024,16 +1024,28 @@ def check(request):
 
     elif data == "research-description":
 
-        if 'researchDescription' not in entity:
-            researchDescription = ''
+        if 'research_summary' not in entity:
+            research_summary = ''
         else:
-            researchDescription = entity['researchDescription']
+            research_summary = entity['research_summary']
+
+        if 'research_projectsAndFundings' not in entity:
+            research_projectsAndFundings = ''
+        else:
+            research_projectsAndFundings = entity['research_projectsAndFundings']
+
+        if 'research_projectsInProgress' not in entity:
+            research_projectsInProgress = ''
+        else:
+            research_projectsInProgress = entity['research_projectsInProgress']
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity, 'extIds': ['a', 'b', 'c'],
-                                              'form': forms.setResearchDescription(researchDescription=researchDescription),
+                                              'form': forms.setResearchDescription(research_summary=research_summary, research_projectsInProgress=research_projectsInProgress, research_projectsAndFundings=research_projectsAndFundings),
                                               'startDate': start_date,
-                                              'researchDescription': researchDescription,
+                                              'research_summary': research_summary,
+                                              'research_projectsInProgress': research_projectsInProgress,
+                                              'research_projectsAndFundings': research_projectsAndFundings,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "expertise":
@@ -2796,11 +2808,20 @@ def validateResearchDescription(request):
 
     if request.method == 'POST':
 
-        researchDescription = request.POST.get("f_researchDescription")
+        research_summary = request.POST.get("f_research_summary")
+        research_projectsInProgress = request.POST.get("f_research_projectsInProgress")
+        research_projectsAndFundings = request.POST.get("f_research_projectsAndFundings")
 
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(researchDescription, 'html.parser')
-        researchDescriptionRaw = soup.getText().replace("\n", " ")
+
+        soup = BeautifulSoup(research_summary, 'html.parser')
+        research_summary_raw = soup.getText().replace("\n", " ")
+
+        soup = BeautifulSoup(research_projectsInProgress, 'html.parser')
+        research_projectsInProgress_raw = soup.getText().replace("\n", " ")
+
+        soup = BeautifulSoup(research_projectsAndFundings, 'html.parser')
+        research_projectsAndFundings_raw = soup.getText().replace("\n", " ")
 
         if type == "rsr":
             scope_param = {
@@ -2818,7 +2839,10 @@ def validateResearchDescription(request):
                 return redirect('unknown')
 
             es.update(index=structId + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
-                      body={"doc": {"researchDescription": researchDescription, "researchDescriptionRaw": researchDescriptionRaw}})
+                      body={"doc": {"research_summary": research_summary, "research_summary_raw": research_summary_raw,
+                                    "research_projectsInProgress": research_projectsInProgress, "research_projectsInProgress_raw": research_projectsInProgress_raw,
+                                    "research_projectsAndFundings": research_projectsAndFundings, "research_projectsAndFundings_raw": research_projectsAndFundings_raw,
+                                    }})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 

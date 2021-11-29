@@ -132,13 +132,19 @@ class setGuidingKeywords(forms.Form):
 
 class setResearchDescription(forms.Form):
     def __init__(self,*args,**kwargs):
-        researchDescription = kwargs.pop('researchDescription')
+        research_summary = kwargs.pop('research_summary')
+        research_projectsInProgress = kwargs.pop('research_projectsInProgress')
+        research_projectsAndFundings = kwargs.pop('research_projectsAndFundings')
 
         super(setResearchDescription,self).__init__(*args,**kwargs)
 
-        self.fields['f_researchDescription'].initial = researchDescription
+        self.fields['f_research_summary'].initial = research_summary
+        self.fields['f_research_projectsInProgress'].initial = research_projectsInProgress
+        self.fields['f_research_projectsAndFundings'].initial = research_projectsAndFundings
 
-    f_researchDescription = forms.CharField(widget=forms.Textarea)
+    f_research_summary = forms.CharField(widget=forms.Textarea)
+    f_research_projectsInProgress = forms.CharField(widget=forms.Textarea)
+    f_research_projectsAndFundings = forms.CharField(widget=forms.Textarea)
 
 
 class search(forms.Form):
