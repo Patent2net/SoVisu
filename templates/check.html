@@ -330,23 +330,22 @@
 
             {% if data == "research-description" %}
 
-                <script src='https://cdn.tiny.cloud/1/ptoqz8svct6s4mbrens2dcb8fejbla16xuvuaa15ayqwps0i/tinymce/5/tinymce.min.js' referrerpolicy="origin">
-                </script>
-                <script>
-                    tinymce.init({
-                        language : 'fr_FR',
-                        selector: 'textarea',
-                        plugins: 'export formatpainter linkchecker autolink lists checklist media mediaembed pageembed permanentpen powerpaste table advtable',
-                        toolbar_mode: 'floating',
-                    });
-                </script>
+                <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
                 <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p>Dans cet onglet, vous pouvez renseigner un descriptif plus ou moins long présentant vos recherches. Vous pouvez utiliser les outils de mise en forme, glisser déposer une image, etc.</p>
+                    <p>Dans cet onglet, vous pouvez renseigner un descriptif plus ou moins long présentant vos recherches. Vous pouvez utiliser la barre d'outil pour mettre en forme votre texte, ajouter des images, etc.</p>
                 </div>
+
+                                <!-- Include the Quill library -->
+                <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+                <div id="editor">
+                    {{ researchDescription | safe }}
+                </div>
+
 
                 <form action="/validate_research-description/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}" method="post">
                     {% csrf_token %}
@@ -355,11 +354,39 @@
                     {% endfor %}
                     {% for field in form.visible_fields %}
                         <div>
-                            {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                            {% render_field field class="hidden flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
                         </div>
                     {% endfor %}
                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Valider">
                 </form>
+
+                                <script>
+                  var quill = new Quill('#editor', {modules: {
+    toolbar: [
+      ['bold', 'italic'],
+      ['link', 'image'],
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'align': ['', 'center', 'right', 'justify'] }],
+      [{ list: 'ordered' }, { list: 'bullet' }]
+    ]
+  },
+                    theme: 'snow'
+                  })
+
+                  var myElement = document.getElementById('editor');
+if(window.addEventListener) {
+   // Normal browsers
+   myElement.addEventListener('DOMSubtreeModified', contentChanged, false);
+} else
+   if(window.attachEvent) {
+      // IE
+      myElement.attachEvent('DOMSubtreeModified', contentChanged);
+   }
+
+function contentChanged() {
+   document.getElementById('id_f_researchDescription').value = myElement.innerHTML;
+}
+                </script>
 
             {% endif %}
 
