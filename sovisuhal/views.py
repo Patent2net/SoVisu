@@ -2842,6 +2842,7 @@ def validateResearchDescription(request):
                       body={"doc": {"research_summary": research_summary, "research_summary_raw": research_summary_raw,
                                     "research_projectsInProgress": research_projectsInProgress, "research_projectsInProgress_raw": research_projectsInProgress_raw,
                                     "research_projectsAndFundings": research_projectsAndFundings, "research_projectsAndFundings_raw": research_projectsAndFundings_raw,
+                                    "research_updatedDate": datetime.today().isoformat()
                                     }})
 
     return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
