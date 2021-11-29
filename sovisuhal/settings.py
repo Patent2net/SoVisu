@@ -91,7 +91,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'uniauth',
-    'tinymce'
+    'django_quill',
     # 'celery',
     # 'celery_progress'
 ]

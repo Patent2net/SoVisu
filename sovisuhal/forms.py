@@ -2,7 +2,7 @@ from django import forms
 from django.forms import models
 from elasticsearch import Elasticsearch
 from decouple import config
-from tinymce.widgets import TinyMCE
+
 
 try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -138,8 +138,7 @@ class setResearchDescription(forms.Form):
 
         self.fields['f_researchDescription'].initial = researchDescription
 
-    # Set choices to an empty list as it is a required argument.
-    f_researchDescription = forms.CharField(widget=TinyMCE(attrs={'rows': 24}))
+    f_researchDescription = forms.CharField(widget=forms.Textarea)
 
 
 class search(forms.Form):

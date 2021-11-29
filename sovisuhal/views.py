@@ -1033,6 +1033,7 @@ def check(request):
                                               'entity': entity, 'extIds': ['a', 'b', 'c'],
                                               'form': forms.setResearchDescription(researchDescription=researchDescription),
                                               'startDate': start_date,
+                                              'researchDescription': researchDescription,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "expertise":
