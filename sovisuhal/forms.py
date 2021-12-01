@@ -41,7 +41,7 @@ class CreateCredentials(forms.Form):
     f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
     f_IdRef = forms.CharField(label='IdRef - identifiant de la notice')
     f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594')
-    f_more = forms.CharField(label='autres')
+    # f_more = forms.CharField(label='autres')
 
     es = esConnector()
 
@@ -88,8 +88,8 @@ class validCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label='ID HAL (texte)')
-    f_IdRef = forms.CharField(label='IdRef')
-    f_orcId = forms.CharField(label='ORCID')
+    f_IdRef = forms.CharField(label='IdRef', required=False)
+    f_orcId = forms.CharField(label='ORCID', required=False)
 
 
 class validLabCredentials(forms.Form):
@@ -142,9 +142,9 @@ class setResearchDescription(forms.Form):
         self.fields['f_research_projectsInProgress'].initial = research_projectsInProgress
         self.fields['f_research_projectsAndFundings'].initial = research_projectsAndFundings
 
-    f_research_summary = forms.CharField(widget=forms.Textarea)
-    f_research_projectsInProgress = forms.CharField(widget=forms.Textarea)
-    f_research_projectsAndFundings = forms.CharField(widget=forms.Textarea)
+    f_research_summary = forms.CharField(widget=forms.Textarea, required=False)
+    f_research_projectsInProgress = forms.CharField(widget=forms.Textarea, required=False)
+    f_research_projectsAndFundings = forms.CharField(widget=forms.Textarea, required=False)
 
 
 class search(forms.Form):
