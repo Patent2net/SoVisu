@@ -264,6 +264,11 @@ def cs_index(request):
     for entity in entities:
         cleaned_entities.append(entity['_source'])
 
+    if type == "lab":
+        cleaned_entities = sorted(cleaned_entities, key=lambda k: k['acronym'])
+    elif type == "rsr":
+        cleaned_entities = sorted(cleaned_entities, key=lambda k: k['lastName'])
+
     # /
 
     return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
