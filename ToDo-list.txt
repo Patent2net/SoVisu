@@ -15,3 +15,6 @@ Activité IGE
 - Participation aux nouvelles fonctionnalités
 	- exports excel fichier HCERES 
 	- cartographie des publications
+	- liens biblioLabs
+	
+	
