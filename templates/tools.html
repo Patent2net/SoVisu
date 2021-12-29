@@ -1,273 +1,73 @@
-{% include "includes/header.html" with title="Outils & services" %} <!--Titre de la page et définit les options appliquées par menu.html-->
-<style>
-    /* Tab content - closed */
-    .tab-content {
-        max-height: 0;
-        -webkit-transition: max-height .35s;
-        -o-transition: max-height .35s;
-        transition: max-height .35s;
-    }
-    /* :checked - resize to full height */
-    .tab input:checked ~ .tab-content {
-        max-height: 100vh;
-    }
-    /* Label formatting when open */
-    .tab input:checked + label{
-        /*@apply text-xl p-5 border-l-2 border-indigo-500 bg-gray-100 text-indigo*/
-        font-size: 1rem; /*.text-base*/
-        padding: 1.25rem; /*.p-5*/
-        border-left-width: 2px; /*.border-l-2*/
-        border-color: #6574cd; /*.border-indigo*/
-        background-color: #f8fafc; /*.bg-gray-100 */
-        color: #6574cd; /*.text-indigo*/
-    }
-    /* Icon */
-    .tab label::after {
-        float:right;
-        right: 0;
-        top: 0;
-        display: block;
-        width: 1.5em;
-        height: 1.5em;
-        line-height: 1.5;
-        font-size: 1rem;
-        text-align: center;
-        -webkit-transition: all .35s;
-        -o-transition: all .35s;
-        transition: all .35s;
-    }
-    /* Icon formatting - closed */
-    .tab input[type=checkbox] + label::after {
-        content: "+";
-        font-weight:bold; /*.font-bold*/
-        border-width: 1px; /*.border*/
-        border-radius: 9999px; /*.rounded-full */
-        border-color: #b8c2cc; /*.border-grey*/
-    }
-    .tab input[type=radio] + label::after {
-        content: "\25BE";
-        font-weight:bold; /*.font-bold*/
-        border-width: 1px; /*.border*/
-        border-radius: 9999px; /*.rounded-full */
-        border-color: #b8c2cc; /*.border-grey*/
-    }
-    /* Icon formatting - open */
-    .tab input[type=checkbox]:checked + label::after {
-        transform: rotate(315deg);
-        background-color: #6574cd; /*.bg-indigo*/
-        color: #f8fafc; /*.text-grey-lightest*/
-    }
-    .tab input[type=radio]:checked + label::after {
-        transform: rotateX(180deg);
-        background-color: #6574cd; /*.bg-indigo*/
-        color: #f8fafc; /*.text-grey-lightest*/
-    }
-</style>
-<div class="h-full w-full flex">
+{% include "includes/header.html" with title="Outils" %}
+{% load widget_tweaks %}
 
-    {% include "includes/menu.html" with title="Outils & services" %} <!--permet à menu.html de repérer la section correspondante et white text-->
+<div class="h-full w-full flex ">
+
+    {% include "includes/menu.html" with title="Outils" %}
 
     <div class="w-full h-full relative p-3" style="background: #fafbfd;">
-        <!--boutons accordeon -->
-        <div class="bg-white rounded w-full h-full">
-            <div class="shadow-md">
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0 " id="tab-solo-one" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-one">Outils & services développés localement pour améliorer ou faciliter l'utilisation de HAL</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                            <div class="pt-3 pl-3 text-gray-500">Outils facilitant le dépôt des publications dans HAL :</div>
-                            <p class="pl-6">
-                                <a href="http://perso.ens-lyon.fr/martin.verot/HAL.php" target="_blank" style="color:#1478B7">mHALoDOI</a><br>
-                                <a href="https://x2hal.inria.fr/" target="_blank" style="color:#1478B7">X2HAL</a><br>
-                                <a href="http://assessmentlibrarian.fr/?p=2079" target="_blank" style="color:#1478B7">Bib2HAL</a><br>
-                                <a href="http://aigle.sf.net/" target="_blank" style="color:#1478B7">AIGLe</a><br>
-                                <a href="https://halur1.univ-rennes1.fr/Manuel-OverHAL.pdf" target="_blank" style="color:#1478B7">OverHAL</a>
-                            </p>
 
-                            <div class="pt-3 pl-3 text-gray-500">Pages web dynamiques alimentées par les dépôts HAL :</div>
-                            <p class="pl-6">
-                                <a href="https://haltools.archives-ouvertes.fr/" target="_blank" style="color:#1478B7">HALtools</a><br>
-                                <a href="https://github.com/Saga-UGA" target="_blank" style="color:#1478B7">Saga UGA</a><br>
-                                <a href="https://www.loma.cnrs.fr/production-scientifique/" target="_blank" style="color:#1478B7">LOMA Cnrs</a><br>
-                                <a href="https://micmac.univ-rennes1.fr/nos-publications" target="_blank" style="color:#1478B7">Université de Rennes 1</a><br>
-                                <a href="http://aigle.sf.net/" target="_blank" style="color:#1478B7">AIGLe</a>
-                            </p>
-                            <div class="pt-3 pl-3 text-gray-500">Visualisation d'informations extraites de HAL :</div>
-                            <p class="pl-6">
-                                <a href="https://github.com/anHALytics" target="_blank" style="color:#1478B7">AnHALytics</a><br>
-                                <a href="http://igm.univ-mlv.fr/~gambette/ExtractionHAL/InternationHAL.php" target="_blank" style="color:#1478B7">InternationHAL</a>
-                            </p>
-                            <div class="pt-3 pl-3 text-gray-500">Extraction &amp; mise en forme des publications :</div>
-                            <p class="pl-6">
-                                <a href="http://igm.univ-mlv.fr/~gambette/ExtractionHAL/ExtractionHAL.php?team=MSME" target="_blank" style="color:#1478B7">ExtractionHAL</a><br>
-                                <a href="https://halur1.univ-rennes1.fr/ExtractionHAL.php" target="_blank" style="color:#1478B7">ExtrHAL</a><br>
-                                <a href="http://www.univ-orleans.fr/lifo/membres/Yannick.Parmentier/hallo.html" target="_blank" style="color:#1478B7">HALLO</a><br>
-                                <a href="http://igm.univ-mlv.fr/~gambette/ExtractionHAL/WidgetCvHAL.txt" target="_blank" style="color:#1478B7">Widget export CV HAL</a><br>
-                                <a href="http://aigle.sf.net/" target="_blank" style="color:#1478B7">AIGLe</a>
-                            </p>
-                            <div class="pt-3 pl-3 text-gray-500">Contrôle bibliographique des collections HAL :</div>
-                            <p class="pl-6">
-                                <a href="http://www.gipsa-lab.grenoble-inp.fr/valorisation/logiciels.php?id_valorisation=123" target="_blank" style="color:#1478B7">OCdHAL</a><vr>
-                                <a href="http://igm.univ-mlv.fr/~gambette/ExtractionHAL/JournHAL.php" target="_blank" style="color:#1478B7">JournHAL</a><br>
-                                <a href="http://aigle.sf.net/" target="_blank" style="color:#1478B7">AIGLe</a>
-                            </vr></p>
-                            <div class="pt-3 pl-3 text-gray-500">Autres outils :</div>
-                            <p class="pl-6">
-                                <a href="https://marprod.in2p3.fr/limbra_cppm" target="_blank" style="color:#1478B7">LIMBRA</a><br>
-                                <a href="http://ipag.osug.fr/" target="_blank" style="color:#1478B7">IPAG</a><br>
-                                <a href="http://www.lesia.obspm.fr/-Catalogue-Publesia-.html" target="_blank" style="color:#1478B7">Publesia</a><br>
-                                <a href="http://igm.univ-mlv.fr/~gambette/ExtractionHAL/CouvertureHAL/" target="_blank" style="color:#1478B7">CouvertureHAL</a><br>
-                                <a href="https://github.com/RomBoistel/structurHAL" target="_blank" style="color:#1478B7">StructurHAL</a><br>
-                                <a href="https://github.com/Podatus/AureHalStructQual" target="_blank" style="color:#1478B7">Qualité Référentiel Structure (UVSQ)</a>
-                            </p>
-                    </div>
-                </div>
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-two" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-two">Baromètres </label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                        <p class="p-5">
-
-                            <a href="https://ministeresuprecherche.github.io/bso/" target="_blank" style="color:#1478B7">Baromètre officiel de la SO</a><br>
-                            <a href="http://scienceouverte.univ-lorraine.fr/barometre-lorrain-de-la-science-ouverte/" target="_blank" style="color:#1478B7">Exemple pour l'Université de Lorraine</a>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-three" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-three">Outils d'aide juridique pour les droits d'auteurs</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-
-                        <p class="p-5">
-                            <a href="http://sherpa.ac.uk/romeo/search.php" target="_blank" style="color:#1478B7">Sherpa Romeo</a><br>
-                            <a href="https://heloise.ccsd.cnrs.fr/" target="_blank" style="color:#1478B7">Heloise</a>
-                        </p>
-
-                    </div>
-                </div>
-
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-four" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-four">Outils pour le dépôt, le partage & la gestion des données</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                            <div class="pt-3 pl-3 text-gray-500">Outils génériques :</div>
-                            <p class="pl-6">
-                                <a href="https://cat.opidor.fr/" target="_blank" style="color:#1478B7">Cat Opidor</a><br>
-                                <a href="https://dataverse.org/" target="_blank" style="color:#1478B7">Dataverse</a><br>
-                                <a href="https://opidor.fr/" target="_blank" style="color:#1478B7">Opidor</a><br>
-                                <a href="https://www.re3data.org/about" target="_blank" style="color:#1478B7">Re3data (Registry of Research Data Repositories)</a><br>
-                                <a href="http://datadryad.org/" target="_blank" style="color:#1478B7">Dryad</a><br>
-                                <a href="https://zenodo.org/" target="_blank" style="color:#1478B7">Zenodo</a><br>
-                                <a href="https://figshare.com/" target="_blank" style="color:#1478B7">Figshare</a><br>
-                                <a href="https://www.nakala.fr/" target="_blank" style="color:#1478B7">Nakala</a><br>
-                                <a href="https://rdmtoolkit.jisc.ac.uk/" target="_blank" style="color:#1478B7">Research Data Management Toolkit</a>
-                            </p>
-
-                            <div class="pt-3 pl-3 text-gray-500">Outils dédiées aux aspects juridiques &amp; éthiques :</div>
-                            <p class="pl-6">
-                                <a href="http://www.bibliotheque-numerique.fr/DonneesDiffusables.php" target="_blank" style="color:#1478B7">Système expert d'aide à la décision pour diffuser les données de la recherche</a>
-                            </p>
-                            <div class="pt-3 pl-3 text-gray-500">Outils dédiés au DMP :</div>
-                            <p class="pl-6">
-                                <a href="https://dmp.opidor.fr/" target="_blank" style="color:#1478B7">DMP Opidor</a>
-                            </p>
-                            <div class="pt-3 pl-3 text-gray-500">Outils dédiés aux métadonnées :</div>
-                            <p class="pl-6">
-                                <a href="https://www.datacite.org/" target="_blank" style="color:#1478B7">Datacite Metadata Generator</a><br>
-                                <a href="https://0xacab.org/jvoisin/mat2" target="_blank" style="color:#1478B7">Metadata Anonymisation Toolkit</a><br>
-                                <a href="https://ordar.otelo.univ-lorraine.fr/record?id=10.24396/ORDAR-1" target="_blank" style="color:#1478B7">Modèle OTELO / INIST-CNRS</a><br>
-                                <a href="http://rd-alliance.github.io/metadata-directory/tools/" target="_blank" style="color:#1478B7">Répertoire de schémas de métadonnées mis en place par Research Data Alliance</a>
-                            </p>
-
-                    </div>
-                </div>
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-five" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-five">Répertoires & annuaires</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-
-                        <p class="p-5">
-                            <a href="http://roar.eprints.org/" target="_blank" style="color:#1478B7">Registry of Open Access Repositories (ROAR)</a><br>
-                            <a href="http://www.opendoar.org/index.html" target="_blank" style="color:#1478B7">Directory of Open Access Repositories (OpenDOAR)</a><br>
-                            <a href="https://doaj.org/" target="_blank" style="color:#1478B7">DOAJ (Directory of Open Access Journals)</a><br>
-                            <a href="https://www.doabooks.org/" target="_blank" style="color:#1478B7">DOAB (Directory of Open Access Books)</a><br>
-                            <a href="http://www.opendoar.org/index.html" target="_blank" style="color:#1478B7">Directory of Open Access Repositories (OpenDOAR)</a>
-                        </p>
-
-                    </div>
-                </div>
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-six" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-six">Portails</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                        <p class="p-5">
-
-                            <a href="https://opidor.fr/opidor/" target="_blank" style="color:#1478B7">OPIDoR (Optimisation du Partage et de l’Interopérabilité des Données de la Recherche)</a><br>
-                            <a href="http://www.opendoar.org/index.html" target="_blank" style="color:#1478B7">Directory of Open Access Repositories (OpenDOAR)</a><br>
-                            <a href="https://www.openedition.org/" target="_blank" style="color:#1478B7">OpenEdition</a>
-
-                        </p>
-                    </div>
-                </div>
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-seven" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-seven">Plateformes</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                        <p class="p-5">
-                            <a href="https://www.fosteropenscience.eu/about#theportal" target="_blank" style="color:#1478B7">FOSTER (Facilitate Open Science Training for European Research)</a><br>
-                            <a href="https://hal.archives-ouvertes.fr/" target="_blank" style="color:#1478B7">HAL</a><br>
-                            <a href="http://www.openarchives.it/pleiadi/" target="_blank" style="color:#1478B7">Pleiadi</a><br>
-                            <a href="https://www.openaire.eu/" target="_blank" style="color:#1478B7">OpenAire</a><br>
-                            <a href="http://arxiv.org/" target="_blank" style="color:#1478B7">ArXiv</a><br>
-                            <a href="http://www.ncbi.nlm.nih.gov/pmc/" target="_blank" style="color:#1478B7">PubmedCentral</a><br>
-                            <a href="http://repec.org/" target="_blank" style="color:#1478B7">REPEC</a><br>
-                            <a href="http://Social Science Open Access Repository!" target="_blank" style="color:#1478B7">SSOAR</a><br>
-                            <a href="https://doranum.fr/" target="_blank" style="color:#1478B7">DoRANum</a>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="tab w-full overflow-hidden border-t">
-                    <input class="absolute opacity-0" id="tab-solo-eight" type="radio" name="tabs2">
-                    <label class="block p-5 leading-normal cursor-pointer" for="tab-solo-eight">Moteurs de recherche & réferenciels</label>
-                    <div class="tab-content overflow-hidden border-l-2 bg-gray-100 border-indigo-500 leading-normal">
-                        <p class="p-5">
-                            <a href="http://www.base-search.net/about/en/" target="_blank" style="color:#1478B7">BASE</a><br>
-                            <a href="http://core.ac.uk/" target="_blank" style="color:#1478B7">CORE</a><br>
-                            <a href="https://www.istex.fr/" target="_blank" style="color:#1478B7">ISTEX</a><br>
-                            <a href="https://pascal-francis.inist.fr/" target="_blank" style="color:#1478B7">Pascal, Francis</a><br>
-                            <a href="http://oaister.worldcat.org/" target="_blank" style="color:#1478B7">OAISTER</a><br>
-                            <a href="https://www.openaire.eu/" target="_blank" style="color:#1478B7">OpenAire</a>
-                        </p>
-                    </div>
-                </div>
-
+        <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
+            <div class="absolute inset-center text-sm flex">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Chargement des données
             </div>
         </div>
+
+        <div class="flex flex-col bg-white rounded h-full relative" style="border: 1px solid rgb(211, 218, 230); padding: 6px 8px">
+
+            <div class="flex justify-between items-start">
+
+                <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+                    {% if entity.halStructId %}
+                        <a class="px-2 pb-1
+                        {% if data == "hceres" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                           href="/tools/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=hceres"
+                        >Export HCERES</a>
+                    {% endif %}
+                </h1>
+
+            </div>
+
+            {% if data == "hceres" %}
+                <div>
+
+                    <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <!--- Orange box -->
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+
+                        <p>Vous pouvez générer un fichier Excel contenant la liste des publications présentes sur HAL, par type de publication, en cliquant sur le bouton ci-dessous.</p>
+
+                    </div>
+
+                    <form action="/export_hceres_xls/?type={{ type }}&id={{ id }}&data={{ data }}" method="post">
+                    {% csrf_token %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    {% for field in form.visible_fields %}
+                        <div>
+                            <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                            {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                        </div>
+                    {% endfor %}
+                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Exporter (format Excel)">
+                </form>
+
+                </div>
+            {% endif %}
+
+            </div>
+
     </div>
 </div>
-
-<script>
-    /*Javascript to close the radio button version by clicking it again */
-    var myRadios = document.getElementsByName('tabs2');
-    var setCheck;
-    var x = 0;
-    for(x = 0; x < myRadios.length; x++){
-        myRadios[x].onclick = function(){
-            if(setCheck != this){
-                setCheck = this;
-            }else{
-                this.checked = false;
-                setCheck = null;
-            }
-        };
-    }
-</script>
-
 {% include "includes/footer.html" %}

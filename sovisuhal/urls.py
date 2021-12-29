@@ -28,10 +28,10 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('publicationboard/', views.publicationboard, name='publicationboard'),
     path('references/', views.references, name='references'),
-
     path('terminology/', views.terminology, name='terminology'),
-
     path('wordcloud/', views.wordcloud, name='wordcloud'),
+
+    path('tools/', views.tools, name='tools'),
 
     path('check/', views.check, name='check'),
 
@@ -39,7 +39,7 @@ urlpatterns = [
 
     path('faq/', views.faq, name='faq'),
     path('ressources/', views.ressources, name='ressources'),
-    path('tools/', views.tools, name='tools'),
+    path('useful_links/', views.useful_links, name='useful_links'),
     path('contact/', views.contact, name='contact'),
 
     path('help/', views.help, name='help'),
@@ -52,6 +52,8 @@ urlpatterns = [
     path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
     path('validate_research-description/', views.validateResearchDescription, name='validate_research-description'),
     path('force-update_references/', views.forceUpdateReference, name='force-update_references'),
+    path('export_hceres_xls/', views.exportHceresXls, name='export_hceres_xls'),
+
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
     path('create/', views.create, name='creation'),

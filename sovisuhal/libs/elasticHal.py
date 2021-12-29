@@ -1,8 +1,7 @@
 #from libs import hal, utils, unpaywall, scanR
 
-from sovisuhal.archivesOuvertes import getConceptsAndKeywords
-from sovisuhal.libsElastichal import getAureHal
-from sovisuhal.libs.unpaywall import getOa
+from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
+from sovisuhal.libs.libsElastichal import getAureHal
 from sovisuhal.libs import utils, hal, unpaywall
 from elasticsearch import Elasticsearch, helpers
 import json
