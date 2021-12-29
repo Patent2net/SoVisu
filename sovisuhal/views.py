@@ -3713,6 +3713,9 @@ def exportHceresXls(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
 
+
+    print(references_cleaned)
+
     sort_results = hceres.sortReferences(references_cleaned)
 
     art_df = sort_results[0]
@@ -3722,12 +3725,21 @@ def exportHceresXls(request):
     output = IO()
 
     writer = pd.ExcelWriter(output, engine='openpyxl')
-    art_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+    if len(art_df.index) > 0:
+        art_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
             'openAccess_bool_s']].to_excel(writer, 'ART', index=False)
-    book_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'isbn_s',
+    else:
+        art_df.to_excel(writer, 'ART', index=False)
+    if len(book_df.index) > 0:
+        book_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'isbn_s',
              'openAccess_bool_s']].to_excel(writer, 'OUV', index=False)
-    conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+    else:
+        book_df.to_excel(writer, 'OUV', index=False)
+    if len(conf_df.index) > 0:
+        conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
              'conferenceTitle_s', 'conferenceDate_s', 'openAccess_bool_s']].to_excel(writer, 'CONF', index=False)
+    else:
+        conf_df.to_excel(writer, 'CONF', index=False)
     writer.close()
 
     output.seek(0)
