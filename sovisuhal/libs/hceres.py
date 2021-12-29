@@ -10,7 +10,11 @@ def sortReferences(articles):
 
     for article in articles:
 
+        print(article)
+
         article["authfullName_s"] = ""
+
+        article["volFull_s"] = ""
 
         if "serie_s" in article:
             if "issue_s" in article:
@@ -61,14 +65,16 @@ def sortReferences(articles):
         if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
             hceres_book.append(article)
 
-
     art_df = pd.DataFrame(hceres_art)
-    art_df = art_df.sort_values(by=['publicationDateY_i'])
+    if len(art_df.index) > 0:
+        art_df = art_df.sort_values(by=['publicationDateY_i'])
 
     book_df = pd.DataFrame(hceres_book)
-    book_df = book_df.sort_values(by=['publicationDateY_i'])
+    if len(book_df.index) > 0:
+        book_df = book_df.sort_values(by=['publicationDateY_i'])
 
     conf_df = pd.DataFrame(hceres_conf)
-    conf_df = conf_df.sort_values(by=['publicationDateY_i'])
+    if len(conf_df.index) > 0:
+        conf_df = conf_df.sort_values(by=['publicationDateY_i'])
 
     return art_df, book_df, conf_df
