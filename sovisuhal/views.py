@@ -3,20 +3,20 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.core.mail import mail_admins,mail_managers, send_mail
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
-from elasticsearch import Elasticsearch, helpers
-from .elasticHal import indexe_chercheur, collecte_docs
+from elasticsearch import Elasticsearch
+from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs
 from . import forms, settings
 from .forms import ContactForm
 
 from urllib.parse import urlencode
 from django.urls import reverse
 
-from . import libsElastichal
-from sovisuhal.archivesOuvertes import getConceptsAndKeywords
+from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
 
-from .libs import utils
+from .libs import utils, libsElastichal
 
 # from celery.result import AsyncResult
 
@@ -979,6 +979,57 @@ def check(request):
         dateTo = datetime.today().strftime('%Y-%m-%d')
     # /
 
+    hasToConfirm = False
+
+    if type == "rsr":
+        hasToConfirm_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                "authIdHal_s": entity['halId_s']
+                            }
+                        },
+                        {
+                            "match": {
+                                "validated": False
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
+
+    if type == "lab":
+        hasToConfirm_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                "labStructId_i": entity['halStructId']
+                            }
+                        },
+                        {
+                            "match": {
+                                "validated": False
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+    if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
+        'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
+        hasToConfirm = True
+
+    print(hasToConfirm)
+
     if data == "state":
         rsr_param = {
             "query": {
@@ -1000,6 +1051,7 @@ def check(request):
                                               'entity': entity,
                                               'researchers': rsrs_cleaned,
                                               'startDate': start_date,
+                                              'hasToConfirm': hasToConfirm,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     if data == "-1" or data == "credentials":
@@ -1016,6 +1068,7 @@ def check(request):
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
                                                                                  idRef=entity['idRef'], orcId=orcId),
                                                   'startDate': start_date,
+                                                  'hasToConfirm': hasToConfirm,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
         if type == "lab":
@@ -1025,6 +1078,7 @@ def check(request):
                                                                                     rsnr=entity['rsnr'],
                                                                                     idRef=entity['idRef']),
                                                   'startDate': start_date,
+                                                  'hasToConfirm': hasToConfirm,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "research-description":
@@ -1051,6 +1105,7 @@ def check(request):
                                               'research_summary': research_summary,
                                               'research_projectsInProgress': research_projectsInProgress,
                                               'research_projectsAndFundings': research_projectsAndFundings,
+                                              'hasToConfirm': hasToConfirm,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "expertise":
@@ -1081,6 +1136,7 @@ def check(request):
                                               'entity': entity,
                                               'concepts': concepts,
                                               'startDate': start_date,
+                                              'hasToConfirm': hasToConfirm,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "guiding-keywords":
@@ -1089,6 +1145,7 @@ def check(request):
                                               'form': forms.setGuidingKeywords(
                                                   guidingKeywords=entity['guidingKeywords']),
                                               'startDate': start_date,
+                                              'hasToConfirm': hasToConfirm,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "guiding-domains":
@@ -2069,6 +2126,7 @@ def check(request):
                                               'domains': domains,
                                               'guidingDomains': guidingDomains,
                                               'startDate': start_date,
+                                              'hasToConfirm': hasToConfirm,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 
@@ -2124,6 +2182,7 @@ def check(request):
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
+                                              'hasToConfirm': hasToConfirm,
                                               'references': references_cleaned, 'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -2907,8 +2966,210 @@ def ressources(request):
 
 
 def tools(request):
-    return render(request, 'tools.html')
+    """
+         # Get parameters
+         if 'type' in request.GET:
+             type = request.GET['type']
+         else:
+             return redirect('unknown')
+         if 'id' in request.GET:
+             id = request.GET['id']
+         else:
+             return redirect('unknown')
+         # /
+         """
+    # Get parameters
+    if 'type' in request.GET and 'id' in request.GET:
+        type = request.GET['type']
+        id = request.GET['id']
 
+    elif request.user.is_authenticated:
+        id = request.user.get_username()
+        id = id.replace(patternCas, '').lower()
+        if id == 'adminlab':
+            type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
+        elif not id == 'adminlab' and not id == 'visiteur':
+            type = "rsr"
+            base_url = reverse('dashboard')
+            query_string = urlencode({'type': type, 'id': id})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+        else:
+            return redirect('unknown')
+    else:
+        return redirect('unknown')
+
+    # /
+    # Connect to DB
+    es = esConnector()
+
+    # Get scope informations
+    if type == "rsr":
+        scope_param = {
+            "query": {
+                "match": {
+                    "_id": id
+                }
+            }
+        }
+
+        key = 'halId_s'
+        ext_key = "harvested_from_ids"
+
+        res = es.search(index=structId + "*-researchers",
+                        body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
+
+    elif type == "lab":
+        scope_param = {
+            "query": {
+                "match": {
+                    "halStructId": id
+                }
+            }
+        }
+
+        key = "halStructId"
+        ext_key = "harvested_from_ids"
+
+        res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
+        try:
+            entity = res['hits']['hits'][0]['_source']
+        except:
+            return redirect('unknown')
+    # /
+
+    hasToConfirm = False
+
+    if type == "rsr":
+        hasToConfirm_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                "authIdHal_s": entity['halId_s']
+                            }
+                        },
+                        {
+                            "match": {
+                                "validated": False
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
+
+    if type == "lab":
+        hasToConfirm_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                "labStructId_i": entity['halStructId']
+                            }
+                        },
+                        {
+                            "match": {
+                                "validated": False
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+    if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
+        'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
+        hasToConfirm = True
+
+    # Get first submittedDate_tdate date
+    if type == "rsr":
+        try:
+            start_date_param = {
+                "size": 1,
+                "sort": [
+                    {"submittedDate_tdate": {"order": "asc"}}
+                ],
+                "query": {
+                    "match_all": {}
+                }
+                # "query": {
+                #     "match_phrase": {"harvested_from_ids": entity['halId_s']}
+                # }
+            }
+            res = es.search(
+                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+                body=start_date_param)
+        except:
+            start_date_param.pop("sort")
+            res = es.search(
+                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+                body=start_date_param)
+
+    elif type == "lab":
+        start_date_param = {
+            "size": 1,
+            "sort": [
+                {"submittedDate_tdate": {"order": "asc"}}
+            ],
+            "query": {
+                "match_phrase": {"harvested_from_ids": entity['halStructId']}
+            }
+        }
+        res = es.search(index=structId + '-' + id + "-laboratories-documents", body=start_date_param)
+
+    try:
+        start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
+    except:
+        start_date = "2000"
+    # /
+
+    # Get parameters
+    if 'from' in request.GET:
+        dateFrom = request.GET['from']
+    else:
+        dateFrom = start_date[0:4] + '-01-01'
+
+    if 'to' in request.GET:
+        dateTo = request.GET['to']
+    else:
+        dateTo = datetime.today().strftime('%Y-%m-%d')
+    # /
+
+    if 'data' in request.GET:
+        data = request.GET['data']
+    else:
+        data = "hceres"
+
+    print(data)
+
+    if (data == "hceres" or data == -1):
+
+        return render(request, 'tools.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                                  'entity': entity,
+                                                  'hasToConfirm': hasToConfirm,
+                                                  'ext_key': ext_key,
+                                                  'key': entity[key],
+                                                  'startDate': start_date,
+                                                  'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+
+def useful_links(request):
+    return render(request, 'useful_links.html')
 
 def presentation(request):
     return render(request, 'presentation.html')
@@ -3370,3 +3631,112 @@ def forceUpdateReference(request):
 
     return redirect(
         '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=references')
+
+
+import pandas as pd
+from io import BytesIO as IO
+
+def exportHceresXls(request):
+
+    # Get parameters
+    if 'type' in request.GET:
+        type = request.GET['type']
+    else:
+        return redirect('unknown')
+    if 'id' in request.GET:
+        id = request.GET['id']
+    else:
+        return redirect('unknown')
+
+    scope_param = {
+            "query": {
+                "match": {
+                    "halStructId": id
+                }
+            }
+        }
+
+    key = "halStructId"
+    ext_key = "harvested_from_ids"
+
+    es = esConnector()
+
+    res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
+
+    ref_param = {
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "match_phrase": {
+                                ext_key: entity[key]
+                            }
+                        },
+                        {
+                            "match": {
+                                    "validated": True
+                                }
+                            },
+                        {
+                            "range": {
+                                "submittedDate_tdate": {
+                                    "gte": "2016-01-01",
+                                    "lt": "2021-12-31"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+    # {
+    #     "match": {
+    #         "validated": True
+    #     }
+    # },
+
+    count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
+    references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param, size=count)
+
+    print(entity)
+    print(references)
+
+    from .libs import hceres
+
+    references_cleaned = []
+
+    for ref in references['hits']['hits']:
+        references_cleaned.append(ref['_source'])
+
+    sort_results = hceres.sortReferences(references_cleaned)
+
+    art_df = sort_results[0]
+    book_df = sort_results[1]
+    conf_df = sort_results[2]
+
+    output = IO()
+
+    writer = pd.ExcelWriter(output, engine='openpyxl')
+    art_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+            'openAccess_bool_s']].to_excel(writer, 'ART', index=False)
+    book_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'isbn_s',
+             'openAccess_bool_s']].to_excel(writer, 'OUV', index=False)
+    conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+             'conferenceTitle_s', 'conferenceDate_s', 'openAccess_bool_s']].to_excel(writer, 'CONF', index=False)
+    writer.close()
+
+    output.seek(0)
+
+    filename = 'hceres_' + entity["acronym"] + '.xlsx'
+    response = HttpResponse(
+        output,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+    return response

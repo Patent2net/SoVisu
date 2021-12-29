@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 import json
-from . import forms
+from sovisuhal import forms
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from django.core.mail import mail_admins, send_mail
-from .forms import ContactForm
+from sovisuhal.forms import ContactForm
 from decouple import config
 from django.contrib import messages
 #from ssl import create_default_context
@@ -798,7 +798,7 @@ def search(request):
         for result in res['hits']['hits']:
             res_cleaned.append(result['_source'])
         messages.add_message(request, messages.INFO, 'Résultats de la recherche "{}" dans la collection "{}"'.format(search,index))
-        return render(request, 'search.html', {'form': forms.search(val=search), 'count': p_res['count'], 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'", 'filter': search, 'index': index, 'search': search,'results': res_cleaned, 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'from': dateFrom, 'to': dateTo})
+        return render(request, 'search.html', {'form': forms.search(val=search), 'count': p_res['count'], 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'", 'filter': search, 'index': index, 'search': search, 'results': res_cleaned, 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'from': dateFrom, 'to': dateTo})
 
 
     return render(request, 'search.html', {'form': forms.search(), 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'from': dateFrom, 'to': dateTo, 'filter': ''})
@@ -1210,7 +1210,7 @@ def ressources(request):
     return render(request, 'ressources.html')
 
 def tools(request):
-    return render(request, 'tools.html')
+    return render(request, 'useful_links.html')
 
 def presentation(request):
     return render(request, 'presentation.html')
