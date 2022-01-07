@@ -219,7 +219,7 @@ def collecte_docs( Chercheur): #self,
     for num, doc in enumerate(docs):
    #     progress_recorder.set_progress(num, len(docs))
         doc["_id"] = doc['docid']
-        doc["validated"] = False
+        doc["validated"] = True
 
         doc["harvested_from"] = "researcher"
 
