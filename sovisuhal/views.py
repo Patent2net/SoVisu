@@ -2217,7 +2217,8 @@ def check(request):
             references_cleaned.append(ref['_source'])
         # /
 
-        return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,'validation':validation,
+        return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                              'validation': validation,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
                                               'references': references_cleaned, 'startDate': start_date,
