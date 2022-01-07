@@ -2640,7 +2640,7 @@ def validateReferences(request):
             for docid in toValidate:
                 es.update(index=structId + '-' + entity["halStructId"] + "-laboratories-documents", refresh='wait_for',
                           id=docid,
-                          body={"doc": {"validated": True}})
+                          body={"doc": {"validated": validate}})
 
     return redirect(
         '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data + '&validation=' + validation)
