@@ -27,5 +27,5 @@ bs4==0.0.1
 SPARQLWrapper==1.8.5
 unidecode==1.2.0
 matplotlib==3.4.2
-nested-lookup=0.2.22
+nested-lookup==0.2.22
 django-tinymce
