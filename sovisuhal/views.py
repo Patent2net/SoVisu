@@ -2140,63 +2140,40 @@ def check(request):
             validation = request.GET['validation']
 
         if validation == "0":
-            # Get references
-            ref_param = {
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "match_phrase": {
-                                    ext_key: entity[key]
-                                }
-                            },
-                            {
-                                "match": {
-                                    "validated": True
-                                }
-                            },
-                            {
-                                "range": {
-                                    "submittedDate_tdate": {
-                                        "gte": dateFrom,
-                                        "lt": dateTo
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
+            validate = True
         elif validation == "1":
-            # Get references
-            ref_param = {
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "match_phrase": {
-                                    ext_key: entity[key]
-                                }
-                            },
-                            {
-                                "match": {
-                                    "validated": False
-                                }
-                            },
-                            {
-                                "range": {
-                                    "submittedDate_tdate": {
-                                        "gte": dateFrom,
-                                        "lt": dateTo
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
+            validate = False
         else:
             return redirect('unknown')
+
+        ref_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                ext_key: entity[key]
+                            }
+                        },
+                        {
+                            "match": {
+                                "validated": validate
+                            }
+                        },
+                        {
+                            "range": {
+                                "submittedDate_tdate": {
+                                    "gte": dateFrom,
+                                    "lt": dateTo
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+
         if type == "rsr":  # I hope this is a focused search :-/
             count = \
                 es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
