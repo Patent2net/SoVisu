@@ -829,23 +829,6 @@ def check(request):
 
     es = esConnector()
 
-    """
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    if 'data' in request.GET:
-        data = request.GET['data']
-    else:
-        data = -1
-
-    # /
-    """
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -2139,9 +2122,9 @@ def check(request):
         if 'validation' in request.GET:
             validation = request.GET['validation']
 
-        if validation == "0":
+        if validation == "1":
             validate = True
-        elif validation == "1":
+        elif validation == "0":
             validate = False
         else:
             return redirect('unknown')
@@ -2173,7 +2156,6 @@ def check(request):
             }
         }
 
-
         if type == "rsr":  # I hope this is a focused search :-/
             count = \
                 es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
@@ -2183,10 +2165,11 @@ def check(request):
                 body=ref_param, size=count)
 
         if type == "lab":
-            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
-                'count']
-            references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
-                                   body=ref_param, size=count)
+            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
+                             body=ref_param)['count']
+            references = es.search(
+                index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
+                body=ref_param, size=count)
 
         references_cleaned = []
 
@@ -2547,7 +2530,6 @@ def validateReferences(request):
     else:
         return redirect('unknown')
 
-
     if 'data' in request.GET:
         data = request.GET['data']
     else:
@@ -2558,9 +2540,9 @@ def validateReferences(request):
         dateTo = request.GET['to']
 
     if int(validation) == 0:
-        validate = False
-    elif int(validation) == 1:
         validate = True
+    elif int(validation) == 1:
+        validate = False
 
     # Connect to DB
     es = esConnector()
@@ -2574,7 +2556,6 @@ def validateReferences(request):
             }
         }
 
-
         res = es.search(index=structId + "-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
@@ -2582,8 +2563,6 @@ def validateReferences(request):
             return redirect('unknown')
 
         if request.method == 'POST':
-
-
 
             toValidate = request.POST.get("toValidate", "").split(",")
             for docid in toValidate:
@@ -3665,7 +3644,7 @@ def forceUpdateReference(request):
         collecte_docs(entity)
 
     return redirect(
-        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=references'+'&validation='
+        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=references' + '&validation='
         + validation)
 
 
