@@ -99,8 +99,10 @@
 
                         <thead>
                         <tr class="bg-gray-100 text-gray-700 text-xs">
+                            <th class="hidden">ID</th>
                             <th>Nom</th>
                             <th>IDs validés</th>
+                            <th>Axe</th>
                         </tr>
                         </thead>
 
@@ -108,8 +110,23 @@
 
                         {% for rsr in researchers %}
                             <tr class="text-gray-500">
+                                <td class="hidden ldapId">{{ rsr.ldapId }}</td>
                                 <td>{{ rsr.firstName }} {{ rsr.lastName }}</td>
                                 <td>{{ rsr.validated }}</td>
+                                {% if rsr.team %}
+                                    <td>{{ rsr.team }}</td>
+                                {% else %}
+                                    <td>
+                                        <select class="border border-gray-300 axis" name="axis" id="axis">
+                                            <option value="">Aucun axe affecté</option>
+                                            <option value="axis1">Axe 1</option>
+                                            <option value="axis2">Axe 2</option>
+                                            <option value="axis3">Axe 3</option>
+                                            <option value="axis4">Axe 4</option>
+                                            <option value="axis5">Axe 5</option>
+                                        </select>
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
 
@@ -118,6 +135,16 @@
                     </table>
 
                 </div>
+
+                <div class="hidden researchers-json">{{ researchers|json_script:"researchers" }}</div>
+
+                <div class="dt-bottom-infos-rplc flex justify-between items-center">
+                    <button class="update-members text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
+                        Mettre à jour
+                    </button>
+                </div>
+
+
             {% endif %}
 
             {% if data == "create" %}
@@ -1066,7 +1093,7 @@
                     buttons: [],
                     "columnDefs": [
                         {
-                            "targets": [1],
+                            "targets": [2],
                             "render": function (data, type, row, meta) {
                                 if (data === 'True') {
                                     data = 'Oui';
@@ -1091,11 +1118,57 @@
                 $('.dataTables_scrollHeadInner').css('padding-right', 0);
                 $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
 
-
+                $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
                 $('.dataTables_filter').addClass('flex items-center');
                 $('.dataTables_filter').prepend($('.dt-buttons'));
 
                 $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            });
+
+            var researchers = JSON.parse(document.querySelector('.researchers-json').textContent)
+
+            var getObjectByValue = function (array, key, value) {
+                return array.filter(function (object) {
+                    return object[key] === value;
+                });
+            };
+
+            var table = document.getElementById("state");
+            for (let i in table.rows) {
+                try {
+                    let row = table.rows[i]
+                    let curr_rsr = getObjectByValue(researchers, "ldapId", row.cells[0].textContent );
+                    if (curr_rsr[0].axis) {
+                        row.cells[3].querySelector('#axis').value = curr_rsr[0].axis;
+                    } else {
+                        row.cells[3].querySelector('#axis').value = "";
+                    }
+                } catch (error) {
+                }
+            }
+
+            membersUpdated = []
+
+            const elements = document.querySelectorAll('select.axis');
+            Array.from(elements).forEach((element, index) => {
+
+                element.onchange = (event) => {
+                    let val = event.target.value;
+                    let ldapId = parentNode = element.parentNode.parentNode.querySelector(".ldapId").textContent;
+
+                    membersUpdated.push(ldapId + ":" + val);
+                }
+            });
+
+            $('.update-members').click(function () {
+
+                var form = $('<form action="/update_members/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                    '{% csrf_token %}' +
+                    '<input type="text" name="toUpdate" value="' + membersUpdated + '" />' +
+                    '</form>');
+
+                form.appendTo('body').hide()
+                form.submit();
             });
 
             $('.validate').click(function () {
@@ -1129,7 +1202,10 @@
             });
 
 
+
         });
+
+
 
     {% endif %}
 

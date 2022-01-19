@@ -3648,6 +3648,55 @@ def forceUpdateReference(request):
         + validation)
 
 
+def updateMembers(request):
+    # Get parameters
+    if 'type' in request.GET:
+        type = request.GET['type']
+    else:
+        return redirect('unknown')
+    if 'id' in request.GET:
+        id = request.GET['id']
+    else:
+        return redirect('unknown')
+
+    if 'data' in request.GET:
+        data = request.GET['data']
+    else:
+        data = -1
+    if 'from' in request.GET:
+        dateFrom = request.GET['from']
+    if 'to' in request.GET:
+        dateTo = request.GET['to']
+
+    # Connect to DB
+    es = esConnector()
+
+    if request.method == 'POST':
+        toUpdate = request.POST.get("toUpdate", "").split(",")
+
+        for element in toUpdate:
+            element = element.split(":")
+            scope_param = {
+                "query": {
+                    "match": {
+                        "_id": element[0]
+                    }
+                }
+            }
+            res = es.search(index=structId + "-*-researchers", body=scope_param)
+            try:
+                entity = res['hits']['hits'][0]['_source']
+            except:
+                return redirect('unknown')
+
+            es.update(index=structId + '-' + entity['labHalId'] + "-researchers",
+                      refresh='wait_for', id=entity['ldapId'],
+                      body={"doc": {"axis": element[1]}})
+
+    return redirect(
+        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+
+
 import pandas as pd
 from io import BytesIO as IO
 
