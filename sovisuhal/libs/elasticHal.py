@@ -212,7 +212,11 @@ def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
 
 # @shared_task(bind=True)
 def collecte_docs( Chercheur): #self,
+
+    init = False
+
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
+    es = esConnector()
   #  progress_recorder = ProgressRecorder(self)
   #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
@@ -265,34 +269,33 @@ def collecte_docs( Chercheur): #self,
         except:
             print('publicationDate_tdate error ?')
         doc ['Created'] = datetime.datetime.now().isoformat()
-        # if not init:
-        #
-        #     doc_param = {
-        #         "query": {
-        #             "match": {
-        #                 "_id": doc["_id"]
-        #             }
-        #         }
-        #     }
-        #
-        #     if not es.indices.exists(index=row["structSirene"] + "-" + row["labHalId"] + "-researchers-" + row[
-        #         "ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
-        #         print("exception ", row["labHalId"], row["ldapId"])
-        #         break
-        #     res = es.search(
-        #         index=row["structSirene"] + "-" + row["labHalId"] + "-researchers-" + row["ldapId"] + "-documents",
-        #         body=doc_param)  # -researchers" + row["ldapId"] + "-documents
-        #
-        #     if len(res['hits']['hits']) > 0:
-        #         doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-        #
-        #         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-        #             doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-        #                                    'MDS': res['hits']['hits'][0]['_source']['MDS']})
-        #
-        #     else:
-        #         doc["validated"] = False
-    es = esConnector()
+
+        if not init:
+            doc_param = {
+                "query": {
+                    "match": {
+                        "_id": doc["_id"]
+                    }
+                }
+            }
+
+            if not es.indices.exists(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" +
+                                           Chercheur["ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
+                print("exception ", Chercheur["labHalId"], Chercheur["ldapId"])
+
+            res = es.search(
+                index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents",
+                body=doc_param)  # -researchers" + row["ldapId"] + "-documents
+
+            if len(res['hits']['hits']) > 0:
+                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+
+                if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                    doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                           'MDS': res['hits']['hits'][0]['_source']['MDS']})
+
+            else:
+                doc["validated"] = True
     res = helpers.bulk(
         es,
         docs,
