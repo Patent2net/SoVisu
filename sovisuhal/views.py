@@ -60,6 +60,21 @@ def esConnector(mode=mode):
     return es
 
 
+# Elastic generic query call
+def scope_p(scope_field, scope_value):
+    scope = {
+        "query": {
+            "match": {
+                scope_field: scope_value
+            }
+        }
+    }
+    return scope
+# Elastic generic query call
+
+
+
+
 @login_required
 def index(request):
     if not request.user.is_authenticated:
@@ -79,13 +94,10 @@ def index(request):
             gugusse = gugusse.replace(patternCas, '').lower()
             # check présence gugusse
             es = esConnector()
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": gugusse
-                    }
-                }
-            }
+
+            field = "_id"
+            scope_param = scope_p(field, gugusse)
+
             count = es.count(index="*-researchers", body=scope_param)['count']
             if count > 0:
                 return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
@@ -115,13 +127,10 @@ def loggedin(request):
 
             # check présence gugusse
             es = esConnector()
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": gugusse
-                    }
-                }
-            }
+
+            field = "_id"
+            scope_param = scope_p(field, gugusse)
+
             count = es.count(index=structId + "*-researchers", body=scope_param)['count']
             if count > 0:
                 return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
@@ -247,13 +256,9 @@ def cs_index(request):
             count = es.count(index=structId + "*-researchers", body=scope_param)['count']
             res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
         else:
-            scope_param = {
-                "query": {
-                    "match": {
-                        "labHalId": id
-                    }
-                }
-            }
+
+            field = "labHalId"
+            scope_param = scope_p(field, id)
 
             count = es.count(index=structId + "-" + id + "-researchers", body=scope_param)['count']
 
@@ -276,18 +281,7 @@ def cs_index(request):
 
 
 def dashboard(request):
-    """
-     # Get parameters
-     if 'type' in request.GET:
-         type = request.GET['type']
-     else:
-         return redirect('unknown')
-     if 'id' in request.GET:
-         id = request.GET['id']
-     else:
-         return redirect('unknown')
-     # /
-     """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -320,43 +314,29 @@ def dashboard(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
-
-        res = es.search(index=structId + "*-researchers",
-                        body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
-
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+        search_id = "*"
+        index_pattern = "-researchers"
 
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "harvested_from_ids"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
     # /
+
 
     hasToConfirm = False
 
@@ -531,39 +511,27 @@ def references(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
+        search_id = "*"
+        index_pattern = "-researchers"
 
-        res = es.search(index=structId + "-*-researchers", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "harvested_from_ids"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
     # /
 
     # Get first submittedDate_tdate date
@@ -872,40 +840,27 @@ def check(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
-
-        res = es.search(index=structId + "-*-researchers*", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')  # plante si id pas présente ?
+        search_id = "*"
+        index_pattern = "-researchers"
 
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "harvested_from_ids"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "-*-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
     # /
 
     # Get first submittedDate_tdate date
