@@ -2265,40 +2265,27 @@ def terminology(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
-
-        res = es.search(index=structId + "-*-researchers", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+        search_id = "*"
+        index_pattern = "-researchers"
 
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "harvested_from_ids"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "-*-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
     # /
 
     hasToConfirm = False
@@ -2502,14 +2489,9 @@ def validateReferences(request):
     # Connect to DB
     es = esConnector()
 
+  # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
+        scope_param = scope_p("_id", id)
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
         try:
@@ -2532,13 +2514,7 @@ def validateReferences(request):
                     pass  # doc du chercheur pas dans le labo
 
     if type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
+        scope_param = scope_p("_id", id)
 
         res = es.search(index=structId + "-*-laboratories", body=scope_param)
         try:
@@ -2584,13 +2560,7 @@ def validateGuidingDomains(request):
         toValidate = request.POST.get("toValidate", "").split(',')
 
         if type == "rsr":
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": id
-                    }
-                }
-            }
+            scope_param = scope_p("_id", id)
 
             res = es.search(index=structId + "-*-researchers", body=scope_param)
             try:
@@ -2633,13 +2603,8 @@ def invalidateConcept(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
+        scope_param = scope_p("_id", id)
+
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
         try:
@@ -2651,13 +2616,7 @@ def invalidateConcept(request):
         lab_index = structId + '-' + entity['labHalId'] + '-laboratories'
 
         # get tree from lab
-        lab_scope_param = {
-            "query": {
-                "match": {
-                    "_id": entity['labHalId']
-                }
-            }
-        }
+        lab_scope_param = scope_p("_id", entity['labHalId'])
 
         res = es.search(index=structId + "*-laboratories", body=lab_scope_param)
         entity_lab = res['hits']['hits'][0]['_source']
@@ -2729,13 +2688,7 @@ def validateCredentials(request):
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
 
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": id
-                    }
-                }
-            }
+            scope_param = scope_p("_id", id)
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
             try:
@@ -2785,13 +2738,7 @@ def validateGuidingKeywords(request):
         guidingKeywords = request.POST.get("f_guidingKeywords").split(";")
 
         if type == "rsr":
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": id
-                    }
-                }
-            }
+            scope_param = scope_p("_id", id)
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
             try:
@@ -2849,13 +2796,7 @@ def validateResearchDescription(request):
         research_projectsAndFundings_raw = soup.getText().replace("\n", " ")
 
         if type == "rsr":
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": id
-                    }
-                }
-            }
+            scope_param = scope_p("_id", id)
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
             try:
@@ -2897,13 +2838,7 @@ def refreshAureHalId(request):
     # Connect to DB
     es = esConnector()
 
-    scope_param = {
-        "query": {
-            "match": {
-                "_id": id
-            }
-        }
-    }
+    scope_param = scope_p("_id", id)
 
     res = es.search(index=structId + "*-researchers", body=scope_param)
     try:
@@ -2975,42 +2910,27 @@ def tools(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
-
-        res = es.search(index=structId + "*-researchers",
-                        body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
-
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+        search_id = "*"
+        index_pattern = "-researchers"
 
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "harvested_from_ids"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
     # /
 
     hasToConfirm = False
@@ -3186,40 +3106,28 @@ def wordcloud(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
-
-        res = es.search(index=structId + "*-researchers", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+        search_id = "*"
+        index_pattern = "-researchers"
 
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "labStructId_i"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "*-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')  # /
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
+    # /
 
     hasToConfirm = False
 
@@ -3358,40 +3266,28 @@ def publicationboard(request):
 
     # Get scope informations
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
-
+        field = "_id"
         key = 'halId_s'
-        ext_key = "harvested_from_ids"
-
-        res = es.search(index=structId + "*-researchers", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')
+        search_id = "*"
+        index_pattern = "-researchers"
 
     elif type == "lab":
-        scope_param = {
-            "query": {
-                "match": {
-                    "halStructId": id
-                }
-            }
-        }
-
+        field = "halStructId"
         key = "halStructId"
-        ext_key = "harvested_from_ids"
+        search_id = id
+        index_pattern = "-laboratories"
 
-        res = es.search(index=structId + "*-laboratories", body=scope_param)
-        try:
-            entity = res['hits']['hits'][0]['_source']
-        except:
-            return redirect('unknown')  # /
+    ext_key = "harvested_from_ids"
+
+    scope_param = scope_p(field, id)
+
+    res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
+    # /
 
     hasToConfirm = False
 
@@ -3583,13 +3479,7 @@ def forceUpdateReference(request):
     # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
 
     if type == "rsr":
-        scope_param = {
-            "query": {
-                "match": {
-                    "_id": id
-                }
-            }
-        }
+        scope_param = scope_p("_id", id)
 
         res = es.search(index=structId + "*-researchers", body=scope_param)
         try:
@@ -3631,13 +3521,8 @@ def updateMembers(request):
 
         for element in toUpdate:
             element = element.split(":")
-            scope_param = {
-                "query": {
-                    "match": {
-                        "_id": element[0]
-                    }
-                }
-            }
+            scope_param = scope_p("_id", element[0])
+
             res = es.search(index=structId + "-*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
@@ -3667,13 +3552,7 @@ def exportHceresXls(request):
     else:
         return redirect('unknown')
 
-    scope_param = {
-        "query": {
-            "match": {
-                "halStructId": id
-            }
-        }
-    }
+    scope_param = scope_p("halStructId", id)
 
     key = "halStructId"
     ext_key = "harvested_from_ids"
