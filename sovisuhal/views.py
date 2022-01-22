@@ -3581,7 +3581,7 @@ def exportHceresXls(request):
                     },
                     {
                         "range": {
-                            "submittedDate_tdate": {
+                            "publicationDate_tdate": {
                                 "gte": "2016-01-01",
                                 "lt": "2021-12-31"
                             }
@@ -3602,17 +3602,12 @@ def exportHceresXls(request):
     references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
                            size=count)
 
-    print(entity)
-    print(references)
-
     from .libs import hceres
 
     references_cleaned = []
 
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
-
-    print(references_cleaned)
 
     sort_results = hceres.sortReferences(references_cleaned, esConnector())
 
