@@ -13,23 +13,25 @@ def sortReferences(articles, es):
 
         article["team"] = ""
 
-        for authIdHal_s in article["authIdHal_s"]:
+        if "authIdHal_s" in article:
+            for authIdHal_s in article["authIdHal_s"]:
 
-            doc_param = {
-                "query": {
-                    "match": {
-                        "authIdHal_s": authIdHal_s
+                doc_param = {
+                    "query": {
+                        "match": {
+                            "halId_s": authIdHal_s
+                        }
                     }
                 }
-            }
 
-            res = es.search(index="*-researchers", body=doc_param)
-            if len(res['hits']['hits']) > 0:
-                axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
-                article["team"] = article["team"] + axis + " ; "
+                res = es.search(index="*-researchers", body=doc_param)
+                if len(res['hits']['hits']) > 0:
+                    if 'axis' in res['hits']['hits'][0]['_source']:
+                        axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
+                        article["team"] = article["team"] + axis + " ; "
 
-        if len(article["team"]) > 2:
-            article["team"] = article["team"][:-2]
+            if len(article["team"]) > 2:
+                article["team"] = article["team"][:-2]
 
         article["authfullName_s"] = ""
 
@@ -71,8 +73,6 @@ def sortReferences(articles, es):
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
 
-        print(article["authfullName_s"])
-
         # colloque et posters
         if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
             hceres_conf.append(article)
@@ -84,6 +84,7 @@ def sortReferences(articles, es):
             hceres_book.append(article)
         # hdr
         if article["docType_s"] == "HDR":
+            print(article)
             hceres_hdr.append(article)
 
     art_df = pd.DataFrame(hceres_art)
