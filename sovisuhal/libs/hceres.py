@@ -1,7 +1,8 @@
 import pandas as pd
 
 
-def sortReferences(articles):
+
+def sortReferences(articles, es):
 
     hceres_art = []
     hceres_book = []
@@ -10,7 +11,25 @@ def sortReferences(articles):
 
     for article in articles:
 
-        print(article)
+        article["team"] = ""
+
+        for authIdHal_s in article["authIdHal_s"]:
+
+            doc_param = {
+                "query": {
+                    "match": {
+                        "authIdHal_s": authIdHal_s
+                    }
+                }
+            }
+
+            res = es.search(index="*-researchers", body=doc_param)
+            if len(res['hits']['hits']) > 0:
+                axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
+                article["team"] = article["team"] + axis + " ; "
+
+        if len(article["team"]) > 2:
+            article["team"] = article["team"][:-2]
 
         article["authfullName_s"] = ""
 
@@ -57,13 +76,15 @@ def sortReferences(articles):
         # colloque et posters
         if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
             hceres_conf.append(article)
-
         # art
         if article["docType_s"] == "ART":
             hceres_art.append(article)
         # ouvrages, chapitres d'ouvrages et directions d'ouvrages
         if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
             hceres_book.append(article)
+        # hdr
+        if article["docType_s"] == "HDR":
+            hceres_hdr.append(article)
 
     art_df = pd.DataFrame(hceres_art)
     if len(art_df.index) > 0:
@@ -77,4 +98,8 @@ def sortReferences(articles):
     if len(conf_df.index) > 0:
         conf_df = conf_df.sort_values(by=['publicationDateY_i'])
 
-    return art_df, book_df, conf_df
+    hceres_df = pd.DataFrame(hceres_hdr)
+    if len(hceres_df.index) > 0:
+        hceres_df = hceres_df.sort_values(by=['publicationDateY_i'])
+
+    return art_df, book_df, conf_df, hceres_df
