@@ -3539,7 +3539,7 @@ def updateMembers(request):
 
 import pandas as pd
 from io import BytesIO as IO
-
+import numpy as np
 
 def exportHceresXls(request):
     # Get parameters
@@ -3615,6 +3615,21 @@ def exportHceresXls(request):
     book_df = sort_results[1]
     conf_df = sort_results[2]
     hdr_df = sort_results[3]
+
+    art_df = art_df.fillna("")
+    book_df = book_df.fillna("")
+    conf_df = conf_df.fillna("")
+    hdr_df = hdr_df.fillna("")
+
+    if not (conf_df.columns == 'doiId_s').any():
+        conf_df["doiId_s"] = " "
+    if not (hdr_df.columns == 'defenseDateY_i').any():
+        hdr_df["defenseDateY_i"] = " "
+    if not (book_df.columns == 'isbn_s').any():
+        book_df["isbn_s"] = ""
+
+    pd.set_option('display.max_columns', None)
+    print(book_df.head(10))
 
     output = IO()
 
