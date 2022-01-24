@@ -2584,15 +2584,16 @@ def exportHceresXls(request):
     except:
         return redirect('unknown')
 
-    toProcess = json.loads(request.POST.get("toProcess", ""))
-    print(toProcess)
-    toProcess_extra_cleaned = []
-    toProcess_extra = request.POST.get("toProcess_extra", "").splitlines()
-    for line in toProcess_extra:
-        values = line.split(";")
-        toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1], "function": values[2], "scope": values[3]})
+    # Acquisition des chercheurs à traiter
+    # toProcess = json.loads(request.POST.get("toProcess", ""))
+    # toProcess_extra_cleaned = []
+    # toProcess_extra = request.POST.get("toProcess_extra", "").splitlines()
+    # for line in toProcess_extra:
+    #     values = line.split(";")
+    #     toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1], "function": values[2], "scope": values[3]})
+    #
+    # toProcess.extend(toProcess_extra_cleaned)
 
-    print(toProcess_extra_cleaned)
 
     ref_param = {
         "query": {
