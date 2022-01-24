@@ -53,7 +53,7 @@
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise"
+                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
                         >Expertise</a>
                     {% endif %}
                     <a class="px-2 pb-1
@@ -346,6 +346,21 @@
                         collaborations.</p>
                 </div>
 
+                    <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+
+                            <a class="px-2 pb-1
+                        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+                            >Expertises validées</a>
+                            <a class="px-2 pb-1
+                        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
+                            >Expertises retirées</a>
+
+                    </div>
+
+
+
                 <div class="justify-end flex w-full">
                     <div class="dt-buttons-rplc flex items-center text-xs">
                     </div>
@@ -378,8 +393,13 @@
                 </div>
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
-                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer delete outline-none">
-                        Valider
+                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer delete outline-none whitespace-nowrap">
+                        {% if validation == "1" %}
+                            Retirer du profil
+                        {% endif %}
+                        {% if validation == "0" %}
+                            Intégrer au profil
+                        {% endif %}
                     </button>
                 </div>
 
@@ -1128,51 +1148,51 @@
 
             {% if data == "state" %}
 
-            var researchers = JSON.parse(document.querySelector('.researchers-json').textContent)
+                var researchers = JSON.parse(document.querySelector('.researchers-json').textContent)
 
-            var getObjectByValue = function (array, key, value) {
-                return array.filter(function (object) {
-                    return object[key] === value;
-                });
-            };
+                var getObjectByValue = function (array, key, value) {
+                    return array.filter(function (object) {
+                        return object[key] === value;
+                    });
+                };
 
-            var table = document.getElementById("state");
-            for (let i in table.rows) {
-                try {
-                    let row = table.rows[i]
-                    let curr_rsr = getObjectByValue(researchers, "ldapId", row.cells[0].textContent );
-                    if (curr_rsr[0].axis) {
-                        row.cells[3].querySelector('#axis').value = curr_rsr[0].axis;
-                    } else {
-                        row.cells[3].querySelector('#axis').value = "";
+                var table = document.getElementById("state");
+                for (let i in table.rows) {
+                    try {
+                        let row = table.rows[i]
+                        let curr_rsr = getObjectByValue(researchers, "ldapId", row.cells[0].textContent);
+                        if (curr_rsr[0].axis) {
+                            row.cells[3].querySelector('#axis').value = curr_rsr[0].axis;
+                        } else {
+                            row.cells[3].querySelector('#axis').value = "";
+                        }
+                    } catch (error) {
                     }
-                } catch (error) {
                 }
-            }
 
-            membersUpdated = []
+                membersUpdated = []
 
-            const elements = document.querySelectorAll('select.axis');
-            Array.from(elements).forEach((element, index) => {
+                const elements = document.querySelectorAll('select.axis');
+                Array.from(elements).forEach((element, index) => {
 
-                element.onchange = (event) => {
-                    let val = event.target.value;
-                    let ldapId = parentNode = element.parentNode.parentNode.querySelector(".ldapId").textContent;
+                    element.onchange = (event) => {
+                        let val = event.target.value;
+                        let ldapId = parentNode = element.parentNode.parentNode.querySelector(".ldapId").textContent;
 
-                    membersUpdated.push(ldapId + ":" + val);
-                }
-            });
+                        membersUpdated.push(ldapId + ":" + val);
+                    }
+                });
 
-            $('.update-members').click(function () {
+                $('.update-members').click(function () {
 
-                var form = $('<form action="/update_members/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
-                    '{% csrf_token %}' +
-                    '<input type="text" name="toUpdate" value="' + membersUpdated + '" />' +
-                    '</form>');
+                    var form = $('<form action="/update_members/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                        '{% csrf_token %}' +
+                        '<input type="text" name="toUpdate" value="' + membersUpdated + '" />' +
+                        '</form>');
 
-                form.appendTo('body').hide()
-                form.submit();
-            });
+                    form.appendTo('body').hide()
+                    form.submit();
+                });
 
             {% endif %}
 
@@ -1205,7 +1225,6 @@
                 form.appendTo('body').hide()
                 form.submit();
             });
-
 
 
         });

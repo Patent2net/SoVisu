@@ -1053,30 +1053,39 @@ def check(request):
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
     elif data == "expertise":
+        if 'validation' in request.GET:
+            validation = request.GET['validation']
 
+        if validation == "1":
+            validate = 'validated'
+        elif validation == "0":
+            validate = 'invalidated'
+        else:
+            return redirect('unknown')
         concepts = []
         if 'children' in entity['concepts']:
             for children in entity['concepts']['children']:
                 if "state" in children.keys():
-                    if children['state'] == 'invalidated':
+                    if children['state'] == validate:
                         concepts.append(
-                            {'id': children['id'], 'label_fr': children['label_fr'], 'state': 'invalidated'})
+                            {'id': children['id'], 'label_fr': children['label_fr'], 'state': validate})
                 if 'children' in children:
                     for children1 in children['children']:
                         if "state" in children1.keys():
-                            if children1['state'] == 'invalidated':
+                            if children1['state'] == validate:
                                 concepts.append(
-                                    {'id': children1['id'], 'label_fr': children1['label_fr'], 'state': 'invalidated'})
+                                    {'id': children1['id'], 'label_fr': children1['label_fr'], 'state': validate})
                             else:
                                 print(children1)
                         if 'children' in children1:
                             for children2 in children1['children']:
                                 if "state" in children2.keys():
-                                    if children2['state'] == 'invalidated':
+                                    if children2['state'] == validate:
                                         concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'],
-                                                         'state': 'invalidated'})
+                                                         'state': validate})
 
         return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                                              'validation': validation,
                                               'entity': entity,
                                               'concepts': concepts,
                                               'startDate': start_date,
@@ -1622,8 +1631,9 @@ def invalidateConcept(request):
         type = request.GET['type']
     else:
         return redirect('unknown')
-    if 'id' in request.GET:
+    if 'id' in request.GET and 'validation' in request.GET:
         id = request.GET['id']
+        validation = request.GET['validation']
     else:
         return redirect('unknown')
     if 'data' in request.GET:
@@ -1634,6 +1644,12 @@ def invalidateConcept(request):
         dateFrom = request.GET['from']
     if 'to' in request.GET:
         dateTo = request.GET['to']
+
+
+    if int(validation) == 0:
+        validate = 'validated'
+    elif int(validation) == 1:
+        validate = 'invalidated'
 
     # Connect to DB
     es = esConnector()
@@ -1667,26 +1683,26 @@ def invalidateConcept(request):
                 for children in entity['concepts']['children']:
                     if children['id'] == conceptId:
                         lab_tree = utils.appendToTree(children, entity, lab_tree)
-                        children['state'] = 'validated'
+                        children['state'] = validate
                     if 'children' in children:
                         for children1 in children['children']:
                             if children1['id'] == conceptId:
                                 if len(children['children']) == 1:
                                     lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                    children['state'] = 'validated'
+                                    children['state'] = validate
                                 lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                children1['state'] = 'validated'
+                                children1['state'] = validate
                             if 'children' in children1:
                                 for children2 in children1['children']:
                                     if children2['id'] == conceptId:
                                         if len(children['children']) == 1:
                                             lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                            children['state'] = 'validated'
+                                            children['state'] = validate
                                         if len(children1['children']) == 1:
                                             lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                            children1['state'] = 'validated'
+                                            children1['state'] = validate
                                         lab_tree = utils.appendToTree(children2, entity, lab_tree)
-                                        children2['state'] = 'validated'
+                                        children2['state'] = validate
 
             es.update(index=index, refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"concepts": entity['concepts']}})
@@ -1694,7 +1710,8 @@ def invalidateConcept(request):
             es.update(index=lab_index, refresh='wait_for', id=entity['labHalId'],
                       body={"doc": {"concepts": lab_tree}})
 
-    return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect('/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data
+                    + '&validation=' + validation)
 
 
 def validateCredentials(request):
