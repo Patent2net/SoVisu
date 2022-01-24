@@ -113,7 +113,7 @@ def index(request):
 @login_required
 def loggedin(request):
     if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL,))
+        return redirect('%s?next=%s' % settings.LOGIN_URL)
     elif request.user.is_authenticated:
         gugusse = request.user.get_username()
         gugusse = gugusse.replace(patternCas, '').lower()
@@ -361,7 +361,8 @@ def dashboard(request):
             }
         }
         # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
+        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
+        #  entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
 
     if type == "lab":
         hasToConfirm_param = {
@@ -456,22 +457,6 @@ def dashboard(request):
 
 
 def references(request):
-    """
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    if 'filter' in request.GET:
-        filter = request.GET['filter']
-    else:
-        filter = -1
-    # /
-    """
 
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
@@ -792,8 +777,7 @@ def references(request):
 def check(request):
     # Connect to DB
 
-    if request.user.is_authenticated:
-        if request.user.get_username() == 'visiteur':
+    if request.user.is_authenticated and request.user.get_username() == 'visiteur':
             return redirect('unknown')
 
     es = esConnector()
@@ -1065,8 +1049,7 @@ def check(request):
         concepts = []
         if 'children' in entity['concepts']:
             for children in entity['concepts']['children']:
-                if "state" in children.keys():
-                    if children['state'] == validate:
+                if "state" in children.keys()and children['state'] == validate:
                         concepts.append(
                             {'id': children['id'], 'label_fr': children['label_fr'], 'state': validate})
                 if 'children' in children:
@@ -1079,8 +1062,7 @@ def check(request):
                                 print(children1)
                         if 'children' in children1:
                             for children2 in children1['children']:
-                                if "state" in children2.keys():
-                                    if children2['state'] == validate:
+                                if "state" in children2.keys() and children2['state'] == validate:
                                         concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'],
                                                          'state': validate})
 
@@ -1247,11 +1229,10 @@ def search(request):
                                                'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'",
                                                'filter': search, 'index': index, 'search': search,
                                                'results': res_cleaned, 'from': dateFrom, 'to': dateTo,
-                                               'startDate': min_date, 'from': dateFrom, 'to': dateTo})
+                                               'startDate': min_date})
 
     return render(request, 'search.html',
-                  {'form': forms.search(), 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'from': dateFrom,
-                   'to': dateTo, 'filter': ''})
+                  {'form': forms.search(), 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'filter': ''})
 
 
 @xframe_options_exempt
@@ -1448,8 +1429,7 @@ def terminology(request):
         print(entity['concepts'])
 
     if type == "lab":
-        if 'children' in list(entity['concepts']):
-            for children in list(entity['concepts']['children']):
+        if 'children' in list(entity['concepts']) and children in list(entity['concepts']['children']):
                 if 'researchers' in children:
                     state = 'invalidated'
                     for rsr in children['researchers']:
@@ -1581,14 +1561,12 @@ def validateReferences(request):
 
 def validateGuidingDomains(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
@@ -1716,14 +1694,12 @@ def invalidateConcept(request):
 
 def validateCredentials(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
@@ -1767,14 +1743,12 @@ def validateCredentials(request):
 
 def validateGuidingKeywords(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
@@ -1812,14 +1786,12 @@ def validateGuidingKeywords(request):
 
 def validateResearchDescription(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
@@ -1872,11 +1844,8 @@ def validateResearchDescription(request):
 
 def refreshAureHalId(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
@@ -2116,18 +2085,7 @@ def presentation(request):
 
 
 def wordcloud(request):
-    """
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    # /
-    """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -2275,18 +2233,7 @@ def wordcloud(request):
 
 
 def publicationboard(request):
-    """
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    # /
-    """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -2506,14 +2453,12 @@ def contact(request):
 
 def forceUpdateReference(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'filter' in request.GET:
         data = request.GET['filter']
     else:
@@ -2549,11 +2494,8 @@ def forceUpdateReference(request):
 
 def updateMembers(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
@@ -2597,11 +2539,8 @@ import numpy as np
 
 def exportHceresXls(request):
     # Get parameters
-    if 'type' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'id' in request.GET:
         id = request.GET['id']
     else:
         return redirect('unknown')
@@ -2645,12 +2584,6 @@ def exportHceresXls(request):
             }
         }
     }
-
-    # {
-    #     "match": {
-    #         "validated": True
-    #     }
-    # },
 
     count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
     references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
