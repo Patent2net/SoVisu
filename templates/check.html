@@ -1125,6 +1125,9 @@
                 $('.dataTables_info').addClass('flex justify-between w-full pr-2');
             });
 
+
+            {% if data == "state" %}
+
             var researchers = JSON.parse(document.querySelector('.researchers-json').textContent)
 
             var getObjectByValue = function (array, key, value) {
@@ -1170,6 +1173,8 @@
                 form.appendTo('body').hide()
                 form.submit();
             });
+
+            {% endif %}
 
             $('.validate').click(function () {
                 toValidate = []
