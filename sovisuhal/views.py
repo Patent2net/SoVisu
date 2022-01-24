@@ -1963,13 +1963,7 @@ def tools(request):
     es = esConnector()
 
     # Get scope informations
-    if type == "rsr":
-        field = "_id"
-        key = 'halId_s'
-        search_id = "*"
-        index_pattern = "-researchers"
-
-    elif type == "lab":
+    if type == "lab":
         field = "halStructId"
         key = "halStructId"
         search_id = id
@@ -1988,28 +1982,6 @@ def tools(request):
     # /
 
     hasToConfirm = False
-
-    if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-        # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
 
     if type == "lab":
         hasToConfirm_param = {
@@ -2037,30 +2009,7 @@ def tools(request):
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
-    if type == "rsr":
-        try:
-            start_date_param = {
-                "size": 1,
-                "sort": [
-                    {"submittedDate_tdate": {"order": "asc"}}
-                ],
-                "query": {
-                    "match_all": {}
-                }
-                # "query": {
-                #     "match_phrase": {"harvested_from_ids": entity['halId_s']}
-                # }
-            }
-            res = es.search(
-                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                body=start_date_param)
-        except:
-            start_date_param.pop("sort")
-            res = es.search(
-                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                body=start_date_param)
-
-    elif type == "lab":
+    if type == "lab":
         start_date_param = {
             "size": 1,
             "sort": [
@@ -2095,7 +2044,21 @@ def tools(request):
     else:
         data = "hceres"
 
-    print(data)
+    rsr_param = {
+        "query": {
+            "match": {
+                "labHalId": id
+            }
+        }
+    }
+    count = es.count(index=structId + "*-researchers", body=rsr_param)['count']
+
+    rsrs = es.search(index=structId + "-*-researchers", body=rsr_param, size=count)
+
+    rsrs_cleaned = []
+
+    for result in rsrs['hits']['hits']:
+        rsrs_cleaned.append(result['_source'])
 
     if (data == "hceres" or data == -1):
         return render(request, 'tools.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
@@ -2103,6 +2066,7 @@ def tools(request):
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
                                               'key': entity[key],
+                                              'researchers': rsrs_cleaned,
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -2581,7 +2545,8 @@ def updateMembers(request):
             try:
                 entity = res['hits']['hits'][0]['_source']
             except:
-                return redirect('unknown')
+                return redirect(
+                    '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
             es.update(index=structId + '-' + entity['labHalId'] + "-researchers",
                       refresh='wait_for', id=entity['ldapId'],
@@ -2618,6 +2583,16 @@ def exportHceresXls(request):
         entity = res['hits']['hits'][0]['_source']
     except:
         return redirect('unknown')
+
+    toProcess = json.loads(request.POST.get("toProcess", ""))
+    print(toProcess)
+    toProcess_extra_cleaned = []
+    toProcess_extra = request.POST.get("toProcess_extra", "").splitlines()
+    for line in toProcess_extra:
+        values = line.split(";")
+        toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1], "function": values[2], "scope": values[3]})
+
+    print(toProcess_extra_cleaned)
 
     ref_param = {
         "query": {
@@ -2681,9 +2656,6 @@ def exportHceresXls(request):
         hdr_df["defenseDateY_i"] = " "
     if not (book_df.columns == 'isbn_s').any():
         book_df["isbn_s"] = ""
-
-    pd.set_option('display.max_columns', None)
-    print(book_df.head(10))
 
     output = IO()
 
