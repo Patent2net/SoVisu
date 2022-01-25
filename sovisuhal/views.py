@@ -303,48 +303,19 @@ def dashboard(request):
 
     hasToConfirm = False
 
+    validate = False
     if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        field = "authIdHal_s"
+        hasToConfirm_param = esActions.confirm_p(field,entity['halId_s'],validate)
+
         # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
         #  entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
 
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "labStructId_i": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        field = "labStructId_i"
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
@@ -495,48 +466,18 @@ def references(request):
     # /
 
     hasToConfirm = False
-
+    field = "harvested_from_ids"
+    validate = False
     if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+
+        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+
         if es.count(index=structId + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                     body=hasToConfirm_param)['count'] > 0:
             hasToConfirm = True
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
         if es.count(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=hasToConfirm_param)[
             'count'] > 0:
@@ -694,48 +635,18 @@ def check(request):
     # /
 
     hasToConfirm = False
-
+    validate = False
     if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "authIdHal_s": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        field = "authIdHal_s"
+        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+
         # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
 
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "labStructId_i": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        field = "labStructId_i"
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
@@ -1078,45 +989,17 @@ def terminology(request):
 
     hasToConfirm = False
 
+    validate = False
+    field = "harvested_from_ids"
+
     if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+
+        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
 
     if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -1699,25 +1582,11 @@ def tools(request):
 
     hasToConfirm = False
 
+    validate =False
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "labStructId_i": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        field = "labStructId_i"
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
@@ -1845,45 +1714,15 @@ def wordcloud(request):
 
     hasToConfirm = False
 
+    field = "harvested_from_ids"
+    validate = False
     if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+
 
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -1982,45 +1821,14 @@ def publicationboard(request):
 
     hasToConfirm = False
 
+    field = "harvested_from_ids"
+    validate = False
     if type == "rsr":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halId_s']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+
 
     if type == "lab":
-        hasToConfirm_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "harvested_from_ids": entity['halStructId']
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": False
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
     if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True

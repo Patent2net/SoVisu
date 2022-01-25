@@ -112,7 +112,7 @@ def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, 
 
 
 def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
-              scope_date_to):
+                 scope_date_to):
     if filter == "uncomplete":
         ref_param = {
             "query": {
@@ -216,4 +216,28 @@ def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, da
         ref_param = ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
                           scope_date_to)
     return ref_param
+
+
 # ref_param = esActions.ref_p_alt(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
+
+
+def confirm_p(scope_field, scope_value, validate):
+    has_to_confirm_param = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match_phrase": {
+                            scope_field: scope_value
+                        }
+                    },
+                    {
+                        "match": {
+                            "validated": validate
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    return has_to_confirm_param
