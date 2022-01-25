@@ -64,6 +64,7 @@ def date_all():
     }
     return start_date_param
 
+
 def date_p(scope_field, scope_value):
     start_date_param = {
         "size": 1,
@@ -75,3 +76,144 @@ def date_p(scope_field, scope_value):
         }
     }
     return start_date_param
+
+
+def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from, scope_date_to):
+    ref_param = {
+        "query": {
+            "bool": {
+                scope_bool_type: [
+                    {
+                        "match_phrase": {
+                            scope_field: scope_value
+                        }
+                    },
+                    {
+                        "match": {
+                            "validated": validate
+                        }
+                    },
+                    {
+                        "range": {
+                            date_range_type: {
+                                "gte": scope_date_from,
+                                "lt": scope_date_to
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    return ref_param
+
+
+# ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
+
+
+def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
+              scope_date_to):
+    if filter == "uncomplete":
+        ref_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "match_phrase": {
+                                            scope_field: scope_value,
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "validated": validate,
+                                        }
+                                    },
+                                    {
+                                        "range": {
+                                            "submittedDate_tdate": {
+                                                "gte": scope_date_from,
+                                                "lt": scope_date_to
+                                            }
+                                        }
+                                    },
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "must_not": [
+                                    {
+                                        "exists": {
+                                            "field": "fileMain_s"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "*_abstract_s"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+    elif filter == "complete":
+        ref_param = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "match_phrase": {
+                                            scope_field: scope_value,
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "validated": validate,
+                                        }
+                                    },
+                                    {
+                                        "range": {
+                                            "submittedDate_tdate": {
+                                                "gte": scope_date_from,
+                                                "lt": scope_date_to
+                                            }
+                                        }
+                                    },
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "exists": {
+                                            "field": "fileMain_s"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "*_abstract_s"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    else:
+        ref_param = ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
+                          scope_date_to)
+    return ref_param
+# ref_param = esActions.ref_p_alt(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
