@@ -543,144 +543,11 @@ def references(request):
             hasToConfirm = True
 
     # Get references
-    ref_param = {
-        "query": {
-            "bool": {
-                "filter": [
-                    {
-                        "match_phrase": {
-                            ext_key: entity[key]
-                        }
-                    },
-                    {
-                        "match": {
-                            "validated": True
-                        }
-                    },
-                    {
-                        "range": {
-                            "submittedDate_tdate": {
-                                "gte": dateFrom,
-                                "lt": dateTo
-                            }
-                        }
-                    }
-                ]
-            }
-        }
-    }
-
-    if filter == "uncomplete":
-        ref_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "match_phrase": {
-                                            "validated": True,
-                                        }
-                                    },
-                                    {
-                                        "match_phrase": {
-                                            ext_key: entity[key],
-                                        }
-                                    },
-                                    {
-                                        "range": {
-                                            "submittedDate_tdate": {
-                                                "gte": dateFrom,
-                                                "lt": dateTo
-                                            }
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "exists": {
-                                                        "field": "fileMain_s"
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "exists": {
-                                                        "field": "*_abstract_s"
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-
-    if filter == "complete":
-        ref_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "match_phrase": {
-                                            "validated": True,
-                                        }
-                                    },
-                                    {
-                                        "match_phrase": {
-                                            ext_key: entity[key]
-                                        }
-                                    },
-                                    {
-                                        "range": {
-                                            "submittedDate_tdate": {
-                                                "gte": dateFrom,
-                                                "lt": dateTo
-                                            }
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "exists": {
-                                            "field": "fileMain_s"
-                                        }
-                                    },
-                                    {
-                                        "exists": {
-                                            "field": "*_abstract_s"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+    scope_bool_type = "filter"
+    validate = True
+    date_range_type = "submittedDate_tdate"
+    ref_param = esActions.ref_p_filter(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom,
+                                    dateTo)
 
     if type == "rsr":  # I hope this is a focused search :-/
         count = es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
@@ -1028,33 +895,9 @@ def check(request):
             validate = False
         else:
             return redirect('unknown')
-
-        ref_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                ext_key: entity[key]
-                            }
-                        },
-                        {
-                            "match": {
-                                "validated": validate
-                            }
-                        },
-                        {
-                            "range": {
-                                "submittedDate_tdate": {
-                                    "gte": dateFrom,
-                                    "lt": dateTo
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+        date_range_type = "submittedDate_tdate"
+        scope_bool_type = "must"
+        ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
 
         if type == "rsr":  # I hope this is a focused search :-/
             count = \
@@ -2406,33 +2249,12 @@ def exportHceresXls(request):
     #     toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1], "function": values[2], "scope": values[3]})
     #
     # toProcess.extend(toProcess_extra_cleaned)
-
-    ref_param = {
-        "query": {
-            "bool": {
-                "filter": [
-                    {
-                        "match_phrase": {
-                            ext_key: entity[key]
-                        }
-                    },
-                    {
-                        "match": {
-                            "validated": True
-                        }
-                    },
-                    {
-                        "range": {
-                            "publicationDate_tdate": {
-                                "gte": "2016-01-01",
-                                "lt": "2021-12-31"
-                            }
-                        }
-                    }
-                ]
-            }
-        }
-    }
+    scope_bool_type = "filter"
+    validate = True
+    date_range_type = "publicationDate_tdate"
+    dateFrom = "2016-01-01"
+    dateTo = "2021-12-31"
+    ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
 
     count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
     references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
