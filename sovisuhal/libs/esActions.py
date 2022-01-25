@@ -30,7 +30,7 @@ def esConnector(mode=mode):
     return es
 
 
-# Elastic generic query call
+# Elastic match query call
 def scope_all():
     scope = {
         "query": {
@@ -50,4 +50,28 @@ def scope_p(scope_field, scope_value):
     }
     return scope
 
-# Elastic generic query call
+
+def date_all():
+    start_date_param = {
+        "size": 1,
+        "sort": [
+            {"submittedDate_tdate": {"order": "asc"}}
+        ],
+        "query": {
+            "match_all": {}
+        }
+
+    }
+    return start_date_param
+
+def date_p(scope_field, scope_value):
+    start_date_param = {
+        "size": 1,
+        "sort": [
+            {"submittedDate_tdate": {"order": "asc"}}
+        ],
+        "query": {
+            "match_phrase": {scope_field: scope_value}
+        }
+    }
+    return start_date_param
