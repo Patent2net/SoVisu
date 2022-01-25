@@ -31,3 +31,4 @@ nested-lookup==0.2.22
 django-tinymce
 ldap3
 pandas==1.3.5
+openpyxl
