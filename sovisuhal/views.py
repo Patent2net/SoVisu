@@ -19,6 +19,8 @@ from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
 from .libs import utils, libsElastichal
 from .libs import halConcepts
 
+from .libs import esActions
+
 # from celery.result import AsyncResult
 
 # from ssl import create_default_context
@@ -45,36 +47,6 @@ except:
 # struct = "198307662"
 
 
-def esConnector(mode=mode):
-    if mode == "Prod":
-
-        secret = config('ELASTIC_PASSWORD')
-        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch('localhost',
-                           http_auth=('elastic', secret),
-                           scheme="http",
-                           port=9200,
-                           # ssl_context=context,
-                           timeout=10)
-    else:
-        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-    return es
-
-
-# Elastic generic query call
-def scope_p(scope_field, scope_value):
-    scope = {
-        "query": {
-            "match": {
-                scope_field: scope_value
-            }
-        }
-    }
-    return scope
-# Elastic generic query call
-
-
-
 
 @login_required
 def index(request):
@@ -94,10 +66,10 @@ def index(request):
             # gugusse = request.user.get_username()
             gugusse = gugusse.replace(patternCas, '').lower()
             # check présence gugusse
-            es = esConnector()
+            es = esActions.esConnector()
 
             field = "_id"
-            scope_param = scope_p(field, gugusse)
+            scope_param = esActions.scope_p(field, gugusse)
 
             count = es.count(index="*-researchers", body=scope_param)['count']
             if count > 0:
@@ -127,10 +99,10 @@ def loggedin(request):
             # gugusse = request.user.get_username()
 
             # check présence gugusse
-            es = esConnector()
+            es = esActions.esConnector()
 
             field = "_id"
-            scope_param = scope_p(field, gugusse)
+            scope_param = esActions.scope_p(field, gugusse)
 
             count = es.count(index=structId + "*-researchers", body=scope_param)['count']
             if count > 0:
@@ -232,14 +204,10 @@ def cs_index(request):
     # /
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     if type == "lab":
-        scope_param = {
-            "query": {
-                "match_all": {}
-            }
-        }
+        scope_param = esActions.scope_all()
 
         count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
         res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
@@ -248,18 +216,14 @@ def cs_index(request):
     elif type == "rsr":
 
         if id == -1:
-            scope_param = {
-                "query": {
-                    "match_all": {}
-                }
-            }
+            scope_param = esActions.scope_all()
 
             count = es.count(index=structId + "*-researchers", body=scope_param)['count']
             res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
         else:
 
             field = "labHalId"
-            scope_param = scope_p(field, id)
+            scope_param = esActions.scope_p(field, id)
 
             count = es.count(index=structId + "-" + id + "-researchers", body=scope_param)['count']
 
@@ -311,7 +275,7 @@ def dashboard(request):
 
     # /
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "rsr":
@@ -328,7 +292,7 @@ def dashboard(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -493,7 +457,7 @@ def references(request):
 
     # /
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "rsr":
@@ -510,7 +474,7 @@ def references(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -780,7 +744,7 @@ def check(request):
     if request.user.is_authenticated and request.user.get_username() == 'visiteur':
             return redirect('unknown')
 
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
@@ -838,7 +802,7 @@ def check(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -1173,7 +1137,7 @@ def check(request):
 
 def search(request):
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     date_param = {
         "aggs": {
@@ -1197,7 +1161,7 @@ def search(request):
     if request.method == 'POST':
 
         # Connect to DB
-        es = esConnector()
+        es = esActions.esConnector()
 
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
@@ -1288,7 +1252,7 @@ def terminology(request):
     # /
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "rsr":
@@ -1305,7 +1269,7 @@ def terminology(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -1513,11 +1477,11 @@ def validateReferences(request):
         validate = False
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
   # Get scope informations
     if type == "rsr":
-        scope_param = scope_p("_id", id)
+        scope_param = esActions.scope_p("_id", id)
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
         try:
@@ -1540,7 +1504,7 @@ def validateReferences(request):
                     pass  # doc du chercheur pas dans le labo
 
     if type == "lab":
-        scope_param = scope_p("_id", id)
+        scope_param = esActions.scope_p("_id", id)
 
         res = es.search(index=structId + "-*-laboratories", body=scope_param)
         try:
@@ -1577,14 +1541,14 @@ def validateGuidingDomains(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     if request.method == 'POST':
 
         toValidate = request.POST.get("toValidate", "").split(',')
 
         if type == "rsr":
-            scope_param = scope_p("_id", id)
+            scope_param = esActions.scope_p("_id", id)
 
             res = es.search(index=structId + "-*-researchers", body=scope_param)
             try:
@@ -1630,11 +1594,11 @@ def invalidateConcept(request):
         validate = 'invalidated'
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "rsr":
-        scope_param = scope_p("_id", id)
+        scope_param = esActions.scope_p("_id", id)
 
 
         res = es.search(index=structId + "-*-researchers", body=scope_param)
@@ -1647,7 +1611,7 @@ def invalidateConcept(request):
         lab_index = structId + '-' + entity['labHalId'] + '-laboratories'
 
         # get tree from lab
-        lab_scope_param = scope_p("_id", entity['labHalId'])
+        lab_scope_param = esActions.scope_p("_id", entity['labHalId'])
 
         res = es.search(index=structId + "*-laboratories", body=lab_scope_param)
         entity_lab = res['hits']['hits'][0]['_source']
@@ -1710,7 +1674,7 @@ def validateCredentials(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     if request.method == 'POST':
 
@@ -1718,7 +1682,7 @@ def validateCredentials(request):
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
 
-            scope_param = scope_p("_id", id)
+            scope_param = esActions.scope_p("_id", id)
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
             try:
@@ -1759,14 +1723,14 @@ def validateGuidingKeywords(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     if request.method == 'POST':
 
         guidingKeywords = request.POST.get("f_guidingKeywords").split(";")
 
         if type == "rsr":
-            scope_param = scope_p("_id", id)
+            scope_param = esActions.scope_p("_id", id)
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
             try:
@@ -1802,7 +1766,7 @@ def validateResearchDescription(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     if request.method == 'POST':
 
@@ -1822,7 +1786,7 @@ def validateResearchDescription(request):
         research_projectsAndFundings_raw = soup.getText().replace("\n", " ")
 
         if type == "rsr":
-            scope_param = scope_p("_id", id)
+            scope_param = esActions.scope_p("_id", id)
 
             res = es.search(index=structId + "*-researchers", body=scope_param)
             try:
@@ -1859,9 +1823,9 @@ def refreshAureHalId(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
-    scope_param = scope_p("_id", id)
+    scope_param = esActions.scope_p("_id", id)
 
     res = es.search(index=structId + "*-researchers", body=scope_param)
     try:
@@ -1929,7 +1893,7 @@ def tools(request):
 
     # /
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "lab":
@@ -1940,7 +1904,7 @@ def tools(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -2078,7 +2042,7 @@ def wordcloud(request):
     # /
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "rsr":
@@ -2095,7 +2059,7 @@ def wordcloud(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -2227,7 +2191,7 @@ def publicationboard(request):
     # /
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # Get scope informations
     if type == "rsr":
@@ -2244,7 +2208,7 @@ def publicationboard(request):
 
     ext_key = "harvested_from_ids"
 
-    scope_param = scope_p(field, id)
+    scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=structId + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
@@ -2436,13 +2400,13 @@ def forceUpdateReference(request):
         validation = request.GET['validation']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     # if request.method == 'POST':
     # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
 
     if type == "rsr":
-        scope_param = scope_p("_id", id)
+        scope_param = esActions.scope_p("_id", id)
 
         res = es.search(index=structId + "*-researchers", body=scope_param)
         try:
@@ -2474,14 +2438,14 @@ def updateMembers(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esConnector()
+    es = esActions.esConnector()
 
     if request.method == 'POST':
         toUpdate = request.POST.get("toUpdate", "").split(",")
 
         for element in toUpdate:
             element = element.split(":")
-            scope_param = scope_p("_id", element[0])
+            scope_param = esActions.scope_p("_id", element[0])
 
             res = es.search(index=structId + "-*-researchers", body=scope_param)
             try:
@@ -2510,12 +2474,12 @@ def exportHceresXls(request):
     else:
         return redirect('unknown')
 
-    scope_param = scope_p("halStructId", id)
+    scope_param = esActions.scope_p("halStructId", id)
 
     key = "halStructId"
     ext_key = "harvested_from_ids"
 
-    es = esConnector()
+    es = esActions.esConnector()
 
     res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
     try:
@@ -2572,7 +2536,7 @@ def exportHceresXls(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
 
-    sort_results = hceres.sortReferences(references_cleaned, esConnector())
+    sort_results = hceres.sortReferences(references_cleaned, esActions.esConnector())
 
     art_df = sort_results[0]
     book_df = sort_results[1]

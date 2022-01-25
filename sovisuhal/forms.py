@@ -3,6 +3,7 @@ from django.forms import models
 from elasticsearch import Elasticsearch
 from decouple import config
 
+from .libs import esActions
 
 try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -15,20 +16,6 @@ except:
     structId = "198307662"  # UTLN
 
 #struct = "198307662"
-
-def esConnector(mode = mode):
-    if mode == "Prod":
-        secret = config ('ELASTIC_PASSWORD')
-        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch('localhost',
-                           http_auth=('elastic', secret),
-                           scheme="http",
-                           port=9200,
-                           # ssl_context=context,
-                           timeout=10)
-    else:
-        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-    return es
 
 class CreateCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
@@ -43,20 +30,13 @@ class CreateCredentials(forms.Form):
     f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594')
     # f_more = forms.CharField(label='autres')
 
-    es = esConnector()
+    es = esActions.esConnector()
 
-    scope_param = {
-        "query": {
-            "match_all": {}
-        }
-    }
+    scope_param = esActions.scope_all()
 
     count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
-    scope_param = {
-        "query": {
-            "match_all": {}
-        } # ,  "fields": [ "acronym", "label", "idRef", "halStructId"]
-    }
+    scope_param = esActions.scope_all()
+
     res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
     entities = res['hits']['hits']
     ##harvested_from_label.keyword
