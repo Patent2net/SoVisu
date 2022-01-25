@@ -6,6 +6,11 @@ from sovisuhal.libs import utils, hal, unpaywall
 from elasticsearch import Elasticsearch, helpers
 import json
 import datetime
+
+from . import esActions
+
+
+
 try:
     from decouple import config
     from ldap3 import Server, Connection, ALL
@@ -23,27 +28,10 @@ except:
 
 #struct = "198307662"
 
-def esConnector(mode = mode):
-    if mode == "Prod":
-
-        secret = config ('ELASTIC_PASSWORD')
-        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch('localhost',
-                           http_auth=('elastic', secret),
-                           scheme="http",
-                           port=9200,
-                           # ssl_context=context,
-                           timeout=10)
-    else:
-        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-    return es
-
-
-
 
 #@shared_task(bind=True)
 def indexe_chercheur (ldapId, laboAccro, labHalId, idhal, idRef, orcId): #self,
-    es = esConnector()
+    es = esActions.esConnector()
  #   progress_recorder = ProgressRecorder(self)
  #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
     if mode =="Prod":
@@ -152,14 +140,10 @@ def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
     #for row in csv_reader:
         row = dict()
         # print(row['acronym'])
-        es = esConnector(mode)
-        rsr_param = {
-            "query": {
-                "match": {
-                    "labHalId": labHalId# row["halStructId"]
-                }
-            }
-        }
+        es = esActions.esConnector(mode)
+        field = "labHalId"
+        rsr_param =esActions.scope_p(field, labHalId)
+
         res = es.search(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers", body=rsr_param)
         # tous ces champs (lignes qui suit) sont là (ligne précédente à adapter) ou dans structSirene + "-" +labHalId + "-" + ldapId +"-researchers" ?
         # structSirene, ldapId, name, type, function, mail, lab, supannAffectation, supannEntiteAffectationPrincipale, halId_s, labHalId, idRef, structDomain, firstName, lastName, aurehalId
@@ -216,7 +200,7 @@ def collecte_docs( Chercheur): #self,
     init = False
 
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
-    es = esConnector()
+    es = esActions.esConnector()
   #  progress_recorder = ProgressRecorder(self)
   #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
@@ -271,13 +255,8 @@ def collecte_docs( Chercheur): #self,
         doc ['Created'] = datetime.datetime.now().isoformat()
 
         if not init:
-            doc_param = {
-                "query": {
-                    "match": {
-                        "_id": doc["_id"]
-                    }
-                }
-            }
+            field = "_id"
+            doc_param = esActions.scope_p(field, doc["_id"])
 
             if not es.indices.exists(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" +
                                            Chercheur["ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
