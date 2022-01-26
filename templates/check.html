@@ -346,18 +346,18 @@
                         collaborations.</p>
                 </div>
 
-                    <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+                <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
 
-                            <a class="px-2 pb-1
+                    <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
-                            >Expertises validées</a>
-                            <a class="px-2 pb-1
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+                    >Expertises validées</a>
+                    <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
-                            >Expertises retirées</a>
+                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
+                    >Expertises retirées</a>
 
-                    </div>
+                </div>
 
 
 
@@ -633,8 +633,11 @@
                             <th>URL</th>
                             <th>Année</th>
                             <th>Titre</th>
+                            {% if validation == "1" and type == "rsr" %}
+                                <th>Paternité</th>
+                            {% endif %}
                             <th>label_bibtex</th>
-                            <th>docid</th>
+                            <th class="hidden">docid</th>
                         </tr>
                         </thead>
 
@@ -645,8 +648,18 @@
                                 <td class="whitespace-nowrap">{{ ref.halId_s }}</td>
                                 <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
                                 <td>{{ ref.title_s.0 | safe }}</td>
+                                {% if validation == "1" and type == "rsr" %}
+                                    <td>
+                                        <select class="border border-gray-300 author" name="authorship" id="authorship">
+                                            <option value="">Aucune information</option>
+                                            <option value="firstAuthor">Premier auteur</option>
+                                            <option value="lastAuthor">Dernier auteur</option>
+                                            <option value="correspondingAuthor">Corresponding auteur</option>
+                                        </select>
+                                    </td>
+                                {% endif %}
                                 <td>{{ ref.label_bibtex }}</td>
-                                <td>{{ ref.docid }}</td>
+                                <td class="docid hidden">{{ ref.docid }}</td>
                             </tr>
                         {% endfor %}
 
@@ -656,8 +669,30 @@
 
                 </div>
 
+                {% if validation == "1" and type == "rsr" %}
+
+                {% endif %}
+
+                <div class="hidden references-json">{{ references|json_script:"references" }}</div>
+                <div class="hidden halId_s">{{ entity.halId_s|safe }}</div>
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
+                    {% if validation == "1" %}
+                        <form action="/update_authorship/?type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
+                            {% csrf_token %}
+                            <input id="toProcess" name="toProcess" class="hidden"/>
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            {% for field in form.visible_fields %}
+                                <div>
+                                    <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                                    {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                                </div>
+                            {% endfor %}
+                            <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour">
+                        </form>
+                    {% endif %}
                     <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
                         {% if validation == "1" %}
                             Retirer du profil
@@ -713,15 +748,11 @@
             sel_role = document.querySelector('#id_f_role')
             sel_role.addEventListener("change", function () {
                 if (sel_role.value == 'chercheur') {
-                    console.log('a')
-                    console.log(slides.length)
                     for (var i = 0; i < slides.length; i++) {
                         console.log(slides.item(i));
                         slides.item(i).style.display = "block";
                     }
                 } else {
-                    console.log('b')
-                    console.log(slides.length)
                     for (var i = 0; i < slides.length; i++) {
                         console.log(slides.item(i));
                         slides.item(i).style.display = "none";
@@ -981,9 +1012,108 @@
 
     {% endif %}
 
-    {% if data == "references" or data == "expertise" or data == "state"%}
+    {% if data == "references" or data == "expertise" or data == "state" %}
 
         /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
+
+        {% if validation == "1" and type == "rsr" %}
+
+            var references = JSON.parse(document.querySelector(".references-json").textContent)
+
+            var getObjectByValue = function (array, key, value) {
+                return array.filter(function (object) {
+                    return object[key] === value;
+                });
+            };
+
+            var table = document.getElementById("references");
+            console.log(references);
+            for (let i in table.rows) {
+                try {
+                    let row = table.rows[i]
+                    let curr_rsr = getObjectByValue(references, "docid", parseInt(row.cells[5].textContent));
+                    if (curr_rsr[0].authorship) {
+                        let curr_val = getObjectByValue(curr_rsr[0].authorship, "halId_s", document.querySelector(".halId_s").textContent);
+                        row.cells[3].querySelector('#authorship').value = curr_val[0].authorship;
+                    } else {
+                        row.cells[3].querySelector('#authorship').value = "";
+                    }
+                } catch (error) {
+                }
+            }
+
+
+            refUpdated = []
+
+            const elements = document.querySelectorAll('select#authorship');
+            Array.from(elements).forEach((element, index) => {
+
+                element.onchange = (event) => {
+                    let val = event.target.value;
+                    let docid = element.parentNode.parentNode.querySelector(".docid").textContent;
+
+                    refUpdated.push({'docid': docid, 'authorship': val, author: '{{ entity.ldapId|safe }}'});
+
+                    document.querySelector("#toProcess").value = JSON.stringify(refUpdated);
+                }
+            });
+
+            cols = [
+                {
+                    "targets": [1],
+                    "className": "text-center",
+                },
+                {
+                    "targets": [2],
+                    "orderable": false
+                },
+                {
+                    "targets": [0],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                        }
+                        return data;
+                    },
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [4],
+                    "visible": false
+                }
+            ]
+        {% else %}
+            cols = [
+                {
+                    "targets": [1],
+                    "className": "text-center",
+                },
+                {
+                    "targets": [2],
+                    "orderable": false
+                },
+                {
+                    "targets": [0],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                        }
+                        return data;
+                    },
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [3],
+                    "visible": false
+                },
+                {
+                    "targets": [4],
+                    "visible": false
+                }
+            ]
+        {% endif %}
 
         $(document).ready(function () {
             var table = $('#references').DataTable(
@@ -1007,35 +1137,7 @@
                             }
                         }
                     ],
-                    "columnDefs": [
-                        {
-                            "targets": [1],
-                            "className": "text-center",
-                        },
-                        {
-                            "targets": [2],
-                            "orderable": false
-                        },
-                        {
-                            "targets": [0],
-                            "render": function (data, type, row, meta) {
-                                if (type === 'display') {
-                                    data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                                }
-                                return data;
-                            },
-                            "className": "text-center",
-                            "orderable": false
-                        },
-                        {
-                            "targets": [3],
-                            "visible": false
-                        },
-                        {
-                            "targets": [4],
-                            "visible": false
-                        }
-                    ],
+                    "columnDefs": cols,
                     scrollResize: true,
                     scrollY: 100,
                     scrollCollapse: true,
@@ -1113,6 +1215,7 @@
                     buttons: [],
                     "columnDefs": [
                         {
+
                             "targets": [2],
                             "render": function (data, type, row, meta) {
                                 if (data === 'True') {
@@ -1199,7 +1302,12 @@
             $('.validate').click(function () {
                 toValidate = []
                 table.rows('.selected').data().map(function (row) {
-                    toValidate.push(row[4])
+
+                    {% if validation == "1" and type == "rsr" %}
+                        toValidate.push(row[5])
+                    {% else %}
+                        toValidate.push(row[4])
+                    {% endif %}
                 });
 
                 var form = $('<form action="/validate_references/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +

@@ -2022,6 +2022,56 @@ def updateMembers(request):
         '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
+def updateAuthorship(request):
+    # Get parameters
+    if 'type' in request.GET and 'id' in request.GET:
+        type = request.GET['type']
+        id = request.GET['id']
+    else:
+        return redirect('unknown')
+
+    if 'data' in request.GET:
+        data = request.GET['data']
+    else:
+        data = -1
+    if 'from' in request.GET:
+        dateFrom = request.GET['from']
+    if 'to' in request.GET:
+        dateTo = request.GET['to']
+
+    # Connect to DB
+    es = esActions.esConnector()
+
+    scope_param = esActions.scope_p("ldapId", id)
+
+    key = "ldapId"
+    ext_key = "harvested_from_ids"
+
+    es = esActions.esConnector()
+
+    res = es.search(index=structId + "-" + "*" + "-researchers", body=scope_param)
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
+
+    toProcess = json.loads(request.POST.get("toProcess", ""))
+
+    for doc in toProcess:
+
+        authorship = [
+            {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
+        ]
+
+
+        es.update(index=structId + '-' + entity['labHalId'] + "-researchers-" + entity["ldapId"] + '-documents',
+                  refresh='wait_for', id=doc['docid'],
+                  body={"doc": {"authorship": authorship}})
+
+    return redirect(
+        '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data + "&validation=1")
+
+
 import pandas as pd
 from io import BytesIO as IO
 import numpy as np
