@@ -46,6 +46,7 @@ urlpatterns = [
     path('CreateCredentials/', views.CreateCredentials, name='credentials'),
     path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
     path('refresh-aurehal-id/', views.refreshAureHalId, name='refresh-aurehal-id'),
+    path('update_authorship/', views.updateAuthorship, name='update_authorship'),
     path('update_members/', views.updateMembers, name='update_members'),
     path('validate_references/', views.validateReferences, name='validate_references'),
     path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
