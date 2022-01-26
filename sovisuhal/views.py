@@ -2067,22 +2067,27 @@ def updateAuthorship(request):
         doc_param = {
             "query": {
                 "match": {
-                    "_id": doc["_id"]
+                    "_id": doc["docid"]
                 }
             }
         }
 
         res = es.search(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity["ldapId"] + "-documents", body=doc_param)
 
-        if "autorship" in res['hits']['hits'][0]['_source']:
-            authorship = res['hits']['hits'][0]['_source']["authorship"]
-            exists = False
-            for author in authorship:
-                if author["halId_s"] == entity["halId_s"]:
-                    exists = True
-                    author["authorship"] = doc["authorship"]
-            if not exists:
-                authorship.append({"authorship": doc["authorship"], "halId_s": entity['halId_s']})
+        if len(res['hits']['hits']) > 0:
+            if "autorship" in res['hits']['hits'][0]['_source']:
+                authorship = res['hits']['hits'][0]['_source']["authorship"]
+                exists = False
+                for author in authorship:
+                    if author["halId_s"] == entity["halId_s"]:
+                        exists = True
+                        author["authorship"] = doc["authorship"]
+                if not exists:
+                    authorship.append({"authorship": doc["authorship"], "halId_s": entity['halId_s']})
+            else:
+                authorship = [
+                    {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
+                ]
         else:
             authorship = [
                 {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
@@ -2096,7 +2101,7 @@ def updateAuthorship(request):
         doc_param = {
             "query": {
                 "match": {
-                    "_id": doc["_id"]
+                    "_id": doc["docid"]
                 }
             }
         }
@@ -2104,23 +2109,31 @@ def updateAuthorship(request):
         res = es.search(index=structId + "-" + entity["labHalId"] + "-laboratories-documents",
                         body=doc_param)
 
-        if "autorship" in res['hits']['hits'][0]['_source']:
-            authorship = res['hits']['hits'][0]['_source']["authorship"]
-            exists = False
-            for author in authorship:
-                if author["halId_s"] == entity["halId_s"]:
-                    exists = True
-                    author["authorship"] = doc["authorship"]
-            if not exists:
-                authorship.append({"authorship": doc["authorship"], "halId_s": entity['halId_s']})
-        else:
-            authorship = [
-                {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
-            ]
+        try:
+            if len(res['hits']['hits']) > 0:
+                if "autorship" in res['hits']['hits'][0]['_source']:
+                    authorship = res['hits']['hits'][0]['_source']["authorship"]
+                    exists = False
+                    for author in authorship:
+                        if author["halId_s"] == entity["halId_s"]:
+                            exists = True
+                            author["authorship"] = doc["authorship"]
+                    if not exists:
+                        authorship.append({"authorship": doc["authorship"], "halId_s": entity['halId_s']})
+                else:
+                    authorship = [
+                        {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
+                    ]
+            else:
+                authorship = [
+                    {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
+                ]
 
-        es.update(index=structId + '-' + entity['labHalId'] + "-laboratories-documents",
-                  refresh='wait_for', id=doc['docid'],
-                  body={"doc": {"authorship": authorship}})
+            es.update(index=structId + '-' + entity['labHalId'] + "-laboratories-documents",
+                      refresh='wait_for', id=doc['docid'],
+                      body={"doc": {"authorship": authorship}})
+        except:
+            print("docid " + str(doc["docid"]) + " non trouvé dans l'index des labs...")
 
     return redirect(
         '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data + "&validation=1")
