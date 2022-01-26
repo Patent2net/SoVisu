@@ -268,6 +268,8 @@ def collecte_docs( Chercheur): #self,
 
             if len(res['hits']['hits']) > 0:
                 doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                if 'authorship' in res['hits']['hits'][0]['_source']:
+                    doc['authorship'] = res['hits']['hits'][0]['_source']['authorship']
 
                 if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
                     doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
