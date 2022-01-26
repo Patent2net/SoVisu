@@ -56,6 +56,7 @@ class validCredentials(forms.Form):
         halId_s = kwargs.pop('halId_s')
         idRef = kwargs.pop('idRef')
         orcId = kwargs.pop('orcId')
+        status = kwargs.pop('status')
 
         super(validCredentials,self).__init__(*args,**kwargs)
 
@@ -64,10 +65,18 @@ class validCredentials(forms.Form):
         self.fields['f_IdRef'].initial = idRef
         self.fields['f_orcId'].initial = orcId
         self.fields['f_more'].initial = '0'
+        self.fields['f_status'].initial = status
+
+    status =(
+        ("0", "Non renseigné"),
+        ("1", "Enseinant chercheur"),
+        ("2", "Doctorant")
+    )
 
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label='ID HAL (texte)')
+    f_status = forms.ChoiceField(label='Statut', choices=status)
     f_IdRef = forms.CharField(label='IdRef', required=False)
     f_orcId = forms.CharField(label='ORCID', required=False)
 

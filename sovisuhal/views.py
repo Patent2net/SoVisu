@@ -683,11 +683,14 @@ def check(request):
                 orcId = entity['orcId']
             if 'orcId' in request.GET:
                 orcId = request.GET['orcId']
+            status = 0
+            if 'status' in entity:
+                status = entity['status']
 
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a', 'b', 'c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 idRef=entity['idRef'], orcId=orcId),
+                                                                                 idRef=entity['idRef'], orcId=orcId, status=status),
                                                   'startDate': start_date,
                                                   'hasToConfirm': hasToConfirm,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
@@ -1346,6 +1349,7 @@ def validateCredentials(request):
         if type == "rsr":
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
+            status = request.POST.get("f_status")
 
             scope_param = esActions.scope_p("_id", id)
 
@@ -1358,7 +1362,7 @@ def validateCredentials(request):
             print(structId + "-" + entity['labHalId'] + '-researchers')
 
             es.update(index=structId + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
-                      body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True}})
+                      body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True, "status": status}})
 
         if type == "lab":
             rsnr = request.POST.get("f_rsnr")
