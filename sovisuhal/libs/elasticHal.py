@@ -197,7 +197,7 @@ def propage_concepts (structSirene, ldapId, laboAccro, labHalId):
 # @shared_task(bind=True)
 def collecte_docs( Chercheur): #self,
 
-    init = False
+    init = False  #If True, data persistence is lost when references are updated
 
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
     es = esActions.esConnector()
@@ -280,8 +280,20 @@ def collecte_docs( Chercheur): #self,
     res = helpers.bulk(
         es,
         docs,
-        index= Chercheur["structSirene"]  + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents"
+        index= Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents"
         # -researchers" + row["ldapId"] + "-documents
         )
+    """
+    print("res is stocked in")
+    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents")
+
+    res = helpers.bulk(
+        es,
+        docs,
+        index= Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents"
+    )
+    print("res lab is stocked in")
+    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents")
+    """
     #return docs # pas utile...
     return Chercheur # au cas où
