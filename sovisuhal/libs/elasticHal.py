@@ -277,6 +277,7 @@ def collecte_docs( Chercheur): #self,
 
             else:
                 doc["validated"] = True
+
     res = helpers.bulk(
         es,
         docs,
