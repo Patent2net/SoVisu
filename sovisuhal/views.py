@@ -21,6 +21,10 @@ from .libs import halConcepts
 
 from .libs import esActions
 
+import pandas as pd
+from io import BytesIO as IO
+import numpy as np
+
 # from celery.result import AsyncResult
 
 # from ssl import create_default_context
@@ -42,7 +46,6 @@ except:
     mode = "Dev"
     structId = "198307662"  # UTLN
     patternCas = ''  # motif à enlever aux identifiants CAS
-
 
 
 @login_required
@@ -126,7 +129,7 @@ def CreateCredentials(request):
     # resultat
     Chercheur = indexe_chercheur(ldapId, accroLab, labo, idhal, idRef, orcId)
 
-    docs = collecte_docs(Chercheur)
+    collecte_docs(Chercheur)
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
@@ -302,7 +305,7 @@ def dashboard(request):
     validate = False
     if type == "rsr":
         field = "authIdHal_s"
-        hasToConfirm_param = esActions.confirm_p(field,entity['halId_s'],validate)
+        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
         # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
@@ -311,7 +314,6 @@ def dashboard(request):
     if type == "lab":
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
@@ -483,8 +485,9 @@ def references(request):
     scope_bool_type = "filter"
     validate = True
     date_range_type = "submittedDate_tdate"
-    ref_param = esActions.ref_p_filter(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom,
-                                    dateTo)
+    ref_param = esActions.ref_p_filter(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type,
+                                       dateFrom,
+                                       dateTo)
 
     if type == "rsr":  # I hope this is a focused search :-/
         count = es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
@@ -643,7 +646,6 @@ def check(request):
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
@@ -686,7 +688,8 @@ def check(request):
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a', 'b', 'c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 idRef=entity['idRef'], orcId=orcId, status=status),
+                                                                                 idRef=entity['idRef'], orcId=orcId,
+                                                                                 status=status),
                                                   'startDate': start_date,
                                                   'hasToConfirm': hasToConfirm,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
@@ -963,17 +966,13 @@ def terminology(request):
     # Get scope informations
     if type == "rsr":
         field = "_id"
-        key = 'halId_s'
         search_id = "*"
         index_pattern = "-researchers"
 
     elif type == "lab":
         field = "halStructId"
-        key = "halStructId"
         search_id = id
         index_pattern = "-laboratories"
-
-    ext_key = "harvested_from_ids"
 
     scope_param = esActions.scope_p(field, id)
 
@@ -992,13 +991,10 @@ def terminology(request):
     field = "harvested_from_ids"
 
     if type == "rsr":
-
         hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
     if type == "lab":
-
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
 
     if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -1582,11 +1578,10 @@ def tools(request):
 
     hasToConfirm = False
 
-    validate =False
+    validate = False
     if type == "lab":
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
@@ -1719,10 +1714,8 @@ def wordcloud(request):
     if type == "rsr":
         hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-
     if type == "lab":
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
 
     if es.count(index=structId + "*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -1796,17 +1789,13 @@ def publicationboard(request):
     # Get scope informations
     if type == "rsr":
         field = "_id"
-        key = 'halId_s'
         search_id = "*"
         index_pattern = "-researchers"
 
     elif type == "lab":
         field = "halStructId"
-        key = "halStructId"
         search_id = id
         index_pattern = "-laboratories"
-
-    ext_key = "harvested_from_ids"
 
     scope_param = esActions.scope_p(field, id)
 
@@ -1825,7 +1814,6 @@ def publicationboard(request):
     validate = False
     if type == "rsr":
         hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
-
 
     if type == "lab":
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
@@ -1947,10 +1935,6 @@ def forceUpdateReference(request):
     else:
         return redirect('unknown')
 
-    if 'filter' in request.GET:
-        data = request.GET['filter']
-    else:
-        data = -1  # "references"
     if 'from' in request.GET:
         dateFrom = request.GET['from']
     if 'to' in request.GET:
@@ -2044,11 +2028,6 @@ def updateAuthorship(request):
 
     scope_param = esActions.scope_p("ldapId", id)
 
-    key = "ldapId"
-    ext_key = "harvested_from_ids"
-
-    es = esActions.es_connector()
-
     res = es.search(index=structId + "-" + "*" + "-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -2061,10 +2040,10 @@ def updateAuthorship(request):
 
         # update in researcher's collection
         field = "_id"
-        doc_param = esActions.scope_p(field,doc["docid"])
+        doc_param = esActions.scope_p(field, doc["docid"])
 
-
-        res = es.search(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity["ldapId"] + "-documents", body=doc_param)
+        res = es.search(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity["ldapId"] + "-documents",
+                        body=doc_param)
 
         if len(res['hits']['hits']) > 0:
             if "autorship" in res['hits']['hits'][0]['_source']:
@@ -2126,9 +2105,7 @@ def updateAuthorship(request):
         '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data + "&validation=1")
 
 
-import pandas as pd
-from io import BytesIO as IO
-import numpy as np
+
 
 
 def exportHceresXls(request):
@@ -2213,8 +2190,9 @@ def exportHceresXls(request):
         book_df.to_excel(writer, 'OUV', index=False)
     if len(conf_df.index) > 0:
         conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
-                 'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship', 'openAccess_bool_s']].to_excel(writer, 'CONF',
-                                                                                                 index=False)
+                 'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
+                 'openAccess_bool_s']].to_excel(writer, 'CONF',
+                                                index=False)
     else:
         conf_df.to_excel(writer, 'CONF', index=False)
     if len(hdr_df.index) > 0:
