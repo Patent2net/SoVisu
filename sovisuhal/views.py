@@ -2179,7 +2179,7 @@ def exportHceresXls(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
 
-    sort_results = hceres.sortReferences(references_cleaned, esActions.esConnector())
+    sort_results = hceres.sortReferences(references_cleaned, esActions.esConnector(), entity["halStructId"])
 
     art_df = sort_results[0]
     book_df = sort_results[1]
@@ -2203,17 +2203,17 @@ def exportHceresXls(request):
     writer = pd.ExcelWriter(output, engine='openpyxl')
     if len(art_df.index) > 0:
         art_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
-                'team', 'openAccess_bool_s']].to_excel(writer, 'ART', index=False)
+                'team', 'hasPhDCandidate', 'hasAuthorship', 'openAccess_bool_s']].to_excel(writer, 'ART', index=False)
     else:
         art_df.to_excel(writer, 'ART', index=False)
     if len(book_df.index) > 0:
         book_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'isbn_s',
-                 'team', 'openAccess_bool_s']].to_excel(writer, 'OUV', index=False)
+                 'team', 'hasPhDCandidate', 'hasAuthorship', 'openAccess_bool_s']].to_excel(writer, 'OUV', index=False)
     else:
         book_df.to_excel(writer, 'OUV', index=False)
     if len(conf_df.index) > 0:
         conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
-                 'team', 'conferenceTitle_s', 'conferenceDate_s', 'openAccess_bool_s']].to_excel(writer, 'CONF',
+                 'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship', 'openAccess_bool_s']].to_excel(writer, 'CONF',
                                                                                                  index=False)
     else:
         conf_df.to_excel(writer, 'CONF', index=False)
