@@ -1,9 +1,10 @@
 import pandas as pd
 
+from . import esActions
 
+es = esActions.es_connector()
 
-def sortReferences(articles, es, halStructId):
-
+def sortReferences(articles, halStructId):
     hceres_art = []
     hceres_book = []
     hceres_conf = []
@@ -17,21 +18,15 @@ def sortReferences(articles, es, halStructId):
         if "authIdHal_s" in article:
             for authIdHal_s in article["authIdHal_s"]:
 
-                doc_param = {
-                    "query": {
-                        "match": {
-                            "halId_s": authIdHal_s
-                        }
-                    }
-                }
+                field = "halId_s"
+                doc_param = esActions.scope_p(field, authIdHal_s)
 
                 res = es.search(index="*-researchers", body=doc_param)
 
                 if len(res['hits']['hits']) > 0:
 
-                    if 'status' in res['hits']['hits'][0]['_source']:
-                        if "status" == 2:
-                            hasPhDCandidate = True
+                    if 'status' in res['hits']['hits'][0]['_source'] and "status" == 2:
+                        hasPhDCandidate = True
 
                     if 'axis' in res['hits']['hits'][0]['_source']:
                         axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
@@ -49,19 +44,12 @@ def sortReferences(articles, es, halStructId):
 
         if "authorship" in article:
             for authorship in article["authorship"]:
-
-                doc_param = {
-                    "query": {
-                        "match": {
-                            "halId_s": authorship["halId_s"]
-                        }
-                    }
-                }
+                field = "halId_s"
+                doc_param = esActions.scope_p(field, authorship["halId_s"])
 
                 res = es.search(index="*-researchers", body=doc_param)
-                if len(res['hits']['hits']) > 0:
-                    if res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
-                        hasAuthorship = True
+                if len(res['hits']['hits']) > 0 and res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
+                    hasAuthorship = True
 
         if hasAuthorship:
             article["hasAuthorship"] = "O"
@@ -91,7 +79,8 @@ def sortReferences(articles, es, halStructId):
             tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
             if 'conferenceEndDate_tdate' in article:
                 tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
-                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[
+                    2] + "-" + tmp_end[1] + "-" + tmp_end[0]
             else:
                 article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
         else:
@@ -104,7 +93,8 @@ def sortReferences(articles, es, halStructId):
         article["title_s"] = article["title_s"][0]
 
         for i in range(len(article["authFirstName_s"])):
-            article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][i] + ", "
+            article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][
+                i] + ", "
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
 

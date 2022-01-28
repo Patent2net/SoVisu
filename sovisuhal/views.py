@@ -2179,7 +2179,7 @@ def exportHceresXls(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
 
-    sort_results = hceres.sortReferences(references_cleaned, esActions.es_connector(), entity["halStructId"])
+    sort_results = hceres.sortReferences(references_cleaned, entity["halStructId"])
 
     art_df = sort_results[0]
     book_df = sort_results[1]
