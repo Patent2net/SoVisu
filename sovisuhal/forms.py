@@ -30,7 +30,7 @@ class CreateCredentials(forms.Form):
     f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594')
     # f_more = forms.CharField(label='autres')
 
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     scope_param = esActions.scope_all()
 

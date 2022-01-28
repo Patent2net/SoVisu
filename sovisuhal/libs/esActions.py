@@ -14,7 +14,7 @@ except:
     structId = "198307662"  # UTLN
 
 
-def esConnector(mode=mode):
+def es_connector(mode=mode):
     if mode == "Prod":
 
         secret = config('ELASTIC_PASSWORD')
