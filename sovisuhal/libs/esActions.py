@@ -14,6 +14,7 @@ except:
     structId = "198307662"  # UTLN
 
 
+# Use that base code in other files to use es_connector function: es = esActions.es_connector()
 def es_connector(mode=mode):
     if mode == "Prod":
 
@@ -31,6 +32,8 @@ def es_connector(mode=mode):
 
 
 # Elastic match query call
+
+# Use that base code in other files to use scope_all function: variable_name = esActions.scope_all()
 def scope_all():
     scope = {
         "query": {
@@ -39,7 +42,7 @@ def scope_all():
     }
     return scope
 
-
+# Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
 def scope_p(scope_field, scope_value):
     scope = {
         "query": {
@@ -50,7 +53,7 @@ def scope_p(scope_field, scope_value):
     }
     return scope
 
-
+# Use that base code in other files to use date_all function: variable_name = esActions.date_all()
 def date_all():
     start_date_param = {
         "size": 1,
@@ -64,7 +67,7 @@ def date_all():
     }
     return start_date_param
 
-
+# Use that base code in other files to use date_p function: variable_name = esActions.date_p(scope_field, scope_value)
 def date_p(scope_field, scope_value):
     start_date_param = {
         "size": 1,
@@ -77,6 +80,9 @@ def date_p(scope_field, scope_value):
     }
     return start_date_param
 
+
+# Use that base code in other files to use ref_p function: variable_name = esActions.ref_p(scope_bool_type, ext_key,
+# entity[key], validate, date_range_type, dateFrom, dateTo)
 
 def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from, scope_date_to):
     ref_param = {
@@ -108,8 +114,8 @@ def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, 
     return ref_param
 
 
-# ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
-
+# Use that base code in other files to use ref_p_filter function: variable_name = esActions.ref_p_filter(filter,
+# scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
 
 def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
                  scope_date_to):
@@ -216,9 +222,6 @@ def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, da
         ref_param = ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
                           scope_date_to)
     return ref_param
-
-
-# ref_param = esActions.ref_p_alt(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
 
 
 def confirm_p(scope_field, scope_value, validate):
