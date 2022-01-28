@@ -2,7 +2,7 @@ import pandas as pd
 
 
 
-def sortReferences(articles, es):
+def sortReferences(articles, es, halStructId):
 
     hceres_art = []
     hceres_book = []
@@ -13,6 +13,7 @@ def sortReferences(articles, es):
 
         article["team"] = ""
 
+        hasPhDCandidate = False
         if "authIdHal_s" in article:
             for authIdHal_s in article["authIdHal_s"]:
 
@@ -25,13 +26,47 @@ def sortReferences(articles, es):
                 }
 
                 res = es.search(index="*-researchers", body=doc_param)
+
                 if len(res['hits']['hits']) > 0:
+
+                    if 'status' in res['hits']['hits'][0]['_source']:
+                        if "status" == 2:
+                            hasPhDCandidate = True
+
                     if 'axis' in res['hits']['hits'][0]['_source']:
                         axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
                         article["team"] = article["team"] + axis + " ; "
 
             if len(article["team"]) > 2:
                 article["team"] = article["team"][:-2]
+
+        if hasPhDCandidate:
+            article["hasPhDCandidate"] = "O"
+        else:
+            article["hasPhDCandidate"] = "N"
+
+        hasAuthorship = False
+
+        if "authorship" in article:
+            for authorship in article["authorship"]:
+
+                doc_param = {
+                    "query": {
+                        "match": {
+                            "halId_s": authorship["halId_s"]
+                        }
+                    }
+                }
+
+                res = es.search(index="*-researchers", body=doc_param)
+                if len(res['hits']['hits']) > 0:
+                    if res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
+                        hasAuthorship = True
+
+        if hasAuthorship:
+            article["hasAuthorship"] = "O"
+        else:
+            article["hasAuthorship"] = "N"
 
         article["authfullName_s"] = ""
 
