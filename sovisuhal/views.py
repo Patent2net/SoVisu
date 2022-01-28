@@ -44,39 +44,35 @@ except:
     patternCas = ''  # motif à enlever aux identifiants CAS
 
 
-# struct = "198307662"
-
 
 @login_required
 def index(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
-        gugusse = request.user.get_username().lower()
+        auth_user = request.user.get_username().lower()
 
-        if gugusse == 'admin':
+        if auth_user == 'admin':
             return redirect('/admin/')
-        elif gugusse == 'adminlab':
+        elif auth_user == 'adminlab':
             return redirect("/index/?type=lab")
-        elif gugusse == 'visiteur':
+        elif auth_user == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
-            print(gugusse)
-            # gugusse = request.user.get_username()
-            gugusse = gugusse.replace(patternCas, '').lower()
-            # check présence gugusse
+            print(auth_user)
+            # auth_user = request.user.get_username()
+            auth_user = auth_user.replace(patternCas, '').lower()
+            # check présence auth_user
             es = esActions.esConnector()
 
             field = "_id"
-            scope_param = esActions.scope_p(field, gugusse)
+            scope_param = esActions.scope_p(field, auth_user)
 
             count = es.count(index="*-researchers", body=scope_param)['count']
             if count > 0:
-                return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
+                return redirect('check/?type=rsr&id=' + auth_user + '&from=1990-01-01&to=now&data=credentials')
             else:
-                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
-
-            # return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
+                return redirect('create/?ldapid=' + auth_user + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
     return redirect('loggedin')
 
@@ -86,28 +82,28 @@ def loggedin(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % settings.LOGIN_URL)
     elif request.user.is_authenticated:
-        gugusse = request.user.get_username()
-        gugusse = gugusse.replace(patternCas, '').lower()
-        if gugusse == 'admin':
+        auth_user = request.user.get_username()
+        auth_user = auth_user.replace(patternCas, '').lower()
+        if auth_user == 'admin':
             return redirect('/admin/')
-        elif gugusse == 'adminlab':
+        elif auth_user == 'adminlab':
             return redirect("/index/?type=lab")
-        elif gugusse == 'visiteur':
+        elif auth_user == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
-            # gugusse = request.user.get_username()
+            # auth_user = request.user.get_username()
 
-            # check présence gugusse
+            # check présence auth_user
             es = esActions.esConnector()
 
             field = "_id"
-            scope_param = esActions.scope_p(field, gugusse)
+            scope_param = esActions.scope_p(field, auth_user)
 
             count = es.count(index=structId + "*-researchers", body=scope_param)['count']
             if count > 0:
-                return redirect('check/?type=rsr&id=' + gugusse + '&from=1990-01-01&to=now&data=credentials')
+                return redirect('check/?type=rsr&id=' + auth_user + '&from=1990-01-01&to=now&data=credentials')
             else:
-                return redirect('create/?ldapid=' + gugusse + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
+                return redirect('create/?ldapid=' + auth_user + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
     else:
         # heu ?
         print("cas raté")
@@ -168,17 +164,17 @@ def unknown(request):
     # if not request.user.is_authenticated:
     #     return redirect('%s?next=%s' % (LOGIN_URL, "/check"))
     # elif request.user.is_authenticated:
-    #     gugusse = request.user.get_username()
-    #     if gugusse == 'admin':
+    #     auth_user = request.user.get_username()
+    #     if auth_user == 'admin':
     #         return redirect('/admin/')
-    #     elif gugusse == 'adminlab':
+    #     elif auth_user == 'adminlab':
     #         return redirect("/index/?type=lab")
-    #     elif gugusse == 'guest':
+    #     elif auth_user == 'guest':
     #         return redirect("/index/?type=rsr")
     #     else:
-    #         gugusse = request.user.get_username()
-    #         gugusse = gugusse.replace(patternCas, '')
-    #         return redirect('/check/?type=rsr&id=' + gugusse +'&from=1990-01-01&to=now')
+    #         auth_user = request.user.get_username()
+    #         auth_user = auth_user.replace(patternCas, '')
+    #         return redirect('/check/?type=rsr&id=' + auth_user +'&from=1990-01-01&to=now')
     # else:
     # return redirect('/accounts/login/')
     return render(request, '404.html')
@@ -2064,13 +2060,9 @@ def updateAuthorship(request):
     for doc in toProcess:
 
         # update in researcher's collection
-        doc_param = {
-            "query": {
-                "match": {
-                    "_id": doc["docid"]
-                }
-            }
-        }
+        field = "_id"
+        doc_param = esActions.scope_p(field,doc["docid"])
+
 
         res = es.search(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity["ldapId"] + "-documents", body=doc_param)
 
@@ -2098,13 +2090,8 @@ def updateAuthorship(request):
                   body={"doc": {"authorship": authorship}})
 
         # update in laboratory's collection
-        doc_param = {
-            "query": {
-                "match": {
-                    "_id": doc["docid"]
-                }
-            }
-        }
+        field = "_id"
+        doc_param = esActions.scope_p(field, doc["docid"])
 
         res = es.search(index=structId + "-" + entity["labHalId"] + "-laboratories-documents",
                         body=doc_param)
