@@ -63,7 +63,7 @@ def index(request):
             # auth_user = request.user.get_username()
             auth_user = auth_user.replace(patternCas, '').lower()
             # check présence auth_user
-            es = esActions.esConnector()
+            es = esActions.es_connector()
 
             field = "_id"
             scope_param = esActions.scope_p(field, auth_user)
@@ -94,7 +94,7 @@ def loggedin(request):
             # auth_user = request.user.get_username()
 
             # check présence auth_user
-            es = esActions.esConnector()
+            es = esActions.es_connector()
 
             field = "_id"
             scope_param = esActions.scope_p(field, auth_user)
@@ -199,7 +199,7 @@ def cs_index(request):
     # /
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     if type == "lab":
         scope_param = esActions.scope_all()
@@ -269,7 +269,7 @@ def dashboard(request):
 
     # /
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -405,7 +405,7 @@ def references(request):
 
     # /
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -518,7 +518,7 @@ def check(request):
     if request.user.is_authenticated and request.user.get_username() == 'visiteur':
         return redirect('unknown')
 
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
@@ -843,7 +843,7 @@ def check(request):
 
 def search(request):
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     date_param = {
         "aggs": {
@@ -867,7 +867,7 @@ def search(request):
     if request.method == 'POST':
 
         # Connect to DB
-        es = esActions.esConnector()
+        es = esActions.es_connector()
 
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
@@ -958,7 +958,7 @@ def terminology(request):
     # /
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -1143,7 +1143,7 @@ def validateReferences(request):
         validate = False
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -1207,7 +1207,7 @@ def validateGuidingDomains(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     if request.method == 'POST':
 
@@ -1259,7 +1259,7 @@ def invalidateConcept(request):
         validate = 'invalidated'
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -1338,7 +1338,7 @@ def validateCredentials(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     if request.method == 'POST':
 
@@ -1388,7 +1388,7 @@ def validateGuidingKeywords(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     if request.method == 'POST':
 
@@ -1431,7 +1431,7 @@ def validateResearchDescription(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     if request.method == 'POST':
 
@@ -1488,7 +1488,7 @@ def refreshAureHalId(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     scope_param = esActions.scope_p("_id", id)
 
@@ -1558,7 +1558,7 @@ def tools(request):
 
     # /
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "lab":
@@ -1684,7 +1684,7 @@ def wordcloud(request):
     # /
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -1791,7 +1791,7 @@ def publicationboard(request):
     # /
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # Get scope informations
     if type == "rsr":
@@ -1960,7 +1960,7 @@ def forceUpdateReference(request):
         validation = request.GET['validation']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     # if request.method == 'POST':
     # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
@@ -1998,7 +1998,7 @@ def updateMembers(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     if request.method == 'POST':
         toUpdate = request.POST.get("toUpdate", "").split(",")
@@ -2040,14 +2040,14 @@ def updateAuthorship(request):
         dateTo = request.GET['to']
 
     # Connect to DB
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     scope_param = esActions.scope_p("ldapId", id)
 
     key = "ldapId"
     ext_key = "harvested_from_ids"
 
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     res = es.search(index=structId + "-" + "*" + "-researchers", body=scope_param)
     try:
@@ -2144,7 +2144,7 @@ def exportHceresXls(request):
     key = "halStructId"
     ext_key = "harvested_from_ids"
 
-    es = esActions.esConnector()
+    es = esActions.es_connector()
 
     res = es.search(index=structId + "-" + id + "-laboratories", body=scope_param)
     try:
@@ -2179,7 +2179,7 @@ def exportHceresXls(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
 
-    sort_results = hceres.sortReferences(references_cleaned, esActions.esConnector(), entity["halStructId"])
+    sort_results = hceres.sortReferences(references_cleaned, esActions.es_connector(), entity["halStructId"])
 
     art_df = sort_results[0]
     book_df = sort_results[1]
