@@ -28,6 +28,9 @@ def sortReferences(articles, halStructId):
                     if 'status' in res['hits']['hits'][0]['_source'] and "status" == 2:
                         hasPhDCandidate = True
 
+                    #if 'status' in res['hits']['hits'][0]['_source'] and 'status' in res['hits']['hits'][0]['_source'] == 2:
+                    #    hasPhDCandidate = True
+
                     if 'axis' in res['hits']['hits'][0]['_source']:
                         axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
                         article["team"] = article["team"] + axis + " ; "
