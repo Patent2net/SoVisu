@@ -1325,7 +1325,7 @@
                     toInvalidate.push(row[0])
                 });
 
-                var form = $('<form action="/invalidate_concepts/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                var form = $('<form action="/validate_expertise/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
                     '{% csrf_token %}' +
                     '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' +
                     '</form>');
