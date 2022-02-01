@@ -1016,7 +1016,7 @@
 
         /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
-        {% if validation == "0" and validation == "1" and  type == "rsr" %}
+        {% if validation == "1" and  type == "rsr" and data == "references" %}
 
             var references = JSON.parse(document.querySelector(".references-json").textContent)
 
