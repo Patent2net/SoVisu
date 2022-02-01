@@ -1215,7 +1215,6 @@
                     buttons: [],
                     "columnDefs": [
                         {
-
                             "targets": [2],
                             "render": function (data, type, row, meta) {
                                 if (data === 'True') {
@@ -1247,7 +1246,6 @@
 
                 $('.dataTables_info').addClass('flex justify-between w-full pr-2');
             });
-
 
             {% if data == "state" %}
 
@@ -1299,6 +1297,7 @@
 
             {% endif %}
 
+
             $('.validate').click(function () {
                 toValidate = []
                 table.rows('.selected').data().map(function (row) {
@@ -1333,6 +1332,7 @@
                 form.appendTo('body').hide()
                 form.submit();
             });
+
 
 
         });

@@ -43,6 +43,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
 
     path('help/', views.help, name='help'),
+
     path('CreateCredentials/', viewsActions.create_credentials, name='credentials'),
     path('validate_credentials/', viewsActions.validate_credentials, name='validate_credentials'),
     path('refresh-aurehal-id/', viewsActions.refresh_aurehal_id, name='refresh-aurehal-id'),
@@ -55,7 +56,6 @@ urlpatterns = [
     path('validate_research-description/', viewsActions.validate_research_description, name='validate_research-description'),
     path('force-update_references/', viewsActions.force_update_references, name='force-update_references'),
     path('export_hceres_xls/', viewsActions.export_hceres_xls, name='export_hceres_xls'),
-
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
     path('create/', viewsActions.create, name='creation'),
