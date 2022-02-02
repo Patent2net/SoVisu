@@ -1,8 +1,10 @@
 import pandas as pd
 
+from . import esActions
 
-def sortReferences(articles):
+es = esActions.es_connector()
 
+def sortReferences(articles, halStructId):
     hceres_art = []
     hceres_book = []
     hceres_conf = []
@@ -10,7 +12,49 @@ def sortReferences(articles):
 
     for article in articles:
 
-        print(article)
+        article["team"] = ""
+
+        hasPhDCandidate = False
+        if "authIdHal_s" in article:
+            for authIdHal_s in article["authIdHal_s"]:
+
+                field = "halId_s"
+                doc_param = esActions.scope_p(field, authIdHal_s)
+
+                res = es.search(index="*-researchers", body=doc_param)
+
+                if len(res['hits']['hits']) > 0:
+
+                    if 'status' in res['hits']['hits'][0]['_source'] and 'status' in res['hits']['hits'][0]['_source'] == 2:
+                        hasPhDCandidate = True
+
+                    if 'axis' in res['hits']['hits'][0]['_source']:
+                        axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
+                        article["team"] = article["team"] + axis + " ; "
+
+            if len(article["team"]) > 2:
+                article["team"] = article["team"][:-2]
+
+        if hasPhDCandidate:
+            article["hasPhDCandidate"] = "O"
+        else:
+            article["hasPhDCandidate"] = "N"
+
+        hasAuthorship = False
+
+        if "authorship" in article:
+            for authorship in article["authorship"]:
+                field = "halId_s"
+                doc_param = esActions.scope_p(field, authorship["halId_s"])
+
+                res = es.search(index="*-researchers", body=doc_param)
+                if len(res['hits']['hits']) > 0 and res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
+                    hasAuthorship = True
+
+        if hasAuthorship:
+            article["hasAuthorship"] = "O"
+        else:
+            article["hasAuthorship"] = "N"
 
         article["authfullName_s"] = ""
 
@@ -35,7 +79,8 @@ def sortReferences(articles):
             tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
             if 'conferenceEndDate_tdate' in article:
                 tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
-                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[
+                    2] + "-" + tmp_end[1] + "-" + tmp_end[0]
             else:
                 article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
         else:
@@ -48,22 +93,24 @@ def sortReferences(articles):
         article["title_s"] = article["title_s"][0]
 
         for i in range(len(article["authFirstName_s"])):
-            article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][i] + ", "
+            article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][
+                i] + ", "
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
-
-        print(article["authfullName_s"])
 
         # colloque et posters
         if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
             hceres_conf.append(article)
-
         # art
         if article["docType_s"] == "ART":
             hceres_art.append(article)
         # ouvrages, chapitres d'ouvrages et directions d'ouvrages
         if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
             hceres_book.append(article)
+        # hdr
+        if article["docType_s"] == "HDR":
+            print(article)
+            hceres_hdr.append(article)
 
     art_df = pd.DataFrame(hceres_art)
     if len(art_df.index) > 0:
@@ -77,4 +124,8 @@ def sortReferences(articles):
     if len(conf_df.index) > 0:
         conf_df = conf_df.sort_values(by=['publicationDateY_i'])
 
-    return art_df, book_df, conf_df
+    hceres_df = pd.DataFrame(hceres_hdr)
+    if len(hceres_df.index) > 0:
+        hceres_df = hceres_df.sort_values(by=['publicationDateY_i'])
+
+    return art_df, book_df, conf_df, hceres_df

@@ -17,16 +17,16 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import include
 from django.urls import re_path, include
-from . import views
+from . import views, viewsActions
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', views.index, name='index'),
+    path('', viewsActions.admin_access_login, name='index'),
 
-    path('index/', views.cs_index, name='cs_index'),
+    path('index/', views.index, name='index'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('publicationboard/', views.publicationboard, name='publicationboard'),
+    path('publicationboard/', views.publication_board, name='publicationboard'),
     path('references/', views.references, name='references'),
     path('terminology/', views.terminology, name='terminology'),
     path('wordcloud/', views.wordcloud, name='wordcloud'),
@@ -42,24 +42,23 @@ urlpatterns = [
     path('useful_links/', views.useful_links, name='useful_links'),
     path('contact/', views.contact, name='contact'),
 
-    path('help/', views.help, name='help'),
-    path('CreateCredentials/', views.CreateCredentials, name='credentials'),
-    path('validate_credentials/', views.validateCredentials, name='validate_credentials'),
-    path('refresh-aurehal-id/', views.refreshAureHalId, name='refresh-aurehal-id'),
-    path('update_members/', views.updateMembers, name='update_members'),
-    path('validate_references/', views.validateReferences, name='validate_references'),
-    path('invalidate_concepts/', views.invalidateConcept, name='invalidate_concepts'),
-    path('validate_guiding-domains/', views.validateGuidingDomains, name='validate_guiding-domains'),
-    path('validate_guiding-keywords/', views.validateGuidingKeywords, name='validate_guiding-keywords'),
-    path('validate_research-description/', views.validateResearchDescription, name='validate_research-description'),
-    path('force-update_references/', views.forceUpdateReference, name='force-update_references'),
-    path('export_hceres_xls/', views.exportHceresXls, name='export_hceres_xls'),
-
+    path('CreateCredentials/', viewsActions.create_credentials, name='credentials'),
+    path('validate_credentials/', viewsActions.validate_credentials, name='validate_credentials'),
+    path('refresh-aurehal-id/', viewsActions.refresh_aurehal_id, name='refresh-aurehal-id'),
+    path('update_authorship/', viewsActions.update_authorship, name='update_authorship'),
+    path('update_members/', viewsActions.update_members, name='update_members'),
+    path('validate_references/', viewsActions.validate_references, name='validate_references'),
+    path('validate_expertise/', viewsActions.validate_expertise, name='invalidate_concepts'),
+    path('validate_guiding-domains/', viewsActions.validate_guiding_domains, name='validate_guiding-domains'),
+    path('validate_guiding-keywords/', viewsActions.validate_guiding_keywords, name='validate_guiding-keywords'),
+    path('validate_research-description/', viewsActions.validate_research_description, name='validate_research-description'),
+    path('force-update_references/', viewsActions.force_update_references, name='force-update_references'),
+    path('export_hceres_xls/', viewsActions.export_hceres_xls, name='export_hceres_xls'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
-    path('create/', views.create, name='creation'),
+    path('create/', viewsActions.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
-    path('loggedin/', views.loggedin, name='loggued'),
+    path('loggedin/', viewsActions.logged_in, name='loggued'),
 
     path('tinymce/', include('tinymce.urls')),
     # path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
