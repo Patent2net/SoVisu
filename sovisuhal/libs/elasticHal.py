@@ -206,6 +206,8 @@ def collecte_docs(Chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
 
+
+
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
@@ -223,7 +225,19 @@ def collecte_docs(Chercheur):  # self,
         # try:
         #     doc["harvested_from_label"].append(dicoAcronym[row["labHalId"]])
         # except:
-        #     doc["harvested_from_label"].append("non-labo")
+        #     doc["harvested_from_label"].append("non-
+
+        doc["authorship"] = []
+
+        if "authIdHal_s" in doc:
+            authors_count = len(doc["authIdHal_s"])
+            i = 0
+            for auth in doc["authIdHal_s"]:
+                i += 1
+                if i == 1:
+                    doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
+                elif i == authors_count:
+                    doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
 
         doc["harvested_from_ids"].append(Chercheur['halId_s'])
 
