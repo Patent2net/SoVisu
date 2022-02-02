@@ -206,8 +206,6 @@ def collecte_docs(Chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
 
-
-
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
