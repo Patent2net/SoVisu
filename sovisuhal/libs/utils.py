@@ -5,6 +5,7 @@ import dateutil.parser
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+
 def shouldBeOpen(doc):
     # -1 non
     # 1 oui
@@ -42,10 +43,7 @@ def shouldBeOpen(doc):
     return 2
 
 
-
-
 def calculateMDS(doc):
-
     score = 0
 
     if 'title_s' in doc:
@@ -108,8 +106,7 @@ def calculateMDS(doc):
     return score * 100 / (0.8 + 0.2 + 1 + 0.8 + 0.4 + 0.6)
 
 
-def appendToTree(scope, rsr, tree, state = 'validated'):
-
+def appendToTree(scope, rsr, tree, state='validated'):
     rsrData = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
 
     sid = scope['id'].split('.')
@@ -132,45 +129,39 @@ def appendToTree(scope, rsr, tree, state = 'validated'):
     if len(sid) == 2:
         exists = False
         for child in tree['children']:
-            if sid[0] == child['id']:
-                if 'children' in child:
-                    for child1 in child['children']:
-                        if sid[0] + '.' + sid[1] == child1['id']:
-                            child1['researchers'].append(rsrData)
-                            exists = True
+            if sid[0] == child['id'] and 'children' in child:
+                for child1 in child['children']:
+                    if sid[0] + '.' + sid[1] == child1['id']:
+                        child1['researchers'].append(rsrData)
+                        exists = True
 
         if not exists:
             for child in tree['children']:
-                if 'children' in child:
-                    if sid[0] == child['id']:
-                        child['children'].append(scopeData)
+                if 'children' in child and sid[0] == child['id']:
+                    child['children'].append(scopeData)
 
     if len(sid) == 3:
         exists = False
         for child in tree['children']:
-            if sid[0] == child['id']:
-                if 'children' in child:
-                    for child1 in child['children']:
-                        if sid[0] + '.' + sid[1] == child1['id']:
-                            if 'children' in child1:
-                                for child2 in child1['children']:
-                                    if sid[0] + '.' + sid[1] + '.' + sid[2] == child2['id']:
-                                        child2['researchers'].append(rsrData)
-                                        exists = True
+            if sid[0] == child['id'] and 'children' in child:
+                for child1 in child['children']:
+                    if sid[0] + '.' + sid[1] == child1['id'] and 'children' in child1:
+                        for child2 in child1['children']:
+                            if sid[0] + '.' + sid[1] + '.' + sid[2] == child2['id']:
+                                child2['researchers'].append(rsrData)
+                                exists = True
 
         if not exists:
             for child in tree['children']:
-                if 'children' in child:
-                    if sid[0] == child['id']:
-                        for child1 in child['children']:
-                            if sid[0] + '.' + sid[1] == child1['id']:
-                                child1['children'].append(scopeData)
+                if 'children' in child and sid[0] == child['id']:
+                    for child1 in child['children']:
+                        if sid[0] + '.' + sid[1] == child1['id']:
+                            child1['children'].append(scopeData)
 
     return tree
 
 
 def filterConcepts(concepts, validated_ids):
-
     if len(concepts) > 0:
 
         for children in concepts['children']:
