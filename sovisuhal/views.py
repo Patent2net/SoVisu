@@ -66,10 +66,6 @@ def unknown(request):
     return render(request, '404.html')
 
 
-def help(request):
-    return render(request, 'help.html')
-
-
 def index(request):
     # Get parameters
     if 'type' in request.GET:
