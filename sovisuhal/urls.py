@@ -42,8 +42,6 @@ urlpatterns = [
     path('useful_links/', views.useful_links, name='useful_links'),
     path('contact/', views.contact, name='contact'),
 
-    path('help/', views.help, name='help'),
-
     path('CreateCredentials/', viewsActions.create_credentials, name='credentials'),
     path('validate_credentials/', viewsActions.validate_credentials, name='validate_credentials'),
     path('refresh-aurehal-id/', viewsActions.refresh_aurehal_id, name='refresh-aurehal-id'),
