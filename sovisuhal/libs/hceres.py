@@ -25,7 +25,7 @@ def sortReferences(articles, halStructId):
 
                 if len(res['hits']['hits']) > 0:
 
-                    if 'status' in res['hits']['hits'][0]['_source'] and 'status' in res['hits']['hits'][0]['_source'] == 2:
+                    if 'function' in res['hits']['hits'][0]['_source'] and res['hits']['hits'][0]['_source']['function'] == "Doctorant":
                         hasPhDCandidate = True
 
                     if 'axis' in res['hits']['hits'][0]['_source']:
