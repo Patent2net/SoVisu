@@ -562,15 +562,15 @@ def check(request):
                 orcId = entity['orcId']
             if 'orcId' in request.GET:
                 orcId = request.GET['orcId']
-            status = 0
-            if 'status' in entity:
-                status = entity['status']
+            function = 0
+            if 'function' in entity:
+                function = entity['function']
 
             return render(request, 'check.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                   'entity': entity, 'extIds': ['a', 'b', 'c'],
                                                   'form': forms.validCredentials(halId_s=entity['halId_s'],
                                                                                  idRef=entity['idRef'], orcId=orcId,
-                                                                                 status=status),
+                                                                                 function=function),
                                                   'startDate': start_date,
                                                   'hasToConfirm': hasToConfirm,
                                                   'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
