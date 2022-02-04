@@ -536,7 +536,7 @@ def check(request):
 
         count = es.count(index="*-researchers", body=rsr_param)['count']
 
-        rsrs = es.search(index="-*-researchers", body=rsr_param, size=count)
+        rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
 
         rsrs_cleaned = []
 
