@@ -20,6 +20,24 @@ def sortReferences(articles, halStructId):
 
                 field = "halId_s"
                 doc_param = esActions.scope_p(field, authIdHal_s)
+                doc_param = {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match_phrase": {
+                                        "halId_s": authIdHal_s
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "labHalId": halStructId
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
 
                 res = es.search(index="*-researchers", body=doc_param)
 
