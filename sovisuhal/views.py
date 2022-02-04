@@ -93,8 +93,8 @@ def index(request):
         if id == -1:
             scope_param = esActions.scope_all()
 
-            count = es.count(index=structId + "*-researchers", body=scope_param)['count']
-            res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
+            count = es.count(index="*-researchers", body=scope_param)['count']
+            res = es.search(index="*-researchers", body=scope_param, size=count)
         else:
 
             field = "labHalId"
@@ -384,7 +384,7 @@ def references(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
     # /
-
+    print(references_cleaned)
     return render(request, 'references.html', {'filter': filter, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                'entity': entity,
                                                'hasToConfirm': hasToConfirm,
