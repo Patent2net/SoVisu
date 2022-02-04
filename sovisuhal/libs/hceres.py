@@ -42,7 +42,6 @@ def sortReferences(articles, halStructId):
 
         hasAuthorship = False
 
-        print(article)
         if "authorship" in article:
             for authorship in article["authorship"]:
                 field = "halId_s"
