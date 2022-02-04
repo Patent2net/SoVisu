@@ -45,7 +45,8 @@ def sortReferences(articles, halStructId):
         if "authorship" in article:
             for authorship in article["authorship"]:
                 field = "halId_s"
-                doc_param = esActions.scope_p(field, authorship["halId_s"])
+                # authFullName_s qui est en fait halId_s
+                doc_param = esActions.scope_p(field, authorship["authFullName_s"])
 
                 res = es.search(index="*-researchers", body=doc_param)
                 if len(res['hits']['hits']) > 0 and res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
