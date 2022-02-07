@@ -135,6 +135,12 @@ def dashboard(request):
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
 
         elif not id == 'adminlab' and not id == 'visiteur':
             type = "rsr"
@@ -259,6 +265,12 @@ def references(request):
         id = id.replace(patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
             base_url = reverse('index')
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)
@@ -410,6 +422,12 @@ def check(request):
         id = id.replace(patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
             base_url = reverse('index')
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)
@@ -817,6 +835,12 @@ def terminology(request):
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
 
         elif not id == 'adminlab' and not id == 'visiteur':  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
             type = "rsr"
@@ -1022,6 +1046,12 @@ def tools(request):
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
 
         elif not id == 'adminlab' and not id == 'visiteur':
             type = "rsr"
@@ -1147,6 +1177,13 @@ def wordcloud(request):
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         elif not id == 'adminlab' and not id == 'visiteur':
             type = "rsr"
             base_url = reverse('wordcloud')
@@ -1247,6 +1284,12 @@ def publication_board(request):
         id = id.replace(patternCas, '')
         if id == 'adminlab':
             type = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'type': type})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+        if id == "invitamu":
+            type = "rsr"
             base_url = reverse('index')
             query_string = urlencode({'type': type})
             url = '{}?{}'.format(base_url, query_string)

@@ -40,6 +40,8 @@ def admin_access_login(request):
             return redirect('/admin/')
         elif auth_user == 'adminlab':
             return redirect("/index/?type=lab")
+        elif auth_user == 'invitamu':
+            return redirect("/index/?type=rsr")
         elif auth_user == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
@@ -72,6 +74,8 @@ def logged_in(request):
             return redirect('/admin/')
         elif auth_user == 'adminlab':
             return redirect("/index/?type=lab")
+        elif auth_user == 'invitamu':
+            return redirect("/index/?type=rsr")
         elif auth_user == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
