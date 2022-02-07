@@ -597,7 +597,8 @@ def update_members(request):
             element = element.split(":")
             scope_param = esActions.scope_p("_id", element[0])
 
-            res = es.search(index=structId + "-*-researchers", body=scope_param)
+            # attention multi univ la...
+            res = es.search(index="*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
             except:
