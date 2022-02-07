@@ -19,7 +19,7 @@ from .libs import utils, halConcepts, esActions
 # from elasticsearch.connection import create_ssl_context
 # from uniauth.decorators import login_required
 
-
+"""
 try:
     from decouple import config
     from ldap3 import Server, Connection, ALL
@@ -34,7 +34,7 @@ except:
     mode = "Dev"
     structId = "198307662"  # UTLN
     patternCas = ''  # motif à enlever aux identifiants CAS
-
+"""
 
 # def get_progress(request, task_id):
 #     result = AsyncResult(task_id)
@@ -84,8 +84,8 @@ def index(request):
     if type == "lab":
         scope_param = esActions.scope_all()
 
-        count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
-        res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
+        count = es.count(index=viewsActions.structId + "*-laboratories", body=scope_param)['count']
+        res = es.search(index=viewsActions.structId + "*-laboratories", body=scope_param, size=count)
         entities = res['hits']['hits']
 
     elif type == "rsr":
@@ -93,18 +93,17 @@ def index(request):
         if id == -1:
             scope_param = esActions.scope_all()
 
-            count = es.count(index=structId + "*-researchers", body=scope_param)['count']
-            res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
+            count = es.count(index=viewsActions.structId + "*-researchers", body=scope_param)['count']
+            res = es.search(index=viewsActions.structId + "*-researchers", body=scope_param, size=count)
         else:
 
             field = "labHalId"
             scope_param = esActions.scope_p(field, id)
 
-            count = es.count(index=structId + "-" + id + "-researchers", body=scope_param)['count']
+            count = es.count(index=viewsActions.structId + "-" + id + "-researchers", body=scope_param)['count']
 
-            res = es.search(index=structId + "-" + id + "-researchers", body=scope_param, size=count)
+            res = es.search(index=viewsActions.structId + "-" + id + "-researchers", body=scope_param, size=count)
         entities = res['hits']['hits']
-
     cleaned_entities = []
 
     for entity in entities:
@@ -128,7 +127,7 @@ def dashboard(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '').lower()
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -174,7 +173,7 @@ def dashboard(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -198,7 +197,7 @@ def dashboard(request):
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
+    if es.count(index=viewsActions.structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -209,12 +208,12 @@ def dashboard(request):
             start_date_param = esActions.date_all()
 
             res = es.search(
-                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+                index=viewsActions.structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                 body=start_date_param)
         except:
             start_date_param.pop("sort")
             res = es.search(
-                index=structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+                index=viewsActions.structId + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                 body=start_date_param)
 
         filtrelab = ''
@@ -222,7 +221,7 @@ def dashboard(request):
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
-        res = es.search(index=structId + '-' + id + "-laboratories-documents", body=start_date_param)
+        res = es.search(index=viewsActions.structId + '-' + id + "-laboratories-documents", body=start_date_param)
 
         filtrelab = 'harvested_from_ids: "' + id + '"'
     try:
@@ -262,7 +261,7 @@ def references(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '').lower()
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -315,7 +314,7 @@ def references(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -330,12 +329,12 @@ def references(request):
     if type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
 
-        res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+        res = es.search(index=viewsActions.structId + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                         body=start_date_param)  # labHalId est-il là ?
     elif type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
-        res = es.search(index=structId + "-" + id + "-laboratories-documents", body=start_date_param)
+        res = es.search(index=viewsActions.structId + "-" + id + "-laboratories-documents", body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
@@ -359,14 +358,14 @@ def references(request):
 
         hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-        if es.count(index=structId + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+        if es.count(index=viewsActions.structId + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                     body=hasToConfirm_param)['count'] > 0:
             hasToConfirm = True
     if type == "lab":
 
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-        if es.count(index=structId + "-" + entity['halStructId'] + "-laboratories-documents", body=hasToConfirm_param)[
+        if es.count(index=viewsActions.structId + "-" + entity['halStructId'] + "-laboratories-documents", body=hasToConfirm_param)[
             'count'] > 0:
             hasToConfirm = True
 
@@ -379,16 +378,16 @@ def references(request):
                                        dateTo)
 
     if type == "rsr":  # I hope this is a focused search :-/
-        count = es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+        count = es.count(index=viewsActions.structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                          body=ref_param)['count']
         references = es.search(
-            index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+            index=viewsActions.structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
             body=ref_param, size=count)
 
     if type == "lab":
-        count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
+        count = es.count(index=viewsActions.structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
             'count']
-        references = es.search(index=structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
+        references = es.search(index=viewsActions.structId + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
                                size=count)
 
     references_cleaned = []
@@ -419,7 +418,7 @@ def check(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '').lower()
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -476,7 +475,7 @@ def check(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -492,12 +491,12 @@ def check(request):
 
         try:
 
-            res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
+            res = es.search(index=viewsActions.structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
         except:
             start_date_param.pop("sort")
-            res = es.search(index=structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
+            res = es.search(index=viewsActions.structId + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
                             body=start_date_param)
             start_date = "2000"
     elif type == "lab":
@@ -505,12 +504,12 @@ def check(request):
 
         try:
 
-            res = es.search(index=structId + "-" + entity['halStructId'] + "-laboratories-documents",
+            res = es.search(index=viewsActions.structId + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
         except:
             start_date_param.pop("sort")
-            res = es.search(index=structId + "-" + entity['halStructId'] + "-laboratories-documents",
+            res = es.search(index=viewsActions.structId + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
             start_date = "2000"
 
@@ -541,7 +540,7 @@ def check(request):
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
+    if es.count(index=viewsActions.structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -709,17 +708,17 @@ def check(request):
 
         if type == "rsr":  # I hope this is a focused search :-/
             count = \
-                es.count(index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+                es.count(index=viewsActions.structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                          body=ref_param)['count']
             references = es.search(
-                index=structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
+                index=viewsActions.structId + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                 body=ref_param, size=count)
 
         if type == "lab":
-            count = es.count(index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
+            count = es.count(index=viewsActions.structId + "-" + entity["halStructId"] + "-laboratories-documents",
                              body=ref_param)['count']
             references = es.search(
-                index=structId + "-" + entity["halStructId"] + "-laboratories-documents",
+                index=viewsActions.structId + "-" + entity["halStructId"] + "-laboratories-documents",
                 body=ref_param, size=count)
 
         references_cleaned = []
@@ -770,12 +769,12 @@ def search(request):
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
-        if (structId + "-*-researchers-*-doc*") in index:  # == 'documents':
+        if (viewsActions.structId + "-*-researchers-*-doc*") in index:  # == 'documents':
             search_param = {
                 "query": {"bool": {"must": [{"query_string": {"query": search}}],
                                    "filter": [{"match": {"validated": "true"}}]}}
             }
-        elif (structId + "-*-researchers") in index:  # =='researchers':
+        elif (viewsActions.structId + "-*-researchers") in index:  # =='researchers':
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
@@ -828,7 +827,7 @@ def terminology(request):
 
     elif request.user.is_authenticated:  # si l'ancien système ne sais pas quoi faire
         id = request.user.get_username()  # check si l'utilisateur est log
-        id = id.replace(patternCas, '').lower()
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
             type = "lab"
             base_url = reverse('index')
@@ -877,7 +876,7 @@ def terminology(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -909,7 +908,7 @@ def terminology(request):
     elif type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
-    res = es.search(index=structId + "-*-documents", body=start_date_param)
+    res = es.search(index=viewsActions.structId + "-*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1039,7 +1038,7 @@ def tools(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '').lower()
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -1079,7 +1078,7 @@ def tools(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -1095,7 +1094,7 @@ def tools(request):
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=structId + "*-documents", body=hasToConfirm_param)[
+    if es.count(index=viewsActions.structId + "*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -1105,7 +1104,7 @@ def tools(request):
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
-        res = es.search(index=structId + '-' + id + "-laboratories-documents", body=start_date_param)
+        res = es.search(index=viewsActions.structId + '-' + id + "-laboratories-documents", body=start_date_param)
 
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -1134,9 +1133,9 @@ def tools(request):
 
     rsr_param = esActions.scope_p(field, id)
 
-    count = es.count(index=structId + "*-researchers", body=rsr_param)['count']
+    count = es.count(index=viewsActions.structId + "*-researchers", body=rsr_param)['count']
 
-    rsrs = es.search(index=structId + "-*-researchers", body=rsr_param, size=count)
+    rsrs = es.search(index=viewsActions.structId + "-*-researchers", body=rsr_param, size=count)
 
     rsrs_cleaned = []
 
@@ -1170,7 +1169,7 @@ def wordcloud(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '')
+        id = id.replace(viewsActions.patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -1217,7 +1216,7 @@ def wordcloud(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -1236,7 +1235,7 @@ def wordcloud(request):
     if type == "lab":
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=structId + "*-documents", body=hasToConfirm_param)['count'] > 0:
+    if es.count(index=viewsActions.structId + "*-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
 
     # Get first submittedDate_tdate date
@@ -1249,7 +1248,7 @@ def wordcloud(request):
 
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
-    res = es.search(index=structId + "*-documents", body=start_date_param)
+    res = es.search(index=viewsActions.structId + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
@@ -1281,7 +1280,7 @@ def publication_board(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(patternCas, '')
+        id = id.replace(viewsActions.patternCas, '')
         if id == 'adminlab':
             type = "lab"
             base_url = reverse('index')
@@ -1324,7 +1323,7 @@ def publication_board(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=structId + "-" + search_id + index_pattern,
+    res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
                     body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
@@ -1353,7 +1352,7 @@ def publication_board(request):
 
         start_date_param = esActions.date_p(field, entity['halId_s'])
 
-        res = es.search(index=structId + '-' + entity['labHalId'] + "-researchers-" + id + "-documents",
+        res = es.search(index=viewsActions.structId + '-' + entity['labHalId'] + "-researchers-" + id + "-documents",
                         body=start_date_param)
         # Première visu : entrée de l'annuaire
         filtreA = 'labHalId.keyword:"' + entity["labHalId"] + '" AND ldapId.keyword :"' + id + '"'
@@ -1372,7 +1371,7 @@ def publication_board(request):
             "halStructId"] + '"'  # entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
         # Troisième visu : données éditeurs et revues de l'individu et validées
         filtreC = "harvested_from_ids" + ':"' + entity["halStructId"]  # + '" AND validated:true'
-        res = es.search(index=structId + '-' + entity['halStructId'] + '-' + "laboratories-documents*",
+        res = es.search(index=viewsActions.structId + '-' + entity['halStructId'] + '-' + "laboratories-documents*",
                         body=start_date_param)
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
