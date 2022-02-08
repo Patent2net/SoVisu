@@ -625,8 +625,7 @@ def update_members(request):
             except:
                 return redirect(
                     '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
-
-            es.update(index=structId + '-' + entity['labHalId'] + "-researchers",
+            es.update(index=res['hits']['hits'][0]['_index'],
                       refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"axis": element[1]}})
 
