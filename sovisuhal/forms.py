@@ -153,9 +153,9 @@ class search(forms.Form):
     # Set choices to an empty list as it is a required argument.
 
     indexes = (
-        (structId + "-*-researchers-*-doc*", "références"),
-        (structId + "-*-researchers", "chercheurs"),
-        (structId + "-*-laboratories", "laboratoires")
+        (viewsActions.structId + "-*-researchers-*-doc*", "références"),
+        (viewsActions.structId + "-*-researchers", "chercheurs"),
+        (viewsActions.structId + "-*-laboratories", "laboratoires")
     )
 
     f_index = forms.ChoiceField(label='Collection', choices = indexes)
