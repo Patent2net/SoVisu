@@ -34,16 +34,39 @@ def admin_access_login(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
+        # Remise à zero des variables structId et patternCas pour l'UTLN,
+        # la valeur pour l'AMU est gardée sinon dans le cas d'une connection après invitamu
+        global structId
+        global patternCas
+        try:
+
+            structId = config("structId")
+            patternCas = 'cas-utln-'  # motif à enlever aux identifiants CAS
+        except:
+            from django.contrib.auth.decorators import login_required
+
+            structId = "198307662"  # UTLN
+            patternCas = ''  # motif à enlever aux identifiants CAS
+
+        # fonction
         auth_user = request.user.get_username().lower()
 
         if auth_user == 'admin':
             return redirect('/admin/')
         elif auth_user == 'adminlab':
             return redirect("/index/?type=lab")
+        elif auth_user == 'invitamu':
+
+            structId = "130015332"  # change la variable globale pour l'AMU
+            patternCas = ''  # enlève le patternCas de la requète sous peine de bug? (préventif)
+
+            return redirect("/index/?type=rsr")
         elif auth_user == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
             print(auth_user)
+            print("auth user related structId is:")
+            print(structId)
             # auth_user = request.user.get_username()
             auth_user = auth_user.replace(patternCas, '').lower()
             # check présence auth_user
@@ -72,6 +95,8 @@ def logged_in(request):
             return redirect('/admin/')
         elif auth_user == 'adminlab':
             return redirect("/index/?type=lab")
+        elif auth_user == 'invitamu':
+            return redirect("/index/?type=rsr")
         elif auth_user == 'visiteur':
             return redirect("/index/?type=rsr")
         else:
@@ -593,14 +618,14 @@ def update_members(request):
             element = element.split(":")
             scope_param = esActions.scope_p("_id", element[0])
 
-            res = es.search(index=structId + "-*-researchers", body=scope_param)
+            # attention multi univ la...
+            res = es.search(index="*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
             except:
                 return redirect(
                     '/check/?type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
-
-            es.update(index=structId + '-' + entity['labHalId'] + "-researchers",
+            es.update(index=res['hits']['hits'][0]['_index'],
                       refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"axis": element[1]}})
 
