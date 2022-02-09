@@ -1094,7 +1094,7 @@ def tools(request):
         field = "labStructId_i"
         hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=viewsActions.structId + "*-documents", body=hasToConfirm_param)[
+    if es.count(index="*-documents", body=hasToConfirm_param)[
         'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
         hasToConfirm = True
@@ -1129,26 +1129,12 @@ def tools(request):
     else:
         data = "hceres"
 
-    field = "labHalId"
-
-    rsr_param = esActions.scope_p(field, id)
-
-    count = es.count(index=viewsActions.structId + "*-researchers", body=rsr_param)['count']
-
-    rsrs = es.search(index=viewsActions.structId + "-*-researchers", body=rsr_param, size=count)
-
-    rsrs_cleaned = []
-
-    for result in rsrs['hits']['hits']:
-        rsrs_cleaned.append(result['_source'])
-
     if (data == "hceres" or data == -1):
         return render(request, 'tools.html', {'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
                                               'key': entity[key],
-                                              'researchers': rsrs_cleaned,
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
