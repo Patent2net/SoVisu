@@ -321,8 +321,8 @@
                         {% csrf_token %}
                         <p class="text-sm">
                             En cas de soucis avec la récupération de l'identifiant AuréHal, déclenchez manuellement un
-                            nouvel essai en cliquant sur le bouton ci-dessous.  Attention l'auréhal  peut être indsiponible
-                            si l'idhal vient d'être créé, si c'est le cas veuillez réessayer plus tard
+                            nouvel essai en cliquant sur le bouton ci-dessous.  Si l'IDhal vient d'être créé, l'AuréHalId peut être indisponible.
+                            Si c'est le cas veuillez réessayer plus tard
                         </p>
                         <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none w-64"
                                type="submit" value="Mettre à jour l'ID AuréHAL (automatique)">
@@ -627,7 +627,7 @@
                             <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
                         text-gray-600 "
                                href="/force-update_references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
-                            >Mettre à jour les références</a>
+                            >Collecter de nouvelles références</a>
 
                         {% endif %}
 
@@ -644,7 +644,7 @@
                             <th>Année</th>
                             <th>Titre</th>
                             {% if validation == "1" and type == "rsr" %}
-                                <th>Paternité</th>
+                                <th>Auctorialité</th>
                             {% endif %}
                             <th>label_bibtex</th>
                             <th class="hidden">docid</th>
@@ -688,7 +688,8 @@
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
                     {% if validation == "1" %}
-                        <form action="/update_authorship/?type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
+
+                    <form action="/update_authorship/?type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
                             {% csrf_token %}
                             <input id="toProcess" name="toProcess" class="hidden"/>
                             {% for hidden in form.hidden_fields %}
@@ -700,8 +701,9 @@
                                     {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
                                 </div>
                             {% endfor %}
-                            <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour">
+                            <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'auctorialité">
                         </form>
+
                     {% endif %}
                     <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
                         {% if validation == "1" %}
