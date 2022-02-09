@@ -2,7 +2,7 @@
 
 from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
 from sovisuhal.libs.libsElastichal import getAureHal
-from sovisuhal.libs import utils, hal, unpaywall
+from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
 from elasticsearch import Elasticsearch, helpers
 import json
 import datetime
@@ -227,15 +227,23 @@ def collecte_docs(Chercheur):  # self,
 
         doc["authorship"] = []
 
-        if "authIdHal_s" in doc:
-            authors_count = len(doc["authIdHal_s"])
-            i = 0
-            for auth in doc["authIdHal_s"]:
-                i += 1
-                if i == 1:
-                    doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
-                elif i == authors_count:
-                    doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
+        authHalId_s_filled = []
+        if "authId_i" in doc:
+            for auth in doc["authId_i"]:
+                try:
+                    aureHal = archivesOuvertes.getHalId_s(auth)
+                    authHalId_s_filled.append(aureHal)
+                except:
+                    authHalId_s_filled.append("")
+
+        authors_count = len(authHalId_s_filled)
+        i = 0
+        for auth in authHalId_s_filled:
+            i += 1
+            if i == 1 and auth != "":
+                doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
+            elif i == authors_count and auth != "":
+                doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
 
         doc["harvested_from_ids"].append(Chercheur['halId_s'])
 

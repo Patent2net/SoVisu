@@ -4,6 +4,7 @@ from pprint import pprint
 import matplotlib.pyplot as plt
 
 
+
 def cycle(liste):
     tempo = []
     if len(liste) < 1:
@@ -18,6 +19,19 @@ def cycle(liste):
 ## lets go
 sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
+
+
+def getHalId_s(aureHalId):
+    sparql.setQuery("""
+    select ?p ?o
+    where  {
+    <https://data.archives-ouvertes.fr/author/%s> ?p ?o
+    }""" % aureHalId)
+    results = sparql.query().convert()
+    extIds = [truc for truc in results['results']['bindings'] if
+              truc['p']['value'] == "http://www.openarchives.org/ore/terms/isAggregatedBy"]
+
+    return extIds[0]['o']['value'].split('/')[-1]
 
 
 def getExtId(halId_s):
