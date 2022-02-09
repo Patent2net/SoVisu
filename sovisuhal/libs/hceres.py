@@ -4,7 +4,42 @@ from . import esActions
 
 es = esActions.es_connector()
 
+
+def common_data(list1, list2):
+    result = False
+
+    # traverse in the 1st list
+    for x in list1:
+
+        # traverse in the 2nd list
+        for y in list2:
+
+            # if one common
+            if x == y:
+                result = True
+                return result
+
+    return result
+
 def sortReferences(articles, halStructId):
+
+    # sort by lab
+    utln_rsr = []
+    amu_rsr = []
+
+    universities = ["198307662", "130015332"]
+
+    sort_param = esActions.scope_p("labHalId", halStructId)
+    for u in universities:
+        res = es.search(index="*-researchers", body=sort_param)
+        for rsr in res['hits']['hits']:
+            if u == "198307662":
+                utln_rsr.append(rsr['_source']['halId_s'])
+            elif u == "130015332":
+                amu_rsr.append(rsr['_source']['halId_s'])
+
+    sort_trigger = False
+
     hceres_art = []
     hceres_book = []
     hceres_conf = []
@@ -135,19 +170,38 @@ def sortReferences(articles, halStructId):
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
 
-        # colloque et posters
-        if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
-            hceres_conf.append(article)
-        # art
-        if article["docType_s"] == "ART":
-            hceres_art.append(article)
-        # ouvrages, chapitres d'ouvrages et directions d'ouvrages
-        if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
-            hceres_book.append(article)
-        # hdr
-        if article["docType_s"] == "HDR":
-            print(article)
-            hceres_hdr.append(article)
+        if sort_trigger:
+            if "authIdHal_s" in article:
+                if common_data(utln_rsr, article["authIdHal_s"]):
+
+                    # colloque et posters
+                    if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
+                        hceres_conf.append(article)
+                    # art
+                    if article["docType_s"] == "ART":
+                        hceres_art.append(article)
+                    # ouvrages, chapitres d'ouvrages et directions d'ouvrages
+                    if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article[
+                        "docType_s"] == "OUV":
+                        hceres_book.append(article)
+                    # hdr
+                    if article["docType_s"] == "HDR":
+                        print(article)
+                        hceres_hdr.append(article)
+        else:
+            # colloque et posters
+            if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
+                hceres_conf.append(article)
+            # art
+            if article["docType_s"] == "ART":
+                hceres_art.append(article)
+            # ouvrages, chapitres d'ouvrages et directions d'ouvrages
+            if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
+                hceres_book.append(article)
+            # hdr
+            if article["docType_s"] == "HDR":
+                print(article)
+                hceres_hdr.append(article)
 
     art_df = pd.DataFrame(hceres_art)
     if len(art_df.index) > 0:

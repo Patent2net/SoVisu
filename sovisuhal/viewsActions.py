@@ -403,7 +403,7 @@ def validate_credentials(request):
             print(structId + "-" + entity['labHalId'] + '-researchers')
 
             es.update(index=structId + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
-                      body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True, "status": status}})
+                      body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True, "function": function}})
 
         if type == "lab":
             rsnr = request.POST.get("f_rsnr")
