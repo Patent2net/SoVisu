@@ -390,7 +390,7 @@ def validate_credentials(request):
         if type == "rsr":
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
-            status = request.POST.get("f_status")
+            function = request.POST.get("f_status")
 
             scope_param = esActions.scope_p("_id", id)
 
