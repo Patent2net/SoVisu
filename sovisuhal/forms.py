@@ -2,9 +2,9 @@ from django import forms
 from django.forms import models
 from elasticsearch import Elasticsearch
 from decouple import config
-
+from . import viewsActions
 from .libs import esActions
-
+"""
 try:
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
     from decouple import config
@@ -14,7 +14,7 @@ try:
     structId = config("structId")
 except:
     structId = "198307662"  # UTLN
-
+"""
 #struct = "198307662"
 
 class CreateCredentials(forms.Form):
@@ -34,10 +34,10 @@ class CreateCredentials(forms.Form):
 
     scope_param = esActions.scope_all()
 
-    count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
+    count = es.count(index=viewsActions.structId + "*-laboratories", body=scope_param)['count']
     scope_param = esActions.scope_all()
 
-    res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
+    res = es.search(index=viewsActions.structId + "*-laboratories", body=scope_param, size=count)
     entities = res['hits']['hits']
     ##harvested_from_label.keyword
     # labos = []
@@ -153,9 +153,9 @@ class search(forms.Form):
     # Set choices to an empty list as it is a required argument.
 
     indexes = (
-        (structId + "-*-researchers-*-doc*", "références"),
-        (structId + "-*-researchers", "chercheurs"),
-        (structId + "-*-laboratories", "laboratoires")
+        (viewsActions.structId + "-*-researchers-*-doc*", "références"),
+        (viewsActions.structId + "-*-researchers", "chercheurs"),
+        (viewsActions.structId + "-*-laboratories", "laboratoires")
     )
 
     f_index = forms.ChoiceField(label='Collection', choices = indexes)
