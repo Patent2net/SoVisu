@@ -688,20 +688,9 @@
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
                     {% if validation == "1" %}
-                        <form action="/update_authorship/?type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
-                            {% csrf_token %}
-                            <input id="toProcess" name="toProcess" class="hidden"/>
-                            {% for hidden in form.hidden_fields %}
-                                {{ hidden }}
-                            {% endfor %}
-                            {% for field in form.visible_fields %}
-                                <div>
-                                    <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                    {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-                                </div>
-                            {% endfor %}
-                            <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour">
-                        </form>
+
+
+
                     {% endif %}
                     <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
                         {% if validation == "1" %}
