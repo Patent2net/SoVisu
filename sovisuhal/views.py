@@ -19,22 +19,6 @@ from .libs import utils, halConcepts, esActions
 # from elasticsearch.connection import create_ssl_context
 # from uniauth.decorators import login_required
 
-"""
-try:
-    from decouple import config
-    from ldap3 import Server, Connection, ALL
-    from uniauth.decorators import login_required
-
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-    structId = config("structId")
-    patternCas = 'cas-utln-'  # motif à enlever aux identifiants CAS
-except:
-    from django.contrib.auth.decorators import login_required
-
-    mode = "Dev"
-    structId = "198307662"  # UTLN
-    patternCas = ''  # motif à enlever aux identifiants CAS
-"""
 
 # def get_progress(request, task_id):
 #     result = AsyncResult(task_id)
@@ -47,22 +31,6 @@ except:
 
 # Pages
 def unknown(request):
-    # if not request.user.is_authenticated:
-    #     return redirect('%s?next=%s' % (LOGIN_URL, "/check"))
-    # elif request.user.is_authenticated:
-    #     auth_user = request.user.get_username()
-    #     if auth_user == 'admin':
-    #         return redirect('/admin/')
-    #     elif auth_user == 'adminlab':
-    #         return redirect("/index/?type=lab")
-    #     elif auth_user == 'guest':
-    #         return redirect("/index/?type=rsr")
-    #     else:
-    #         auth_user = request.user.get_username()
-    #         auth_user = auth_user.replace(patternCas, '')
-    #         return redirect('/check/?type=rsr&id=' + auth_user +'&from=1990-01-01&to=now')
-    # else:
-    # return redirect('/accounts/login/')
     return render(request, '404.html')
 
 
@@ -804,22 +772,7 @@ def search(request):
 
 @xframe_options_exempt
 def terminology(request):
-    """
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'export' in request.GET:
-        export = request.GET['export']
-    else:
-        export = False
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    # /
-    """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
@@ -1019,18 +972,7 @@ def ressources(request):
 
 
 def tools(request):
-    """
-         # Get parameters
-         if 'type' in request.GET:
-             type = request.GET['type']
-         else:
-             return redirect('unknown')
-         if 'id' in request.GET:
-             id = request.GET['id']
-         else:
-             return redirect('unknown')
-         # /
-         """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
