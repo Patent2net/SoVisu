@@ -4,18 +4,7 @@ from elasticsearch import Elasticsearch
 from decouple import config
 from . import viewsActions
 from .libs import esActions
-"""
-try:
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-    from decouple import config
-except:
-    mode = "Dev"
-try:
-    structId = config("structId")
-except:
-    structId = "198307662"  # UTLN
-"""
-#struct = "198307662"
+
 
 class CreateCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
