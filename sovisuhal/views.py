@@ -109,7 +109,7 @@ def dashboard(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('dashboard')
             query_string = urlencode({'type': type, 'id': id})
@@ -243,7 +243,7 @@ def references(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('references')
             default_filter = 'uncomplete'
@@ -400,7 +400,7 @@ def check(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             default_data = "credentials"
             base_url = reverse('check')
@@ -794,7 +794,7 @@ def terminology(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
+        elif not id == 'adminlab' and not id == 'visiteur'  and not id == 'invitamu':  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
             type = "rsr"
             base_url = reverse('terminology')
             query_string = urlencode({'type': type, 'id': id})
@@ -994,7 +994,7 @@ def tools(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('dashboard')
             query_string = urlencode({'type': type, 'id': id})
@@ -1111,7 +1111,7 @@ def wordcloud(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('wordcloud')
             query_string = urlencode({'type': type, 'id': id})
@@ -1222,7 +1222,7 @@ def publication_board(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('publicationboard')
             query_string = urlencode({'type': type, 'id': id})
