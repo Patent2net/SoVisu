@@ -26,8 +26,8 @@ class CreateCredentials(forms.Form):
     f_role = forms.CharField(label='Role', widget=forms.Select(choices=roles))
 
     f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
-    f_IdRef = forms.CharField(label='IdRef - identifiant de la notice')
-    f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594')
+    f_IdRef = forms.CharField(label='IdRef - identifiant de la notice',required=False)
+    f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594',required=False)
     # f_more = forms.CharField(label='autres')
 
     es = esActions.es_connector()
