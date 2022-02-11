@@ -155,14 +155,16 @@ def create_credentials(request):
     # resultat
     Chercheur = indexe_chercheur(ldapId, accroLab, labo, idhal, idRef, orcId)
 
+
     idhal_test = idhal_checkout(idhal)
 
     if idhal_test == 0:
         auth_user = request.user.get_username().lower()
         print("idhal not found")
-        return redirect('/?ldapid=' + ldapId + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
+        return redirect('/create/?ldapid=' + ldapId + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=true')
 
     else:
+
         print("idhal found")
         collecte_docs(Chercheur)
 
