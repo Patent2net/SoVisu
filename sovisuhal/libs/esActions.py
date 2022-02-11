@@ -11,7 +11,6 @@ except:
     from django.contrib.auth.decorators import login_required
 
     mode = "Dev"
-    structId = "198307662"  # UTLN
 
 
 # Use that base code in other files to use es_connector function: es = esActions.es_connector()

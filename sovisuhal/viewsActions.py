@@ -1,5 +1,8 @@
 import json
+from bs4 import BeautifulSoup
 from datetime import datetime
+
+from urllib.request import urlopen
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -152,12 +155,21 @@ def create_credentials(request):
     # resultat
     Chercheur = indexe_chercheur(ldapId, accroLab, labo, idhal, idRef, orcId)
 
-    collecte_docs(Chercheur)
+    idhal_test = idhal_checkout(idhal)
 
-    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
+    if idhal_test == 0:
+        auth_user = request.user.get_username().lower()
+        print("idhal not found")
+        return redirect('/?ldapid=' + ldapId + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
-    return redirect(
-        '/check/?type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=now&data=credentials')
+    else:
+        print("idhal found")
+        collecte_docs(Chercheur)
+
+        # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
+
+        return redirect(
+            '/check/?type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=now&data=credentials')
 
 
 # Redirects
@@ -483,8 +495,6 @@ def validate_research_description(request):
         research_summary = request.POST.get("f_research_summary")
         research_projectsInProgress = request.POST.get("f_research_projectsInProgress")
         research_projectsAndFundings = request.POST.get("f_research_projectsAndFundings")
-
-        from bs4 import BeautifulSoup
 
         soup = BeautifulSoup(research_summary, 'html.parser')
         research_summary_raw = soup.getText().replace("\n", " ")
@@ -838,3 +848,21 @@ def export_hceres_xls(request):
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
     return response
+
+
+def idhal_checkout(idhal):
+    confirmation = ""
+    #idhal = "luc-quoniam" valeur test
+    html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
+    response = urlopen(html)
+
+    data_json = json.loads(response.read())
+
+    print(data_json)
+    print(data_json["response"]["numFound"])
+    if data_json["response"]["numFound"] == 0:
+        confirmation = 0
+    else:
+        confirmation = 1
+    return confirmation
+

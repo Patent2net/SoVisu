@@ -19,22 +19,6 @@ from .libs import utils, halConcepts, esActions
 # from elasticsearch.connection import create_ssl_context
 # from uniauth.decorators import login_required
 
-"""
-try:
-    from decouple import config
-    from ldap3 import Server, Connection, ALL
-    from uniauth.decorators import login_required
-
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-    structId = config("structId")
-    patternCas = 'cas-utln-'  # motif à enlever aux identifiants CAS
-except:
-    from django.contrib.auth.decorators import login_required
-
-    mode = "Dev"
-    structId = "198307662"  # UTLN
-    patternCas = ''  # motif à enlever aux identifiants CAS
-"""
 
 # def get_progress(request, task_id):
 #     result = AsyncResult(task_id)
@@ -47,22 +31,6 @@ except:
 
 # Pages
 def unknown(request):
-    # if not request.user.is_authenticated:
-    #     return redirect('%s?next=%s' % (LOGIN_URL, "/check"))
-    # elif request.user.is_authenticated:
-    #     auth_user = request.user.get_username()
-    #     if auth_user == 'admin':
-    #         return redirect('/admin/')
-    #     elif auth_user == 'adminlab':
-    #         return redirect("/index/?type=lab")
-    #     elif auth_user == 'guest':
-    #         return redirect("/index/?type=rsr")
-    #     else:
-    #         auth_user = request.user.get_username()
-    #         auth_user = auth_user.replace(patternCas, '')
-    #         return redirect('/check/?type=rsr&id=' + auth_user +'&from=1990-01-01&to=now')
-    # else:
-    # return redirect('/accounts/login/')
     return render(request, '404.html')
 
 
@@ -141,7 +109,7 @@ def dashboard(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('dashboard')
             query_string = urlencode({'type': type, 'id': id})
@@ -275,7 +243,7 @@ def references(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('references')
             default_filter = 'uncomplete'
@@ -432,7 +400,7 @@ def check(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             default_data = "credentials"
             base_url = reverse('check')
@@ -804,22 +772,7 @@ def search(request):
 
 @xframe_options_exempt
 def terminology(request):
-    """
-    # Get parameters
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        return redirect('unknown')
-    if 'export' in request.GET:
-        export = request.GET['export']
-    else:
-        export = False
-    if 'id' in request.GET:
-        id = request.GET['id']
-    else:
-        return redirect('unknown')
-    # /
-    """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
@@ -841,7 +794,7 @@ def terminology(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
+        elif not id == 'adminlab' and not id == 'visiteur'  and not id == 'invitamu':  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
             type = "rsr"
             base_url = reverse('terminology')
             query_string = urlencode({'type': type, 'id': id})
@@ -1019,18 +972,7 @@ def ressources(request):
 
 
 def tools(request):
-    """
-         # Get parameters
-         if 'type' in request.GET:
-             type = request.GET['type']
-         else:
-             return redirect('unknown')
-         if 'id' in request.GET:
-             id = request.GET['id']
-         else:
-             return redirect('unknown')
-         # /
-         """
+
     # Get parameters
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -1052,7 +994,7 @@ def tools(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('dashboard')
             query_string = urlencode({'type': type, 'id': id})
@@ -1169,7 +1111,7 @@ def wordcloud(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('wordcloud')
             query_string = urlencode({'type': type, 'id': id})
@@ -1280,7 +1222,7 @@ def publication_board(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
             type = "rsr"
             base_url = reverse('publicationboard')
             query_string = urlencode({'type': type, 'id': id})
