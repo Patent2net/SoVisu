@@ -31,7 +31,7 @@ def sortReferences(articles, halStructId):
 
     sort_param = esActions.scope_p("labHalId", halStructId)
     for u in universities:
-        res = es.search(index=u + "-*-researchers", body=sort_param)
+        res = es.search(index=u + -"*-researchers", body=sort_param)
         for rsr in res['hits']['hits']:
             if u == "198307662":
                 utln_rsr.append(rsr['_source']['halId_s'])
