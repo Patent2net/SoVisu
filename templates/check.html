@@ -184,6 +184,18 @@
 
                 </div>
 
+              {% if iDhalerror == "True"   %}
+                    <div class="my-3 mt-1 flex w-full bg-red-100 border border-red-300 rounded text-xs p-4 items-center text-yellow-800">
+                        <ul>
+                            <li>
+                                Votre ID HAL n'est pas valide
+                            </li>
+                        </ul>
+                    </div>
+
+              {% endif %}
+
+
                 <form action="/CreateCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
@@ -311,6 +323,8 @@
                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none"
                            type="submit" value="Modifier ou valider les identifiants">
                 </form>
+
+
 
                 {% if entity.aurehalId == -1 %}
 
