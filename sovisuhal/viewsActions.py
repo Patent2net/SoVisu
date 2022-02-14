@@ -125,6 +125,11 @@ def logged_in(request):
 @login_required
 def create(request):
     ldapid = request.GET['ldapid']  # ldapid
+    iDhalerror = False
+    if 'iDhalerror' in request.GET:
+        iDhalerror = request.GET['iDhalerror']
+
+
     return render(request, 'check.html', {'data': "create",  # 'type': type,
                                           'ldapid': ldapid,  # 'from': dateFrom, 'to': dateTo,
                                           # 'entity': entity, #'extIds': ['a', 'b', 'c'],
@@ -132,7 +137,8 @@ def create(request):
                                           'idRef': 'nullNone',
                                           'orcId': 'nullNone',
                                           'autres': 'nullNone',
-                                          'form': forms.CreateCredentials()
+                                          'form': forms.CreateCredentials(),
+                                          'iDhalerror': iDhalerror,
                                           }
                   # "'startDate': start_date,
                   # 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
@@ -161,7 +167,7 @@ def create_credentials(request):
     if idhal_test == 0:
         auth_user = request.user.get_username().lower()
         print("idhal not found")
-        return redirect('/create/?ldapid=' + ldapId + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=true')
+        return redirect('/create/?ldapid=' + ldapId + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True')
 
     else:
 
