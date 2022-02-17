@@ -22,6 +22,11 @@ sparql.setReturnFormat(JSON)
 
 
 def getHalId_s(aureHalId):
+    # start
+    # auteur :Joseph
+    # commentaire:  Cette fonction prend en paramètre la valeur aureHalId  et retourne la valeur authIdHal_s  associée
+    # example: aureHalId(826859)=>vanessa-richard
+    # end
     sparql.setQuery("""
     select ?p ?o
     where  {
@@ -31,55 +36,78 @@ def getHalId_s(aureHalId):
     extIds = [truc for truc in results['results']['bindings'] if
               truc['p']['value'] == "http://www.openarchives.org/ore/terms/isAggregatedBy"]
 
-    return extIds[0]['o']['value'].split('/')[-1]
+    authIdHal_s = extIds[0]['o']['value'].split('/')[-1]
+    return authIdHal_s
 
 
-def getExtId(halId_s):
+def getExtId(authIdHal_s):
+    #start
+    #auteur :Joseph
+    #commentaire:  Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aureHalId associée
+    #example: authIdHal_s(vanessa-richard)=>826859
+    #end
     sparql.setQuery("""
     select ?p ?o
     where  {
     <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-    }""" % halId_s)
+    }""" % authIdHal_s)
     results = sparql.query().convert()
     extIds = [truc for truc in results['results']['bindings'] if
               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
+    aureHalId = int(extIds[0]['o']['value'].rsplit('/', 1)[1])
+    return  aureHalId
 
-    return int(extIds[0]['o']['value'].rsplit('/', 1)[1])
-
-def getLabel(topic, lang):
+def getLabel(label, lang):
+    #start
+    #auteur :Joseph
+    #commentaire:  Cette fonction prend en paramètre la valeur label et lang  et retourne le nom complet du label en fonction de la langue associée
+    #example: getLabel("phys","en") => Physics
+    #end
     sparql.setQuery("""
         select ?p ?o
         where  {
         <https://data.archives-ouvertes.fr/subject/%s> ?p ?o
-        }""" % topic)
+        }""" % label)
     results = sparql.query().convert()
 
     label = [truc['o']['value'] for truc in results['results']['bindings'] if
              truc['p']['value'] == "http://www.w3.org/2004/02/skos/core#prefLabel" if
              truc['o']['xml:lang'] == lang]
+    label_complet = label[0]
+    return label_complet
 
-    return label[0]
 
-
-def getArticle(artHalId):
+def getArticle(halId_s):
+    # start
+    # auteur :Joseph
+    # commentaire: Cette fonction prend en paramètre halId_s l'id d'un article  et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
+    # example: getArticle(702215) => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': []}}
+    # end
     """returns  Liste des métadonnées d'un document in sparlq dataarchive format"""
     sparql.setQuery("""select ?p ?o 
 where {
  <https://data.archives-ouvertes.fr/document/%s> ?p ?o
-} """ % artHalId)
+} """ % halId_s)
     results = sparql.query().convert()
-    return results
+    metadone_article = results
+    return metadone_article
 
 
-def recupIndividu(halidint):
+def recupIndividu(authIdHal_s):
+    # start
+    # auteur :Joseph
+    # commentaire: Cette fonction prend en paramètre authIdHal_s  s d'un cherhcheur   et retourne sous forme de dictionnaire donnee_individu qui regroupe  l'ensemble des donnée concernant le chercheur
+    # example: recupIndividu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
+    # end
     sparql.setQuery("""
 select ?p ?o
 where  {
 <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-}""" % halidint)
+}""" % authIdHal_s)
     results = sparql.query().convert()
     # result in form of predicat, objet in a list in results['results']['bindings']
-    return results
+    donnee_individu = results
+    return donnee_individu
 
 
 def exploreBroader(uri):
@@ -106,19 +134,19 @@ def exploreBroader(uri):
 
     return dicoTop
 
-def extraitSujetsDomaines(dat):
+def extraitSujetsDomaines(data):
     """ inputs from recupIndividu(halidint)
     halidint est un individu
     """
     # extraction des résultats
-    topics = [truc for truc in dat['results']['bindings'] if
+    topics = [truc for truc in data['results']['bindings'] if
               truc['p']['value'] == "http://xmlns.com/foaf/0.1/topic_interest"]
-    sujets = [truc['o']['value'] for truc in dat['results']['bindings'] if
+    sujets = [truc['o']['value'] for truc in data['results']['bindings'] if
               truc['p']['value'] == "http://xmlns.com/foaf/0.1/interest"]
     # récupération des langues
 
     # alaric :  soit on considère que les mots qui n'ont pas de langue renseignée sont en anglais (j'ai constaté ça pour chl)
-    #           soit on les drop ?
+    # soit on les drop ?
     for top in topics:
         if 'xml:lang' not in top['o']:
             top['o']['xml:lang'] = 'en'
@@ -208,12 +236,18 @@ def extraitMotsCles(dat):
 # print (extraitMotsCles (res) )
 
 
-def getConceptsAndKeywords(halId_i):
+def getConceptsAndKeywords(aureHalId):
+    # start
+    # auteur :Joseph
+    # commentaire: Cette fonction prend en paramètre aureHalId  d'un chercheur   et retourne sous forme de dictionnaire ConceptsAndKeywords  qui regroupe  l'ensemble des concept et donnée aborder par le chercheur
+    # example: getConceptsAndKeywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
+    # end
+
     concept = []
     keywords = []
 
     # extraction des sujets d'intérêt et domaines d'un chercheur
-    data = recupIndividu(halId_i)
+    data = recupIndividu(aureHalId)
 
     sujets, domaines = extraitSujetsDomaines(data)
     Domains = []
@@ -227,8 +261,6 @@ def getConceptsAndKeywords(halId_i):
 
             # réseau json hiérarchiques
             #
-
-
             dicoNoeuds = dict()
             tree = nx.DiGraph()
 
@@ -276,8 +308,9 @@ def getConceptsAndKeywords(halId_i):
             keywords.append({'lang': lang, 'keywords': nx.tree_data(treeWords, lang)})
             # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
             #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
-
-        return {'concepts': concepts, 'keywords': keywords}
+        ConceptsAndKeywords ={'concepts': concepts, 'keywords': keywords}
+        return ConceptsAndKeywords
 
     except:
-        return {'concepts': [], 'keywords': []}
+        ConceptsAndKeywords= {'concepts': [], 'keywords': []}
+        return  ConceptsAndKeywords
