@@ -59,5 +59,4 @@ urlpatterns = [
     path('loggedin/', viewsActions.logged_in, name='loggued'),
 
     path('tinymce/', include('tinymce.urls')),
-    # path('celery-progress/', include('celery_progress.urls'))  # the endpoint is configurable
 ]
