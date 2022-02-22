@@ -163,10 +163,12 @@ def sortReferences(articles, halStructId):
             article["defenseDate_tdate_s"] = article["defenseDate_tdate"][0:9]
 
         article["title_s"] = article["title_s"][0]
-
-        for i in range(len(article["authFirstName_s"])):
-            article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][
-                i] + ", "
+        if len(article["authFirstName_s"]) >0:
+            for i in range(len(article["authFirstName_s"])):
+                article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][
+                    i] + ", "
+        else:
+            article["authfullName_s"] = ', '.join(article["authFullName_s"])
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
 
