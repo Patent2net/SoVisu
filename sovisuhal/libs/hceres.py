@@ -101,15 +101,19 @@ def sortReferences(articles, halStructId):
                 # authFullName_s qui est en fait halId_s mais pas toujours
                 try:
                     doc_param = esActions.scope_p(field, authorship["authFullName_s"])
+                    halId_s = authorship["authFullName_s"]
+
                 except:
                     doc_param = esActions.scope_p(field, authorship['halId_s'])
+                    halId_s = authorship["halId_s"]
+
                 doc_param = {
                     "query": {
                         "bool": {
                             "must": [
                                 {
                                     "match_phrase": {
-                                        "halId_s": authorship["authFullName_s"]
+                                        "halId_s": halId_s
                                     }
                                 },
                                 {
@@ -121,7 +125,6 @@ def sortReferences(articles, halStructId):
                         }
                     }
                 }
-
                 res = es.search(index="*-researchers", body=doc_param)
                 if len(res['hits']['hits']) > 0 and res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
                     hasAuthorship = True
