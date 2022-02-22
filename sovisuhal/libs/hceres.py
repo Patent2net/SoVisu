@@ -30,12 +30,12 @@ def sortReferences(articles, halStructId):
     universities = ["198307662", "130015332"]
 
     sort_param = esActions.scope_p("labHalId", halStructId)
-    for u in universities:
-        res = es.search(index=u + "-*-researchers", body=sort_param)
+    for univ in universities:
+        res = es.search(index=univ + "-*-researchers", body=sort_param)
         for rsr in res['hits']['hits']:
-            if u == "198307662":
+            if univ == "198307662":
                 utln_rsr.append(rsr['_source']['halId_s'])
-            elif u == "130015332":
+            elif univ == "130015332":
                 amu_rsr.append(rsr['_source']['halId_s'])
 
     sort_trigger = False
