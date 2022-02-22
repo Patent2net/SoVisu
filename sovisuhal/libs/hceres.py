@@ -174,7 +174,9 @@ def sortReferences(articles, halStructId):
             article["authfullName_s"] = ', '.join(article["authFullName_s"])
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
-
+        if "docType_s" not in article .keys(): # Encore des exeptions... Est que c'est ponctuel le temps que la base mouline ????
+            if "journalTitle_s" in article .keys():
+                article["docType_s"] = "ART"
         if sort_trigger:
             if "authIdHal_s" in article:
                 if common_data(utln_rsr, article["authIdHal_s"]):
