@@ -102,7 +102,7 @@ def sortReferences(articles, halStructId):
                 try:
                     doc_param = esActions.scope_p(field, authorship["authFullName_s"])
                 except:
-                    doc_param = esActions.scope_p(field, authorship['halId_s']
+                    doc_param = esActions.scope_p(field, authorship['halId_s'])
                 doc_param = {
                     "query": {
                         "bool": {
