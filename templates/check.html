@@ -27,6 +27,8 @@
 
             <div class="flex justify-between items-start">
 
+
+
                 <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
                     {% if entity.halStructId %}
                         <a class="px-2 pb-1
@@ -111,7 +113,10 @@
                         {% for rsr in researchers %}
                             <tr class="text-gray-500">
                                 <td class="hidden ldapId">{{ rsr.ldapId }}</td>
-                                <td>{{ rsr.firstName }} {{ rsr.lastName }}</td>
+                                <td>
+                                     <a class="text-blue-700 text-sm"    href="/dashboard/?type=rsr&id={{  rsr.ldapId}}" >
+                                     <span class=""> {{ rsr.firstName }} {{ rsr.lastName }} </span>
+                                </td>
                                 <td>{{ rsr.validated }}</td>
                                 {% if rsr.team %}
                                     <td>{{ rsr.team }}</td>
