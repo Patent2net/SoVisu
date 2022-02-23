@@ -21,10 +21,7 @@ def unknown(request):
 
 def index(request):
     # Get parameters
-    if 'indexcat' in request.GET:
-        indexcat = request.GET['indexcat']
-    else:
-        indexcat = -1
+    indexcat = request.GET['indexcat']
 
     if 'type' in request.GET:
         type = request.GET['type']
@@ -39,13 +36,12 @@ def index(request):
 
     # Connect to DB
     es = esActions.es_connector()
+
     indextype = ""
     if indexcat == "lab":
-        print("lab type")
         indextype = "*-laboratories"
 
     elif indexcat == "rsr":
-        print("rsr type")
         indextype = "*-researchers"
 
     scope_param = esActions.scope_all()
@@ -61,13 +57,11 @@ def index(request):
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['acronym'])
     elif indexcat == "rsr":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['lastName'])
-
     # /
-    if type == -1 and id == -1:
-        print("-1 route")
-        return render(request, 'index.html',{'entities': cleaned_entities, 'indexcat': indexcat, })
-    else:
-        print("normal route")
+    if type == -1 and id == -1:  # Si le type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
+        # → évite des erreurs lors des vérifications pour les autres pages dans le cas d'un -1
+        return render(request, 'index.html', {'entities': cleaned_entities, 'indexcat': indexcat, })
+    else:  # Le type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
         return render(request, 'index.html', {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'id': id})
 
 
@@ -126,7 +120,7 @@ def dashboard(request):
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=viewsActions.structId + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
