@@ -21,10 +21,16 @@ def unknown(request):
 
 def index(request):
     # Get parameters
+    if 'indexcat' in request.GET:
+        indexcat = request.GET['indexcat']
+    else:
+        indexcat = -1
+
     if 'type' in request.GET:
         type = request.GET['type']
     else:
         type = -1
+
     if 'id' in request.GET:
         id = request.GET['id']
     else:
@@ -33,43 +39,36 @@ def index(request):
 
     # Connect to DB
     es = esActions.es_connector()
+    indextype = ""
+    if indexcat == "lab":
+        print("lab type")
+        indextype = "*-laboratories"
 
-    if type == "lab":
-        scope_param = esActions.scope_all()
+    elif indexcat == "rsr":
+        print("rsr type")
+        indextype = "*-researchers"
 
-        count = es.count(index=viewsActions.structId + "*-laboratories", body=scope_param)['count']
-        res = es.search(index=viewsActions.structId + "*-laboratories", body=scope_param, size=count)
-        entities = res['hits']['hits']
-
-    elif type == "rsr":
-
-        if id == -1:
-            scope_param = esActions.scope_all()
-
-            count = es.count(index=viewsActions.structId + "*-researchers", body=scope_param)['count']
-            res = es.search(index=viewsActions.structId + "*-researchers", body=scope_param, size=count)
-        else:
-
-            field = "labHalId"
-            scope_param = esActions.scope_p(field, id)
-
-            count = es.count(index=viewsActions.structId + "-" + id + "-researchers", body=scope_param)['count']
-
-            res = es.search(index=viewsActions.structId + "-" + id + "-researchers", body=scope_param, size=count)
-        entities = res['hits']['hits']
+    scope_param = esActions.scope_all()
+    count = es.count(index=viewsActions.structId + indextype, body=scope_param)['count']
+    res = es.search(index=viewsActions.structId + indextype, body=scope_param, size=count)
+    entities = res['hits']['hits']
     cleaned_entities = []
 
     for entity in entities:
         cleaned_entities.append(entity['_source'])
 
-    if type == "lab":
+    if indexcat == "lab":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['acronym'])
-    elif type == "rsr":
+    elif indexcat == "rsr":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['lastName'])
 
     # /
-
-    return render(request, 'index.html', {'entities': cleaned_entities, 'type': type})
+    if type == -1 and id == -1:
+        print("-1 route")
+        return render(request, 'index.html',{'entities': cleaned_entities, 'indexcat': indexcat, })
+    else:
+        print("normal route")
+        return render(request, 'index.html', {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'id': id})
 
 
 def dashboard(request):
@@ -82,19 +81,19 @@ def dashboard(request):
         id = request.user.get_username()
         id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
             type = "rsr"
             base_url = reverse('dashboard')
             query_string = urlencode({'type': type, 'id': id})
@@ -216,19 +215,19 @@ def references(request):
         id = request.user.get_username()
         id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
             type = "rsr"
             base_url = reverse('references')
             default_filter = 'uncomplete'
@@ -373,19 +372,19 @@ def check(request):
         id = request.user.get_username()
         id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
             type = "rsr"
             default_data = "credentials"
             base_url = reverse('check')
@@ -767,19 +766,19 @@ def terminology(request):
         id = request.user.get_username()  # check si l'utilisateur est log
         id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur'  and not id == 'invitamu':  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
+        elif not id == 'adminlab' and not id == 'visiteur'  and not id == 'invitamu' and not id == -1:  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
             type = "rsr"
             base_url = reverse('terminology')
             query_string = urlencode({'type': type, 'id': id})
@@ -967,19 +966,19 @@ def tools(request):
         id = request.user.get_username()
         id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
             type = "rsr"
             base_url = reverse('dashboard')
             query_string = urlencode({'type': type, 'id': id})
@@ -1084,19 +1083,19 @@ def wordcloud(request):
         id = request.user.get_username()
         id = id.replace(viewsActions.patternCas, '')
         if id == 'adminlab':
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
             type = "rsr"
             base_url = reverse('wordcloud')
             query_string = urlencode({'type': type, 'id': id})
@@ -1195,19 +1194,19 @@ def publication_board(request):
         id = request.user.get_username()
         id = id.replace(viewsActions.patternCas, '')
         if id == 'adminlab':
-            type = "lab"
+            indexcat = "lab"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         if id == "invitamu":
-            type = "rsr"
+            indexcat = "rsr"
             base_url = reverse('index')
-            query_string = urlencode({'type': type})
+            query_string = urlencode({'indexcat': indexcat})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu':
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
             type = "rsr"
             base_url = reverse('publicationboard')
             query_string = urlencode({'type': type, 'id': id})
