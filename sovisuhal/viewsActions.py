@@ -57,15 +57,15 @@ def admin_access_login(request):
         if auth_user == 'admin':
             return redirect('/admin/')
         elif auth_user == 'adminlab':
-            return redirect("/index/?type=lab")
+            return redirect("/index/?indexcat=lab")
         elif auth_user == 'invitamu':
 
             structId = "130015332"  # change la variable globale pour l'AMU
             patternCas = ''  # enlève le patternCas de la requète sous peine de bug? (préventif)
 
-            return redirect("/index/?type=rsr")
+            return redirect("/index/?indexcat=rsr")
         elif auth_user == 'visiteur':
-            return redirect("/index/?type=rsr")
+            return redirect("/index/?indexcat=rsr")
         else:
             print(auth_user)
             print("auth user related structId is:")
@@ -97,11 +97,11 @@ def logged_in(request):
         if auth_user == 'admin':
             return redirect('/admin/')
         elif auth_user == 'adminlab':
-            return redirect("/index/?type=lab")
+            return redirect("/index/?indexcat=lab&type=lab")
         elif auth_user == 'invitamu':
-            return redirect("/index/?type=rsr")
+            return redirect("/index/?indexcat=rsr")
         elif auth_user == 'visiteur':
-            return redirect("/index/?type=rsr")
+            return redirect("/index/?indexcat=rsr")
         else:
             # auth_user = request.user.get_username()
 

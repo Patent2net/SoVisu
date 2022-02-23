@@ -1,16 +1,16 @@
-{% if type == "lab" %}
+{% if indexcat == "lab" %}
     {% include "includes/header.html" with title="Index des laboratoires" %}
 {%  endif %}
-{% if type == "rsr" %}
+{% if indexcat == "rsr" %}
     {% include "includes/header.html" with title="Index des chercheurs" %}
 {%  endif %}
 
 <div class="w-full flex" style="height:calc(100% - 48px)">
 
-    {% if type == "lab" %}
+    {% if indexcat == "lab" %}
         {% include "includes/menu.html" with title="Index des laboratoires" %}
     {%  endif %}
-    {% if type == "rsr" %}
+    {% if indexcat == "rsr" %}
         {% include "includes/menu.html" with title="Index des chercheurs" %}
     {%  endif %}
 
