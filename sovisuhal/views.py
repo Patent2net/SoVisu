@@ -13,21 +13,6 @@ from django.urls import reverse
 
 from .libs import utils, halConcepts, esActions
 
-# from celery.result import AsyncResult
-
-# from ssl import create_default_context
-# from elasticsearch.connection import create_ssl_context
-# from uniauth.decorators import login_required
-
-
-# def get_progress(request, task_id):
-#     result = AsyncResult(task_id)
-#     response_data = {
-#         'state': result.state,
-#         'details': result.info,
-#     }
-#     return HttpResponse(json.dumps(response_data), content_type='application/json')
-
 
 # Pages
 def unknown(request):
