@@ -114,8 +114,9 @@
                             <tr class="text-gray-500">
                                 <td class="hidden ldapId">{{ rsr.ldapId }}</td>
                                 <td>
-                                     <a class="text-blue-700 text-sm"    href="/dashboard/?type=rsr&id={{  rsr.ldapId}}" >
+                                     <a class="text-blue-700 text-sm underline" href="/dashboard/?type=rsr&id={{rsr.ldapId}}">
                                      <span class=""> {{ rsr.firstName }} {{ rsr.lastName }} </span>
+                                    </a>
                                 </td>
                                 <td>{{ rsr.validated }}</td>
                                 {% if rsr.team %}
