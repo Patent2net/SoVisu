@@ -33,43 +33,43 @@
                     {% if entity.halStructId %}
                         <a class="px-2 pb-1
                         {% if data == "state" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
                         >Membres du laboratoire</a>
                     {% endif %}
                     <a class="px-2 pb-1
                         {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
                     >Identifiants</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                         >Notices HAL</a>
                     {% endif %}
                     {% if type == "lab" %}
                         <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                         >Notices HAL du labo</a>
                     {% endif %}
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
                         >Expertise</a>
                     {% endif %}
                     <a class="px-2 pb-1
                         {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
                     >Mots-clés orienteurs</a>
                     <a class="px-2 pb-1
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
                     >Domaines orienteurs</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
                         >Descriptifs de recherche</a>
                     {% endif %}
                 </h1>
@@ -114,7 +114,7 @@
                             <tr class="text-gray-500">
                                 <td class="hidden ldapId">{{ rsr.ldapId }}</td>
                                 <td>
-                                     <a class="text-blue-700 text-sm underline" href="/dashboard/?type=rsr&id={{rsr.ldapId}}">
+                                     <a class="text-blue-700 text-sm underline" target="_blank" href="/dashboard/?struct={{ struct }}&type=rsr&id={{rsr.ldapId}}">
                                      <span class=""> {{ rsr.firstName }} {{ rsr.lastName }} </span>
                                     </a>
                                 </td>
@@ -311,7 +311,7 @@
 
                 </div>
 
-                <form action="/validate_credentials/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                <form action="/validate_credentials/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                       method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
@@ -336,7 +336,7 @@
 
                     <hr class="mb-4 mt-4"/>
 
-                    <form action="/refresh-aurehal-id/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                    <form action="/refresh-aurehal-id/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                           method="post">
                         {% csrf_token %}
                         <p class="text-sm">
@@ -371,11 +371,11 @@
 
                     <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
                     >Expertises validées</a>
                     <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
                     >Expertises retirées</a>
 
                 </div>
@@ -448,7 +448,7 @@
                         et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
                 </div>
 
-                <form action="/validate_guiding-keywords/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                <form action="/validate_guiding-keywords/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                       method="post">
                     {% csrf_token %}
                     {% for hidden in form.hidden_fields %}
@@ -500,7 +500,7 @@
                 </div>
 
 
-                <form action="/validate_research-description/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                <form action="/validate_research-description/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                       method="post">
                     {% csrf_token %}
                     {% for hidden in form.hidden_fields %}
@@ -622,22 +622,22 @@
                         {% if type == "rsr" %}
                             <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                             >Notices validées</a>
                             <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
                             >Notices retirées</a>
                         {% endif %}
 
                         {% if type == "lab" %}
                             <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                             >Notices validées</a>
                             <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
                             >Notices retirées</a>
                         {% endif %}
                     </div>
@@ -646,7 +646,7 @@
                         {% if type == "rsr" %}
                             <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
                         text-gray-600 "
-                               href="/force-update_references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
+                               href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
                             >Collecter de nouvelles références</a>
 
                         {% endif %}
@@ -709,7 +709,7 @@
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
                     {% if validation == "1" %}
 
-                    <form action="/update_authorship/?type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
+                    <form action="/update_authorship/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
                             {% csrf_token %}
                             <input id="toProcess" name="toProcess" class="hidden"/>
                             {% for hidden in form.hidden_fields %}

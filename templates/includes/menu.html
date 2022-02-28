@@ -7,7 +7,7 @@
                     <li class="flex h-8">
                         <a
                                 class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Vérification des données' %} text-white {% else %} text-gray-300 {% endif %}"
-                                href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials">
+                                href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials">
                             <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg"
                                  viewBox="0 0 20 20"
                                  fill="currentColor">
@@ -56,12 +56,12 @@
                     >
                         <li class="flex w-full h-8">
                             <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold {% if title == 'Tableau des dépôts' %} text-white {% else %} text-gray-300 {% endif %}"
-                               href="/dashboard/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}"
+                               href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}"
                             >Dépôts Hal</a></li>
 
                         <li class="flex w-full h-8">
                             <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}"
-                               href="/publicationboard/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}"
+                               href="/publicationboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}"
                             >données d'annuaire</a></li>
                     </ul>
                 </li>
@@ -77,7 +77,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Références' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=uncomplete">
+                        href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=uncomplete">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -89,7 +89,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Expertise' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/terminology/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/terminology/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -102,7 +102,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Nuage de Mots' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/wordcloud/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
+                        href="/wordcloud/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -115,7 +115,7 @@
         {% if entity.halStructId %}
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Outils' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/tools/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
+                        href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
@@ -130,7 +130,7 @@
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Ressources</h3>
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Index des laboratoires' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/index/?indexcat=lab{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/index/?indexcat=lab&indexstruct={{ struct }}&struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
@@ -140,7 +140,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Index des chercheurs' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/index/?indexcat=rsr{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/index/?indexcat=rsr&indexstruct={{ struct }}&struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -155,7 +155,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Recherche' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/search/">
+                        href="/search/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2h-1.528A6 6 0 004 9.528V4z"/>
@@ -171,7 +171,7 @@
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Plus d'informations</h3>
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Présentation' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/presentation/">
+                        href="/presentation/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -183,7 +183,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Ressources' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/ressources/">
+                        href="/ressources/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -208,7 +208,7 @@
 -->
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Foire aux questions' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/faq/">
+                        href="/faq/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -220,7 +220,7 @@
 
                 <li class="flex h-8"><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Nous contacter' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/contact/">
+                        href="/contact/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
   <path fill-rule="evenodd" d="M14.243 5.757a6 6 0 10-.986 9.284 1 1 0 111.087 1.678A8 8 0 1118 10a3 3 0 01-4.8 2.401A4 4 0 1114 10a1 1 0 102 0c0-1.537-.586-3.07-1.757-4.243zM12 10a2 2 0 10-4 0 2 2 0 004 0z" clip-rule="evenodd" />
