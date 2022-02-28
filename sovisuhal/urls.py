@@ -20,7 +20,7 @@ from . import views, viewsActions
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', viewsActions.admin_access_login, name='index'),
+    path('', viewsActions.admin_access_login, name='login'),
 
     path('index/', views.index, name='index'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -56,7 +56,7 @@ urlpatterns = [
     path('unknown/', views.unknown, name='unknown'),
     path('create/', viewsActions.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
-    path('loggedin/', viewsActions.logged_in, name='loggued'),
+
 
     path('tinymce/', include('tinymce.urls')),
 ]
