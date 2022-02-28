@@ -47,22 +47,22 @@
                         {% if indexcat == "rsr" %}
                             <a class="px-2 pb-1
                         {% if indexstruct == "130015332" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/index/?indexcat=rsr&indexstruct=130015332&struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
+                               href="/index/?indexcat=rsr&indexstruct=130015332{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
                             > AMU</a>
                             <a class="px-2 pb-1
                         {% if indexstruct == "198307662" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/index/?indexcat=rsr&indexstruct=198307662&struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
+                               href="/index/?indexcat=rsr&indexstruct=198307662{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
                             > UTLN</a>
                         {% endif %}
 
                         {% if indexcat == "lab" %}
                             <a class="px-2 pb-1
                         {% if indexstruct == "130015332" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/index/?indexcat=lab&indexstruct=130015332&struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
+                               href="/index/?indexcat=lab&indexstruct=130015332{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
                             > AMU</a>
                             <a class="px-2 pb-1
                         {% if indexstruct == "198307662" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/index/?indexcat=lab&indexstruct=198307662&struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
+                               href="/index/?indexcat=lab&indexstruct=198307662{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"
                             > UTLN</a>
                         {% endif %}
                     </div>
