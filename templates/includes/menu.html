@@ -1,37 +1,73 @@
 <div class="flex flex-col bg-gray-600 h-full">
     <div class="flex flex-col h-full justify-between mt-4">
         <div>
+        <!-- Profil -->
+            <ul class="flex flex-col" :class="{'block': open, 'hidden': !open}">
+
+                <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Profil</h3>
+                {% if user.is_authenticated and user.get_username != 'visiteur' %}
+                    {% if ldapid and user.get_username != 'adminlab' and user.get_username != 'invitamu' and user.get_username != 'admin'  %}
+                        <li class="flex h-8 ">
+                            <a class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Création de profil' %} text-white {% else %} text-gray-300 {% endif %}"
+                                    href="/create/?ldapid={{ user.get_username }}&halId_s=nullNone&orcId=nullNone&idRef=nullNone">
+                                <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 20 20"
+                                     fill="currentColor">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                    <path fillRule="evenodd"
+                                          d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z"
+                                          clipRule="evenodd"/>
+                                </svg>
+                                Création de profil
+
+
+                                <span class="-ml-6 flex h-3 w-3 absolute">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+
+
+                            </a>
+                        </li>
+                {% endif %}
+                    {% if struct and struct != '-1'%}
+                        {% if not ldapid %}
+                        <li class="flex h-8 ">
+                            <a class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Vérification des données' %} text-white {% else %} text-gray-300 {% endif %}"
+                                    href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials">
+                                <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 20 20"
+                                     fill="currentColor">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                    <path fillRule="evenodd"
+                                          d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                          clipRule="evenodd"/>
+                                </svg>
+                                Vérification des données
+
+                                {% if hasToConfirm == True %}
+                                    <span class="-ml-6 flex h-3 w-3 absolute">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                                    </span>
+                                {% endif %}
+
+
+
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </ul>
+
+        <!-- Synthèses -->
         {% if struct and struct != '-1'%} <!-- affiche la partie synthèse du menu uniquement si struc est présent et ne vaut pas -1-->
             <ul class="flex flex-col" :class="{'block': open, 'hidden': !open}">
 
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Synthèses</h3>
-                {% if user.is_authenticated and user.get_username != 'visiteur' %}
-                    <li class="flex h-8">
-                        <a
-                                class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Vérification des données' %} text-white {% else %} text-gray-300 {% endif %}"
-                                href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials">
-                            <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg"
-                                 viewBox="0 0 20 20"
-                                 fill="currentColor">
-                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                <path fillRule="evenodd"
-                                      d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                      clipRule="evenodd"/>
-                            </svg>
-                            Vérification des données
 
-                            {% if hasToConfirm == True %}
-                                <span class="-ml-6 flex h-3 w-3 absolute">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
-                        </span>
-                            {% endif %}
-
-
-                        </a>
-                    </li>
-                {% endif %}
-                <li @click.away="open = false" x-data="{ open: false }" class=" flex w-full h-8 relative">
+                <li @click.away="open = false" x-data="{ open: false }" class=" flex w-full h-8 relative ">
                     <a @click="open = !open"
                        class="cursor-pointer w-full whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Tableau des dépôts' or title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}">
                         <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -48,24 +84,24 @@
 
                     </a>
 
-                    <ul class="absolute z-10 bg-gray-500 mt-8 left-4 rounded right-4"
-                        x-show="open" x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                    >
-                        <li class="flex w-full h-8">
-                            <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold {% if title == 'Tableau des dépôts' %} text-white {% else %} text-gray-300 {% endif %}"
-                               href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}"
-                            >Dépôts Hal</a></li>
+                        <ul class="absolute z-10 bg-gray-500 mt-8 left-4 rounded right-4"
+                            x-show="open" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                        >
+                            <li class="flex w-full h-8 ">
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold {% if title == 'Tableau des dépôts' %} text-white {% else %} text-gray-300 {% endif %}"
+                                   href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}"
+                                >Dépôts Hal</a></li>
 
-                        <li class="flex w-full h-8">
-                            <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}"
-                               href="/publicationboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}"
-                            >données d'annuaire</a></li>
-                    </ul>
+                            <li class="flex w-full h-8 ">
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}"
+                                   href="/publicationboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}"
+                                >données d'annuaire</a></li>
+                        </ul>
                 </li>
 
                 <!--<li class="flex h-8"><a class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full
@@ -77,9 +113,9 @@
                     Tableau des publications
                 </a></li>-->
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Références' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=uncomplete">
+                        href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=uncomplete">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -89,9 +125,9 @@
                     Références
                 </a></li>
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Expertise' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/terminology/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/terminology/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -102,9 +138,9 @@
                     Expertise
                 </a></li>
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Nuage de Mots' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/wordcloud/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
+                        href="/wordcloud/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -114,25 +150,27 @@
                     Nuage de Mots
                 </a></li>
 
-        {% if entity.halStructId %}
-                <li class="flex h-8"><a
+            {% if entity.halStructId %}
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Outils' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
+                        href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
                     </svg>
                     Outils
                 </a></li>
-
             {% endif %}
+
             </ul>
         {% endif %}
+
+        <!-- Ressources -->
             <ul class="flex flex-col mt-4">
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Ressources</h3>
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Index des laboratoires' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/index/?indexcat=lab&{%  if struct and struct != '-1' %}indexstruct={{ struct }}&struct={{ struct }}{% else %}indexstruct=198307662{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/index/?indexcat=lab&{%  if struct and struct != '-1' %}indexstruct={{ struct }}&struct={{ struct }}{% else %}indexstruct=198307662{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
@@ -140,9 +178,9 @@
                     Index des laboratoires
                 </a></li>
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Index des chercheurs' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/index/?indexcat=rsr&{%  if struct and struct != '-1' %}indexstruct={{ struct }}&struct={{ struct }}{% else %}indexstruct=198307662{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/index/?indexcat=rsr&{%  if struct and struct != '-1' %}indexstruct={{ struct }}&struct={{ struct }}{% else %}indexstruct=198307662{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -152,12 +190,13 @@
                 </a></li>
             </ul>
 
-            <ul class="flex flex-col mt-4">
+        <!-- Exploration -->
+            <ul class="flex flex-col mt-4 ">
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Exploration</h3>
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Recherche' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/search/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/search/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2h-1.528A6 6 0 004 9.528V4z"/>
@@ -169,11 +208,12 @@
                 </a></li>
             </ul>
 
+        <!-- Plus d'informations -->
             <ul class="flex flex-col mt-4">
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Plus d'informations</h3>
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Présentation' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/presentation/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/presentation/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -183,9 +223,9 @@
                     Présentation
                 </a></li>
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Ressources' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/ressources/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/ressources/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -208,9 +248,9 @@
                     Outils & services
                 </a></li>
 -->
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Foire aux questions' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/faq/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/faq/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -220,9 +260,9 @@
                     Foire aux questions
                 </a></li>
 
-                <li class="flex h-8"><a
+                <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Nous contacter' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="/contact/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}">
+                        href="/contact/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
   <path fill-rule="evenodd" d="M14.243 5.757a6 6 0 10-.986 9.284 1 1 0 111.087 1.678A8 8 0 1118 10a3 3 0 01-4.8 2.401A4 4 0 1114 10a1 1 0 102 0c0-1.537-.586-3.07-1.757-4.243zM12 10a2 2 0 10-4 0 2 2 0 004 0z" clip-rule="evenodd" />
@@ -232,8 +272,10 @@
 
 
             </ul>
+
         </div>
 
+        <!-- Connexion/Déconnexion -->
         <div>
 
             {% block content %}
@@ -255,7 +297,7 @@
                     </ul>
                 {% else %}
                     <ul class="flex flex-col">
-                        <li class="flex h-8 hover:bg-green-500">
+                        <li class="flex h-8 border-l-8 border-transparent hover:border-green-500">
                             <a class="whitespace-nowrap px-4 pr-6 flex justify-center w-full items-center text-sm font-semibold h-full text-gray-300"
                                href="/accounts/login/">
                                 <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg"

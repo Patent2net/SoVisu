@@ -66,26 +66,6 @@ def admin_access_login(request):
     return render(request, '404.html')
 
 
-@login_required
-def create(request):
-    ldapid = request.GET['ldapid']  # ldapid
-    iDhalerror = False
-    if 'iDhalerror' in request.GET:
-        iDhalerror = request.GET['iDhalerror']
-
-    return render(request, 'check.html', {'data': "create",  # 'type': type,
-                                          'ldapid': ldapid,  # 'from': dateFrom, 'to': dateTo,
-                                          # 'entity': entity, #'extIds': ['a', 'b', 'c'],
-                                          'halId_s': 'nullNone',
-                                          'idRef': 'nullNone',
-                                          'orcId': 'nullNone',
-                                          'autres': 'nullNone',
-                                          'form': forms.CreateCredentials(),
-                                          'iDhalerror': iDhalerror,
-                                          }
-                  # "'startDate': start_date,
-                  # 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
-                  )
 
 
 def create_credentials(request):

@@ -40,7 +40,7 @@
 
             </div>
 
-            <form action="/search/" method="post">
+            <form action="/search/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}" method="post">
                 {% csrf_token %}
                 {% for field in form.visible_fields %}
                     <div>
