@@ -19,6 +19,27 @@ def unknown(request):
     return render(request, '404.html')
 
 
+def create(request):
+    ldapid = request.GET['ldapid']  # ldapid
+    iDhalerror = False
+    if 'iDhalerror' in request.GET:
+        iDhalerror = request.GET['iDhalerror']
+
+    return render(request, 'create.html', {'data': "create",  # 'type': type,
+                                          'ldapid': ldapid,  # 'from': dateFrom, 'to': dateTo,
+                                          # 'entity': entity, #'extIds': ['a', 'b', 'c'],
+                                          'halId_s': 'nullNone',
+                                          'idRef': 'nullNone',
+                                          'orcId': 'nullNone',
+                                          'autres': 'nullNone',
+                                          'form': forms.CreateCredentials(),
+                                          'iDhalerror': iDhalerror,
+                                          }
+                  # "'startDate': start_date,
+                  # 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
+                  )
+
+
 def check(request):
     # Connect to DB
 
@@ -27,7 +48,6 @@ def check(request):
 
     es = esActions.es_connector()
 
-    # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
     else:
@@ -72,7 +92,7 @@ def check(request):
         data = -1
     # /
     if data == -1:
-        return render(request, 'check.html', {'data': viewsActions.create,
+        return render(request, 'create.html', {'data': viewsActions.create,
                                               # 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'form': forms.CreateCredentials(),
 
@@ -366,9 +386,15 @@ def dashboard(request):
     else:
         struct = -1
 
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
+
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
         id = request.GET['id']
+
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
@@ -487,7 +513,7 @@ def dashboard(request):
         dateTo = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    return render(request, 'dashboard.html', {'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+    return render(request, 'dashboard.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
@@ -504,6 +530,11 @@ def publication_board(request):
         struct = request.GET['struct']
     else:
         struct = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -621,7 +652,7 @@ def publication_board(request):
         dateTo = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    return render(request, 'publicationboard.html', {'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+    return render(request, 'publicationboard.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                      'entity': entity,
                                                      'hasToConfirm': hasToConfirm,
                                                      'filterA': filtreA,
@@ -640,6 +671,12 @@ def references(request):
         struct = request.GET['struct']
     else:
         struct = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
+
 
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -782,7 +819,7 @@ def references(request):
         references_cleaned.append(ref['_source'])
     # /
     print(references_cleaned)
-    return render(request, 'references.html', {'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+    return render(request, 'references.html', {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                'entity': entity,
                                                'hasToConfirm': hasToConfirm,
                                                'references': references_cleaned, 'startDate': start_date,
@@ -797,6 +834,11 @@ def terminology(request):
         struct = request.GET['struct']
     else:
         struct = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
@@ -974,13 +1016,13 @@ def terminology(request):
                                     children1['children'].remove(children2)
 
     if export:
-        return render(request, 'terminology_ext.html', {'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+        return render(request, 'terminology_ext.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                         'entity': entity,
                                                         'hasToConfirm': hasToConfirm,
                                                         'startDate': start_date,
                                                         'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
     else:
-        return render(request, 'terminology.html', {'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+        return render(request, 'terminology.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                     'entity': entity,
                                                     'hasToConfirm': hasToConfirm,
                                                     'startDate': start_date,
@@ -993,6 +1035,11 @@ def wordcloud(request):
         struct = request.GET['struct']
     else:
         struct = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -1095,7 +1142,7 @@ def wordcloud(request):
         dateTo = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    return render(request, 'wordcloud.html', {'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+    return render(request, 'wordcloud.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
                                               'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
@@ -1111,6 +1158,10 @@ def tools(request):
     else:
         struct = -1
 
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:
         type = request.GET['type']
@@ -1210,7 +1261,7 @@ def tools(request):
         data = "hceres"
 
     if (data == "hceres" or data == -1):
-        return render(request, 'tools.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+        return render(request, 'tools.html', {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
@@ -1238,6 +1289,11 @@ def index(request):
         id = request.GET['id']
     else:
         id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
     # /
 
     # Connect to DB
@@ -1266,9 +1322,9 @@ def index(request):
     # /
     if type == -1 and id == -1:  # Si le type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
         # → évite des erreurs lors des vérifications pour les autres pages dans le cas d'un -1
-        return render(request, 'index.html', {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct, })
+        return render(request, 'index.html', {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,'ldapid': ldapid })
     else:  # Le type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
-        return render(request, 'index.html', {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'indexstruct': indexstruct, 'id': id, 'struct': struct})
+        return render(request, 'index.html', {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'indexstruct': indexstruct, 'id': id, 'struct': struct,'ldapid': ldapid})
 
 
 def search(request):  # Revoir la fonction
@@ -1308,6 +1364,11 @@ def search(request):  # Revoir la fonction
     else:
         dateTo = datetime.today().strftime('%Y-%m-%d')
 
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
+
     if request.method == 'POST':
 
         # Connect to DB
@@ -1343,10 +1404,10 @@ def search(request):  # Revoir la fonction
                                                'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'",
                                                'filter': search, 'index': index, 'search': search,
                                                'results': res_cleaned, 'from': dateFrom, 'to': dateTo,
-                                               'startDate': min_date})
+                                               'startDate': min_date, 'ldapid': ldapid})
 
     return render(request, 'search.html',
-                  {'struct': struct, 'type': type, 'id': id, 'form': forms.search(), 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'filter': ''})
+                  {'struct': struct, 'type': type, 'id': id, 'form': forms.search(), 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'filter': '', 'ldapid': ldapid})
 
 
 def presentation(request):
@@ -1365,8 +1426,13 @@ def presentation(request):
         id = request.GET['id']
     else:
         id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
     # /
-    return render(request, 'presentation.html', {'struct': struct, 'type': type, 'id': id})
+    return render(request, 'presentation.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
 
 
 def ressources(request):
@@ -1385,8 +1451,13 @@ def ressources(request):
         id = request.GET['id']
     else:
         id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
     # /
-    return render(request, 'ressources.html', {'struct': struct, 'type': type, 'id': id})
+    return render(request, 'ressources.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
 
 
 def faq(request):
@@ -1405,8 +1476,13 @@ def faq(request):
         id = request.GET['id']
     else:
         id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
     # /
-    return render(request, 'faq.html', {'struct': struct, 'type': type, 'id': id})
+    return render(request, 'faq.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
 
 
 def contact(request):
@@ -1425,6 +1501,11 @@ def contact(request):
         id = request.GET['id']
     else:
         id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
     # /
     if request.method == 'POST':
         f = ContactForm(request.POST)
@@ -1465,12 +1546,12 @@ def contact(request):
             messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
             f = ContactForm()
 
-            return render(request, 'contact.html', {'struct': struct, 'type': type, 'id': id, 'form': f})
+            return render(request, 'contact.html', {'struct': struct, 'type': type, 'id': id, 'form': f, 'ldapid': ldapid})
 
     else:
         f = ContactForm()
 
-    return render(request, 'contact.html', {'struct': struct, 'type': type, 'id': id, 'form': f})
+    return render(request, 'contact.html', {'struct': struct, 'type': type, 'id': id, 'form': f, 'ldapid': ldapid})
 
 
 def useful_links(request):
@@ -1489,5 +1570,10 @@ def useful_links(request):
         id = request.GET['id']
     else:
         id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
     # /
-    return render(request, 'useful_links.html', {'struct': struct, 'type': type, 'id': id})
+    return render(request, 'useful_links.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})

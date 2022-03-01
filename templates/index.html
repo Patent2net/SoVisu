@@ -75,10 +75,10 @@
                         <li class="leading-4 w-full bg-gray-50 py-1 px-2">
                             <a class="text-blue-700 text-sm"
                                     {% if entity.ldapId %}
-                                        href="/dashboard/?struct={{ indexstruct }}&type=rsr&id={{ entity.ldapId }}"
+                                        href="/dashboard/?struct={{ indexstruct }}&type=rsr&id={{ entity.ldapId }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
                                     {%  endif %}
                                     {% if entity.halStructId %}
-                                        href="/dashboard/?struct={{ indexstruct }}&type=lab&id={{ entity.halStructId }}"
+                                        href="/dashboard/?struct={{ indexstruct }}&type=lab&id={{ entity.halStructId }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
                                     {%  endif %}
                             >
                                 {% if entity.ldapId %}
