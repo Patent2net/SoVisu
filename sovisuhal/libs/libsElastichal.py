@@ -27,6 +27,8 @@ def getAureHal(idHal):
         }""" % idHal)
     results = sparql.query().convert()
 
+    print(results)
+
     aureHal = [truc for truc in results['results']['bindings'] if
                truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
 
