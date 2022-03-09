@@ -528,6 +528,7 @@ def refresh_aurehal_id(request):
         return redirect('unknown')
 
     aurehalId = libsElastichal.getAureHal(entity['halId_s'])
+    concepts = []
     if aurehalId != -1:
         archivesOuvertesData = getConceptsAndKeywords(aurehalId)
         concepts = utils.filterConcepts(archivesOuvertesData['concepts'], validated_ids=[])
