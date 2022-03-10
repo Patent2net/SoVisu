@@ -260,7 +260,8 @@
                     Foire aux questions
                 </a></li>
 
-                <li class="flex h-8 "><a
+{% comment %}                <li class="flex h-8"><a
+
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Nous contacter' %} text-white {% else %} text-gray-300 {% endif %}"
                         href="/contact/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -268,7 +269,7 @@
   <path fill-rule="evenodd" d="M14.243 5.757a6 6 0 10-.986 9.284 1 1 0 111.087 1.678A8 8 0 1118 10a3 3 0 01-4.8 2.401A4 4 0 1114 10a1 1 0 102 0c0-1.537-.586-3.07-1.757-4.243zM12 10a2 2 0 10-4 0 2 2 0 004 0z" clip-rule="evenodd" />
                     </svg>
                     Nous contacter
-                </a></li>
+                </a></li>{% endcomment %}
 
 
             </ul>
