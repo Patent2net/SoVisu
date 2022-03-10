@@ -27,7 +27,7 @@
                     {% if entity.halStructId %}
                         <a class="px-2 pb-1
                         {% if data == "hceres" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/tools/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=hceres"
+                           href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=hceres"
                         >Export HCERES</a>
                     {% endif %}
                 </h1>
@@ -49,7 +49,7 @@
 
                     </div>
 
-                    <form action="/export_hceres_xls/?type={{ type }}&id={{ id }}&data={{ data }}" method="post">
+                    <form action="/export_hceres_xls/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}" method="post">
                         {% csrf_token %}
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}

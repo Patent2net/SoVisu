@@ -20,7 +20,12 @@ from . import views, viewsActions
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', viewsActions.admin_access_login, name='index'),
+    path('', viewsActions.admin_access_login, name='login'),
+
+    path('create/', views.create, name='creation'),
+    path('check/', views.check, name='check'),
+
+
 
     path('index/', views.index, name='index'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -31,7 +36,6 @@ urlpatterns = [
 
     path('tools/', views.tools, name='tools'),
 
-    path('check/', views.check, name='check'),
 
     path('search/', views.search, name='search'),
 
@@ -54,9 +58,8 @@ urlpatterns = [
     path('export_hceres_xls/', viewsActions.export_hceres_xls, name='export_hceres_xls'),
     path('presentation/', views.presentation, name='presentation'),
     path('unknown/', views.unknown, name='unknown'),
-    path('create/', viewsActions.create, name='creation'),
     path('accounts/', include('uniauth.urls', namespace='uniauth')),
-    path('loggedin/', viewsActions.logged_in, name='loggued'),
+
 
     path('tinymce/', include('tinymce.urls')),
 ]

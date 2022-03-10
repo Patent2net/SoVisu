@@ -33,43 +33,43 @@
                     {% if entity.halStructId %}
                         <a class="px-2 pb-1
                         {% if data == "state" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=state"
                         >Membres du laboratoire</a>
                     {% endif %}
                     <a class="px-2 pb-1
                         {% if data == -1 or data == "credentials" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=credentials"
                     >Identifiants</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                         >Notices HAL</a>
                     {% endif %}
                     {% if type == "lab" %}
                         <a class="px-2 pb-1
                         {% if data == "references" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                         >Notices HAL du labo</a>
                     {% endif %}
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
                         >Expertise</a>
                     {% endif %}
                     <a class="px-2 pb-1
                         {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
                     >Mots-clés orienteurs</a>
                     <a class="px-2 pb-1
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
                     >Domaines orienteurs</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
+                           href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=research-description"
                         >Descriptifs de recherche</a>
                     {% endif %}
                 </h1>
@@ -114,7 +114,7 @@
                             <tr class="text-gray-500">
                                 <td class="hidden ldapId">{{ rsr.ldapId }}</td>
                                 <td>
-                                     <a class="text-blue-700 text-sm underline" href="/dashboard/?type=rsr&id={{rsr.ldapId}}">
+                                     <a class="text-blue-700 text-sm underline" target="_blank" href="/dashboard/?struct={{ struct }}&type=rsr&id={{rsr.ldapId}}">
                                      <span class=""> {{ rsr.firstName }} {{ rsr.lastName }} </span>
                                     </a>
                                 </td>
@@ -152,124 +152,6 @@
 
 
             {% endif %}
-
-            {% if data == "create" %}
-
-                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-
-                    <ul>
-                        <li>Dans cet onglet, si vous êtes enseignant chercheur de l'établissement, vous devez renseigner
-                            vos identifiants externes. Ces id seront utilisés pour la collecte de données.
-                        </li>
-                        <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le
-                            récupérer là : <a href="https://www.idref.fr/" class="underline" target="_blank">sur le site
-                                IdRef - Identifiants et Référentiels pour l'ESR</a></li>
-                        <li><strong>L'OrcId</strong> est l'identifiant chercheur international. <a
-                                href="https://orcid.org/" class="underline" target="_blank">Nous vous recommandons d'en
-                            créer un</a>. Vous avez une petite procédure réalisée par l'UMR 5206 <a
-                                href="http://triangle.ens-lyon.fr/spip.php?article8796" class="underline"
-                                target="_blank"> sur ce lien.</a></li>
-                        <li>Enfin <strong>l'IdHal</strong> est <a
-                                href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline"
-                                target="_blank">l'identifiant sur l'archive nationale Hal</a>. Ce dernier identifiant
-                            permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer
-                            les différentes formes auteur. Les trois sont à relier.
-                        </li>
-                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... les
-                            moissoneurs se chargeront de publier vos notices sur ces réseaux si nécessaire (<i> ; </i>).
-                        </li>
-                        <li><strong>merci de vérifier vos identifiants avant de les renseigner; un mauvais identifiant
-                            pouvant faire apparaitre une erreur! </strong></li>
-
-                    </ul>
-
-                </div>
-
-              {% if iDhalerror == "True"   %}
-                    <div class="my-3 mt-1 flex w-full bg-red-100 border border-red-300 rounded text-xs p-4 items-center text-yellow-800">
-                        <ul>
-                            <li>
-                                Votre ID HAL n'est pas valide
-                            </li>
-                        </ul>
-                    </div>
-
-              {% endif %}
-
-
-                <form action="/CreateCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
-                    {% csrf_token %}
-                    {% for field in form.visible_fields %}
-                        {% if field.auto_id == "id_f_role" %}
-                            <div>
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
-                            </div>
-                        {% elif field.auto_id == "id_f_labo" %}
-                            <div class="role-trigerred">
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none;" %}
-                            </div>
-                        {% else %}
-                            <div class="role-trigerred">
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-                            </div>{% endif %}
-                    {% endfor %}
-                    <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none"
-                           type="submit" value="J'ai fini !">
-                </form>
-                {% comment %}               {% block progress %}
-                {% load static %}
-                        <div class='progress-wrapper' style="padding-top: 10px;">
-
-                            <div id='progress-bar' class='progress-bar progress-bar-striped' role='progressbar' style="height:30px; width: 0%; border-radius: 5px">&nbsp;</div>
-                            </div>
-                            <div id="celery-result"> </div>
-                            <div id="progress-bar-message">En attente des données saisies...</div>
-
-                {% endblock progress %}
-
-                {% block progress_bar_js %}
-                   {% if task_id %}
-
-                        <script type="text/javascript">
-                            function processProgress(progressBarElement, progressBarMessageElement, progress) {
-                                    progressBarElement.style.width = progress.percent + "%";
-                                    var description = progress.description || "Starting download";
-                                        progressBarMessageElement.innerHTML = description;
-                            }
-
-                        function processResult(resultElement, result) {
-                            if (result.includes("successful")) {
-                                    $( resultElement ).append($('<br>'));
-                                    $( resultElement ).append(
-                                        $('<p class="text-center">').text(result)
-                                            );
-                                        }
-                                }
-
-                        // Progress Bar (JQuery)
-                        $(function () {
-                            var progressUrl = "{% url 'celery_progress:task_status' task_id %}";
-                            CeleryProgressBar.initProgressBar(progressUrl, {
-                            onProgress: processProgress,
-                            onResult: processResult,
-                            })
-                            });
-                        </script>
-
-                   {% endif %}
-                {% endblock progress_bar_js %}
-{% endcomment %}
-
-            {% endif %}
-
 
             {% if data == -1 or data == "credentials" %}
 
@@ -311,7 +193,7 @@
 
                 </div>
 
-                <form action="/validate_credentials/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                <form action="/validate_credentials/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                       method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
@@ -336,7 +218,7 @@
 
                     <hr class="mb-4 mt-4"/>
 
-                    <form action="/refresh-aurehal-id/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                    <form action="/refresh-aurehal-id/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                           method="post">
                         {% csrf_token %}
                         <p class="text-sm">
@@ -371,11 +253,11 @@
 
                     <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
                     >Expertises validées</a>
                     <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
+                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
                     >Expertises retirées</a>
 
                 </div>
@@ -448,7 +330,7 @@
                         et contrôler les expansions sémantiques de vos données récoltées pour indexation.</p>
                 </div>
 
-                <form action="/validate_guiding-keywords/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                <form action="/validate_guiding-keywords/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                       method="post">
                     {% csrf_token %}
                     {% for hidden in form.hidden_fields %}
@@ -500,7 +382,7 @@
                 </div>
 
 
-                <form action="/validate_research-description/?type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
+                <form action="/validate_research-description/?struct={{ struct }}&type={{ type }}&id={{ id }}&from={{ from }}&to={{ to }}&data={{ data }}"
                       method="post">
                     {% csrf_token %}
                     {% for hidden in form.hidden_fields %}
@@ -622,22 +504,22 @@
                         {% if type == "rsr" %}
                             <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                             >Notices validées</a>
                             <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
                             >Notices retirées</a>
                         {% endif %}
 
                         {% if type == "lab" %}
                             <a class="px-2 pb-1
                         {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
                             >Notices validées</a>
                             <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
+                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
                             >Notices retirées</a>
                         {% endif %}
                     </div>
@@ -646,7 +528,7 @@
                         {% if type == "rsr" %}
                             <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
                         text-gray-600 "
-                               href="/force-update_references/?{% if type %}type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
+                               href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
                             >Collecter de nouvelles références</a>
 
                         {% endif %}
@@ -709,7 +591,7 @@
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
                     {% if validation == "1" %}
 
-                    <form action="/update_authorship/?type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
+                    <form action="/update_authorship/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
                             {% csrf_token %}
                             <input id="toProcess" name="toProcess" class="hidden"/>
                             {% for hidden in form.hidden_fields %}
@@ -721,7 +603,11 @@
                                     {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
                                 </div>
                             {% endfor %}
-                            <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'auctorialité">
+
+                            {% if  type == "rsr" %}
+                                <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'auctorialité">
+                            {% endif %}
+
                         </form>
 
                     {% endif %}
@@ -770,34 +656,6 @@
 
 
 <script>
-
-    {% if data == "create" %}
-
-        $(document).ready(function () {
-
-            var slides = document.getElementsByClassName("role-trigerred");
-
-            sel_role = document.querySelector('#id_f_role')
-            sel_role.addEventListener("change", function () {
-                if (sel_role.value == 'chercheur') {
-                    for (var i = 0; i < slides.length; i++) {
-                        console.log(slides.item(i));
-                        slides.item(i).style.display = "block";
-                    }
-                } else {
-                    for (var i = 0; i < slides.length; i++) {
-                        console.log(slides.item(i));
-                        slides.item(i).style.display = "none";
-                    }
-                }
-            });
-
-        });
-
-
-    {% endif %}
-
-
 
     {% if data == "guiding-domains" %}
 
