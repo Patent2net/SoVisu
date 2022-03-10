@@ -76,7 +76,7 @@ $(function() {
         },
 
     }, function(start, end, label) {
-        window.location.href = "/" + document.URL.split("/")[3] + "/?type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + "&from=" + start.format('YYYY-MM-DD') + "&to=" + end.format('YYYY-MM-DD');
+        window.location.href = "/" + document.URL.split("/")[3] + "/?struct="+ getUrlParameter('struct') +"&type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + "&from=" + start.format('YYYY-MM-DD') + "&to=" + end.format('YYYY-MM-DD');
     });
 
 });
