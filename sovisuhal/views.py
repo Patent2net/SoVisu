@@ -521,7 +521,7 @@ def dashboard(request):
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
                                               'key': entity[key],
-                                              'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
+                                              'filter': ext_key + ':"' + entity[key], #+ '" AND validated:true',
                                               'filterlabA': filtrelabA,
                                               'filterlabB': filtrelabB,
                                               'startDate': start_date,
