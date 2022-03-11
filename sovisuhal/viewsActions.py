@@ -827,7 +827,13 @@ def export_hceres_xls(request):
     else:
         book_df.to_excel(writer, 'OUV', index=False)
     if len(conf_df.index) > 0:
-        conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+        if  'page_s' in (conf_df):
+            conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+                 'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
+                 'openAccess_bool_s']].to_excel(writer, 'CONF',
+                                                index=False)
+        else:
+            conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'publicationDateY_i', 'doiId_s',
                  'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
                  'openAccess_bool_s']].to_excel(writer, 'CONF',
                                                 index=False)
