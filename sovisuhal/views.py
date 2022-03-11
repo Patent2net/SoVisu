@@ -487,14 +487,17 @@ def dashboard(request):
                 index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                 body=start_date_param)
 
-        filtrelab = ''
+        filtrelabA = ''
+        filtrelabB = ''
     elif type == "lab":
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
         res = es.search(index=struct + '-' + id + "-laboratories-documents", body=start_date_param)
 
-        filtrelab = 'harvested_from_ids: "' + id + '"'
+        filtrelabA = 'harvested_from_ids: "' + id + '"'
+        filtrelabB = 'labHalId.keyword: "' + id + '"'
+
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     except:
@@ -518,8 +521,9 @@ def dashboard(request):
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
                                               'key': entity[key],
-                                              'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
-                                              'filterlab': filtrelab,
+                                              'filter': ext_key + ':"' + entity[key], #+ '" AND validated:true',
+                                              'filterlabA': filtrelabA,
+                                              'filterlabB': filtrelabB,
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -542,7 +546,7 @@ def publication_board(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '')
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             indexcat = "lab"
             base_url = reverse('index')
@@ -1047,7 +1051,7 @@ def wordcloud(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '')
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             indexcat = "lab"
             base_url = reverse('index')
