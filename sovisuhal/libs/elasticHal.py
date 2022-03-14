@@ -126,6 +126,8 @@ def indexe_chercheur(ldapId, laboAccro, labHalId, idhal, idRef, orcId):  # self,
     Chercheur["concepts"] = archivesOuvertesData['concepts']
     Chercheur["guidingKeywords"] = []
     Chercheur["idRef"] = idRef
+    Chercheur["axis"] = laboAccro
+
     # Chercheur["mappings"]: {
     #     "_default_": {
     #         "_timestamp": {
@@ -205,7 +207,6 @@ def propage_concepts(structSirene, ldapId, laboAccro, labHalId):
 def collecte_docs(Chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
-
     docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
@@ -328,4 +329,6 @@ def collecte_docs(Chercheur):  # self,
     print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents")
     """
     # return docs # pas utile...
+
+
     return Chercheur  # au cas où
