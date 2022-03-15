@@ -119,20 +119,19 @@
                                     </a>
                                 </td>
                                 <td>{{ rsr.validated }}</td>
-                                {% if rsr.team %}
-                                    <td>{{ rsr.team }}</td>
-                                {% else %}
+
+
                                     <td>
                                         <select class="border border-gray-300 axis" name="axis" id="axis">
-                                            <option value="">Aucun axe affecté</option>
+                                            <option value="{{ entity.acronym }}">{{ entity.acronym }} (aucun axe défini)</option>
                                             <option value="axis1">Axe 1</option>
                                             <option value="axis2">Axe 2</option>
                                             <option value="axis3">Axe 3</option>
                                             <option value="axis4">Axe 4</option>
                                             <option value="axis5">Axe 5</option>
                                         </select>
+
                                     </td>
-                                {% endif %}
                             </tr>
                         {% endfor %}
 
@@ -148,7 +147,15 @@
                     <button class="update-members text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
                         Mettre à jour
                     </button>
+
                 </div>
+
+
+
+
+
+
+
 
 
             {% endif %}
@@ -1155,7 +1162,7 @@
                         if (curr_rsr[0].axis) {
                             row.cells[3].querySelector('#axis').value = curr_rsr[0].axis;
                         } else {
-                            row.cells[3].querySelector('#axis').value = "";
+                            row.cells[3].querySelector('#axis').value = "{{ entity.acronym }}";
                         }
                     } catch (error) {
                     }

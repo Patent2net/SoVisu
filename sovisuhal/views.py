@@ -546,7 +546,7 @@ def publication_board(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '')
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             indexcat = "lab"
             base_url = reverse('index')
@@ -1051,7 +1051,7 @@ def wordcloud(request):
 
     elif request.user.is_authenticated:
         id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '')
+        id = id.replace(viewsActions.patternCas, '').lower()
         if id == 'adminlab':
             indexcat = "lab"
             base_url = reverse('index')
