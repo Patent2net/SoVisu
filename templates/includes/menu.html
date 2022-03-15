@@ -63,11 +63,11 @@
 
         <!-- Synthèses -->
         {% if struct and struct != '-1'%} <!-- affiche la partie synthèse du menu uniquement si struc est présent et ne vaut pas -1-->
-            <ul class="flex flex-col" :class="{'block': open, 'hidden': !open}">
+            <ul class="flex flex-col mt-4" :class="{'block': open, 'hidden': !open}">
 
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Synthèses</h3>
 
-                <li @click.away="open = false" x-data="{ open: false }" class=" flex w-full h-8 relative ">
+                <!--<li @click.away="open = false" x-data="{ open: false }" class=" flex w-full h-8 relative ">
                     <a @click="open = !open"
                        class="cursor-pointer w-full whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Tableau des dépôts' or title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}">
                         <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -102,7 +102,7 @@
                                    href="/publicationboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}"
                                 >données d'annuaire</a></li>
                         </ul>
-                </li>
+                </li>-->
 
                 <!--<li class="flex h-8"><a class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full
                         {% if title == 'Tableau des publications' %} text-white {% else %}
@@ -112,6 +112,16 @@
                     </svg>
                     Tableau des publications
                 </a></li>-->
+
+                <li class="flex h-8 "><a
+                        class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Tableau des dépôts' or title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}"
+                         href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
+                        <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                             fill="currentColor">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                    Tableau de bord
+                </a></li>
 
                 <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Références' %} text-white {% else %} text-gray-300 {% endif %}"
