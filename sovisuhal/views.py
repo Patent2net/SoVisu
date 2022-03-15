@@ -822,7 +822,6 @@ def references(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
     # /
-    print(references_cleaned)
     return render(request, 'references.html', {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                'entity': entity,
                                                'hasToConfirm': hasToConfirm,
@@ -1264,7 +1263,7 @@ def tools(request):
     else:
         data = "hceres"
 
-    if (data == "hceres" or data == -1):
+    if data == "hceres" or data == -1:
         return render(request, 'tools.html', {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
@@ -1272,6 +1271,17 @@ def tools(request):
                                               'key': entity[key],
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+    elif data == "consistency":
+
+        consistencyvalues = viewsActions.cohesion(struct, id, dateFrom, dateTo)
+
+        return render(request, 'tools.html',
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                       'entity': entity,
+                       'consistency': consistencyvalues,
+                       'startDate': start_date,
+                       'hasToConfirm': hasToConfirm,
+                       'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 
 def index(request):
