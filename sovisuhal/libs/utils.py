@@ -106,10 +106,15 @@ def calculateMDS(doc):
     return score * 100 / (0.8 + 0.2 + 1 + 0.8 + 0.4 + 0.6)
 
 
-def appendToTree(scope, rsr, tree, state='validated'):
+def appendToTree(scope, rsr, tree, state):
+
     rsrData = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
+    rsrId = rsr['ldapId']
 
     sid = scope['id'].split('.')
+
+    print('llllll', end=' ')
+    print(scope)
 
     scopeData = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
                  'children': [],
@@ -121,8 +126,15 @@ def appendToTree(scope, rsr, tree, state='validated'):
         exists = False
         for child in tree['children']:
             if sid[0] == child['id']:
+                if 'researchers' in child:
+                    for rsr in child['researchers']:
+                        rsrexists = False
+                        if rsr['ldapId'] == rsrId:
+                            rsr['state'] = state
+                            rsrexists = True
+                if not rsrexists:
+                    child['researchers'].append(rsrData)
                 exists = True
-                child['researchers'].append(rsrData)
         if not exists:
             tree['children'].append(scopeData)
 
@@ -132,7 +144,14 @@ def appendToTree(scope, rsr, tree, state='validated'):
             if sid[0] == child['id'] and 'children' in child:
                 for child1 in child['children']:
                     if sid[0] + '.' + sid[1] == child1['id']:
-                        child1['researchers'].append(rsrData)
+                        if 'researchers' in child1:
+                            for rsr in child1['researchers']:
+                                rsrexists = False
+                                if rsr['ldapId'] == rsrId:
+                                    rsr['state'] = state
+                                    rsrexists = True
+                        if not rsrexists:
+                            child1['researchers'].append(rsrData)
                         exists = True
 
         if not exists:
@@ -148,7 +167,14 @@ def appendToTree(scope, rsr, tree, state='validated'):
                     if sid[0] + '.' + sid[1] == child1['id'] and 'children' in child1:
                         for child2 in child1['children']:
                             if sid[0] + '.' + sid[1] + '.' + sid[2] == child2['id']:
-                                child2['researchers'].append(rsrData)
+                                if 'researchers' in child2:
+                                    for rsr in child2['researchers']:
+                                        rsrexists = False
+                                        if rsr['ldapId'] == rsrId:
+                                            rsr['state'] = state
+                                            rsrexists = True
+                                if not rsrexists:
+                                    child2['researchers'].append(rsrData)
                                 exists = True
 
         if not exists:

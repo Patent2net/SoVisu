@@ -295,31 +295,29 @@ def validate_expertise(request):
 
         if request.method == 'POST':
             toInvalidate = request.POST.get("toInvalidate", "").split(",")
+
             for conceptId in toInvalidate:
-                # to-do : désactiver les concepts
+
+                sid = conceptId.split('.')
                 for children in entity['concepts']['children']:
-                    if children['id'] == conceptId:
-                        lab_tree = utils.appendToTree(children, entity, lab_tree)
-                        children['state'] = validate
+                    if len(sid) >= 1:
+                        if sid[0] == children['id']:
+                            lab_tree = utils.appendToTree(children, entity, lab_tree, validate)
+                            children['state'] = validate
+
                     if 'children' in children:
                         for children1 in children['children']:
-                            if children1['id'] == conceptId:
-                                if len(children['children']) == 1:
-                                    lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                    children['state'] = validate
-                                lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                children1['state'] = validate
+                            if len(sid) >= 2:
+                                if sid[0] + '.' + sid[1] == children1['id']:
+                                    lab_tree = utils.appendToTree(children1, entity, lab_tree, validate)
+                                    children1['state'] = validate
+
                             if 'children' in children1:
                                 for children2 in children1['children']:
-                                    if children2['id'] == conceptId:
-                                        if len(children['children']) == 1:
-                                            lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                            children['state'] = validate
-                                        if len(children1['children']) == 1:
-                                            lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                            children1['state'] = validate
-                                        lab_tree = utils.appendToTree(children2, entity, lab_tree)
-                                        children2['state'] = validate
+                                    if len(sid) >= 3:
+                                        if sid[0] + '.' + sid[1] + '.' + sid[2] == children2['id']:
+                                            lab_tree = utils.appendToTree(children2, entity, lab_tree, validate)
+                                            children2['state'] = validate
 
             es.update(index=index, refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"concepts": entity['concepts']}})
