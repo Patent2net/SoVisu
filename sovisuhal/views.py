@@ -440,8 +440,6 @@ def dashboard(request):
         search_id = id
         index_pattern = "-laboratories"
 
-    ext_key = "harvested_from_ids"
-
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern,
@@ -475,18 +473,16 @@ def dashboard(request):
 
     # Get first submittedDate_tdate date
     if type == "rsr":
+        indexsearch= struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         try:
             start_date_param = esActions.date_all()
+            res = es.search(index=indexsearch, body=start_date_param)
 
-            res = es.search(
-                index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                body=start_date_param)
         except:
             start_date_param.pop("sort")
-            res = es.search(
-                index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                body=start_date_param)
+            res = es.search(index=indexsearch, body=start_date_param)
 
+        filtrechercheur = '_index: "' + indexsearch + '"'
         filtrelabA = ''
         filtrelabB = ''
     elif type == "lab":
@@ -494,7 +490,7 @@ def dashboard(request):
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
         res = es.search(index=struct + '-' + id + "-laboratories-documents", body=start_date_param)
-
+        filtrechercheur = ''
         filtrelabA = 'harvested_from_ids: "' + id + '"'
         filtrelabB = 'labHalId.keyword: "' + id + '"'
 
@@ -514,6 +510,8 @@ def dashboard(request):
         dateTo = request.GET['to']
     else:
         dateTo = datetime.today().strftime('%Y-%m-%d')
+
+    ext_key = "harvested_from_ids"
     # /
 
     return render(request, 'dashboard.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
@@ -521,7 +519,7 @@ def dashboard(request):
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
                                               'key': entity[key],
-                                              'filter': ext_key + ':"' + entity[key], #+ '" AND validated:true',
+                                              'filterRsr': filtrechercheur,
                                               'filterlabA': filtrelabA,
                                               'filterlabB': filtrelabB,
                                               'startDate': start_date,
