@@ -24,51 +24,162 @@
             <div class="flex justify-between items-start">
 
                 <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
-                    {% if entity.halStructId %}
                         <a class="px-2 pb-1
                         {% if data == "hceres" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                            href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=hceres"
                         >Export HCERES</a>
-                    {% endif %}
-                </h1>
 
+                        <a class="px-2 pb-1
+                        {% if data == "consistency" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                           href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=consistency"
+                        >Cohésion des données</a>
+                </h1>
             </div>
 
-            {% if data == "hceres" %}
-                <div>
+                {% if data == "hceres" %}
+                    <div>
 
-                    <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                        <!--- Orange box -->
-                        <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                            <!--- Orange box -->
+                            <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
 
-                        <p>Vous pouvez générer un fichier Excel contenant la liste des publications présentes sur HAL en cliquant sur le bouton ci-dessous.</p>
+                            <p>Vous pouvez générer un fichier Excel contenant la liste des publications présentes sur HAL en cliquant sur le bouton ci-dessous.</p>
+
+                        </div>
+
+                        <form action="/export_hceres_xls/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}" method="post">
+                            {% csrf_token %}
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            {% for field in form.visible_fields %}
+                                <div>
+                                    <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                                    {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
+                                </div>
+                            {% endfor %}
+                            <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Exporter (format Excel)">
+                        </form>
 
                     </div>
+                {% endif %}
 
-                    <form action="/export_hceres_xls/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}" method="post">
-                        {% csrf_token %}
-                        {% for hidden in form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
-                        {% for field in form.visible_fields %}
-                            <div>
-                                <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-                            </div>
-                        {% endfor %}
-                        <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none" type="submit" value="Exporter (format Excel)">
-                    </form>
+                {% if data == "consistency" %}
+                    <div>
+                        <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                            <!-- Orange box -->
+                            <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p>Vous pouvez vérifier ici la cohésion des données entre la documentation du laboratoire et la documentation validée par les chercheurs.</p>
+                        </div>
+                        <!-- /Orange box -->
+                    <!--Table -->
+                        <div class="flex-1">
 
-                </div>
-            {% endif %}
+                            <table id="consistency">
 
+                                <thead>
+                                <tr class="bg-gray-100 text-gray-700 text-xs">
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>IDs validés</th>
+                                    <th>Notices référencées en laboratoire</th>
+                                    <th>Notices référencées par le chercheur</th>
+                                </tr>
+                                </thead>
+                            <tbody>
+
+                            {% for cons in consistency %}
+                                <tr class="text-gray-500">
+                                    <td class="hidden ldapId">{{ cons.ldapId }}</td>
+                                    <td>
+                                         <a class="text-blue-700 text-sm underline" target="_blank" href="/dashboard/?struct={{ struct }}&type=rsr&id={{cons.ldapId}}">
+                                         <span class=""> {{ cons.name }} </span>
+                                        </a>
+                                    </td>
+                                    <td>{{ cons.validated }}</td>
+                                    <td>{{ cons.labcount }}</td>
+                                    <td>{{ cons.searchercount }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-
     </div>
 </div>
+{% if data == "consistency" %}
+    <script>
+
+        /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
+
+        $(document).ready(function () {
+
+            var table = $('#consistency').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                    },
+                    dom: 'Bfrtip',
+                    select: false,
+                    buttons: [],
+                    "columnDefs": [
+                        {
+                            "targets": '_all',
+                            "className": "text-center"
+
+                        },
+                        {
+                            "targets":[0],
+                            "visible":false
+                        },
+                        {
+                            "targets": [2], <!--colonne "Id validés" -->
+                            "render": function (data) {
+                                if (data === 'True') {
+                                    data = 'Oui';
+                                }
+                                else {
+                                    data = 'Non';
+                                }
+                                return data;
+                            },
+                        }
+                    ],
+                    scrollResize: false,
+                    scrollY: '70vh',
+                    scrollCollapse: true,
+                    paging: false,
+                }
+            );
+
+
+            table.on('draw', function () {
+                $('.dataTables_scrollHeadInner').css('padding-right', 0);
+                $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+                $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+                $('.dataTables_filter').addClass('flex items-center');
+                $('.dataTables_filter').prepend($('.dt-buttons'));
+
+                $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            });
+
+
+
+        });
+
+    </script>
+{% endif %}
 
 {% include "includes/footer.html" %}

@@ -440,8 +440,6 @@ def dashboard(request):
         search_id = id
         index_pattern = "-laboratories"
 
-    ext_key = "harvested_from_ids"
-
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern,
@@ -475,18 +473,16 @@ def dashboard(request):
 
     # Get first submittedDate_tdate date
     if type == "rsr":
+        indexsearch= struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         try:
             start_date_param = esActions.date_all()
+            res = es.search(index=indexsearch, body=start_date_param)
 
-            res = es.search(
-                index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                body=start_date_param)
         except:
             start_date_param.pop("sort")
-            res = es.search(
-                index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                body=start_date_param)
+            res = es.search(index=indexsearch, body=start_date_param)
 
+        filtrechercheur = '_index: "' + indexsearch + '"'
         filtrelabA = ''
         filtrelabB = ''
     elif type == "lab":
@@ -494,7 +490,7 @@ def dashboard(request):
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
         res = es.search(index=struct + '-' + id + "-laboratories-documents", body=start_date_param)
-
+        filtrechercheur = ''
         filtrelabA = 'harvested_from_ids: "' + id + '"'
         filtrelabB = 'labHalId.keyword: "' + id + '"'
 
@@ -514,6 +510,8 @@ def dashboard(request):
         dateTo = request.GET['to']
     else:
         dateTo = datetime.today().strftime('%Y-%m-%d')
+
+    ext_key = "harvested_from_ids"
     # /
 
     return render(request, 'dashboard.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
@@ -521,7 +519,7 @@ def dashboard(request):
                                               'hasToConfirm': hasToConfirm,
                                               'ext_key': ext_key,
                                               'key': entity[key],
-                                              'filter': ext_key + ':"' + entity[key], #+ '" AND validated:true',
+                                              'filterRsr': filtrechercheur,
                                               'filterlabA': filtrelabA,
                                               'filterlabB': filtrelabB,
                                               'startDate': start_date,
@@ -822,7 +820,6 @@ def references(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
     # /
-    print(references_cleaned)
     return render(request, 'references.html', {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                                'entity': entity,
                                                'hasToConfirm': hasToConfirm,
@@ -957,9 +954,11 @@ def terminology(request):
 
     if type == "rsr":
 
-        print(entity['concepts'])
+        from pprint import pprint
 
-        if 'children' in list(entity['concepts']):
+        pprint(entity['concepts'])
+
+        if 'children' in entity['concepts']:
             for children in list(entity['concepts']['children']):
                 if children['state'] == 'invalidated':
                     entity['concepts']['children'].remove(children)
@@ -971,53 +970,43 @@ def terminology(request):
 
                         if 'children' in children1:
                             for children2 in list(children1['children']):
-                                print(children2)
                                 if children2['state'] == 'invalidated':
                                     children1['children'].remove(children2)
 
-        print(entity['concepts'])
-
     if type == "lab":
-        if 'children' in list(entity['concepts']) and children in list(entity['concepts']['children']):
-            if 'researchers' in children:
+
+        if 'children' in entity['concepts']:
+            for children in list(entity['concepts']['children']):
+                print(children['id'])
                 state = 'invalidated'
-                for rsr in children['researchers']:
-                    if 'state' in rsr.keys():
+                if 'researchers' in children:
+                    for rsr in children['researchers']:
+                        print(rsr)
                         if rsr['state'] == 'validated':
-                            state = None
-                    else:
-                        pass
-                        # pas sûr de bien comprendre ce qu'il y a à faire là ^_^
-                if state:
-                    entity['concepts']['children'].remove(children)
+                            state = 'validated'
+                    if state == "invalidated":
+                        entity['concepts']['children'].remove(children)
 
-            if 'children' in children:
-                for children1 in list(children['children']):
-                    if 'researchers' in children:
+                if 'children' in children:
+                    for children1 in list(children['children']):
                         state = 'invalidated'
-                        for rsr in children1['researchers']:
-                            if 'state' in rsr.keys():
+                        if 'researchers' in children1:
+                            for rsr in children1['researchers']:
                                 if rsr['state'] == 'validated':
-                                    state = None
-                            else:
-                                # idem
-                                pass
-                        if state:
-                            children['children'].remove(children1)
+                                    state = 'validated'
+                            if state == "invalidated":
+                                children['children'].remove(children1)
 
-                    if 'children' in children1:
-                        for children2 in list(children1['children']):
-                            if 'researchers' in children:
+                        if 'children' in children1:
+                            for children2 in list(children1['children']):
                                 state = 'invalidated'
-                                for rsr in children2['researchers']:
-                                    if 'state' in rsr.keys():
+                                if 'researchers' in children2:
+                                    for rsr in children2['researchers']:
                                         if rsr['state'] == 'validated':
-                                            state = None
-                                    else:
-                                        pass
-                                    # idem ter
-                                if state:
-                                    children1['children'].remove(children2)
+                                            state = 'validated'
+                                    if state == "invalidated":
+                                        children1['children'].remove(children2)
+
 
     if export:
         return render(request, 'terminology_ext.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
@@ -1264,7 +1253,7 @@ def tools(request):
     else:
         data = "hceres"
 
-    if (data == "hceres" or data == -1):
+    if data == "hceres" or data == -1:
         return render(request, 'tools.html', {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
@@ -1272,6 +1261,17 @@ def tools(request):
                                               'key': entity[key],
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+    elif data == "consistency":
+
+        consistencyvalues = viewsActions.cohesion(struct, id, dateFrom, dateTo)
+
+        return render(request, 'tools.html',
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                       'entity': entity,
+                       'consistency': consistencyvalues,
+                       'startDate': start_date,
+                       'hasToConfirm': hasToConfirm,
+                       'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 
 def index(request):
