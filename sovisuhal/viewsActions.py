@@ -295,31 +295,29 @@ def validate_expertise(request):
 
         if request.method == 'POST':
             toInvalidate = request.POST.get("toInvalidate", "").split(",")
+
             for conceptId in toInvalidate:
-                # to-do : désactiver les concepts
+
+                sid = conceptId.split('.')
                 for children in entity['concepts']['children']:
-                    if children['id'] == conceptId:
-                        lab_tree = utils.appendToTree(children, entity, lab_tree)
-                        children['state'] = validate
+                    if len(sid) >= 1:
+                        if sid[0] == children['id']:
+                            lab_tree = utils.appendToTree(children, entity, lab_tree, validate)
+                            children['state'] = validate
+
                     if 'children' in children:
                         for children1 in children['children']:
-                            if children1['id'] == conceptId:
-                                if len(children['children']) == 1:
-                                    lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                    children['state'] = validate
-                                lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                children1['state'] = validate
+                            if len(sid) >= 2:
+                                if sid[0] + '.' + sid[1] == children1['id']:
+                                    lab_tree = utils.appendToTree(children1, entity, lab_tree, validate)
+                                    children1['state'] = validate
+
                             if 'children' in children1:
                                 for children2 in children1['children']:
-                                    if children2['id'] == conceptId:
-                                        if len(children['children']) == 1:
-                                            lab_tree = utils.appendToTree(children, entity, lab_tree)
-                                            children['state'] = validate
-                                        if len(children1['children']) == 1:
-                                            lab_tree = utils.appendToTree(children1, entity, lab_tree)
-                                            children1['state'] = validate
-                                        lab_tree = utils.appendToTree(children2, entity, lab_tree)
-                                        children2['state'] = validate
+                                    if len(sid) >= 3:
+                                        if sid[0] + '.' + sid[1] + '.' + sid[2] == children2['id']:
+                                            lab_tree = utils.appendToTree(children2, entity, lab_tree, validate)
+                                            children2['state'] = validate
 
             es.update(index=index, refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"concepts": entity['concepts']}})
@@ -872,3 +870,77 @@ def idhal_checkout(idhal):
     else:
         confirmation = 1
     return confirmation
+
+
+def cohesion(struct, id, dateFrom, dateTo):
+
+    es = esActions.es_connector()
+
+    # parametres fixes pour la recherche dans les bases Elastic
+    scope_bool_type = "filter"
+    scope_field = "harvested_from_ids"
+    validate = True
+    date_range_type = "submittedDate_tdate"
+
+    # /
+
+    # Récupére les infos sur le labo
+
+    scope_param = esActions.scope_p("halStructId", id)
+
+    res = es.search(index=struct + "-" + id + "-laboratories", body=scope_param)
+
+    entity = res['hits']['hits'][0]['_source']
+
+    # récupere les infos sur les chercheurs attachés au laboratoire
+    field = "labHalId"
+    rsr_param = esActions.scope_p(field, id)
+
+    count = es.count(index="*-researchers", body=rsr_param)['count']
+
+    rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
+    rsrs_cleaned = []
+
+    for result in rsrs['hits']['hits']:
+        rsrs_cleaned.append(result['_source'])
+
+    ref_param = esActions.ref_p(scope_bool_type, scope_field, id, validate, date_range_type, dateFrom, dateTo)
+
+    count = es.count(index=struct + "-" + id + "-laboratories-documents", body=ref_param)['count']
+    print('Count of laboratory listed documents validated:')
+    print(count)
+    # references = es.search(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,size=count)
+
+    cohesionvalues = []
+    labtotalcount = 0
+    searchertotalcount = 0
+
+    for x in range(len(rsrs_cleaned)):
+        ldapId = rsrs_cleaned[x]['ldapId']
+        halId_s = rsrs_cleaned[x]['halId_s']
+        structSirene = rsrs_cleaned[x]['structSirene']
+        name = rsrs_cleaned[x]['name']
+        validated = rsrs_cleaned[x]['validated']
+
+        # nombre de documents avec le nom de l'auteur coté lab par ex: (authIdHal_s : david-reymond)
+        ref_lab = esActions.ref_p(scope_bool_type, 'authIdHal_s', halId_s, validate, date_range_type, dateFrom, dateTo)
+        raw_lab_doc_count = es.count(index=structSirene + "-" + id + "-laboratories-documents", body=ref_lab)['count']
+
+
+        labtotalcount += raw_lab_doc_count
+
+        # nombre de documents de l'auteur dans son index
+        ref_param = esActions.ref_p(scope_bool_type, scope_field, halId_s, validate, date_range_type, dateFrom, dateTo)
+        raw_searcher_doc_count = \
+        es.count(index=structSirene + "-" + id + "-researchers-" + ldapId + "-documents", body=ref_param)['count']
+        searchertotalcount += raw_searcher_doc_count
+        # raw_searcher_doc_ref = es.search(index=struct + "-" + entity["halStructId"] + "-researchers-" + ldapId + "-documents", body=ref_param)['count']
+
+        # création du dict à rajouter dans la liste
+        profiledict = {"name": name, "ldapId": ldapId, "validated": validated, "labcount": raw_lab_doc_count,
+                       "searchercount": raw_searcher_doc_count}
+
+        # rajout à la liste
+        cohesionvalues.append(profiledict)
+
+    return cohesionvalues
