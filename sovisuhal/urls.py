@@ -29,7 +29,6 @@ urlpatterns = [
 
     path('index/', views.index, name='index'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('publicationboard/', views.publication_board, name='publicationboard'),
     path('references/', views.references, name='references'),
     path('terminology/', views.terminology, name='terminology'),
     path('wordcloud/', views.wordcloud, name='wordcloud'),
