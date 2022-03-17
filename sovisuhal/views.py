@@ -58,39 +58,20 @@ def check(request):
         id = request.GET['id']
 
     elif request.user.is_authenticated:
-        id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+        basereverse = 'check'
+        default_data = "credentials"
+        return default_checker(request, basereverse, default_data)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
-            type = "rsr"
-            default_data = "credentials"
-            base_url = reverse('check')
-            query_string = urlencode({'type': type, 'id': id, 'data': default_data})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-
-        else:
-            return redirect('unknown')
-    else:
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
+
 
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
     # /
+
     if data == -1:
         return render(request, 'create.html', {'data': viewsActions.create,
                                               # 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
@@ -116,8 +97,7 @@ def check(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -391,38 +371,16 @@ def dashboard(request):
     else:
         ldapid = None
 
-    if 'type' in request.GET and 'id' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
         id = request.GET['id']
 
-
     elif request.user.is_authenticated:
-        id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+        basereverse = 'dashboard'
+        return default_checker(request, basereverse)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
-            type = "rsr"
-            base_url = reverse('dashboard')
-            query_string = urlencode({'type': type, 'id': id})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        else:
-            return redirect('unknown')
-    else:
+    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
-
     # /
     # Connect to DB
     es = esActions.es_connector()
@@ -526,146 +484,6 @@ def dashboard(request):
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
 
-def publication_board(request):
-    # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
-
-    if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
-
-    elif request.user.is_authenticated:
-        id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
-            type = "rsr"
-            base_url = reverse('publicationboard')
-            query_string = urlencode({'type': type, 'id': id})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        else:
-            return redirect('unknown')
-    else:
-        return redirect('unknown')
-
-    # /
-
-    # Connect to DB
-    es = esActions.es_connector()
-
-    # Get scope informations
-    if type == "rsr":
-        field = "_id"
-        search_id = "*"
-        index_pattern = "-researchers"
-
-    elif type == "lab":
-        field = "halStructId"
-        search_id = id
-        index_pattern = "-laboratories"
-
-    scope_param = esActions.scope_p(field, id)
-
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
-
-    try:
-        entity = res['hits']['hits'][0]['_source']
-    except:
-        return redirect('unknown')
-    # /
-
-    hasToConfirm = False
-
-    field = "harvested_from_ids"
-    validate = False
-    if type == "rsr":
-        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
-
-    if type == "lab":
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
-    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
-
-    # Get first submittedDate_tdate date
-    field = "harvested_from_ids"
-
-    if type == "rsr":
-
-        start_date_param = esActions.date_p(field, entity['halId_s'])
-
-        res = es.search(index=struct + '-' + entity['labHalId'] + "-researchers-" + id + "-documents",
-                        body=start_date_param)
-        # Première visu : entrée de l'annuaire
-        filtreA = 'labHalId.keyword:"' + entity["labHalId"] + '" AND ldapId.keyword :"' + id + '"'
-        # Deuxième visu : données du labo
-        filtreB = 'halStructId.keyword:"' + entity["labHalId"] + '"'  # + 'ldapId.keyword :"' + id + '"'
-        # Troisième visu : données éditeurs et revues de l'individu et validées
-        filtreC = "harvested_from_ids" + ':"' + entity["halId_s"] + '" AND validated:true'
-    elif type == "lab":
-
-        start_date_param = esActions.date_p(field, entity['halStructId'])
-
-        # Première visu : entrée de l'annuaire
-        filtreA = 'labHalId.keyword:"' + id + '"'  # entity["labHalId"] # + '" AND ldapId.keyword :"' + id
-        # Deuxième visu : données du labo
-        filtreB = 'halStructId.keyword:"' + entity[
-            "halStructId"] + '"'  # entity["labHalId"]+ '"'#+ 'ldapId.keyword :"' + id + '"'
-        # Troisième visu : données éditeurs et revues de l'individu et validées
-        filtreC = "harvested_from_ids" + ':"' + entity["halStructId"]  # + '" AND validated:true'
-        res = es.search(index=struct + '-' + entity['halStructId'] + '-' + "laboratories-documents*",
-                        body=start_date_param)
-
-    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-    # /
-
-    # Get parameters
-    # Get parameters
-    if 'from' in request.GET:
-        dateFrom = request.GET['from']
-    else:
-        dateFrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateTo = request.GET['to']
-    else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
-    # /
-
-    return render(request, 'publicationboard.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                                     'entity': entity,
-                                                     'hasToConfirm': hasToConfirm,
-                                                     'filterA': filtreA,
-                                                     # "harvested_from_ids" + ':"' + entity["labHalId"] + '" AND validated:true',
-                                                     'filterB': filtreB,
-                                                     # 'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"',
-                                                     'filterC': filtreC,
-                                                     # 'labHalId.keyword:"' + entity["labHalId"]+ '" AND ldapId.keyword :"' + id + '"',
-                                                     'startDate': start_date,
-                                                     'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
-
 
 def references(request):
     # Get parameters
@@ -679,39 +497,17 @@ def references(request):
     else:
         ldapid = None
 
-
-    if 'type' in request.GET and 'id' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
-        id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+        basereverse = 'references'
+        return default_checker(request, basereverse)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
-            type = "rsr"
-            base_url = reverse('references')
-            default_filter = 'uncomplete'
-            query_string = urlencode({'type': type, 'id': id, 'filter': default_filter})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-
-        else:
-            return redirect('unknown')
-    else:
+    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
+
 
     if 'filter' in request.GET:
         filter = request.GET['filter']
@@ -845,41 +641,19 @@ def terminology(request):
         type = request.GET['type']
         id = request.GET['id']
 
-    elif request.user.is_authenticated:  # si l'ancien système ne sais pas quoi faire
-        id = request.user.get_username()  # check si l'utilisateur est log
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+    elif request.user.is_authenticated:
+        basereverse = 'terminology'
+        return default_checker(request, basereverse)
 
-        elif not id == 'adminlab' and not id == 'visiteur'  and not id == 'invitamu' and not id == -1:  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
-            type = "rsr"
-            base_url = reverse('terminology')
-            query_string = urlencode({'type': type, 'id': id})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-
-        else:  # sinon il est inconnu et doit aller dans l'index pour faire ses choix car on ne peut pas le suivre
-            return redirect('unknown')
     else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
+
 
     if 'export' in request.GET:
         export = request.GET['export']
     else:
         export = False
-
     # /
-
     # Connect to DB
     es = esActions.es_connector()
 
@@ -1034,39 +808,17 @@ def wordcloud(request):
     else:
         ldapid = None
 
-    if 'type' in request.GET and 'id' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
-        id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+        basereverse = 'wordcloud'
+        return default_checker(request, basereverse)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
-            type = "rsr"
-            base_url = reverse('wordcloud')
-            query_string = urlencode({'type': type, 'id': id})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        else:
-            return redirect('unknown')
-    else:
+    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
-
     # /
-
     # Connect to DB
     es = esActions.es_connector()
 
@@ -1114,10 +866,13 @@ def wordcloud(request):
 
     if type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
+        indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
+        filtrechercheur = '_index: "' + indexsearch + '"'
 
     elif type == "lab":
 
         start_date_param = esActions.date_p(field, entity['halStructId'])
+        filtrechercheur = ''
 
     res = es.search(index=struct + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -1138,7 +893,7 @@ def wordcloud(request):
     return render(request, 'wordcloud.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
                                               'entity': entity,
                                               'hasToConfirm': hasToConfirm,
-                                              'filter': ext_key + ':"' + entity[key] + '" AND validated:true',
+                                              'filterRsr': filtrechercheur,
                                               'startDate': start_date,
                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
 
@@ -1156,37 +911,16 @@ def tools(request):
     else:
         ldapid = None
 
-    if 'type' in request.GET and 'id' in request.GET:
+    if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
         type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
-        id = request.user.get_username()
-        id = id.replace(viewsActions.patternCas, '').lower()
-        if id == 'adminlab':
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        if id == "invitamu":
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+        basereverse = 'dashboard'
+        return default_checker(request, basereverse)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
-            type = "rsr"
-            base_url = reverse('dashboard')
-            query_string = urlencode({'type': type, 'id': id})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-        else:
-            return redirect('unknown')
-    else:
+    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
-
     # /
     # Connect to DB
     es = esActions.es_connector()
@@ -1581,3 +1315,55 @@ def useful_links(request):
         ldapid = None
     # /
     return render(request, 'useful_links.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
+
+
+#utiliser cette fonction pour call log_checker
+"""
+    default_data ='' #use only if needed that parameter
+    basereverse = ''
+    type, id = log_checker(request, basereverse,default_data)
+    print(type)
+    print(id)
+"""
+
+
+def default_checker(request, basereverse, default_data=None):
+
+        id = request.user.get_username()  # check si l'utilisateur est log
+        print(id)
+        id = id.replace(viewsActions.patternCas, '').lower()
+
+        if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
+            print("1st option")
+            indexcat = "lab"
+            base_url = reverse('index')
+            query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
+            url = '{}?{}'.format(base_url, query_string)
+            print(url)
+            return redirect(url)
+            print("error")
+
+        if id == "invitamu":
+            print("2nd option")
+            indexcat = "rsr"
+            base_url = reverse('index')
+            query_string = urlencode({'indexcat': indexcat, 'indexstruct': '130015332'})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
+        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
+            print("3rd option")
+            type = "rsr"
+            #rajouter une variable pour les fonctions qui le nécessitent - 2 fonctions actuellement, bookmark A & B
+            base_url = reverse(basereverse) #élément à changer en fonction de la fonction effectuant le call
+            if default_data is not None:
+                default_data = "credentials"
+                query_string = urlencode({'type': type, 'id': id, 'data': default_data})
+            else:
+                query_string = urlencode({'type': type, 'id': id})
+            print(query_string)
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
+        else:  # sinon il est inconnu et doit aller dans l'index pour faire ses choix car on ne peut pas le suivre
+            return redirect('unknown')
