@@ -730,60 +730,53 @@ def terminology(request):
 
     entity['concepts'] = json.loads(entity['concepts'])
 
-    if i_type == "rsr":
+    if i_type == "rsr" and 'children' in entity['concepts']:
+        for children in list(entity['concepts']['children']):
+            if children['state'] == 'invalidated':
+                entity['concepts']['children'].remove(children)
 
-        from pprint import pprint
+            if 'children' in children:
+                for children1 in list(children['children']):
+                    if children1['state'] == 'invalidated':
+                        children['children'].remove(children1)
 
-        pprint(entity['concepts'])
+                    if 'children' in children1:
+                        for children2 in list(children1['children']):
+                            if children2['state'] == 'invalidated':
+                                children1['children'].remove(children2)
 
-        if 'children' in entity['concepts']:
-            for children in list(entity['concepts']['children']):
-                if children['state'] == 'invalidated':
+    if i_type == "lab" and 'children' in entity['concepts']:
+
+        for children in list(entity['concepts']['children']):
+            print(children['id'])
+            state = 'invalidated'
+            if 'researchers' in children:
+                for rsr in children['researchers']:
+                    print(rsr)
+                    if rsr['state'] == 'validated':
+                        state = 'validated'
+                if state == "invalidated":
                     entity['concepts']['children'].remove(children)
 
-                if 'children' in children:
-                    for children1 in list(children['children']):
-                        if children1['state'] == 'invalidated':
+            if 'children' in children:
+                for children1 in list(children['children']):
+                    state = 'invalidated'
+                    if 'researchers' in children1:
+                        for rsr in children1['researchers']:
+                            if rsr['state'] == 'validated':
+                                state = 'validated'
+                        if state == "invalidated":
                             children['children'].remove(children1)
 
-                        if 'children' in children1:
-                            for children2 in list(children1['children']):
-                                if children2['state'] == 'invalidated':
+                    if 'children' in children1:
+                        for children2 in list(children1['children']):
+                            state = 'invalidated'
+                            if 'researchers' in children2:
+                                for rsr in children2['researchers']:
+                                    if rsr['state'] == 'validated':
+                                        state = 'validated'
+                                if state == "invalidated":
                                     children1['children'].remove(children2)
-
-    if i_type == "lab":
-
-        if 'children' in entity['concepts']:
-            for children in list(entity['concepts']['children']):
-                print(children['id'])
-                state = 'invalidated'
-                if 'researchers' in children:
-                    for rsr in children['researchers']:
-                        print(rsr)
-                        if rsr['state'] == 'validated':
-                            state = 'validated'
-                    if state == "invalidated":
-                        entity['concepts']['children'].remove(children)
-
-                if 'children' in children:
-                    for children1 in list(children['children']):
-                        state = 'invalidated'
-                        if 'researchers' in children1:
-                            for rsr in children1['researchers']:
-                                if rsr['state'] == 'validated':
-                                    state = 'validated'
-                            if state == "invalidated":
-                                children['children'].remove(children1)
-
-                        if 'children' in children1:
-                            for children2 in list(children1['children']):
-                                state = 'invalidated'
-                                if 'researchers' in children2:
-                                    for rsr in children2['researchers']:
-                                        if rsr['state'] == 'validated':
-                                            state = 'validated'
-                                    if state == "invalidated":
-                                        children1['children'].remove(children2)
 
     if export:
         return render(request, 'terminology_ext.html',
