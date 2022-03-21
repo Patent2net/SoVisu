@@ -101,7 +101,7 @@ def check(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
     # /
 
@@ -115,7 +115,7 @@ def check(request):
             res = es.search(index=struct + "-" + entity['labHalId'] + "-researchers-" + p_id + "-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-        except:
+        except FileNotFoundError:
             start_date_param.pop("sort")
             res = es.search(index=struct + "-" + entity['labHalId'] + "-researchers-" + p_id + "-documents",
                             body=start_date_param)
@@ -128,7 +128,7 @@ def check(request):
             res = es.search(index=struct + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-        except:
+        except FileNotFoundError:
             start_date_param.pop("sort")
             res = es.search(index=struct + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
@@ -305,16 +305,16 @@ def check(request):
 
         domains = halConcepts.concepts()
 
-        guidingDomains = []
+        guiding_domains = []
 
         if 'guidingDomains' in entity:
-            guidingDomains = entity['guidingDomains']
+            guiding_domains = entity['guidingDomains']
 
         return render(request, 'check.html',
                       {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
                        'entity': entity,
                        'domains': domains,
-                       'guidingDomains': guidingDomains,
+                       'guidingDomains': guiding_domains,
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
                        'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
@@ -412,7 +412,7 @@ def dashboard(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
     # /
 
@@ -443,7 +443,7 @@ def dashboard(request):
             start_date_param = esActions.date_all()
             res = es.search(index=indexsearch, body=start_date_param)
 
-        except:
+        except FileNotFoundError:
             start_date_param.pop("sort")
             res = es.search(index=indexsearch, body=start_date_param)
 
@@ -461,7 +461,7 @@ def dashboard(request):
 
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-    except:
+    except FileNotFoundError:
         start_date = "2000"
     # /
 
@@ -546,7 +546,7 @@ def references(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
     # /
 
@@ -681,7 +681,7 @@ def terminology(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
     # /
 
@@ -851,7 +851,7 @@ def wordcloud(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
     # /
 
@@ -948,7 +948,7 @@ def tools(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
     # /
 
@@ -973,7 +973,7 @@ def tools(request):
 
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-    except:
+    except FileNotFoundError:
         start_date = "2000"
     # /
 
