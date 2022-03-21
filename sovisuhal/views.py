@@ -431,8 +431,7 @@ def dashboard(request):
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=struct + "*-documents", body=hastoconfirm_param)[
-        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
@@ -516,9 +515,9 @@ def references(request):
         return redirect('unknown')
 
     if 'filter' in request.GET:
-        filter = request.GET['filter']
+        i_filter = request.GET['filter']
     else:
-        filter = -1
+        i_filter = -1
 
     # /
     # Connect to DB
@@ -592,15 +591,14 @@ def references(request):
 
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)[
-            'count'] > 0:
+        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)['count'] > 0:
             hastoconfirm = True
 
     # Get references
     scope_bool_type = "filter"
     validate = True
     date_range_type = "submittedDate_tdate"
-    ref_param = esActions.ref_p_filter(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type,
+    ref_param = esActions.ref_p_filter(i_filter, scope_bool_type, ext_key, entity[key], validate, date_range_type,
                                        datefrom,
                                        dateto)
 
@@ -623,7 +621,7 @@ def references(request):
         references_cleaned.append(ref['_source'])
     # /
     return render(request, 'references.html',
-                  {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': i_type, 'id': p_id, 'from': datefrom,
+                  {'ldapid': ldapid, 'struct': struct, 'filter': i_filter, 'type': i_type, 'id': p_id, 'from': datefrom,
                    'to': dateto,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
@@ -959,8 +957,7 @@ def tools(request):
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index="*-documents", body=hastoconfirm_param)[
-        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
+    if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
