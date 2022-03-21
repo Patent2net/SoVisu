@@ -1067,20 +1067,8 @@ def search(request):  # Revoir la fonction
     min_date = es.search(index="*-documents", body=date_param, size=0)['aggregations']['min_date']['value_as_string']
 
     # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
 
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
     if 'from' in request.GET:
         datefrom = request.GET['from']
     else:
@@ -1090,11 +1078,6 @@ def search(request):  # Revoir la fonction
         dateto = request.GET['to']
     else:
         dateto = datetime.today().strftime('%Y-%m-%d')
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
 
     if request.method == 'POST':
 
@@ -1270,6 +1253,10 @@ def default_checker(request, basereverse, default_data=None):
 
 
 def regular_get_parameters(request):
+    # utiliser cette fonction pour call regular_get_parameters
+    """
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
+    """
 
     if 'struct' in request.GET:
         struct = request.GET['struct']
