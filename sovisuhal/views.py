@@ -26,17 +26,17 @@ def create(request):
         iDhalerror = request.GET['iDhalerror']
 
     return render(request, 'create.html', {'data': "create",  # 'type': type,
-                                          'ldapid': ldapid,  # 'from': dateFrom, 'to': dateTo,
-                                          # 'entity': entity, #'extIds': ['a', 'b', 'c'],
-                                          'halId_s': 'nullNone',
-                                          'idRef': 'nullNone',
-                                          'orcId': 'nullNone',
-                                          'autres': 'nullNone',
-                                          'form': forms.CreateCredentials(),
-                                          'iDhalerror': iDhalerror,
-                                          }
+                                           'ldapid': ldapid,  # 'from': datefrom, 'to': dateto,
+                                           # 'entity': entity, #'extIds': ['a', 'b', 'c'],
+                                           'halId_s': 'nullNone',
+                                           'idRef': 'nullNone',
+                                           'orcId': 'nullNone',
+                                           'autres': 'nullNone',
+                                           'form': forms.CreateCredentials(),
+                                           'iDhalerror': iDhalerror,
+                                           }
                   # "'startDate': start_date,
-                  # 'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"}
+                  # 'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"}
                   )
 
 
@@ -65,7 +65,6 @@ def check(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
 
-
     if 'data' in request.GET:
         data = request.GET['data']
     else:
@@ -74,13 +73,13 @@ def check(request):
 
     if data == -1:
         return render(request, 'create.html', {'data': viewsActions.create,
-                                              # 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'form': forms.CreateCredentials(),
+                                               # 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                                               'form': forms.CreateCredentials(),
 
-                                              }
+                                               }
                       )
 
-    # Get scope informations
+    # Get scope data
     if type == "rsr":
         field = "_id"
         key = 'halId_s'
@@ -97,7 +96,8 @@ def check(request):
 
     scope_param = esActions.scope_p(field, id)
 
-    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -138,35 +138,35 @@ def check(request):
 
     # Get parameters
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = start_date[0:4] + '-01-01'
+        datefrom = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    hasToConfirm = False
+    hastoconfirm = False
     validate = False
     if type == "rsr":
         field = "authIdHal_s"
-        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-        # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
+        # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
 
     if type == "lab":
         field = "labStructId_i"
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=struct + "*-documents", body=hasToConfirm_param)[
-        'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
+        # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+        hastoconfirm = True
 
-    print(hasToConfirm)
+    print(hastoconfirm)
 
     if data == "state":
         field = "labHalId"
@@ -181,12 +181,13 @@ def check(request):
         for result in rsrs['hits']['hits']:
             rsrs_cleaned.append(result['_source'])
         print(rsrs_cleaned)
-        return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'researchers': rsrs_cleaned,
-                                              'startDate': start_date,
-                                              'hasToConfirm': hasToConfirm,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'check.html',
+                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'entity': entity,
+                       'researchers': rsrs_cleaned,
+                       'startDate': start_date,
+                       'hasToConfirm': hastoconfirm,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     if data == "-1" or data == "credentials":
 
@@ -200,24 +201,26 @@ def check(request):
             if 'function' in entity:
                 function = entity['function']
 
-            return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                                  'entity': entity, 'extIds': ['a', 'b', 'c'],
-                                                  'form': forms.validCredentials(halId_s=entity['halId_s'],
-                                                                                 idRef=entity['idRef'], orcId=orcId,
-                                                                                 function=function),
-                                                  'startDate': start_date,
-                                                  'hasToConfirm': hasToConfirm,
-                                                  'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+            return render(request, 'check.html',
+                          {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                           'entity': entity, 'extIds': ['a', 'b', 'c'],
+                           'form': forms.validCredentials(halId_s=entity['halId_s'],
+                                                          idRef=entity['idRef'], orcId=orcId,
+                                                          function=function),
+                           'startDate': start_date,
+                           'hasToConfirm': hastoconfirm,
+                           'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
         if type == "lab":
-            return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                                  'entity': entity,
-                                                  'form': forms.validLabCredentials(halStructId=entity['halStructId'],
-                                                                                    rsnr=entity['rsnr'],
-                                                                                    idRef=entity['idRef']),
-                                                  'startDate': start_date,
-                                                  'hasToConfirm': hasToConfirm,
-                                                  'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+            return render(request, 'check.html',
+                          {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                           'entity': entity,
+                           'form': forms.validLabCredentials(halStructId=entity['halStructId'],
+                                                             rsnr=entity['rsnr'],
+                                                             idRef=entity['idRef']),
+                           'startDate': start_date,
+                           'hasToConfirm': hastoconfirm,
+                           'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     elif data == "research-description":
 
@@ -236,17 +239,18 @@ def check(request):
         else:
             research_projectsInProgress = entity['research_projectsInProgress']
 
-        return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity, 'extIds': ['a', 'b', 'c'],
-                                              'form': forms.setResearchDescription(research_summary=research_summary,
-                                                                                   research_projectsInProgress=research_projectsInProgress,
-                                                                                   research_projectsAndFundings=research_projectsAndFundings),
-                                              'startDate': start_date,
-                                              'research_summary': research_summary,
-                                              'research_projectsInProgress': research_projectsInProgress,
-                                              'research_projectsAndFundings': research_projectsAndFundings,
-                                              'hasToConfirm': hasToConfirm,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'check.html',
+                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'entity': entity, 'extIds': ['a', 'b', 'c'],
+                       'form': forms.setResearchDescription(research_summary=research_summary,
+                                                            research_projectsInProgress=research_projectsInProgress,
+                                                            research_projectsAndFundings=research_projectsAndFundings),
+                       'startDate': start_date,
+                       'research_summary': research_summary,
+                       'research_projectsInProgress': research_projectsInProgress,
+                       'research_projectsAndFundings': research_projectsAndFundings,
+                       'hasToConfirm': hastoconfirm,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     elif data == "expertise":
         if 'validation' in request.GET:
@@ -278,22 +282,24 @@ def check(request):
                                     concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'],
                                                      'state': validate})
 
-        return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'validation': validation,
-                                              'entity': entity,
-                                              'concepts': concepts,
-                                              'startDate': start_date,
-                                              'hasToConfirm': hasToConfirm,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'check.html',
+                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'validation': validation,
+                       'entity': entity,
+                       'concepts': concepts,
+                       'startDate': start_date,
+                       'hasToConfirm': hastoconfirm,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     elif data == "guiding-keywords":
-        return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'form': forms.setGuidingKeywords(
-                                                  guidingKeywords=entity['guidingKeywords']),
-                                              'startDate': start_date,
-                                              'hasToConfirm': hasToConfirm,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'check.html',
+                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'entity': entity,
+                       'form': forms.setGuidingKeywords(
+                           guidingKeywords=entity['guidingKeywords']),
+                       'startDate': start_date,
+                       'hasToConfirm': hastoconfirm,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     elif data == "guiding-domains":
 
@@ -304,14 +310,14 @@ def check(request):
         if 'guidingDomains' in entity:
             guidingDomains = entity['guidingDomains']
 
-        return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'domains': domains,
-                                              'guidingDomains': guidingDomains,
-                                              'startDate': start_date,
-                                              'hasToConfirm': hasToConfirm,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
-
+        return render(request, 'check.html',
+                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'entity': entity,
+                       'domains': domains,
+                       'guidingDomains': guidingDomains,
+                       'startDate': start_date,
+                       'hasToConfirm': hastoconfirm,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     elif data == "references":
         if 'validation' in request.GET:
@@ -325,7 +331,7 @@ def check(request):
             return redirect('unknown')
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
-        ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
+        ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, datefrom, dateto)
 
         if type == "rsr":  # I hope this is a focused search :-/
             count = \
@@ -348,12 +354,13 @@ def check(request):
             references_cleaned.append(ref['_source'])
         # /
 
-        return render(request, 'check.html', {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'validation': validation,
-                                              'entity': entity,
-                                              'hasToConfirm': hasToConfirm,
-                                              'references': references_cleaned, 'startDate': start_date,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'check.html',
+                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'validation': validation,
+                       'entity': entity,
+                       'hasToConfirm': hastoconfirm,
+                       'references': references_cleaned, 'startDate': start_date,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
     else:
         return redirect('unknown')
@@ -379,13 +386,13 @@ def dashboard(request):
         basereverse = 'dashboard'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
     # /
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope data
     if type == "rsr":
         field = "_id"
         key = 'halId_s'
@@ -409,29 +416,29 @@ def dashboard(request):
         return redirect('unknown')
     # /
 
-    hasToConfirm = False
+    hastoconfirm = False
 
     validate = False
     if type == "rsr":
         field = "authIdHal_s"
-        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-        # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
-        #  entity["ldapId"] +"-documents", body=hasToConfirm_param)['count'] > 0:
+        #  entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
 
     if type == "lab":
         field = "labStructId_i"
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=struct + "*-documents", body=hasToConfirm_param)[
-        'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)[
+        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+        hastoconfirm = True
 
     # Get first submittedDate_tdate date
     if type == "rsr":
-        indexsearch= struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
+        indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         try:
             start_date_param = esActions.date_all()
             res = es.search(index=indexsearch, body=start_date_param)
@@ -460,29 +467,29 @@ def dashboard(request):
 
     # Get parameters
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = start_date[0:4] + '-01-01'
+        datefrom = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
 
     ext_key = "harvested_from_ids"
     # /
 
-    return render(request, 'dashboard.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'hasToConfirm': hasToConfirm,
-                                              'ext_key': ext_key,
-                                              'key': entity[key],
-                                              'filterRsr': filtrechercheur,
-                                              'filterlabA': filtrelabA,
-                                              'filterlabB': filtrelabB,
-                                              'startDate': start_date,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
-
+    return render(request, 'dashboard.html',
+                  {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                   'entity': entity,
+                   'hasToConfirm': hastoconfirm,
+                   'ext_key': ext_key,
+                   'key': entity[key],
+                   'filterRsr': filtrechercheur,
+                   'filterlabA': filtrelabA,
+                   'filterlabB': filtrelabB,
+                   'startDate': start_date,
+                   'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
 
 def references(request):
@@ -505,9 +512,8 @@ def references(request):
         basereverse = 'references'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
-
 
     if 'filter' in request.GET:
         filter = request.GET['filter']
@@ -518,7 +524,7 @@ def references(request):
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope data
     if type == "rsr":
         field = "_id"
         key = 'halId_s'
@@ -536,7 +542,7 @@ def references(request):
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -562,41 +568,41 @@ def references(request):
 
     # Get parameters
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = start_date[0:4] + '-01-01'
+        datefrom = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    hasToConfirm = False
+    hastoconfirm = False
     field = "harvested_from_ids"
     validate = False
     if type == "rsr":
 
-        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
         if es.count(index=struct + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
-                    body=hasToConfirm_param)['count'] > 0:
-            hasToConfirm = True
+                    body=hastoconfirm_param)['count'] > 0:
+            hastoconfirm = True
     if type == "lab":
 
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hasToConfirm_param)[
+        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)[
             'count'] > 0:
-            hasToConfirm = True
+            hastoconfirm = True
 
     # Get references
     scope_bool_type = "filter"
     validate = True
     date_range_type = "submittedDate_tdate"
     ref_param = esActions.ref_p_filter(filter, scope_bool_type, ext_key, entity[key], validate, date_range_type,
-                                       dateFrom,
-                                       dateTo)
+                                       datefrom,
+                                       dateto)
 
     if type == "rsr":  # I hope this is a focused search :-/
         count = es.count(index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
@@ -616,16 +622,17 @@ def references(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
     # /
-    return render(request, 'references.html', {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                               'entity': entity,
-                                               'hasToConfirm': hasToConfirm,
-                                               'references': references_cleaned, 'startDate': start_date,
-                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+    return render(request, 'references.html',
+                  {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': datefrom,
+                   'to': dateto,
+                   'entity': entity,
+                   'hasToConfirm': hastoconfirm,
+                   'references': references_cleaned, 'startDate': start_date,
+                   'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
 
 @xframe_options_exempt
 def terminology(request):
-
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -645,9 +652,8 @@ def terminology(request):
         basereverse = 'terminology'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
-
 
     if 'export' in request.GET:
         export = request.GET['export']
@@ -657,7 +663,7 @@ def terminology(request):
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope data
     if type == "rsr":
         field = "_id"
         search_id = "*"
@@ -671,7 +677,7 @@ def terminology(request):
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -679,19 +685,19 @@ def terminology(request):
         return redirect('unknown')
     # /
 
-    hasToConfirm = False
+    hastoconfirm = False
 
     validate = False
     field = "harvested_from_ids"
 
     if type == "rsr":
-        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
     if type == "lab":
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index="*-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
+    if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:
+        hastoconfirm = True
 
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
@@ -708,14 +714,14 @@ def terminology(request):
 
     # Get parameters
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = start_date[0:4] + '-01-01'
+        datefrom = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
     # /
 
     if type == "lab":
@@ -781,19 +787,20 @@ def terminology(request):
                                     if state == "invalidated":
                                         children1['children'].remove(children2)
 
-
     if export:
-        return render(request, 'terminology_ext.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                                        'entity': entity,
-                                                        'hasToConfirm': hasToConfirm,
-                                                        'startDate': start_date,
-                                                        'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'terminology_ext.html',
+                      {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'entity': entity,
+                       'hasToConfirm': hastoconfirm,
+                       'startDate': start_date,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
     else:
-        return render(request, 'terminology.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                                    'entity': entity,
-                                                    'hasToConfirm': hasToConfirm,
-                                                    'startDate': start_date,
-                                                    'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'terminology.html',
+                      {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                       'entity': entity,
+                       'hasToConfirm': hastoconfirm,
+                       'startDate': start_date,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
 
 def wordcloud(request):
@@ -816,13 +823,13 @@ def wordcloud(request):
         basereverse = 'wordcloud'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
     # /
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope data
     if type == "rsr":
         field = "_id"
         key = 'halId_s'
@@ -840,7 +847,7 @@ def wordcloud(request):
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -848,18 +855,18 @@ def wordcloud(request):
         return redirect('unknown')
     # /
 
-    hasToConfirm = False
+    hastoconfirm = False
 
     field = "harvested_from_ids"
     validate = False
     if type == "rsr":
-        hasToConfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
     if type == "lab":
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=struct + "*-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
+        hastoconfirm = True
 
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
@@ -880,26 +887,26 @@ def wordcloud(request):
 
     # Get parameters
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = start_date[0:4] + '-01-01'
+        datefrom = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    return render(request, 'wordcloud.html', {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'hasToConfirm': hasToConfirm,
-                                              'filterRsr': filtrechercheur,
-                                              'startDate': start_date,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+    return render(request, 'wordcloud.html',
+                  {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                   'entity': entity,
+                   'hasToConfirm': hastoconfirm,
+                   'filterRsr': filtrechercheur,
+                   'startDate': start_date,
+                   'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
 
 def tools(request):
-
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -919,13 +926,13 @@ def tools(request):
         basereverse = 'dashboard'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown si il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
         return redirect('unknown')
     # /
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope data
     if type == "lab":
         field = "halStructId"
         key = "halStructId"
@@ -937,7 +944,7 @@ def tools(request):
     scope_param = esActions.scope_p(field, id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique car pas de LabHalId ?
+                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -945,17 +952,17 @@ def tools(request):
         return redirect('unknown')
     # /
 
-    hasToConfirm = False
+    hastoconfirm = False
 
     validate = False
     if type == "lab":
         field = "labStructId_i"
-        hasToConfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index="*-documents", body=hasToConfirm_param)[
-        'count'] > 0:  # devrait scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hasToConfirm_param)['count'] > 0:
-        hasToConfirm = True
+    if es.count(index="*-documents", body=hastoconfirm_param)[
+        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
+        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+        hastoconfirm = True
 
     # Get first submittedDate_tdate date
     if type == "lab":
@@ -972,14 +979,14 @@ def tools(request):
 
     # Get parameters
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = start_date[0:4] + '-01-01'
+        datefrom = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
     # /
 
     if 'data' in request.GET:
@@ -988,24 +995,27 @@ def tools(request):
         data = "hceres"
 
     if data == "hceres" or data == -1:
-        return render(request, 'tools.html', {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
-                                              'entity': entity,
-                                              'hasToConfirm': hasToConfirm,
-                                              'ext_key': ext_key,
-                                              'key': entity[key],
-                                              'startDate': start_date,
-                                              'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+        return render(request, 'tools.html',
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom,
+                       'to': dateto,
+                       'entity': entity,
+                       'hasToConfirm': hastoconfirm,
+                       'ext_key': ext_key,
+                       'key': entity[key],
+                       'startDate': start_date,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
     elif data == "consistency":
 
-        consistencyvalues = viewsActions.cohesion(struct, id, dateFrom, dateTo)
+        consistencyvalues = viewsActions.cohesion(struct, id, datefrom, dateto)
 
         return render(request, 'tools.html',
-                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': dateFrom, 'to': dateTo,
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom,
+                       'to': dateto,
                        'entity': entity,
                        'consistency': consistencyvalues,
                        'startDate': start_date,
-                       'hasToConfirm': hasToConfirm,
-                       'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'"})
+                       'hasToConfirm': hastoconfirm,
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
 
 def index(request):
@@ -1060,9 +1070,13 @@ def index(request):
     # /
     if type == -1 and id == -1:  # Si le type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
         # → évite des erreurs lors des vérifications pour les autres pages dans le cas d'un -1
-        return render(request, 'index.html', {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,'ldapid': ldapid })
+        return render(request, 'index.html',
+                      {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                       'ldapid': ldapid})
     else:  # Le type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
-        return render(request, 'index.html', {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'indexstruct': indexstruct, 'id': id, 'struct': struct,'ldapid': ldapid})
+        return render(request, 'index.html',
+                      {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                       'id': id, 'struct': struct, 'ldapid': ldapid})
 
 
 def search(request):  # Revoir la fonction
@@ -1093,14 +1107,14 @@ def search(request):  # Revoir la fonction
     else:
         id = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        datefrom = request.GET['from']
     else:
-        dateFrom = min_date[0:4] + '-01-01'
+        datefrom = min_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        dateto = request.GET['to']
     else:
-        dateTo = datetime.today().strftime('%Y-%m-%d')
+        dateto = datetime.today().strftime('%Y-%m-%d')
 
     if 'ldapid' in request.GET:
         ldapid = request.GET['ldapid']
@@ -1138,14 +1152,17 @@ def search(request):  # Revoir la fonction
             res_cleaned.append(result['_source'])
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
-        return render(request, 'search.html', {'struct': struct, 'type': type, 'id': id, 'form': forms.search(val=search), 'count': p_res['count'],
-                                               'timeRange': "from:'" + dateFrom + "',to:'" + dateTo + "'",
-                                               'filter': search, 'index': index, 'search': search,
-                                               'results': res_cleaned, 'from': dateFrom, 'to': dateTo,
-                                               'startDate': min_date, 'ldapid': ldapid})
+        return render(request, 'search.html',
+                      {'struct': struct, 'type': type, 'id': id, 'form': forms.search(val=search),
+                       'count': p_res['count'],
+                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'",
+                       'filter': search, 'index': index, 'search': search,
+                       'results': res_cleaned, 'from': datefrom, 'to': dateto,
+                       'startDate': min_date, 'ldapid': ldapid})
 
     return render(request, 'search.html',
-                  {'struct': struct, 'type': type, 'id': id, 'form': forms.search(), 'from': dateFrom, 'to': dateTo, 'startDate': min_date, 'filter': '', 'ldapid': ldapid})
+                  {'struct': struct, 'type': type, 'id': id, 'form': forms.search(), 'from': datefrom, 'to': dateto,
+                   'startDate': min_date, 'filter': '', 'ldapid': ldapid})
 
 
 def presentation(request):
@@ -1284,7 +1301,8 @@ def contact(request):
             messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
             f = ContactForm()
 
-            return render(request, 'contact.html', {'struct': struct, 'type': type, 'id': id, 'form': f, 'ldapid': ldapid})
+            return render(request, 'contact.html',
+                          {'struct': struct, 'type': type, 'id': id, 'form': f, 'ldapid': ldapid})
 
     else:
         f = ContactForm()
@@ -1317,7 +1335,7 @@ def useful_links(request):
     return render(request, 'useful_links.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
 
 
-#utiliser cette fonction pour call log_checker
+# utiliser cette fonction pour call log_checker
 """
     default_data ='' #use only if needed that parameter
     basereverse = ''
@@ -1328,42 +1346,41 @@ def useful_links(request):
 
 
 def default_checker(request, basereverse, default_data=None):
+    id = request.user.get_username()  # check si l'utilisateur est log
+    print(id)
+    id = id.replace(viewsActions.patternCas, '').lower()
 
-        id = request.user.get_username()  # check si l'utilisateur est log
-        print(id)
-        id = id.replace(viewsActions.patternCas, '').lower()
+    if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
+        print("1st option")
+        indexcat = "lab"
+        base_url = reverse('index')
+        query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
+        url = '{}?{}'.format(base_url, query_string)
+        print(url)
+        return redirect(url)
+        print("error")
 
-        if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
-            print("1st option")
-            indexcat = "lab"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
-            url = '{}?{}'.format(base_url, query_string)
-            print(url)
-            return redirect(url)
-            print("error")
+    if id == "invitamu":
+        print("2nd option")
+        indexcat = "rsr"
+        base_url = reverse('index')
+        query_string = urlencode({'indexcat': indexcat, 'indexstruct': '130015332'})
+        url = '{}?{}'.format(base_url, query_string)
+        return redirect(url)
 
-        if id == "invitamu":
-            print("2nd option")
-            indexcat = "rsr"
-            base_url = reverse('index')
-            query_string = urlencode({'indexcat': indexcat, 'indexstruct': '130015332'})
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
+    elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
+        # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
+        print("3rd option")
+        type = "rsr"
+        base_url = reverse(basereverse)  # élément à changer en fonction de la fonction effectuant le call
+        if default_data is not None:
+            default_data = "credentials"
+            query_string = urlencode({'type': type, 'id': id, 'data': default_data})
+        else:
+            query_string = urlencode({'type': type, 'id': id})
+        print(query_string)
+        url = '{}?{}'.format(base_url, query_string)
+        return redirect(url)
 
-        elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:  # si ce n'est pas adminlab ni un visiteur => c'est un chercheur
-            print("3rd option")
-            type = "rsr"
-            #rajouter une variable pour les fonctions qui le nécessitent - 2 fonctions actuellement, bookmark A & B
-            base_url = reverse(basereverse) #élément à changer en fonction de la fonction effectuant le call
-            if default_data is not None:
-                default_data = "credentials"
-                query_string = urlencode({'type': type, 'id': id, 'data': default_data})
-            else:
-                query_string = urlencode({'type': type, 'id': id})
-            print(query_string)
-            url = '{}?{}'.format(base_url, query_string)
-            return redirect(url)
-
-        else:  # sinon il est inconnu et doit aller dans l'index pour faire ses choix car on ne peut pas le suivre
-            return redirect('unknown')
+    else:  # sinon il est inconnu et doit aller dans l'index pour faire ses choix, car on ne peut pas le suivre
+        return redirect('unknown')
