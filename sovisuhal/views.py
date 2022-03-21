@@ -25,7 +25,7 @@ def create(request):
     if 'iDhalerror' in request.GET:
         iDhalerror = request.GET['iDhalerror']
 
-    return render(request, 'create.html', {'data': "create",  # 'type': type,
+    return render(request, 'create.html', {'data': "create",  # 'type': i_type,
                                            'ldapid': ldapid,  # 'from': datefrom, 'to': dateto,
                                            # 'entity': entity, #'extIds': ['a', 'b', 'c'],
                                            'halId_s': 'nullNone',
@@ -54,7 +54,7 @@ def check(request):
         struct = -1
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
@@ -62,7 +62,7 @@ def check(request):
         default_data = "credentials"
         return default_checker(request, basereverse, default_data)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et id ne sont pas connu
         return redirect('unknown')
 
     if 'data' in request.GET:
@@ -73,20 +73,20 @@ def check(request):
 
     if data == -1:
         return render(request, 'create.html', {'data': viewsActions.create,
-                                               # 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                                               # 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                                                'form': forms.CreateCredentials(),
 
                                                }
                       )
 
     # Get scope data
-    if type == "rsr":
+    if i_type == "rsr":
         field = "_id"
         key = 'halId_s'
         search_id = "*"
         index_pattern = "-researchers"
 
-    elif type == "lab":
+    elif i_type == "lab":
         field = "halStructId"
         key = "halStructId"
         search_id = id
@@ -107,7 +107,7 @@ def check(request):
 
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
-    if type == "rsr":
+    if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
 
         try:
@@ -120,7 +120,7 @@ def check(request):
             res = es.search(index=struct + "-" + entity['labHalId'] + "-researchers-" + id + "-documents",
                             body=start_date_param)
             start_date = "2000"
-    elif type == "lab":
+    elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
         try:
@@ -150,20 +150,20 @@ def check(request):
 
     hastoconfirm = False
     validate = False
-    if type == "rsr":
+    if i_type == "rsr":
         field = "authIdHal_s"
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
         # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
+        #  par ex pour == if i_type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
 
-    if type == "lab":
+    if i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
         # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+        #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     print(hastoconfirm)
@@ -182,7 +182,7 @@ def check(request):
             rsrs_cleaned.append(result['_source'])
         print(rsrs_cleaned)
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'entity': entity,
                        'researchers': rsrs_cleaned,
                        'startDate': start_date,
@@ -191,7 +191,7 @@ def check(request):
 
     if data == "-1" or data == "credentials":
 
-        if type == "rsr":
+        if i_type == "rsr":
             orcId = ''
             if 'orcId' in entity:
                 orcId = entity['orcId']
@@ -202,7 +202,7 @@ def check(request):
                 function = entity['function']
 
             return render(request, 'check.html',
-                          {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                          {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                            'entity': entity, 'extIds': ['a', 'b', 'c'],
                            'form': forms.validCredentials(halId_s=entity['halId_s'],
                                                           idRef=entity['idRef'], orcId=orcId,
@@ -211,9 +211,9 @@ def check(request):
                            'hasToConfirm': hastoconfirm,
                            'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
 
-        if type == "lab":
+        if i_type == "lab":
             return render(request, 'check.html',
-                          {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                          {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                            'entity': entity,
                            'form': forms.validLabCredentials(halStructId=entity['halStructId'],
                                                              rsnr=entity['rsnr'],
@@ -240,7 +240,7 @@ def check(request):
             research_projectsInProgress = entity['research_projectsInProgress']
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'entity': entity, 'extIds': ['a', 'b', 'c'],
                        'form': forms.setResearchDescription(research_summary=research_summary,
                                                             research_projectsInProgress=research_projectsInProgress,
@@ -283,7 +283,7 @@ def check(request):
                                                      'state': validate})
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'validation': validation,
                        'entity': entity,
                        'concepts': concepts,
@@ -293,7 +293,7 @@ def check(request):
 
     elif data == "guiding-keywords":
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'entity': entity,
                        'form': forms.setGuidingKeywords(
                            guidingKeywords=entity['guidingKeywords']),
@@ -311,7 +311,7 @@ def check(request):
             guidingDomains = entity['guidingDomains']
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'entity': entity,
                        'domains': domains,
                        'guidingDomains': guidingDomains,
@@ -333,7 +333,7 @@ def check(request):
         scope_bool_type = "must"
         ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, datefrom, dateto)
 
-        if type == "rsr":  # I hope this is a focused search :-/
+        if i_type == "rsr":  # I hope this is a focused search :-/
             count = \
                 es.count(index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                          body=ref_param)['count']
@@ -341,7 +341,7 @@ def check(request):
                 index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                 body=ref_param, size=count)
 
-        if type == "lab":
+        if i_type == "lab":
             count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents",
                              body=ref_param)['count']
             references = es.search(
@@ -355,7 +355,7 @@ def check(request):
         # /
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'validation': validation,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
@@ -379,27 +379,27 @@ def dashboard(request):
         ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
-        type = request.GET['type']
+        i_type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
         basereverse = 'dashboard'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et id ne sont pas connu
         return redirect('unknown')
     # /
     # Connect to DB
     es = esActions.es_connector()
 
     # Get scope data
-    if type == "rsr":
+    if i_type == "rsr":
         field = "_id"
         key = 'halId_s'
         search_id = "*"
         index_pattern = "-researchers"
 
-    elif type == "lab":
+    elif i_type == "lab":
         field = "halStructId"
         key = "halStructId"
         search_id = id
@@ -419,25 +419,25 @@ def dashboard(request):
     hastoconfirm = False
 
     validate = False
-    if type == "rsr":
+    if i_type == "rsr":
         field = "authIdHal_s"
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
         # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
+        #  par ex pour == if i_type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
         #  entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
 
-    if type == "lab":
+    if i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)[
         'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+        #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
-    if type == "rsr":
+    if i_type == "rsr":
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         try:
             start_date_param = esActions.date_all()
@@ -450,7 +450,7 @@ def dashboard(request):
         filtrechercheur = '_index: "' + indexsearch + '"'
         filtrelabA = ''
         filtrelabB = ''
-    elif type == "lab":
+    elif i_type == "lab":
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
@@ -480,7 +480,7 @@ def dashboard(request):
     # /
 
     return render(request, 'dashboard.html',
-                  {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'ext_key': ext_key,
@@ -505,14 +505,14 @@ def references(request):
         ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
-        type = request.GET['type']
+        i_type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
         basereverse = 'references'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et id ne sont pas connu
         return redirect('unknown')
 
     if 'filter' in request.GET:
@@ -525,13 +525,13 @@ def references(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if type == "rsr":
+    if i_type == "rsr":
         field = "_id"
         key = 'halId_s'
         search_id = "*"
         index_pattern = "-researchers"
 
-    elif type == "lab":
+    elif i_type == "lab":
         field = "halStructId"
         key = "halStructId"
         search_id = id
@@ -553,12 +553,12 @@ def references(request):
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
 
-    if type == "rsr":
+    if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
 
         res = es.search(index=struct + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                         body=start_date_param)  # labHalId est-il là ?
-    elif type == "lab":
+    elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
         res = es.search(index=struct + "-" + id + "-laboratories-documents", body=start_date_param)
@@ -581,14 +581,14 @@ def references(request):
     hastoconfirm = False
     field = "harvested_from_ids"
     validate = False
-    if type == "rsr":
+    if i_type == "rsr":
 
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
         if es.count(index=struct + "-" + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                     body=hastoconfirm_param)['count'] > 0:
             hastoconfirm = True
-    if type == "lab":
+    if i_type == "lab":
 
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
@@ -604,14 +604,14 @@ def references(request):
                                        datefrom,
                                        dateto)
 
-    if type == "rsr":  # I hope this is a focused search :-/
+    if i_type == "rsr":  # I hope this is a focused search :-/
         count = es.count(index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                          body=ref_param)['count']
         references = es.search(
             index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
             body=ref_param, size=count)
 
-    if type == "lab":
+    if i_type == "lab":
         count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
             'count']
         references = es.search(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
@@ -623,7 +623,7 @@ def references(request):
         references_cleaned.append(ref['_source'])
     # /
     return render(request, 'references.html',
-                  {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': type, 'id': id, 'from': datefrom,
+                  {'ldapid': ldapid, 'struct': struct, 'filter': filter, 'type': i_type, 'id': id, 'from': datefrom,
                    'to': dateto,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
@@ -645,14 +645,14 @@ def terminology(request):
         ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
-        type = request.GET['type']
+        i_type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
         basereverse = 'terminology'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et id ne sont pas connu
         return redirect('unknown')
 
     if 'export' in request.GET:
@@ -664,12 +664,12 @@ def terminology(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if type == "rsr":
+    if i_type == "rsr":
         field = "_id"
         search_id = "*"
         index_pattern = "-researchers"
 
-    elif type == "lab":
+    elif i_type == "lab":
         field = "halStructId"
         search_id = id
         index_pattern = "-laboratories"
@@ -690,10 +690,10 @@ def terminology(request):
     validate = False
     field = "harvested_from_ids"
 
-    if type == "rsr":
+    if i_type == "rsr":
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-    if type == "lab":
+    if i_type == "lab":
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
     if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:
@@ -702,10 +702,10 @@ def terminology(request):
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
 
-    if type == "rsr":
+    if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
 
-    elif type == "lab":
+    elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
     res = es.search(index=struct + "-*-documents", body=start_date_param)
@@ -724,15 +724,15 @@ def terminology(request):
         dateto = datetime.today().strftime('%Y-%m-%d')
     # /
 
-    if type == "lab":
+    if i_type == "lab":
         entity['concepts'] = json.dumps(entity['concepts'])
 
-    if type == "rsr":
+    if i_type == "rsr":
         entity['concepts'] = json.dumps(entity['concepts'])
 
     entity['concepts'] = json.loads(entity['concepts'])
 
-    if type == "rsr":
+    if i_type == "rsr":
 
         from pprint import pprint
 
@@ -753,7 +753,7 @@ def terminology(request):
                                 if children2['state'] == 'invalidated':
                                     children1['children'].remove(children2)
 
-    if type == "lab":
+    if i_type == "lab":
 
         if 'children' in entity['concepts']:
             for children in list(entity['concepts']['children']):
@@ -789,14 +789,14 @@ def terminology(request):
 
     if export:
         return render(request, 'terminology_ext.html',
-                      {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
                        'startDate': start_date,
                        'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
     else:
         return render(request, 'terminology.html',
-                      {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                      {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
                        'startDate': start_date,
@@ -816,27 +816,27 @@ def wordcloud(request):
         ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
-        type = request.GET['type']
+        i_type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
         basereverse = 'wordcloud'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et id ne sont pas connu
         return redirect('unknown')
     # /
     # Connect to DB
     es = esActions.es_connector()
 
     # Get scope data
-    if type == "rsr":
+    if i_type == "rsr":
         field = "_id"
         key = 'halId_s'
         search_id = "*"
         index_pattern = "-researchers"
 
-    elif type == "lab":
+    elif i_type == "lab":
         field = "halStructId"
         key = "halStructId"
         search_id = id
@@ -859,10 +859,10 @@ def wordcloud(request):
 
     field = "harvested_from_ids"
     validate = False
-    if type == "rsr":
+    if i_type == "rsr":
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-    if type == "lab":
+    if i_type == "lab":
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
@@ -871,12 +871,12 @@ def wordcloud(request):
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
 
-    if type == "rsr":
+    if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
 
-    elif type == "lab":
+    elif i_type == "lab":
 
         start_date_param = esActions.date_p(field, entity['halStructId'])
         filtrechercheur = ''
@@ -898,7 +898,7 @@ def wordcloud(request):
     # /
 
     return render(request, 'wordcloud.html',
-                  {'ldapid': ldapid, 'struct': struct, 'type': type, 'id': id, 'from': datefrom, 'to': dateto,
+                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': id, 'from': datefrom, 'to': dateto,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
@@ -919,21 +919,21 @@ def tools(request):
         ldapid = None
 
     if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
-        type = request.GET['type']
+        i_type = request.GET['type']
         id = request.GET['id']
 
     elif request.user.is_authenticated:
         basereverse = 'dashboard'
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les type et id ne sont pas connu
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et id ne sont pas connu
         return redirect('unknown')
     # /
     # Connect to DB
     es = esActions.es_connector()
 
     # Get scope data
-    if type == "lab":
+    if i_type == "lab":
         field = "halStructId"
         key = "halStructId"
         search_id = id
@@ -955,17 +955,16 @@ def tools(request):
     hastoconfirm = False
 
     validate = False
-    if type == "lab":
+    if i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index="*-documents", body=hastoconfirm_param)[
-        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
-        #  par ex pour == if type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
+        #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
-    if type == "lab":
+    if i_type == "lab":
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity['halStructId'])
 
@@ -996,7 +995,7 @@ def tools(request):
 
     if data == "hceres" or data == -1:
         return render(request, 'tools.html',
-                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom,
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom,
                        'to': dateto,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
@@ -1009,7 +1008,7 @@ def tools(request):
         consistencyvalues = viewsActions.cohesion(struct, id, datefrom, dateto)
 
         return render(request, 'tools.html',
-                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': type, 'id': id, 'from': datefrom,
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': id, 'from': datefrom,
                        'to': dateto,
                        'entity': entity,
                        'consistency': consistencyvalues,
@@ -1029,9 +1028,9 @@ def index(request):
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1068,14 +1067,14 @@ def index(request):
     elif indexcat == "rsr":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['lastName'])
     # /
-    if type == -1 and id == -1:  # Si le type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
+    if i_type == -1 and id == -1:  # Si l'i_type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
         # → évite des erreurs lors des vérifications pour les autres pages dans le cas d'un -1
         return render(request, 'index.html',
                       {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,
                        'ldapid': ldapid})
-    else:  # Le type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
+    else:  # L'i_type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
         return render(request, 'index.html',
-                      {'entities': cleaned_entities, 'type': type, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                      {'entities': cleaned_entities, 'type': i_type, 'indexcat': indexcat, 'indexstruct': indexstruct,
                        'id': id, 'struct': struct, 'ldapid': ldapid})
 
 
@@ -1098,9 +1097,9 @@ def search(request):  # Revoir la fonction
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1153,7 +1152,7 @@ def search(request):  # Revoir la fonction
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
         return render(request, 'search.html',
-                      {'struct': struct, 'type': type, 'id': id, 'form': forms.search(val=search),
+                      {'struct': struct, 'type': i_type, 'id': id, 'form': forms.search(val=search),
                        'count': p_res['count'],
                        'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'",
                        'filter': search, 'index': index, 'search': search,
@@ -1161,7 +1160,7 @@ def search(request):  # Revoir la fonction
                        'startDate': min_date, 'ldapid': ldapid})
 
     return render(request, 'search.html',
-                  {'struct': struct, 'type': type, 'id': id, 'form': forms.search(), 'from': datefrom, 'to': dateto,
+                  {'struct': struct, 'type': i_type, 'id': id, 'form': forms.search(), 'from': datefrom, 'to': dateto,
                    'startDate': min_date, 'filter': '', 'ldapid': ldapid})
 
 
@@ -1173,9 +1172,9 @@ def presentation(request):
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1187,7 +1186,7 @@ def presentation(request):
     else:
         ldapid = None
     # /
-    return render(request, 'presentation.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
+    return render(request, 'presentation.html', {'struct': struct, 'type': i_type, 'id': id, 'ldapid': ldapid})
 
 
 def ressources(request):
@@ -1198,9 +1197,9 @@ def ressources(request):
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1212,7 +1211,7 @@ def ressources(request):
     else:
         ldapid = None
     # /
-    return render(request, 'ressources.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
+    return render(request, 'ressources.html', {'struct': struct, 'type': i_type, 'id': id, 'ldapid': ldapid})
 
 
 def faq(request):
@@ -1223,9 +1222,9 @@ def faq(request):
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1237,7 +1236,7 @@ def faq(request):
     else:
         ldapid = None
     # /
-    return render(request, 'faq.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
+    return render(request, 'faq.html', {'struct': struct, 'type': i_type, 'id': id, 'ldapid': ldapid})
 
 
 def contact(request):
@@ -1248,9 +1247,9 @@ def contact(request):
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1302,12 +1301,12 @@ def contact(request):
             f = ContactForm()
 
             return render(request, 'contact.html',
-                          {'struct': struct, 'type': type, 'id': id, 'form': f, 'ldapid': ldapid})
+                          {'struct': struct, 'type': i_type, 'id': id, 'form': f, 'ldapid': ldapid})
 
     else:
         f = ContactForm()
 
-    return render(request, 'contact.html', {'struct': struct, 'type': type, 'id': id, 'form': f, 'ldapid': ldapid})
+    return render(request, 'contact.html', {'struct': struct, 'type': i_type, 'id': id, 'form': f, 'ldapid': ldapid})
 
 
 def useful_links(request):
@@ -1318,9 +1317,9 @@ def useful_links(request):
         struct = -1
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
-        type = -1
+        i_type = -1
 
     if 'id' in request.GET:
         id = request.GET['id']
@@ -1332,14 +1331,14 @@ def useful_links(request):
     else:
         ldapid = None
     # /
-    return render(request, 'useful_links.html', {'struct': struct, 'type': type, 'id': id, 'ldapid': ldapid})
+    return render(request, 'useful_links.html', {'struct': struct, 'type': i_type, 'id': id, 'ldapid': ldapid})
 
 
 # utiliser cette fonction pour call log_checker
 """
     default_data ='' #use only if needed that parameter
     basereverse = ''
-    type, id = log_checker(request, basereverse,default_data)
+    i_type, id = log_checker(request, basereverse,default_data)
     print(type)
     print(id)
 """
@@ -1350,7 +1349,7 @@ def default_checker(request, basereverse, default_data=None):
     print(id)
     id = id.replace(viewsActions.patternCas, '').lower()
 
-    if id == 'adminlab':  # si id adminlab on considère que son type par défaut est lab
+    if id == 'adminlab':  # si id adminlab on considère que son i_type par défaut est lab
         print("1st option")
         indexcat = "lab"
         base_url = reverse('index')
@@ -1371,13 +1370,13 @@ def default_checker(request, basereverse, default_data=None):
     elif not id == 'adminlab' and not id == 'visiteur' and not id == 'invitamu' and not id == -1:
         # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
         print("3rd option")
-        type = "rsr"
+        i_type = "rsr"
         base_url = reverse(basereverse)  # élément à changer en fonction de la fonction effectuant le call
         if default_data is not None:
             default_data = "credentials"
-            query_string = urlencode({'type': type, 'id': id, 'data': default_data})
+            query_string = urlencode({'type': i_type, 'id': id, 'data': default_data})
         else:
-            query_string = urlencode({'type': type, 'id': id})
+            query_string = urlencode({'type': i_type, 'id': id})
         print(query_string)
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
