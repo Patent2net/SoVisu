@@ -14,7 +14,7 @@ from django.urls import reverse
 from .libs import utils, halConcepts, esActions
 
 
-# Pages
+# /Pages
 def unknown(request):
     return render(request, '404.html')
 
@@ -431,7 +431,8 @@ def dashboard(request):
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)[
+        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
@@ -591,7 +592,8 @@ def references(request):
 
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)['count'] > 0:
+        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)[
+            'count'] > 0:
             hastoconfirm = True
 
     # Get references
@@ -950,7 +952,8 @@ def tools(request):
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
+    if es.count(index="*-documents", body=hastoconfirm_param)[
+        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
@@ -1013,25 +1016,7 @@ def index(request):
     indexcat = request.GET['indexcat']
     indexstruct = request.GET['indexstruct']
 
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
 
     # Connect to DB
@@ -1157,100 +1142,28 @@ def search(request):  # Revoir la fonction
 
 def presentation(request):
     # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
     return render(request, 'presentation.html', {'struct': struct, 'type': i_type, 'id': p_id, 'ldapid': ldapid})
 
 
 def ressources(request):
     # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
     return render(request, 'ressources.html', {'struct': struct, 'type': i_type, 'id': p_id, 'ldapid': ldapid})
 
 
 def faq(request):
     # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
     return render(request, 'faq.html', {'struct': struct, 'type': i_type, 'id': p_id, 'ldapid': ldapid})
 
 
 def contact(request):
     # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
     if request.method == 'POST':
         f = ContactForm(request.POST)
@@ -1302,40 +1215,20 @@ def contact(request):
 
 def useful_links(request):
     # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        struct = -1
-
-    if 'type' in request.GET:
-        i_type = request.GET['type']
-    else:
-        i_type = -1
-
-    if 'id' in request.GET:
-        p_id = request.GET['id']
-    else:
-        p_id = -1
-
-    if 'ldapid' in request.GET:
-        ldapid = request.GET['ldapid']
-    else:
-        ldapid = None
+    struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
     return render(request, 'useful_links.html', {'struct': struct, 'type': i_type, 'id': p_id, 'ldapid': ldapid})
 
 
-# utiliser cette fonction pour call log_checker
-"""
-    default_data ='' #use only if needed that parameter
-    basereverse = ''
-    i_type, p_id = log_checker(request, basereverse,default_data)
-    print(type)
-    print(id)
-"""
-
+# /fonctions d'initialisation des pages
 
 def default_checker(request, basereverse, default_data=None):
+    # utiliser cette fonction pour call log_checker
+    """
+        default_data ='' #use only if that parameter is needed
+        basereverse = ''
+        return default_checker(request, basereverse)
+    """
     p_id = request.user.get_username()  # check si l'utilisateur est log
     print(p_id)
     p_id = p_id.replace(viewsActions.patternCas, '').lower()
@@ -1374,3 +1267,28 @@ def default_checker(request, basereverse, default_data=None):
 
     else:  # sinon il est inconnu et doit aller dans l'index pour faire ses choix, car on ne peut pas le suivre
         return redirect('unknown')
+
+
+def regular_get_parameters(request):
+
+    if 'struct' in request.GET:
+        struct = request.GET['struct']
+    else:
+        struct = -1
+
+    if 'type' in request.GET:
+        i_type = request.GET['type']
+    else:
+        i_type = -1
+
+    if 'id' in request.GET:
+        p_id = request.GET['id']
+    else:
+        p_id = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
+
+    return struct, i_type, p_id, ldapid
