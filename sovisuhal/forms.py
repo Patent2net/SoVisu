@@ -156,26 +156,3 @@ class search(forms.Form):
 
     f_search = forms.CharField(label='Recherche', max_length=100, widget=forms.TextInput(
         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
-
-
-class ContactForm(forms.Form):
-    BUG = 'b'
-    FEEDBACK = 'fb'
-    NEW_FEATURE = 'nf'
-    OTHER = 'o'
-    PUBLICATION = 'tb'
-    purpose_choices = (
-        (PUBLICATION, 'Problème avec une publication'),
-        (NEW_FEATURE, 'Rajout de fonctionnalité'),
-        (BUG, 'Signaler une erreur'),
-        (FEEDBACK, 'Feedback'),
-        (OTHER, 'Autre'),
-    )
-
-    objet = forms.ChoiceField(label='Catégorie', choices=purpose_choices)
-    nom = forms.CharField(widget=forms.TextInput(attrs={'size': '36', 'placeholder': 'Votre Nom'}))
-    email = forms.EmailField(widget=forms.TextInput(attrs={'size': '36', 'placeholder': 'Votre Email'}))
-    sujet = forms.CharField(max_length=100,
-                            widget=forms.TextInput(attrs={'size': '36', 'placeholder': '100 caractères max'}))
-    message = forms.CharField(label='Description', widget=forms.Textarea(
-        attrs={'cols': 40, 'rows': 5, 'size': '80', 'placeholder': 'Décrivez votre problème'}))

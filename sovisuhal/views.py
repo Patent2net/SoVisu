@@ -6,12 +6,11 @@ from django.core.mail import mail_admins, mail_managers, send_mail
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
 from . import forms, viewsActions
-from .forms import ContactForm
 
 from urllib.parse import urlencode
 from django.urls import reverse
 
-from .libs import utils, halConcepts, esActions
+from .libs import halConcepts, esActions
 
 
 # /Pages
@@ -71,7 +70,7 @@ def check(request):
     # /
 
     if data == -1:
-        return render(request, 'create.html', {'data': viewsActions.create,
+        return render(request, 'create.html', {'data': create,
                                                # 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
                                                'form': forms.CreateCredentials(),
 
@@ -101,9 +100,6 @@ def check(request):
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
         except FileNotFoundError:
-            start_date_param.pop("sort")
-            res = es.search(index=struct + "-" + entity['labHalId'] + "-researchers-" + p_id + "-documents",
-                            body=start_date_param)
             start_date = "2000"
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
@@ -114,9 +110,6 @@ def check(request):
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
         except FileNotFoundError:
-            start_date_param.pop("sort")
-            res = es.search(index=struct + "-" + entity['halStructId'] + "-laboratories-documents",
-                            body=start_date_param)
             start_date = "2000"
     # /
 
@@ -232,10 +225,12 @@ def check(request):
         if 'validation' in request.GET:
             validation = request.GET['validation']
 
-        if validation == "1":
-            validate = 'validated'
-        elif validation == "0":
-            validate = 'invalidated'
+            if validation == "1":
+                validate = 'validated'
+            elif validation == "0":
+                validate = 'invalidated'
+            else:
+                return redirect('unknown')
         else:
             return redirect('unknown')
         concepts = []
@@ -299,10 +294,12 @@ def check(request):
         if 'validation' in request.GET:
             validation = request.GET['validation']
 
-        if validation == "1":
-            validate = True
-        elif validation == "0":
-            validate = False
+            if validation == "1":
+                validate = True
+            elif validation == "0":
+                validate = False
+            else:
+                return redirect('unknown')
         else:
             return redirect('unknown')
         date_range_type = "submittedDate_tdate"
@@ -394,8 +391,7 @@ def dashboard(request):
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index=struct + "*-documents", body=hastoconfirm_param)[
-        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
@@ -521,8 +517,7 @@ def references(request):
 
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)[
-            'count'] > 0:
+        if es.count(index=struct + "-" + entity['halStructId'] + "-laboratories-documents", body=hastoconfirm_param)['count'] > 0:
             hastoconfirm = True
 
     # Get references
@@ -834,8 +829,7 @@ def tools(request):
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
 
-    if es.count(index="*-documents", body=hastoconfirm_param)[
-        'count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
+    if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
@@ -1017,58 +1011,6 @@ def faq(request):
     return render(request, 'faq.html', {'struct': struct, 'type': i_type, 'id': p_id, 'ldapid': ldapid})
 
 
-def contact(request):
-    # Get parameters
-    struct, i_type, p_id, ldapid = regular_get_parameters(request)
-    # /
-    if request.method == 'POST':
-        f = ContactForm(request.POST)
-        if f.is_valid():
-            # create mail content
-            name = f.cleaned_data['nom']
-            usermail = [f.cleaned_data['email']]
-            sujet = f.cleaned_data['sujet']
-            subject = "{} : {}".format(dict(f.purpose_choices).get(f.cleaned_data['objet']), sujet)
-
-            message = "Date: {}\n\nCatégorie: {}\n\nNom d'utilisateur: {}\n\nMail de contact: {}\n\nSujet: {}\n\nDescription:\n\n {}".format(
-                datetime.now().isoformat(timespec='minutes'),
-                dict(f.purpose_choices).get(f.cleaned_data['objet']),
-                name,
-                usermail[0],
-                sujet,
-                f.cleaned_data['message']
-            )
-            if f.cleaned_data['objet'] == 'tb':  # send mail to registered MANAGERS in settings.py
-                mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
-            else:  # send mail to registered ADMINS in settings.py
-                mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
-
-            # /
-
-            # send confirmation message to user
-
-            conf_subject = "Confirmation de reception :{}".format(
-                dict(f.purpose_choices).get(f.cleaned_data['objet'])
-            )
-
-            conf_message = "Bonjour {},\nVotre requête a bien été reçue et sera examinée dans les plus brefs délais\nVeuillez trouvez ci dessous un résumé des informations renseignées:\n\n{}".format(
-                name, message)
-
-            send_mail(conf_subject, conf_message, 'testsovis@gmail.com', usermail, fail_silently=False)
-            # /
-
-            messages.add_message(request, messages.INFO, 'Votre message a bien été envoyé.')
-            f = ContactForm()
-
-            return render(request, 'contact.html',
-                          {'struct': struct, 'type': i_type, 'id': p_id, 'form': f, 'ldapid': ldapid})
-
-    else:
-        f = ContactForm()
-
-    return render(request, 'contact.html', {'struct': struct, 'type': i_type, 'id': p_id, 'form': f, 'ldapid': ldapid})
-
-
 def useful_links(request):
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1086,21 +1028,16 @@ def default_checker(request, basereverse, default_data=None):
         return default_checker(request, basereverse)
     """
     p_id = request.user.get_username()  # check si l'utilisateur est log
-    print(p_id)
     p_id = p_id.replace(viewsActions.patternCas, '').lower()
 
     if p_id == 'adminlab':  # si p_id adminlab on considère que son i_type par défaut est lab
-        print("1st option")
         indexcat = "lab"
         base_url = reverse('index')
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
         url = '{}?{}'.format(base_url, query_string)
-        print(url)
         return redirect(url)
-        print("error")
 
     if p_id == "invitamu":
-        print("2nd option")
         indexcat = "rsr"
         base_url = reverse('index')
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '130015332'})
@@ -1109,7 +1046,6 @@ def default_checker(request, basereverse, default_data=None):
 
     elif not p_id == 'adminlab' and not p_id == 'visiteur' and not p_id == 'invitamu' and not p_id == -1:
         # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
-        print("3rd option")
         i_type = "rsr"
         base_url = reverse(basereverse)  # élément à changer en fonction de la fonction effectuant le call
         if default_data is not None:
@@ -1117,7 +1053,6 @@ def default_checker(request, basereverse, default_data=None):
             query_string = urlencode({'type': i_type, 'id': p_id, 'data': default_data})
         else:
             query_string = urlencode({'type': i_type, 'id': p_id})
-        print(query_string)
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
 
@@ -1174,7 +1109,7 @@ def get_scope_data(i_type, p_id):
     ext_key = "harvested_from_ids"
 
     scope_param = esActions.scope_p(field, p_id)
-    # la partie es.search n'est pas prise dans cette fonction, car la durée de la fonction principale passe de 2 à 4s dans ce cas.
+    # la partie es.search n'est pas prise dans cette fonction, car la durée de la fonction principale passe de 2 à 4 s dans ce cas.
 
     return key, search_id, index_pattern, ext_key, scope_param
 
