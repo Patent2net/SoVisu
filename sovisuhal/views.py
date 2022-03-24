@@ -118,19 +118,10 @@ def check(request):
             res = es.search(index=struct + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
             start_date = "2000"
-
     # /
 
-    # Get parameters
-    if 'from' in request.GET:
-        datefrom = request.GET['from']
-    else:
-        datefrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateto = request.GET['to']
-    else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+    # Get date parameters
+    datefrom, dateto = get_date(request, start_date)
     # /
 
     hastoconfirm = False
@@ -437,18 +428,9 @@ def dashboard(request):
         start_date = "2000"
     # /
 
-    # Get parameters
-    if 'from' in request.GET:
-        datefrom = request.GET['from']
-    else:
-        datefrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateto = request.GET['to']
-    else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+    # Get date parameters
+    datefrom, dateto = get_date(request, start_date)
     # /
-
     return render(request, 'dashboard.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
                    'entity': entity,
@@ -521,17 +503,8 @@ def references(request):
 
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
-
-    # Get parameters
-    if 'from' in request.GET:
-        datefrom = request.GET['from']
-    else:
-        datefrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateto = request.GET['to']
-    else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+    # Get date parameters
+    datefrom, dateto = get_date(request, start_date)
     # /
 
     hastoconfirm = False
@@ -624,7 +597,6 @@ def terminology(request):
 
     res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
     # on pointe sur index générique, car pas de LabHalId ?
-
     try:
         entity = res['hits']['hits'][0]['_source']
     except FileNotFoundError:
@@ -658,16 +630,8 @@ def terminology(request):
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
-    # Get parameters
-    if 'from' in request.GET:
-        datefrom = request.GET['from']
-    else:
-        datefrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateto = request.GET['to']
-    else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+    # Get date parameters
+    datefrom, dateto = get_date(request, start_date)
     # /
 
     if i_type == "lab":
@@ -811,16 +775,8 @@ def wordcloud(request):
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
 
-    # Get parameters
-    if 'from' in request.GET:
-        datefrom = request.GET['from']
-    else:
-        datefrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateto = request.GET['to']
-    else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+    # Get date parameters
+    datefrom, dateto = get_date(request, start_date)
     # /
 
     return render(request, 'wordcloud.html',
@@ -896,16 +852,8 @@ def tools(request):
         start_date = "2000"
     # /
 
-    # Get parameters
-    if 'from' in request.GET:
-        datefrom = request.GET['from']
-    else:
-        datefrom = start_date[0:4] + '-01-01'
-
-    if 'to' in request.GET:
-        dateto = request.GET['to']
-    else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+    # Get date parameters
+    datefrom, dateto = get_date(request, start_date)
     # /
 
     if 'data' in request.GET:
@@ -1229,3 +1177,21 @@ def get_scope_data(i_type, p_id):
     # la partie es.search n'est pas prise dans cette fonction, car la durée de la fonction principale passe de 2 à 4s dans ce cas.
 
     return key, search_id, index_pattern, ext_key, scope_param
+
+
+def get_date(request, start_date):
+    # utiliser cette fonction pour call get_scope_data
+    """
+    datefrom, dateto = get_date(request, start_date)
+    """
+    if 'from' in request.GET:
+        datefrom = request.GET['from']
+    else:
+        datefrom = start_date[0:4] + '-01-01'
+
+    if 'to' in request.GET:
+        dateto = request.GET['to']
+    else:
+        dateto = datetime.today().strftime('%Y-%m-%d')
+
+    return datefrom, dateto
