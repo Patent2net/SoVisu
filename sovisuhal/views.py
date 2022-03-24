@@ -41,11 +41,10 @@ def create(request):
 
 
 def check(request):
-    # Connect to DB
-
     if request.user.is_authenticated and request.user.get_username() == 'visiteur':
         return redirect('unknown')
 
+    # Connect to DB
     es = esActions.es_connector()
 
     if 'struct' in request.GET:
@@ -80,21 +79,7 @@ def check(request):
                       )
 
     # Get scope data
-    if i_type == "rsr":
-        field = "_id"
-        key = 'halId_s'
-        search_id = "*"
-        index_pattern = "-researchers"
-
-    elif i_type == "lab":
-        field = "halStructId"
-        key = "halStructId"
-        search_id = p_id
-        index_pattern = "-laboratories"
-
-    ext_key = "harvested_from_ids"
-
-    scope_param = esActions.scope_p(field, p_id)
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
     res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
     # on pointe sur index générique, car pas de LabHalId ?
@@ -393,23 +378,10 @@ def dashboard(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if i_type == "rsr":
-        field = "_id"
-        key = 'halId_s'
-        search_id = "*"
-        index_pattern = "-researchers"
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
-    elif i_type == "lab":
-        field = "halStructId"
-        key = "halStructId"
-        search_id = p_id
-        index_pattern = "-laboratories"
-
-    scope_param = esActions.scope_p(field, p_id)
-
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
-
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res['hits']['hits'][0]['_source']
     except FileNotFoundError:
@@ -475,8 +447,6 @@ def dashboard(request):
         dateto = request.GET['to']
     else:
         dateto = datetime.today().strftime('%Y-%m-%d')
-
-    ext_key = "harvested_from_ids"
     # /
 
     return render(request, 'dashboard.html',
@@ -525,24 +495,10 @@ def references(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if i_type == "rsr":
-        field = "_id"
-        key = 'halId_s'
-        search_id = "*"
-        index_pattern = "-researchers"
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
-    elif i_type == "lab":
-        field = "halStructId"
-        key = "halStructId"
-        search_id = p_id
-        index_pattern = "-laboratories"
-
-    ext_key = "harvested_from_ids"
-
-    scope_param = esActions.scope_p(field, p_id)
-
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -664,20 +620,10 @@ def terminology(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if i_type == "rsr":
-        field = "_id"
-        search_id = "*"
-        index_pattern = "-researchers"
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
-    elif i_type == "lab":
-        field = "halStructId"
-        search_id = p_id
-        index_pattern = "-laboratories"
-
-    scope_param = esActions.scope_p(field, p_id)
-
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -823,24 +769,11 @@ def wordcloud(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if i_type == "rsr":
-        field = "_id"
-        key = 'halId_s'
-        search_id = "*"
-        index_pattern = "-researchers"
+    # l'ext_key n'est pas utilisé dans cette fonction
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
-    elif i_type == "lab":
-        field = "halStructId"
-        key = "halStructId"
-        search_id = p_id
-        index_pattern = "-laboratories"
-
-    ext_key = "harvested_from_ids"
-
-    scope_param = esActions.scope_p(field, p_id)
-
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -926,18 +859,11 @@ def tools(request):
     es = esActions.es_connector()
 
     # Get scope data
-    if i_type == "lab":
-        field = "halStructId"
-        key = "halStructId"
-        search_id = p_id
-        index_pattern = "-laboratories"
+    # la fonction n'utilise que la partie i_type =="lab" de get_scope_data
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
-    ext_key = "harvested_from_ids"
-
-    scope_param = esActions.scope_p(field, p_id)
-
-    res = es.search(index=struct + "-" + search_id + index_pattern,
-                    body=scope_param)  # on pointe sur index générique, car pas de LabHalId ?
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
 
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -1018,7 +944,6 @@ def index(request):
 
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
-
     # Connect to DB
     es = esActions.es_connector()
 
@@ -1279,3 +1204,28 @@ def regular_get_parameters(request):
         ldapid = None
 
     return struct, i_type, p_id, ldapid
+
+
+def get_scope_data(i_type, p_id):
+    # utiliser cette fonction pour call get_scope_data
+    """
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+    """
+    if i_type == "rsr":
+        field = "_id"
+        key = 'halId_s'
+        search_id = "*"
+        index_pattern = "-researchers"
+
+    elif i_type == "lab":
+        field = "halStructId"
+        key = "halStructId"
+        search_id = p_id
+        index_pattern = "-laboratories"
+
+    ext_key = "harvested_from_ids"
+
+    scope_param = esActions.scope_p(field, p_id)
+    # la partie es.search n'est pas prise dans cette fonction, car la durée de la fonction principale passe de 2 à 4s dans ce cas.
+
+    return key, search_id, index_pattern, ext_key, scope_param
