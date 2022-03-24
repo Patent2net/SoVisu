@@ -866,7 +866,7 @@ def tools(request):
                        'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
     elif data == "consistency":
 
-        consistencyvalues = viewsActions.cohesion(struct, p_id, datefrom, dateto)
+        consistencyvalues = viewsActions.cohesion(p_id, datefrom, dateto)
 
         return render(request, 'tools.html',
                       {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom,

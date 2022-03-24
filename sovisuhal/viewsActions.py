@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs
-from . import forms, settings
+from . import settings
 from .libs import utils, libsElastichal, esActions
 
 from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
@@ -23,7 +23,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
     patternCas = 'cas-utln-'  # motif à enlever aux identifiants CAS
-except:
+except FileNotFoundError:
     from django.contrib.auth.decorators import login_required
 
     mode = "Dev"
@@ -58,14 +58,10 @@ def admin_access_login(request):
                 res = es.search(index="*-researchers", body=scope_param, size=count)
                 entity = res['hits']['hits'][0]['_source']
                 struct = entity['structSirene']
-                return redirect('check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to=now&data=credentials')
+                return redirect(
+                    'check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to=now&data=credentials')
             else:
                 return redirect('create/?ldapid=' + auth_user + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
-
-    print("cas raté")
-    return render(request, '404.html')
-
-
 
 
 def create_credentials(request):
@@ -108,7 +104,7 @@ def create_credentials(request):
         # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
         return redirect(
-            '/check/?struct=' + struct +'&type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=now&data=credentials')
+            '/check/?struct=' + struct + '&type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=now&data=credentials')
 
 
 # Redirects
@@ -236,7 +232,8 @@ def validate_guiding_domains(request):
             es.update(index=struct + "-" + id + "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingDomains": toValidate}})
 
-    return redirect('/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect(
+        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def validate_expertise(request):
@@ -300,10 +297,9 @@ def validate_expertise(request):
 
                 sid = conceptId.split('.')
                 for children in entity['concepts']['children']:
-                    if len(sid) >= 1:
-                        if sid[0] == children['id']:
-                            lab_tree = utils.appendToTree(children, entity, lab_tree, validate)
-                            children['state'] = validate
+                    if len(sid) >= 1 and sid[0] == children['id']:
+                        lab_tree = utils.appendToTree(children, entity, lab_tree, validate)
+                        children['state'] = validate
 
                     if 'children' in children:
                         for children1 in children['children']:
@@ -325,8 +321,9 @@ def validate_expertise(request):
             es.update(index=lab_index, refresh='wait_for', id=entity['labHalId'],
                       body={"doc": {"concepts": lab_tree}})
 
-    return redirect('/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data
-                    + '&validation=' + validation)
+    return redirect(
+        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data
+        + '&validation=' + validation)
 
 
 def validate_credentials(request):
@@ -381,7 +378,8 @@ def validate_credentials(request):
             es.update(index=struct + "-" + id + "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"rsnr": rsnr, "idRef": idRef, "validated": True}})
 
-    return redirect('/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect(
+        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def validate_guiding_keywords(request):
@@ -429,7 +427,8 @@ def validate_guiding_keywords(request):
             es.update(index=struct + "-" + str(id) + "-laboratories", refresh='wait_for', id=id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
 
-    return redirect('/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect(
+        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def validate_research_description(request):
@@ -490,7 +489,8 @@ def validate_research_description(request):
                                     "research_updatedDate": datetime.today().isoformat()
                                     }})
 
-    return redirect('/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect(
+        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def refresh_aurehal_id(request):
@@ -534,7 +534,8 @@ def refresh_aurehal_id(request):
     es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
               body={"doc": {"aurehalId": aurehalId, 'concepts': concepts}})
 
-    return redirect('/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+    return redirect(
+        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
 
 
 def force_update_references(request):
@@ -825,16 +826,18 @@ def export_hceres_xls(request):
     else:
         book_df.to_excel(writer, 'OUV', index=False)
     if len(conf_df.index) > 0:
-        if  'page_s' in (conf_df):
-            conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
+        if 'page_s' in (conf_df):
+            conf_df[
+                ['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
                  'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
-                 'openAccess_bool_s']].to_excel(writer, 'CONF',
-                                                index=False)
+                 'openAccess_bool_s']].to_excel(
+                writer, 'CONF', index=False)
         else:
-            conf_df[['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'publicationDateY_i', 'doiId_s',
-                 'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
-                 'openAccess_bool_s']].to_excel(writer, 'CONF',
-                                                index=False)
+            conf_df[
+                ['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'publicationDateY_i', 'doiId_s', 'team',
+                 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
+                 'openAccess_bool_s']].to_excel(
+                writer, 'CONF', index=False)
     else:
         conf_df.to_excel(writer, 'CONF', index=False)
     if len(hdr_df.index) > 0:
@@ -872,8 +875,7 @@ def idhal_checkout(idhal):
     return confirmation
 
 
-def cohesion(struct, id, dateFrom, dateTo):
-
+def cohesion(p_id, datefrom, dateto):
     es = esActions.es_connector()
 
     # parametres fixes pour la recherche dans les bases Elastic
@@ -882,19 +884,9 @@ def cohesion(struct, id, dateFrom, dateTo):
     validate = True
     date_range_type = "submittedDate_tdate"
 
-    # /
-
-    # Récupére les infos sur le labo
-
-    scope_param = esActions.scope_p("halStructId", id)
-
-    res = es.search(index=struct + "-" + id + "-laboratories", body=scope_param)
-
-    entity = res['hits']['hits'][0]['_source']
-
     # récupere les infos sur les chercheurs attachés au laboratoire
     field = "labHalId"
-    rsr_param = esActions.scope_p(field, id)
+    rsr_param = esActions.scope_p(field, p_id)
 
     count = es.count(index="*-researchers", body=rsr_param)['count']
 
@@ -904,40 +896,26 @@ def cohesion(struct, id, dateFrom, dateTo):
     for result in rsrs['hits']['hits']:
         rsrs_cleaned.append(result['_source'])
 
-    ref_param = esActions.ref_p(scope_bool_type, scope_field, id, validate, date_range_type, dateFrom, dateTo)
-
-    count = es.count(index=struct + "-" + id + "-laboratories-documents", body=ref_param)['count']
-    print('Count of laboratory listed documents validated:')
-    print(count)
-    # references = es.search(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,size=count)
-
     cohesionvalues = []
-    labtotalcount = 0
-    searchertotalcount = 0
 
     for x in range(len(rsrs_cleaned)):
-        ldapId = rsrs_cleaned[x]['ldapId']
-        halId_s = rsrs_cleaned[x]['halId_s']
-        structSirene = rsrs_cleaned[x]['structSirene']
+        ldapid = rsrs_cleaned[x]['ldapId']
+        hal_id_s = rsrs_cleaned[x]['halId_s']
+        struct = rsrs_cleaned[x]['structSirene']
         name = rsrs_cleaned[x]['name']
         validated = rsrs_cleaned[x]['validated']
 
         # nombre de documents avec le nom de l'auteur coté lab par ex: (authIdHal_s : david-reymond)
-        ref_lab = esActions.ref_p(scope_bool_type, 'authIdHal_s', halId_s, validate, date_range_type, dateFrom, dateTo)
-        raw_lab_doc_count = es.count(index=structSirene + "-" + id + "-laboratories-documents", body=ref_lab)['count']
-
-
-        labtotalcount += raw_lab_doc_count
+        ref_lab = esActions.ref_p(scope_bool_type, 'authIdHal_s', hal_id_s, validate, date_range_type, datefrom, dateto)
+        raw_lab_doc_count = es.count(index=struct + "-" + p_id + "-laboratories-documents", body=ref_lab)['count']
 
         # nombre de documents de l'auteur dans son index
-        ref_param = esActions.ref_p(scope_bool_type, scope_field, halId_s, validate, date_range_type, dateFrom, dateTo)
+        ref_param = esActions.ref_p(scope_bool_type, scope_field, hal_id_s, validate, date_range_type, datefrom, dateto)
         raw_searcher_doc_count = \
-        es.count(index=structSirene + "-" + id + "-researchers-" + ldapId + "-documents", body=ref_param)['count']
-        searchertotalcount += raw_searcher_doc_count
-        # raw_searcher_doc_ref = es.search(index=struct + "-" + entity["halStructId"] + "-researchers-" + ldapId + "-documents", body=ref_param)['count']
+            es.count(index=struct + "-" + p_id + "-researchers-" + ldapid + "-documents", body=ref_param)['count']
 
         # création du dict à rajouter dans la liste
-        profiledict = {"name": name, "ldapId": ldapId, "validated": validated, "labcount": raw_lab_doc_count,
+        profiledict = {"name": name, "ldapId": ldapid, "validated": validated, "labcount": raw_lab_doc_count,
                        "searchercount": raw_searcher_doc_count}
 
         # rajout à la liste
