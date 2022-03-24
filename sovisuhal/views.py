@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 
 from django.contrib import messages
-from django.core.mail import mail_admins, mail_managers, send_mail
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
 from . import forms, viewsActions
