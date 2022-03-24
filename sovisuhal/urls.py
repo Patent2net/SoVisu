@@ -41,7 +41,6 @@ urlpatterns = [
     path('faq/', views.faq, name='faq'),
     path('ressources/', views.ressources, name='ressources'),
     path('useful_links/', views.useful_links, name='useful_links'),
-    path('contact/', views.contact, name='contact'),
 
     path('CreateCredentials/', viewsActions.create_credentials, name='credentials'),
     path('validate_credentials/', viewsActions.validate_credentials, name='validate_credentials'),
