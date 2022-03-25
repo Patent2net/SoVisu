@@ -41,6 +41,7 @@ def scope_all():
     }
     return scope
 
+
 # Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
 def scope_p(scope_field, scope_value):
     scope = {
@@ -51,6 +52,7 @@ def scope_p(scope_field, scope_value):
         }
     }
     return scope
+
 
 # Use that base code in other files to use date_all function: variable_name = esActions.date_all()
 def date_all():
@@ -65,6 +67,7 @@ def date_all():
 
     }
     return start_date_param
+
 
 # Use that base code in other files to use date_p function: variable_name = esActions.date_p(scope_field, scope_value)
 def date_p(scope_field, scope_value):

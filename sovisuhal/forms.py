@@ -7,6 +7,7 @@ from .libs import esActions
 
 struct = "198307662"  # mesure temporaire, valable tant que seuls les chercheurs UTLN ont le droit de s'inscrire
 
+
 class CreateCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
     # f_more = forms.CharField()
@@ -29,7 +30,7 @@ class CreateCredentials(forms.Form):
     count = es.count(index=struct + "*-laboratories", body=scope_param)['count']
     res = es.search(index=struct + "*-laboratories", body=scope_param, size=count)
     entities = res['hits']['hits']
-    ##harvested_from_label.keyword
+    # harvested_from_label.keyword
     # labos = []
     # for truc in entities:
     #     if 'halStructId' in truc ['fields'].keys():

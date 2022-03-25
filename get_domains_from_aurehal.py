@@ -5,6 +5,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
 
+
 def getLabel(topic, lang):
     sparql.setQuery("""
         select ?p ?o
@@ -18,6 +19,7 @@ def getLabel(topic, lang):
              truc['o']['xml:lang'] == lang]
 
     return label[0]
+
 
 r = requests.get('https://aurehal.archives-ouvertes.fr/domain/index')
 soup = BeautifulSoup(r.text, 'html.parser')

@@ -4,7 +4,6 @@ from pprint import pprint
 import matplotlib.pyplot as plt
 
 
-
 def cycle(liste):
     tempo = []
     if len(liste) < 1:
@@ -16,7 +15,7 @@ def cycle(liste):
         return tempo
 
 
-## lets go
+# lets go
 sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
 
@@ -24,7 +23,7 @@ sparql.setReturnFormat(JSON)
 def getHalId_s(aureHalId):
     # start
     # auteur :Joseph
-    # commentaire:  Cette fonction prend en paramètre la valeur aureHalId  et retourne la valeur authIdHal_s  associée
+    # commentaire : Cette fonction prend en paramètre la valeur aureHalId et retourne la valeur authIdHal_s associée
     # example: aureHalId(826859)=>vanessa-richard
     # end
     sparql.setQuery("""
@@ -41,11 +40,11 @@ def getHalId_s(aureHalId):
 
 
 def getExtId(authIdHal_s):
-    #start
-    #auteur :Joseph
-    #commentaire:  Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aureHalId associée
-    #example: authIdHal_s(vanessa-richard)=>826859
-    #end
+    # Start
+    # auteur :Joseph
+    # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aureHalId associée
+    # example : authIdHal_s(vanessa-richard)=>826859
+    # end
     sparql.setQuery("""
     select ?p ?o
     where  {
@@ -55,14 +54,15 @@ def getExtId(authIdHal_s):
     extIds = [truc for truc in results['results']['bindings'] if
               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
     aureHalId = int(extIds[0]['o']['value'].rsplit('/', 1)[1])
-    return  aureHalId
+    return aureHalId
+
 
 def getLabel(label, lang):
-    #start
-    #auteur :Joseph
-    #commentaire:  Cette fonction prend en paramètre la valeur label et lang  et retourne le nom complet du label en fonction de la langue associée
-    #example: getLabel("phys","en") => Physics
-    #end
+    # start
+    # auteur :Joseph
+    # commentaire : Cette fonction prend en paramètre la valeur label et lang et retourne le nom complet du label en fonction de la langue associée
+    # example: getLabel("phys","en") => Physics
+    # end
     sparql.setQuery("""
         select ?p ?o
         where  {
@@ -80,7 +80,7 @@ def getLabel(label, lang):
 def getArticle(halId_s):
     # start
     # auteur :Joseph
-    # commentaire: Cette fonction prend en paramètre halId_s l'id d'un article  et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
+    # commentaire : Cette fonction prend en paramètre halId_s l'id d'un article et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
     # example: getArticle(702215) => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': []}}
     # end
     """returns  Liste des métadonnées d'un document in sparlq dataarchive format"""
@@ -96,8 +96,8 @@ where {
 def recupIndividu(authIdHal_s):
     # start
     # auteur :Joseph
-    # commentaire: Cette fonction prend en paramètre authIdHal_s  s d'un cherhcheur   et retourne sous forme de dictionnaire donnee_individu qui regroupe  l'ensemble des donnée concernant le chercheur
-    # example: recupIndividu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
+    # commentaire : Cette fonction prend en paramètre authIdHal_s d'un cherhcheur et retourne sous forme de dictionnaire donnee_individu qui regroupe l'ensemble des données concernant le chercheur
+    # example : recupIndividu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
     # end
     sparql.setQuery("""
 select ?p ?o
@@ -116,7 +116,6 @@ def exploreBroader(uri):
     select ?p ?o
     where  {<%s> ?p ?o }""" % uri)
 
-
     results = sparql.query().convert()
 
     concepts = [truc for truc in results['results']['bindings'] if
@@ -124,7 +123,7 @@ def exploreBroader(uri):
     # filtres par langues
     dicoTop = dict()
 
-    dicoTop= [top['o']['value'] for top in concepts]
+    dicoTop = [top['o']['value'] for top in concepts]
     broader = [truc['o']['value'] for truc in results['results']['bindings'] if
                truc['p']['value'] == "http://www.w3.org/2004/02/skos/core#broader"]
 
@@ -133,6 +132,7 @@ def exploreBroader(uri):
             dicoTop.insert(0, exploreBroader(broad))
 
     return dicoTop
+
 
 def extraitSujetsDomaines(data):
     """ inputs from recupIndividu(halidint)
@@ -145,7 +145,7 @@ def extraitSujetsDomaines(data):
               truc['p']['value'] == "http://xmlns.com/foaf/0.1/interest"]
     # récupération des langues
 
-    # alaric :  soit on considère que les mots qui n'ont pas de langue renseignée sont en anglais (j'ai constaté ça pour chl)
+    # alaric : soit on considère que les mots qui n'ont pas de langue renseignée sont en anglais (j'ai constaté ça pour chl)
     # soit on les drop ?
     for top in topics:
         if 'xml:lang' not in top['o']:
@@ -181,7 +181,6 @@ def ExplainDomains(domUri):
               truc['p']['value'] == "http://purl.org/dc/elements/1.1/identifier"]
     broader = [truc['o']['value'] for truc in results['results']['bindings'] if
                truc['p']['value'] == "http://www.w3.org/2004/02/skos/core#broader"]
-
 
     if len(broader) > 0:
 
@@ -239,8 +238,8 @@ def extraitMotsCles(dat):
 def getConceptsAndKeywords(aureHalId):
     # start
     # auteur :Joseph
-    # commentaire: Cette fonction prend en paramètre aureHalId  d'un chercheur   et retourne sous forme de dictionnaire ConceptsAndKeywords  qui regroupe  l'ensemble des concept et donnée aborder par le chercheur
-    # example: getConceptsAndKeywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
+    # commentaire : Cette fonction prend en paramètre aureHalId d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concept et donnée aborder par le chercheur
+    # example : getConceptsAndKeywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 
     concept = []
@@ -252,12 +251,11 @@ def getConceptsAndKeywords(aureHalId):
     sujets, domaines = extraitSujetsDomaines(data)
     Domains = []
 
-    print (sujets, domaines)
+    print(sujets, domaines)
     try:
 
         for dom in domaines:
             Domains.append(ExplainDomains(dom))
-
 
             # réseau json hiérarchiques
             #
@@ -281,7 +279,6 @@ def getConceptsAndKeywords(aureHalId):
         # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
         #     ficRes.write(str(nx.tree_data(tree, "Concepts")).replace("'", '"'))
 
-
         for children in concepts['children']:
             children['label_en'] = getLabel(children['id'], 'en')
             children['label_fr'] = getLabel(children['id'], 'fr')
@@ -297,7 +294,6 @@ def getConceptsAndKeywords(aureHalId):
                             subsubchildren['label_fr'] = getLabel(subsubchildren['id'], 'fr')
                             subsubchildren['state'] = 'invalidated'
 
-
         for lang in sujets.keys():
 
             treeWords = nx.DiGraph()
@@ -308,9 +304,9 @@ def getConceptsAndKeywords(aureHalId):
             keywords.append({'lang': lang, 'keywords': nx.tree_data(treeWords, lang)})
             # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
             #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
-        ConceptsAndKeywords ={'concepts': concepts, 'keywords': keywords}
+        ConceptsAndKeywords = {'concepts': concepts, 'keywords': keywords}
         return ConceptsAndKeywords
 
     except:
-        ConceptsAndKeywords= {'concepts': [], 'keywords': []}
-        return  ConceptsAndKeywords
+        ConceptsAndKeywords = {'concepts': [], 'keywords': []}
+        return ConceptsAndKeywords
