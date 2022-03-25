@@ -117,11 +117,11 @@ def validate_references(request):
         return redirect('unknown')
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
         return redirect('unknown')
     if 'id' in request.GET and 'validation' in request.GET:
-        id = request.GET['id']
+        p_id = request.GET['id']
         validation = request.GET['validation']
     else:
         return redirect('unknown')
@@ -131,9 +131,9 @@ def validate_references(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     if int(validation) == 0:
         validate = True
@@ -144,19 +144,19 @@ def validate_references(request):
     es = esActions.es_connector()
 
     # Get scope informations
-    if type == "rsr":
-        scope_param = esActions.scope_p("_id", id)
+    if i_type == "rsr":
+        scope_param = esActions.scope_p("_id", p_id)
 
         res = es.search(index=struct + "-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except:
+        except FileNotFoundError:
             return redirect('unknown')
 
         if request.method == 'POST':
 
-            toValidate = request.POST.get("toValidate", "").split(",")
-            for docid in toValidate:
+            to_validate = request.POST.get("toValidate", "").split(",")
+            for docid in to_validate:
                 es.update(index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
                           refresh='wait_for', id=docid,
                           body={"doc": {"validated": validate}})
@@ -164,27 +164,27 @@ def validate_references(request):
                     es.update(index=struct + '-' + entity["labHalId"] + "-laboratories-documents", refresh='wait_for',
                               id=docid,
                               body={"doc": {"validated": validate}})
-                except:
+                except FileNotFoundError:
                     pass  # doc du chercheur pas dans le labo
 
-    if type == "lab":
-        scope_param = esActions.scope_p("_id", id)
+    if i_type == "lab":
+        scope_param = esActions.scope_p("_id", p_id)
 
         res = es.search(index=struct + "-*-laboratories", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except:
+        except FileNotFoundError:
             return redirect('unknown')
 
         if request.method == 'POST':
-            toValidate = request.POST.get("toValidate", "").split(",")
-            for docid in toValidate:
+            to_validate = request.POST.get("toValidate", "").split(",")
+            for docid in to_validate:
                 es.update(index=struct + '-' + entity["halStructId"] + "-laboratories-documents", refresh='wait_for',
                           id=docid,
                           body={"doc": {"validated": validate}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data + '&validation=' + validation)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data + '&validation=' + validation)
 
 
 def validate_guiding_domains(request):
@@ -195,8 +195,8 @@ def validate_guiding_domains(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
@@ -205,35 +205,35 @@ def validate_guiding_domains(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
 
     if request.method == 'POST':
 
-        toValidate = request.POST.get("toValidate", "").split(',')
+        to_validate = request.POST.get("toValidate", "").split(',')
 
-        if type == "rsr":
-            scope_param = esActions.scope_p("_id", id)
+        if i_type == "rsr":
+            scope_param = esActions.scope_p("_id", p_id)
 
             res = es.search(index=struct + "-*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except:
+            except FileNotFoundError:
                 return redirect('unknown')
 
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
-                      body={"doc": {"guidingDomains": toValidate}})
+            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
+                      body={"doc": {"guidingDomains": to_validate}})
 
-        if type == "lab":
-            es.update(index=struct + "-" + id + "-laboratories", refresh='wait_for', id=id,
-                      body={"doc": {"guidingDomains": toValidate}})
+        if i_type == "lab":
+            es.update(index=struct + "-" + p_id + "-laboratories", refresh='wait_for', id=p_id,
+                      body={"doc": {"guidingDomains": to_validate}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def validate_expertise(request):
@@ -244,11 +244,11 @@ def validate_expertise(request):
         return redirect('unknown')
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
         return redirect('unknown')
     if 'id' in request.GET and 'validation' in request.GET:
-        id = request.GET['id']
+        p_id = request.GET['id']
         validation = request.GET['validation']
     else:
         return redirect('unknown')
@@ -257,9 +257,9 @@ def validate_expertise(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     if int(validation) == 0:
         validate = 'validated'
@@ -270,13 +270,13 @@ def validate_expertise(request):
     es = esActions.es_connector()
 
     # Get scope informations
-    if type == "rsr":
-        scope_param = esActions.scope_p("_id", id)
+    if i_type == "rsr":
+        scope_param = esActions.scope_p("_id", p_id)
 
         res = es.search(index=struct + "-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except:
+        except FileNotFoundError:
             return redirect('unknown')
 
         index = struct + '-' + entity['labHalId'] + '-researchers'
@@ -291,9 +291,9 @@ def validate_expertise(request):
         lab_tree = entity_lab['concepts']
 
         if request.method == 'POST':
-            toInvalidate = request.POST.get("toInvalidate", "").split(",")
+            to_invalidate = request.POST.get("toInvalidate", "").split(",")
 
-            for conceptId in toInvalidate:
+            for conceptId in to_invalidate:
 
                 sid = conceptId.split('.')
                 for children in entity['concepts']['children']:
@@ -322,7 +322,7 @@ def validate_expertise(request):
                       body={"doc": {"concepts": lab_tree}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data
         + '&validation=' + validation)
 
 
@@ -334,8 +334,8 @@ def validate_credentials(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
@@ -344,42 +344,42 @@ def validate_credentials(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
 
     if request.method == 'POST':
 
-        if type == "rsr":
+        if i_type == "rsr":
             idRef = request.POST.get("f_IdRef")
             orcId = request.POST.get("f_orcId")
             function = request.POST.get("f_status")
 
-            scope_param = esActions.scope_p("_id", id)
+            scope_param = esActions.scope_p("_id", p_id)
 
             res = es.search(index=struct + "*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except:
+            except FileNotFoundError:
                 return redirect('unknown')
 
             print(struct + "-" + entity['labHalId'] + '-researchers')
 
-            es.update(index=struct + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=id,
+            es.update(index=struct + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=p_id,
                       body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True, "function": function}})
 
-        if type == "lab":
+        if i_type == "lab":
             rsnr = request.POST.get("f_rsnr")
             idRef = request.POST.get("f_IdRef")
 
-            es.update(index=struct + "-" + id + "-laboratories", refresh='wait_for', id=id,
+            es.update(index=struct + "-" + p_id + "-laboratories", refresh='wait_for', id=p_id,
                       body={"doc": {"rsnr": rsnr, "idRef": idRef, "validated": True}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def validate_guiding_keywords(request):
@@ -390,8 +390,8 @@ def validate_guiding_keywords(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
@@ -400,9 +400,9 @@ def validate_guiding_keywords(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
@@ -411,24 +411,24 @@ def validate_guiding_keywords(request):
 
         guidingKeywords = request.POST.get("f_guidingKeywords").split(";")
 
-        if type == "rsr":
-            scope_param = esActions.scope_p("_id", id)
+        if i_type == "rsr":
+            scope_param = esActions.scope_p("_id", p_id)
 
             res = es.search(index=struct + "*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except:
+            except FileNotFoundError:
                 return redirect('unknown')
 
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
+            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
 
-        if type == "lab":
-            es.update(index=struct + "-" + str(id) + "-laboratories", refresh='wait_for', id=id,
+        if i_type == "lab":
+            es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
                       body={"doc": {"guidingKeywords": guidingKeywords}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def validate_research_description(request):
@@ -439,8 +439,8 @@ def validate_research_description(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
@@ -449,9 +449,9 @@ def validate_research_description(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
@@ -471,16 +471,16 @@ def validate_research_description(request):
         soup = BeautifulSoup(research_projectsAndFundings, 'html.parser')
         research_projectsAndFundings_raw = soup.getText().replace("\n", " ")
 
-        if type == "rsr":
-            scope_param = esActions.scope_p("_id", id)
+        if i_type == "rsr":
+            scope_param = esActions.scope_p("_id", p_id)
 
             res = es.search(index=struct + "*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except:
+            except FileNotFoundError:
                 return redirect('unknown')
 
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
+            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
                       body={"doc": {"research_summary": research_summary, "research_summary_raw": research_summary_raw,
                                     "research_projectsInProgress": research_projectsInProgress,
                                     "research_projectsInProgress_raw": research_projectsInProgress_raw,
@@ -490,7 +490,7 @@ def validate_research_description(request):
                                     }})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def refresh_aurehal_id(request):
@@ -501,8 +501,8 @@ def refresh_aurehal_id(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
     if 'data' in request.GET:
@@ -510,19 +510,19 @@ def refresh_aurehal_id(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
 
-    scope_param = esActions.scope_p("_id", id)
+    scope_param = esActions.scope_p("_id", p_id)
 
     res = es.search(index=struct + "*-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
 
     aurehalId = libsElastichal.getAureHal(entity['halId_s'])
@@ -531,11 +531,11 @@ def refresh_aurehal_id(request):
         archivesOuvertesData = getConceptsAndKeywords(aurehalId)
         concepts = utils.filterConcepts(archivesOuvertesData['concepts'], validated_ids=[])
 
-    es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=id,
+    es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
               body={"doc": {"aurehalId": aurehalId, 'concepts': concepts}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def force_update_references(request):
@@ -546,19 +546,19 @@ def force_update_references(request):
         return redirect('unknown')
 
     if 'type' in request.GET:
-        type = request.GET['type']
+        i_type = request.GET['type']
     else:
         return redirect('unknown')
 
     if 'id' in request.GET:
-        id = request.GET['id']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     if 'validation' in request.GET:
         validation = request.GET['validation']
@@ -569,18 +569,18 @@ def force_update_references(request):
     # if request.method == 'POST':
     # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
 
-    if type == "rsr":
-        scope_param = esActions.scope_p("_id", id)
+    if i_type == "rsr":
+        scope_param = esActions.scope_p("_id", p_id)
 
         res = es.search(index=struct + "*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except:
+        except FileNotFoundError:
             return redirect('unknown')
         collecte_docs(entity)
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=references' + '&validation='
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation='
         + validation)
 
 
@@ -592,8 +592,8 @@ def update_members(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
@@ -602,17 +602,17 @@ def update_members(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
 
     if request.method == 'POST':
-        toUpdate = request.POST.get("toUpdate", "").split(",")
+        to_update = request.POST.get("toUpdate", "").split(",")
 
-        for element in toUpdate:
+        for element in to_update:
             element = element.split(":")
             scope_param = esActions.scope_p("_id", element[0])
 
@@ -620,15 +620,15 @@ def update_members(request):
             res = es.search(index="*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except:
+            except FileNotFoundError:
                 return redirect(
-                    '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+                    '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
             es.update(index=res['hits']['hits'][0]['_index'],
                       refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"axis": element[1]}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def update_authorship(request):
@@ -639,8 +639,8 @@ def update_authorship(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
@@ -649,25 +649,25 @@ def update_authorship(request):
     else:
         data = -1
     if 'from' in request.GET:
-        dateFrom = request.GET['from']
+        date_from = request.GET['from']
     if 'to' in request.GET:
-        dateTo = request.GET['to']
+        date_to = request.GET['to']
 
     # Connect to DB
     es = esActions.es_connector()
 
-    scope_param = esActions.scope_p("ldapId", id)
+    scope_param = esActions.scope_p("ldapId", p_id)
 
     res = es.search(index=struct + "-" + "*" + "-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
 
     try:
-        toProcess = json.loads(request.POST.get("toProcess", ""))
+        to_process = json.loads(request.POST.get("toProcess", ""))
 
-        for doc in toProcess:
+        for doc in to_process:
 
             # update in researcher's collection
             field = "_id"
@@ -729,13 +729,13 @@ def update_authorship(request):
                 es.update(index=struct + '-' + entity['labHalId'] + "-laboratories-documents",
                           refresh='wait_for', id=doc['docid'],
                           body={"doc": {"authorship": authorship}})
-            except:
+            except FileNotFoundError:
                 print("docid " + str(doc["docid"]) + " non trouvé dans l'index des labs...")
-    except:
+    except FileNotFoundError:
         pass
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + type + '&id=' + id + '&from=' + dateFrom + '&to=' + dateTo + '&data=' + data + "&validation=1")
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data + "&validation=1")
 
 
 def export_hceres_xls(request):
@@ -746,22 +746,22 @@ def export_hceres_xls(request):
         return redirect('unknown')
 
     if 'type' in request.GET and 'id' in request.GET:
-        type = request.GET['type']
-        id = request.GET['id']
+        i_type = request.GET['type']
+        p_id = request.GET['id']
     else:
         return redirect('unknown')
 
-    scope_param = esActions.scope_p("halStructId", id)
+    scope_param = esActions.scope_p("halStructId", p_id)
 
     key = "halStructId"
     ext_key = "harvested_from_ids"
 
     es = esActions.es_connector()
 
-    res = es.search(index=struct + "-" + id + "-laboratories", body=scope_param)
+    res = es.search(index=struct + "-" + p_id + "-laboratories", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
-    except:
+    except FileNotFoundError:
         return redirect('unknown')
 
     # Acquisition des chercheurs à traiter
@@ -776,9 +776,9 @@ def export_hceres_xls(request):
     scope_bool_type = "filter"
     validate = True
     date_range_type = "publicationDate_tdate"
-    dateFrom = "2016-01-01"
-    dateTo = "2021-12-31"
-    ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
+    datefrom = "2016-01-01"
+    dateto = "2021-12-31"
+    ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, datefrom, dateto)
 
     count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
     print(struct + "-" + entity["halStructId"] + "-laboratories-documents")
@@ -896,7 +896,7 @@ def cohesion(p_id, datefrom, dateto):
     for result in rsrs['hits']['hits']:
         rsrs_cleaned.append(result['_source'])
 
-    cohesionvalues = []
+    consistencyvalues = []
 
     for x in range(len(rsrs_cleaned)):
         ldapid = rsrs_cleaned[x]['ldapId']
@@ -905,7 +905,7 @@ def cohesion(p_id, datefrom, dateto):
         name = rsrs_cleaned[x]['name']
         validated = rsrs_cleaned[x]['validated']
 
-        # nombre de documents avec le nom de l'auteur coté lab par ex: (authIdHal_s : david-reymond)
+        # nombre de documents avec le nom de l'auteur coté lab par ex : (authIdHal_s : david-reymond)
         ref_lab = esActions.ref_p(scope_bool_type, 'authIdHal_s', hal_id_s, validate, date_range_type, datefrom, dateto)
         raw_lab_doc_count = es.count(index=struct + "-" + p_id + "-laboratories-documents", body=ref_lab)['count']
 
@@ -919,6 +919,6 @@ def cohesion(p_id, datefrom, dateto):
                        "searchercount": raw_searcher_doc_count}
 
         # rajout à la liste
-        cohesionvalues.append(profiledict)
+        consistencyvalues.append(profiledict)
 
-    return cohesionvalues
+    return consistencyvalues

@@ -24,7 +24,7 @@ def create(request):
         id_halerror = request.GET['iDhalerror']
 
     return render(request, 'create.html', {'data': "create",  # 'type': i_type,
-                                           'ldapid': ldapid,  # 'from': datefrom, 'to': dateto,
+                                           'ldapid': ldapid,  # 'from': date_from, 'to': date_to,
                                            # 'entity': entity, #'extIds': ['a', 'b', 'c'],
                                            'halId_s': 'nullNone',
                                            'idRef': 'nullNone',
@@ -34,7 +34,7 @@ def create(request):
                                            'iDhalerror': id_halerror,
                                            }
                   # "'startDate': start_date,
-                  # 'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"}
+                  # 'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"}
                   )
 
 
@@ -70,7 +70,7 @@ def check(request):
 
     if data == -1:
         return render(request, 'create.html', {'data': create,
-                                               # 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                                               # 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                                                'form': forms.CreateCredentials(),
 
                                                }
@@ -113,7 +113,7 @@ def check(request):
     # /
 
     # Get date parameters
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     # /
 
     hastoconfirm = False
@@ -150,12 +150,12 @@ def check(request):
             rsrs_cleaned.append(result['_source'])
         print(rsrs_cleaned)
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity,
                        'researchers': rsrs_cleaned,
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     if data == "-1" or data == "credentials":
 
@@ -170,25 +170,25 @@ def check(request):
                 function = entity['function']
 
             return render(request, 'check.html',
-                          {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                          {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                            'entity': entity, 'extIds': ['a', 'b', 'c'],
                            'form': forms.validCredentials(halId_s=entity['halId_s'],
                                                           idRef=entity['idRef'], orcId=orcid,
                                                           function=function),
                            'startDate': start_date,
                            'hasToConfirm': hastoconfirm,
-                           'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                           'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
         if i_type == "lab":
             return render(request, 'check.html',
-                          {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                          {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                            'entity': entity,
                            'form': forms.validLabCredentials(halStructId=entity['halStructId'],
                                                              rsnr=entity['rsnr'],
                                                              idRef=entity['idRef']),
                            'startDate': start_date,
                            'hasToConfirm': hastoconfirm,
-                           'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                           'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     elif data == "research-description":
 
@@ -208,7 +208,7 @@ def check(request):
             research_projects_in_progress = entity['research_projectsInProgress']
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity, 'extIds': ['a', 'b', 'c'],
                        'form': forms.setResearchDescription(research_summary=research_summary,
                                                             research_projectsInProgress=research_projects_in_progress,
@@ -218,7 +218,7 @@ def check(request):
                        'research_projectsInProgress': research_projects_in_progress,
                        'research_projectsAndFundings': research_projects_and_fundings,
                        'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     elif data == "expertise":
         if 'validation' in request.GET:
@@ -253,23 +253,23 @@ def check(request):
                                                      'state': validate})
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'validation': validation,
                        'entity': entity,
                        'concepts': concepts,
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     elif data == "guiding-keywords":
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity,
                        'form': forms.setGuidingKeywords(
                            guidingKeywords=entity['guidingKeywords']),
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     elif data == "guiding-domains":
 
@@ -281,13 +281,13 @@ def check(request):
             guiding_domains = entity['guidingDomains']
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity,
                        'domains': domains,
                        'guidingDomains': guiding_domains,
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     elif data == "references":
         if 'validation' in request.GET:
@@ -303,7 +303,7 @@ def check(request):
             return redirect('unknown')
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
-        ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, datefrom, dateto)
+        ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, date_from, date_to)
 
         if i_type == "rsr":
             count = \
@@ -327,12 +327,12 @@ def check(request):
         # /
 
         return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'validation': validation,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
                        'references': references_cleaned, 'startDate': start_date,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     else:
         return redirect('unknown')
@@ -424,10 +424,10 @@ def dashboard(request):
     # /
 
     # Get date parameters
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     # /
     return render(request, 'dashboard.html',
-                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'ext_key': ext_key,
@@ -436,7 +436,7 @@ def dashboard(request):
                    'filterlabA': filtre_lab_a,
                    'filterlabB': filtre_lab_b,
                    'startDate': start_date,
-                   'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                   'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
 def references(request):
@@ -499,7 +499,7 @@ def references(request):
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
     # Get date parameters
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     # /
 
     hastoconfirm = False
@@ -524,8 +524,8 @@ def references(request):
     validate = True
     date_range_type = "submittedDate_tdate"
     ref_param = esActions.ref_p_filter(i_filter, scope_bool_type, ext_key, entity[key], validate, date_range_type,
-                                       datefrom,
-                                       dateto)
+                                       date_from,
+                                       date_to)
 
     if i_type == "rsr":
         count = es.count(index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
@@ -546,12 +546,12 @@ def references(request):
         references_cleaned.append(ref['_source'])
     # /
     return render(request, 'references.html',
-                  {'ldapid': ldapid, 'struct': struct, 'filter': i_filter, 'type': i_type, 'id': p_id, 'from': datefrom,
-                   'to': dateto,
+                  {'ldapid': ldapid, 'struct': struct, 'filter': i_filter, 'type': i_type, 'id': p_id, 'from': date_from,
+                   'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'references': references_cleaned, 'startDate': start_date,
-                   'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                   'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
 @xframe_options_exempt
@@ -625,7 +625,7 @@ def terminology(request):
     # /
 
     # Get date parameters
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     # /
 
     if i_type == "lab":
@@ -686,18 +686,18 @@ def terminology(request):
 
     if export:
         return render(request, 'terminology_ext.html',
-                      {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
                        'startDate': start_date,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
     else:
         return render(request, 'terminology.html',
-                      {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                      {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
                        'startDate': start_date,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
 def wordcloud(request):
@@ -770,16 +770,16 @@ def wordcloud(request):
     # /
 
     # Get date parameters
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     # /
 
     return render(request, 'wordcloud.html',
-                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': datefrom, 'to': dateto,
+                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
                    'startDate': start_date,
-                   'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                   'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
 def tools(request):
@@ -846,7 +846,7 @@ def tools(request):
     # /
 
     # Get date parameters
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     # /
 
     if 'data' in request.GET:
@@ -856,26 +856,26 @@ def tools(request):
 
     if data == "hceres" or data == -1:
         return render(request, 'tools.html',
-                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom,
-                       'to': dateto,
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from,
+                       'to': date_to,
                        'entity': entity,
                        'hasToConfirm': hastoconfirm,
                        'ext_key': ext_key,
                        'key': entity[key],
                        'startDate': start_date,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
     elif data == "consistency":
 
-        consistencyvalues = viewsActions.cohesion(p_id, datefrom, dateto)
+        consistencyvalues = viewsActions.cohesion(p_id, date_from, date_to)
 
         return render(request, 'tools.html',
-                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': datefrom,
-                       'to': dateto,
+                      {'ldapid': ldapid, 'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from,
+                       'to': date_to,
                        'entity': entity,
                        'consistency': consistencyvalues,
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'"})
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
 def index(request):
@@ -936,14 +936,14 @@ def search(request):  # Revoir la fonction
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
 
     if 'from' in request.GET:
-        datefrom = request.GET['from']
+        date_from = request.GET['from']
     else:
-        datefrom = min_date[0:4] + '-01-01'
+        date_from = min_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateto = request.GET['to']
+        date_to = request.GET['to']
     else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     if request.method == 'POST':
 
@@ -979,13 +979,13 @@ def search(request):  # Revoir la fonction
         return render(request, 'search.html',
                       {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.search(val=search),
                        'count': p_res['count'],
-                       'timeRange': "from:'" + datefrom + "',to:'" + dateto + "'",
+                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'",
                        'filter': search, 'index': index, 'search': search,
-                       'results': res_cleaned, 'from': datefrom, 'to': dateto,
+                       'results': res_cleaned, 'from': date_from, 'to': date_to,
                        'startDate': min_date, 'ldapid': ldapid})
 
     return render(request, 'search.html',
-                  {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.search(), 'from': datefrom, 'to': dateto,
+                  {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.search(), 'from': date_from, 'to': date_to,
                    'startDate': min_date, 'filter': '', 'ldapid': ldapid})
 
 
@@ -1116,16 +1116,16 @@ def get_scope_data(i_type, p_id):
 def get_date(request, start_date):
     # utiliser cette fonction pour call get_scope_data
     """
-    datefrom, dateto = get_date(request, start_date)
+    date_from, date_to = get_date(request, start_date)
     """
     if 'from' in request.GET:
-        datefrom = request.GET['from']
+        date_from = request.GET['from']
     else:
-        datefrom = start_date[0:4] + '-01-01'
+        date_from = start_date[0:4] + '-01-01'
 
     if 'to' in request.GET:
-        dateto = request.GET['to']
+        date_to = request.GET['to']
     else:
-        dateto = datetime.today().strftime('%Y-%m-%d')
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
-    return datefrom, dateto
+    return date_from, date_to
