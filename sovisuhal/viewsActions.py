@@ -143,7 +143,7 @@ def validate_references(request):
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope information
     if i_type == "rsr":
         scope_param = esActions.scope_p("_id", p_id)
 
@@ -269,7 +269,7 @@ def validate_expertise(request):
     # Connect to DB
     es = esActions.es_connector()
 
-    # Get scope informations
+    # Get scope information
     if i_type == "rsr":
         scope_param = esActions.scope_p("_id", p_id)
 
@@ -874,51 +874,3 @@ def idhal_checkout(idhal):
         confirmation = 1
     return confirmation
 
-
-def cohesion(p_id, datefrom, dateto):
-    es = esActions.es_connector()
-
-    # parametres fixes pour la recherche dans les bases Elastic
-    scope_bool_type = "filter"
-    scope_field = "harvested_from_ids"
-    validate = True
-    date_range_type = "submittedDate_tdate"
-
-    # récupere les infos sur les chercheurs attachés au laboratoire
-    field = "labHalId"
-    rsr_param = esActions.scope_p(field, p_id)
-
-    count = es.count(index="*-researchers", body=rsr_param)['count']
-
-    rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
-    rsrs_cleaned = []
-
-    for result in rsrs['hits']['hits']:
-        rsrs_cleaned.append(result['_source'])
-
-    consistencyvalues = []
-
-    for x in range(len(rsrs_cleaned)):
-        ldapid = rsrs_cleaned[x]['ldapId']
-        hal_id_s = rsrs_cleaned[x]['halId_s']
-        struct = rsrs_cleaned[x]['structSirene']
-        name = rsrs_cleaned[x]['name']
-        validated = rsrs_cleaned[x]['validated']
-
-        # nombre de documents avec le nom de l'auteur coté lab par ex : (authIdHal_s : david-reymond)
-        ref_lab = esActions.ref_p(scope_bool_type, 'authIdHal_s', hal_id_s, validate, date_range_type, datefrom, dateto)
-        raw_lab_doc_count = es.count(index=struct + "-" + p_id + "-laboratories-documents", body=ref_lab)['count']
-
-        # nombre de documents de l'auteur dans son index
-        ref_param = esActions.ref_p(scope_bool_type, scope_field, hal_id_s, validate, date_range_type, datefrom, dateto)
-        raw_searcher_doc_count = \
-            es.count(index=struct + "-" + p_id + "-researchers-" + ldapid + "-documents", body=ref_param)['count']
-
-        # création du dict à rajouter dans la liste
-        profiledict = {"name": name, "ldapId": ldapid, "validated": validated, "labcount": raw_lab_doc_count,
-                       "searchercount": raw_searcher_doc_count}
-
-        # rajout à la liste
-        consistencyvalues.append(profiledict)
-
-    return consistencyvalues
