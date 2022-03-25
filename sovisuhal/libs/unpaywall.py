@@ -1,5 +1,6 @@
 import requests
 
+
 def getOa(doi):
 
     req = requests.get('https://api.unpaywall.org/v2/' + doi + '?email=alarictabaries@gmail.com')
@@ -21,7 +22,7 @@ def getOa(doi):
         elif data['is_oa'] == False:
             oa_host_type = 'closed access'
 
-        return {'is_oa': data['is_oa'],'oa_status': data['oa_status'], 'oa_host_type': oa_host_type}
+        return {'is_oa': data['is_oa'], 'oa_status': data['oa_status'], 'oa_host_type': oa_host_type}
 
     else:
         print(req, "unpaywall")

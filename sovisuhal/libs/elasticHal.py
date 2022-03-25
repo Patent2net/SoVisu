@@ -197,7 +197,7 @@ def propage_concepts(structSirene, ldapId, laboAccro, labHalId):
     row['concepts'] = tree
     row["Created"] = datetime.datetime.now().isoformat()
     # Insert laboratory data
-    # est-ce que update est destructeur ?
+    # est-ce qu'update est destructeur ?
     res = es.index(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories", id=row['halStructId'],
                    body=json.dumps(row))
     # timestamp=datetime.datetime.now().isoformat())
@@ -286,9 +286,7 @@ def collecte_docs(Chercheur):  # self,
             field = "_id"
             doc_param = esActions.scope_p(field, doc["_id"])
 
-            if not es.indices.exists(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" +
-                                           Chercheur[
-                                               "ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
+            if not es.indices.exists(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
                 print("exception ", Chercheur["labHalId"], Chercheur["ldapId"])
 
             res = es.search(
@@ -329,6 +327,5 @@ def collecte_docs(Chercheur):  # self,
     print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents")
     """
     # return docs # pas utile...
-
 
     return Chercheur  # au cas où

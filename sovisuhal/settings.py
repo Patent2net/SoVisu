@@ -65,11 +65,11 @@ if mode == 'Prod':
                 'level': 'DEBUG',
                 'propagate': True,
             },
-    'django.template': {
-        'handlers': ['fileinf'],
-        'level': 'INFO',
-        'propagate': True,
-    },
+            'django.template': {
+                'handlers': ['fileinf'],
+                'level': 'INFO',
+                'propagate': True,
+            },
         },
     }
 else:
@@ -204,13 +204,13 @@ EMAIL_SUBJECT_PREFIX = '[SoVisu]'
 
 ADMINS = (
     ('Sovisuhal', 'dreymond@univ-tln.fr'),
-    #pour rajouter un profil:
-    #('role utilisateur', 'mail'),
+    # pour rajouter un profil:
+    # ('role utilisateur', 'mail'),
     ('Sovisuhal1', '')
 )
 
 MANAGERS = (
-    ('BU','dreymond@univ-tln.fr'), #changer l'adresse
-    ('BU_1','')
+    ('BU', 'dreymond@univ-tln.fr'),  # changer l'adresse
+    ('BU_1', '')
 )
-#Attention! La liste Admin a besoin d'avoir un minimum de 2 profil renseignés. Dans le cas ou un seul admin est présent pour le système, merci de laisser le 2ème profil sans adresse mail renseignée.
+# Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés. Dans le cas ou un seul admin est présent pour le système, merci de laisser le 2e profil sans adresse mail renseignée.

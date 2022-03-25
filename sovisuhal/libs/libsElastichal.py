@@ -1,4 +1,4 @@
-#import requests
+# import requests
 import re
 from unidecode import unidecode
 import lxml.etree
@@ -8,10 +8,12 @@ from bs4 import BeautifulSoup
 from sovisuhal.libs import hal
 import time
 
+
 def convertIdHalToStr(idHal_i):
     res = requests.get('https://aurehal.archives-ouvertes.fr/author/browse?critere=idHal_i:"' + idHal_i + '"')
     soup = BeautifulSoup(res.text, 'html.parser')
     return soup.find("td", text="idHal_s").find_next_sibling("td").text.split()[0]
+
 
 def getAureHal(idHal):
 

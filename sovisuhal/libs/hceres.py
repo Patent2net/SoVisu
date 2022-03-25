@@ -21,6 +21,7 @@ def common_data(list1, list2):
 
     return result
 
+
 def sortReferences(articles, halStructId):
 
     # sort by lab
@@ -170,17 +171,16 @@ def sortReferences(articles, halStructId):
 
         article["title_s"] = article["title_s"][0]
         if "authFirstName_s" in article .keys():
-            if len(article["authFirstName_s"]) >0:
+            if len(article["authFirstName_s"]) > 0:
                 for i in range(len(article["authFirstName_s"])):
-                    article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][
-                    i] + ", "
+                    article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][i] + ", "
             else:
                 article["authfullName_s"] = ', '.join(article["authFullName_s"])
         else:
             article["authfullName_s"] = ', '.join(article["authFullName_s"])
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
-        if "docType_s" not in article .keys(): # Encore des exeptions... Est que c'est ponctuel le temps que la base mouline ????
+        if "docType_s" not in article .keys():  # Encore des exeptions... Est que c'est ponctuel le temps que la base mouline ????
             if "journalTitle_s" in article .keys():
                 article["docType_s"] = "ART"
         if sort_trigger:
@@ -194,8 +194,7 @@ def sortReferences(articles, halStructId):
                     if article["docType_s"] == "ART":
                         hceres_art.append(article)
                     # ouvrages, chapitres d'ouvrages et directions d'ouvrages
-                    if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article[
-                        "docType_s"] == "OUV":
+                    if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
                         hceres_book.append(article)
                     # hdr
                     if article["docType_s"] == "HDR":

@@ -36,6 +36,7 @@ def findPublications(idHal, field, increment=0):
         print('Error : can not reach HAL API endpoint')
         return articles
 
+
 def findRandomPublication(idHal, field):
 
     req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idHal))
