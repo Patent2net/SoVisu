@@ -776,9 +776,9 @@ def export_hceres_xls(request):
     scope_bool_type = "filter"
     validate = True
     date_range_type = "publicationDate_tdate"
-    datefrom = "2016-01-01"
-    dateto = "2021-12-31"
-    ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, datefrom, dateto)
+    date_from = "2016-01-01"
+    date_to = "2021-12-31"
+    ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, date_from, date_to)
 
     count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
     print(struct + "-" + entity["halStructId"] + "-laboratories-documents")
