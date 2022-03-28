@@ -9,13 +9,13 @@ from sovisuhal.libs import hal
 import time
 
 
-def convertIdHalToStr(idhal_i):
+def convert_idhal_to_str(idhal_i):
     res = requests.get('https://aurehal.archives-ouvertes.fr/author/browse?critere=idHal_i:"' + idhal_i + '"')
     soup = BeautifulSoup(res.text, 'html.parser')
     return soup.find("td", text="idHal_s").find_next_sibling("td").text.split()[0]
 
 
-def getAureHal(idhal):
+def get_aurehal(idhal):
 
     print(idhal)
 
@@ -31,22 +31,22 @@ def getAureHal(idhal):
 
     print(results)
 
-    aureHal = [truc for truc in results['results']['bindings'] if
+    aurehal = [truc for truc in results['results']['bindings'] if
                truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
 
-    ret_aureHal = -1
+    ret_aurehal = -1
 
-    for id in aureHal:
+    for id in aurehal:
         print(id['o']['value'])
         res = requests.get(id['o']['value'])
 
         if 'Ressource inexistante' not in res.text:
-            ret_aureHal = id['o']['value'].split('/')[-1]
+            ret_aurehal = id['o']['value'].split('/')[-1]
 
-    return ret_aureHal
+    return ret_aurehal
 
 
-def findIdRef(name):
+def find_idref(name):
     r = requests.post('https://www.idref.fr/Sru/Solr?q=persname_t:(' + name + ')&wt=json&sort=score%20desc&version=2.2&start=0&rows=30&indent=on&fl=id,persname_t,ppn_z,geogname_t,recordtype_z,affcourt_')
 
     if r.status_code == 200:
@@ -59,7 +59,7 @@ def findIdRef(name):
     return {}
 
 
-def normalizeName(keyword, i_type):
+def normalize_name(keyword, i_type):
     if i_type == 'id':
         key = 'ppn_z'
     else:
@@ -78,12 +78,12 @@ def normalizeName(keyword, i_type):
     return {}
 
 
-def findNotice(idref):
+def find_notice(idref):
     r = requests.get('https://www.idref.fr/' + idref + '.xml', stream=True)
     doc = lxml.etree.parse(r.raw)
 
-    idHal_s = None
-    idHal_i = None
+    idhal_s = None
+    idhal_i = None
 
     datafield = doc.xpath("//datafield[subfield='HAL']")
 
@@ -91,15 +91,15 @@ def findNotice(idref):
 
     for record in datafield:
         for x in record.xpath("./subfield[@code='a']"):
-            idHal_s = x.text
+            idhal_s = x.text
         for x in record.xpath("./subfield[@code='d']"):
-            idHal_i = x.text
+            idhal_i = x.text
 
-    if idHal_i and idHal_s:
-        return {'idHal_i': idHal_i, 'idHal_s': idHal_s, 'score': 0}
-    elif idHal_i:
-        return {'idHal_i': idHal_i, 'score': 0}
-    elif idHal_s:
-        return {'idHal_s': idHal_s, 'score': 0}
+    if idhal_i and idhal_s:
+        return {'idHal_i': idhal_i, 'idHal_s': idhal_s, 'score': 0}
+    elif idhal_i:
+        return {'idHal_i': idhal_i, 'score': 0}
+    elif idhal_s:
+        return {'idHal_s': idhal_s, 'score': 0}
     else:
         return {}

@@ -2,7 +2,7 @@ import requests
 import random
 
 
-def findPublications(idhal, field, increment=0):
+def find_publications(idhal, field, increment=0):
 
     articles = []
     flags = 'docid,halId_s,labStructId_i,authIdHal_s,authIdHal_i,doiId_s,authFullName_s,doiId_s,journalIssn_s,' \
@@ -23,7 +23,7 @@ def findPublications(idhal, field, increment=0):
                 articles.append(article)
             if (count > 30) and (increment < (count)):
                 increment += 30
-                tmp_articles = findPublications(idhal, field, increment=increment)
+                tmp_articles = find_publications(idhal, field, increment=increment)
                 for tmp_article in tmp_articles:
                     articles.append(tmp_article)
                 return articles
@@ -37,7 +37,7 @@ def findPublications(idhal, field, increment=0):
         return articles
 
 
-def findRandomPublication(idhal, field):
+def find_random_publication(idhal, field):
 
     req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal))
     if req.status_code == 200:

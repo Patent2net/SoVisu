@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 
-from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
-from sovisuhal.libs.libsElastichal import getAureHal
+from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
+from sovisuhal.libs.libsElastichal import get_aurehal
 from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
 from elasticsearch import Elasticsearch, helpers
 import json
@@ -16,7 +16,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
-except ModuleNotFoundError:
+except:
     from django.contrib.auth.decorators import login_required
 
     mode = "Dev"
@@ -114,9 +114,9 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     # New step ?
 
     if idhal != '':
-        aurehal = getAureHal(idhal)
+        aurehal = get_aurehal(idhal)
         # integration contenus
-        archives_ouvertes_data = getConceptsAndKeywords(aurehal)
+        archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     else:
         pass
         # retourne sur check() ?
@@ -175,24 +175,24 @@ def propage_concepts(struct_sirene, ldapid, labo_accro, labhalid):
             for child in concept['children']:
 
                 if child['state'] == 'invalidated':
-                    tree = utils.appendToTree(child, rsr['_source'], tree, 'invalidated')
+                    tree = utils.append_to_tree(child, rsr['_source'], tree, 'invalidated')
                 else:
-                    tree = utils.appendToTree(child, rsr['_source'], tree)
+                    tree = utils.append_to_tree(child, rsr['_source'], tree)
                 if 'children' in child:
                     for child1 in child['children']:
 
                         if child1['state'] == 'invalidated':
-                            tree = utils.appendToTree(child1, rsr['_source'], tree, 'invalidated')
+                            tree = utils.append_to_tree(child1, rsr['_source'], tree, 'invalidated')
                         else:
-                            tree = utils.appendToTree(child1, rsr['_source'], tree)
+                            tree = utils.append_to_tree(child1, rsr['_source'], tree)
 
                         if 'children' in child1:
                             for child2 in child1['children']:
 
                                 if child2['state'] == 'invalidated':
-                                    tree = utils.appendToTree(child2, rsr['_source'], tree, 'invalidated')
+                                    tree = utils.append_to_tree(child2, rsr['_source'], tree, 'invalidated')
                                 else:
-                                    tree = utils.appendToTree(child2, rsr['_source'], tree)
+                                    tree = utils.append_to_tree(child2, rsr['_source'], tree)
 
     row['concepts'] = tree
     row["Created"] = datetime.datetime.now().isoformat()
@@ -207,7 +207,7 @@ def propage_concepts(struct_sirene, ldapid, labo_accro, labhalid):
 def collecte_docs(chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
-    docs = hal.findPublications(chercheur['halId_s'], 'authIdHal_s')
+    docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
@@ -234,7 +234,7 @@ def collecte_docs(chercheur):  # self,
                 try:
                     aurehal = archivesOuvertes.get_halid_s(auth)
                     authhalid_s_filled.append(aurehal)
-                except FileNotFoundError:
+                except:
                     authhalid_s_filled.append("")
 
         authors_count = len(authhalid_s_filled)
@@ -260,15 +260,15 @@ def collecte_docs(chercheur):  # self,
         doc["records"] = []
 
         if 'doiId_s' in doc:
-            tmp_unpaywall = unpaywall.getOa(doc['doiId_s'])
+            tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
             if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
             if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
             if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
 
-        doc["MDS"] = utils.calculateMDS(doc)
+        doc["MDS"] = utils.calculate_mds(doc)
 
         try:
-            should_be_open = utils.shouldBeOpen(doc)
+            should_be_open = utils.should_be_open(doc)
             if should_be_open == 1:
                 doc["shouldBeOpen"] = True
             if should_be_open == -1:
@@ -278,7 +278,7 @@ def collecte_docs(chercheur):  # self,
                 doc['isOaExtra'] = True
             elif should_be_open == -1:
                 doc['isOaExtra'] = False
-        except FileNotFoundError:
+        except:
             print('publicationDate_tdate error ?')
         doc['Created'] = datetime.datetime.now().isoformat()
 

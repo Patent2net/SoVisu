@@ -1,7 +1,7 @@
 import requests
 
 
-def findDomains(idref):
+def find_domains(idref):
 
     r = requests.post('https://scanr-api.enseignementsup-recherche.gouv.fr/api/v2/publications/search',
                       json={"query": "idref" + idref})
@@ -25,7 +25,7 @@ def findDomains(idref):
                         if "label" in domain and "fr" in domain['label']:
                             domains.append(domain['label']['fr'])
     except Exception as e:
-        print('Error in findDomains')
+        print('Error in find_domains')
         print(e)
 
     unique_domains = []

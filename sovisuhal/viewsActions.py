@@ -11,7 +11,7 @@ from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs
 from . import settings
 from .libs import utils, libsElastichal, esActions
 
-from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
+from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
 
 import pandas as pd
 from io import BytesIO as B_io
@@ -23,7 +23,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
     patternCas = 'cas-utln-'  # motif à enlever aux identifiants CAS
-except FileNotFoundError:
+except:
     from django.contrib.auth.decorators import login_required
 
     mode = "Dev"
@@ -150,7 +150,7 @@ def validate_references(request):
         res = es.search(index=struct + "-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except FileNotFoundError:
+        except:
             return redirect('unknown')
 
         if request.method == 'POST':
@@ -164,7 +164,7 @@ def validate_references(request):
                     es.update(index=struct + '-' + entity["labHalId"] + "-laboratories-documents", refresh='wait_for',
                               id=docid,
                               body={"doc": {"validated": validate}})
-                except FileNotFoundError:
+                except:
                     pass  # doc du chercheur pas dans le labo
 
     if i_type == "lab":
@@ -173,7 +173,7 @@ def validate_references(request):
         res = es.search(index=struct + "-*-laboratories", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except FileNotFoundError:
+        except:
             return redirect('unknown')
 
         if request.method == 'POST':
@@ -222,7 +222,7 @@ def validate_guiding_domains(request):
             res = es.search(index=struct + "-*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except FileNotFoundError:
+            except:
                 return redirect('unknown')
 
             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
@@ -276,7 +276,7 @@ def validate_expertise(request):
         res = es.search(index=struct + "-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except FileNotFoundError:
+        except:
             return redirect('unknown')
 
         index = struct + '-' + entity['labHalId'] + '-researchers'
@@ -298,21 +298,21 @@ def validate_expertise(request):
                 sid = conceptId.split('.')
                 for children in entity['concepts']['children']:
                     if len(sid) >= 1 and sid[0] == children['id']:
-                        lab_tree = utils.appendToTree(children, entity, lab_tree, validate)
+                        lab_tree = utils.append_to_tree(children, entity, lab_tree, validate)
                         children['state'] = validate
 
                     if 'children' in children:
                         for children1 in children['children']:
                             if len(sid) >= 2:
                                 if sid[0] + '.' + sid[1] == children1['id']:
-                                    lab_tree = utils.appendToTree(children1, entity, lab_tree, validate)
+                                    lab_tree = utils.append_to_tree(children1, entity, lab_tree, validate)
                                     children1['state'] = validate
 
                             if 'children' in children1:
                                 for children2 in children1['children']:
                                     if len(sid) >= 3:
                                         if sid[0] + '.' + sid[1] + '.' + sid[2] == children2['id']:
-                                            lab_tree = utils.appendToTree(children2, entity, lab_tree, validate)
+                                            lab_tree = utils.append_to_tree(children2, entity, lab_tree, validate)
                                             children2['state'] = validate
 
             es.update(index=index, refresh='wait_for', id=entity['ldapId'],
@@ -363,7 +363,7 @@ def validate_credentials(request):
             res = es.search(index=struct + "*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except FileNotFoundError:
+            except:
                 return redirect('unknown')
 
             print(struct + "-" + entity['labHalId'] + '-researchers')
@@ -417,7 +417,7 @@ def validate_guiding_keywords(request):
             res = es.search(index=struct + "*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except FileNotFoundError:
+            except:
                 return redirect('unknown')
 
             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
@@ -477,7 +477,7 @@ def validate_research_description(request):
             res = es.search(index=struct + "*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except FileNotFoundError:
+            except:
                 return redirect('unknown')
 
             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
@@ -522,14 +522,14 @@ def refresh_aurehal_id(request):
     res = es.search(index=struct + "*-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
 
-    aurehal_id = libsElastichal.getAureHal(entity['halId_s'])
+    aurehal_id = libsElastichal.get_aurehal(entity['halId_s'])
     concepts = []
     if aurehal_id != -1:
-        archives_ouvertes_data = getConceptsAndKeywords(aurehal_id)
-        concepts = utils.filterConcepts(archives_ouvertes_data['concepts'], validated_ids=[])
+        archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)
+        concepts = utils.filter_concepts(archives_ouvertes_data['concepts'], validated_ids=[])
 
     es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
               body={"doc": {"aurehalId": aurehal_id, 'concepts': concepts}})
@@ -575,7 +575,7 @@ def force_update_references(request):
         res = es.search(index=struct + "*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except FileNotFoundError:
+        except:
             return redirect('unknown')
         collecte_docs(entity)
 
@@ -620,7 +620,7 @@ def update_members(request):
             res = es.search(index="*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
-            except FileNotFoundError:
+            except:
                 return redirect(
                     '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
             es.update(index=res['hits']['hits'][0]['_index'],
@@ -661,7 +661,7 @@ def update_authorship(request):
     res = es.search(index=struct + "-" + "*" + "-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
 
     try:
@@ -729,9 +729,9 @@ def update_authorship(request):
                 es.update(index=struct + '-' + entity['labHalId'] + "-laboratories-documents",
                           refresh='wait_for', id=doc['docid'],
                           body={"doc": {"authorship": authorship}})
-            except FileNotFoundError:
+            except:
                 print("docid " + str(doc["docid"]) + " non trouvé dans l'index des labs...")
-    except FileNotFoundError:
+    except:
         pass
 
     return redirect(
@@ -761,7 +761,7 @@ def export_hceres_xls(request):
     res = es.search(index=struct + "-" + p_id + "-laboratories", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
 
     # Acquisition des chercheurs à traiter
@@ -793,7 +793,7 @@ def export_hceres_xls(request):
     for ref in references['hits']['hits']:
         references_cleaned.append(ref['_source'])
 
-    sort_results = hceres.sortReferences(references_cleaned, entity["halStructId"])
+    sort_results = hceres.sort_references(references_cleaned, entity["halStructId"])
 
     art_df = sort_results[0]
     book_df = sort_results[1]

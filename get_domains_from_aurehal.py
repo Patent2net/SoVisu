@@ -6,7 +6,7 @@ sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
 
 
-def getLabel(topic, lang):
+def get_label(topic, lang):
     sparql.setQuery("""
         select ?p ?o
         where  {
@@ -32,8 +32,8 @@ inputs = tree.find_all('input')
 domains = []
 
 for input in inputs:
-    dom = {'id': input.get('value'), 'label_en': getLabel(input.get('value'), 'en'),
-           'label_fr': getLabel(input.get('value'), 'fr'), 'children': []}
+    dom = {'id': input.get('value'), 'label_en': get_label(input.get('value'), 'en'),
+           'label_fr': get_label(input.get('value'), 'fr'), 'children': []}
     domains.append(dom)
 
 tree = {'id': 'Concepts', 'children': []}
