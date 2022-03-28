@@ -22,7 +22,7 @@ def common_data(list1, list2):
     return result
 
 
-def sortReferences(articles, halstructid):
+def sort_references(articles, halstructid):
 
     # sort by lab
     utln_rsr = []
@@ -104,7 +104,7 @@ def sortReferences(articles, halstructid):
                     doc_param = esActions.scope_p(field, authorship["authFullName_s"])
                     halid_s = authorship["authFullName_s"]
 
-                except ValueError:
+                except:
                     doc_param = esActions.scope_p(field, authorship['halId_s'])
                     halid_s = authorship["halId_s"]
 

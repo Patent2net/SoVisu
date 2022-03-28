@@ -38,7 +38,7 @@ def get_halid_s(aurehal_id):
     return authidhal_s
 
 
-def getExtId(authidhal_s):
+def get_extid(authidhal_s):
     # Start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aurehal_id associée
@@ -56,11 +56,11 @@ def getExtId(authidhal_s):
     return aurehalid
 
 
-def getLabel(label, lang):
+def get_label(label, lang):
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre la valeur label et lang et retourne le nom complet du label en fonction de la langue associée
-    # example: getLabel("phys","en") => Physics
+    # example: get_label("phys","en") => Physics
     # end
     sparql.setQuery("""
         select ?p ?o
@@ -76,11 +76,11 @@ def getLabel(label, lang):
     return label_complet
 
 
-def getArticle(halid_s):
+def get_article(halid_s):
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre halId_s l'id d'un article et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
-    # example: getArticle(702215) => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': []}}
+    # example: get_article(702215) => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': []}}
     # end
     """returns  Liste des métadonnées d'un document in sparlq dataarchive format"""
     sparql.setQuery("""select ?p ?o 
@@ -92,11 +92,11 @@ where {
     return metadone_article
 
 
-def recupIndividu(authidhal_s):
+def recup_individu(authidhal_s):
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre authIdHal_s d'un cherhcheur et retourne sous forme de dictionnaire donnee_individu qui regroupe l'ensemble des données concernant le chercheur
-    # example : recupIndividu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
+    # example : recup_individu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
     # end
     sparql.setQuery("""
 select ?p ?o
@@ -109,7 +109,7 @@ where  {
     return donnee_individu
 
 
-def exploreBroader(uri):
+def explore_broader(uri):
 
     sparql.setQuery("""
     select ?p ?o
@@ -128,13 +128,13 @@ def exploreBroader(uri):
 
     if len(broader) > 0:
         for broad in broader:
-            dico_top.insert(0, exploreBroader(broad))
+            dico_top.insert(0, explore_broader(broad))
 
     return dico_top
 
 
-def extraitSujetsDomaines(data):
-    """ inputs from recupIndividu(halidint)
+def extrait_sujets_domaines(data):
+    """ inputs from recup_individu(halidint)
     halidint est un individu
     """
     # extraction des résultats
@@ -162,7 +162,7 @@ def extraitSujetsDomaines(data):
     return dico_top, list(set(sujets))
 
 
-def ExplainDomains(dom_uri):
+def explain_domains(dom_uri):
     sparql.setQuery("""
     prefix foaf: <http://xmlns.com/foaf/0.1/>
     prefix skos: <http://www.w3.org/2004/02/skos/core>
@@ -186,7 +186,7 @@ def ExplainDomains(dom_uri):
         tempo = []
 
         for broad in broader:
-            res = exploreBroader(broad)
+            res = explore_broader(broad)
             for r in res:
                 tempo.append(r)
 
@@ -205,8 +205,8 @@ def ExplainDomains(dom_uri):
         return [labels]
 
 
-def extraitMotsCles(dat):
-    """ inputs from getArticle(halid)
+def extrait_mots_cles(dat):
+    """ inputs from get_article(halid)
     halid est un article
     """
     # extraction des résultats
@@ -228,33 +228,33 @@ def extraitMotsCles(dat):
 # tests
 # Extraction des mots clés d'un article
 # à faire valider par article
-# res = getArticle("hal-00000001v2")
+# res = get_article("hal-00000001v2")
 
-# print (extraitMotsCles (res) )
-# print (extraitMotsCles (res) )
+# print (extrait_mots_cles (res) )
+# print (extrait_mots_cles (res) )
 
 
-def getConceptsAndKeywords(aurehalid):
+def get_concepts_and_keywords(aurehalid):
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concept et donnée aborder par le chercheur
-    # example : getConceptsAndKeywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
+    # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 
     concept = []
     keywords = []
 
     # extraction des sujets d'intérêt et domaines d'un chercheur
-    data = recupIndividu(aurehalid)
+    data = recup_individu(aurehalid)
 
-    sujets, domaines = extraitSujetsDomaines(data)
+    sujets, domaines = extrait_sujets_domaines(data)
     domains = []
 
     print(sujets, domaines)
     try:
 
         for dom in domaines:
-            domains.append(ExplainDomains(dom))
+            domains.append(explain_domains(dom))
 
             # réseau json hiérarchiques
             #
@@ -279,18 +279,18 @@ def getConceptsAndKeywords(aurehalid):
         #     ficRes.write(str(nx.tree_data(tree, "Concepts")).replace("'", '"'))
 
         for children in concepts['children']:
-            children['label_en'] = getLabel(children['id'], 'en')
-            children['label_fr'] = getLabel(children['id'], 'fr')
+            children['label_en'] = get_label(children['id'], 'en')
+            children['label_fr'] = get_label(children['id'], 'fr')
             children['state'] = 'invalidated'
             if 'children' in children:
                 for subchildren in children['children']:
-                    subchildren['label_en'] = getLabel(subchildren['id'], 'en')
-                    subchildren['label_fr'] = getLabel(subchildren['id'], 'fr')
+                    subchildren['label_en'] = get_label(subchildren['id'], 'en')
+                    subchildren['label_fr'] = get_label(subchildren['id'], 'fr')
                     subchildren['state'] = 'invalidated'
                     if 'children' in subchildren:
                         for subsubchildren in subchildren['children']:
-                            subsubchildren['label_en'] = getLabel(subsubchildren['id'], 'en')
-                            subsubchildren['label_fr'] = getLabel(subsubchildren['id'], 'fr')
+                            subsubchildren['label_en'] = get_label(subsubchildren['id'], 'en')
+                            subsubchildren['label_fr'] = get_label(subsubchildren['id'], 'fr')
                             subsubchildren['state'] = 'invalidated'
 
         for lang in sujets.keys():

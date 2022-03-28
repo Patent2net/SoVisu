@@ -1,7 +1,7 @@
 import requests
 
 
-def getOa(doi):
+def get_oa(doi):
 
     req = requests.get('https://api.unpaywall.org/v2/' + doi + '?email=alarictabaries@gmail.com')
 

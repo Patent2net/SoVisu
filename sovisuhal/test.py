@@ -17,7 +17,7 @@ Mode = config('mode')
 struct = "198307662"
 
 
-def esConnector(mode=Mode):
+def es_connector(mode=Mode):
     if mode == "Prod":
 
         secret = config('ELASTIC_PASSWORD')
@@ -33,7 +33,7 @@ def esConnector(mode=Mode):
     return es
 
 
-es = esConnector()
+es = es_connector()
 scope_param = {
     "query": {
         "match_all": {}

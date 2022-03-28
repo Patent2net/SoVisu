@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-def shouldBeOpen(doc):
+def should_be_open(doc):
     # -1 non
     # 1 oui
     # 0 no se
@@ -43,7 +43,7 @@ def shouldBeOpen(doc):
     return 2
 
 
-def calculateMDS(doc):
+def calculate_mds(doc):
     score = 0
 
     if 'title_s' in doc:
@@ -106,7 +106,7 @@ def calculateMDS(doc):
     return score * 100 / (0.8 + 0.2 + 1 + 0.8 + 0.4 + 0.6)
 
 
-def appendToTree(scope, rsr, tree, state):
+def append_to_tree(scope, rsr, tree, state):
 
     rsr_data = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
     rsr_id = rsr['ldapId']
@@ -187,7 +187,7 @@ def appendToTree(scope, rsr, tree, state):
     return tree
 
 
-def filterConcepts(concepts, validated_ids):
+def filter_concepts(concepts, validated_ids):
     if len(concepts) > 0:
 
         for children in concepts['children']:

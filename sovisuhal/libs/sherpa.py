@@ -2,7 +2,7 @@ import requests
 from pprint import pprint
 
 
-def getEmbargoDuration(journal):
+def get_embargo_duration(journal):
 
     api_key = "6569EC86-7B55-11EB-8F47-961C3DE2659A"
     endpoint = "https://v2.sherpa.ac.uk/cgi/retrieve/cgi/retrieve?api-key=" + api_key
