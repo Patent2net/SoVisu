@@ -1,14 +1,14 @@
 import requests
 
 
-def findDomains(idRef):
+def findDomains(idref):
 
     r = requests.post('https://scanr-api.enseignementsup-recherche.gouv.fr/api/v2/publications/search',
-                      json={"query": "idref" + idRef})
+                      json={"query": "idref" + idref})
 
     count = r.json()['total']
     r = requests.post('https://scanr-api.enseignementsup-recherche.gouv.fr/api/v2/publications/search',
-                      json={"query": "idref" + idRef, "pageSize": count})
+                      json={"query": "idref" + idref, "pageSize": count})
 
     publications = r.json()
 

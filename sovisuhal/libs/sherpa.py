@@ -26,7 +26,9 @@ def getEmbargoDuration(journal):
                 if 'embargo' in version:
                     embargo_duration = version['embargo']
 
-    try: embargo_duration
-    except NameError: embargo_duration = None
+    try:
+        embargo_duration
+    except NameError:
+        embargo_duration = None
 
     return embargo_duration

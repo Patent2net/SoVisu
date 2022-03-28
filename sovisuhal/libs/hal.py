@@ -2,7 +2,7 @@ import requests
 import random
 
 
-def findPublications(idHal, field, increment=0):
+def findPublications(idhal, field, increment=0):
 
     articles = []
     flags = 'docid,halId_s,labStructId_i,authIdHal_s,authIdHal_i,doiId_s,authFullName_s,doiId_s,journalIssn_s,' \
@@ -11,7 +11,7 @@ def findPublications(idHal, field, increment=0):
             'version_i,journalDate_s,journalTitle_s,journalPublisher_s,funding_s,' \
             'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s'
 
-    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idHal) + '&fl=' + flags + '&start=' + str(increment))
+    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(increment))
 
     if req.status_code == 200:
         data = req.json()
@@ -23,7 +23,7 @@ def findPublications(idHal, field, increment=0):
                 articles.append(article)
             if (count > 30) and (increment < (count)):
                 increment += 30
-                tmp_articles = findPublications(idHal, field, increment=increment)
+                tmp_articles = findPublications(idhal, field, increment=increment)
                 for tmp_article in tmp_articles:
                     articles.append(tmp_article)
                 return articles
@@ -37,9 +37,9 @@ def findPublications(idHal, field, increment=0):
         return articles
 
 
-def findRandomPublication(idHal, field):
+def findRandomPublication(idhal, field):
 
-    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idHal))
+    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal))
     if req.status_code == 200:
         data = req.json()
         if "response" in data.keys():
