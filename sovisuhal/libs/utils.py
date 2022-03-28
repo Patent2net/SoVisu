@@ -28,12 +28,12 @@ def shouldBeOpen(doc):
                         if int(c) > max:
                             max = int(c)
 
-                pDate = dateutil.parser.parse(doc['publicationDate_tdate']).replace(tzinfo=None)
-                currDate = datetime.now()
-                diff = relativedelta(currDate, pDate)
+                p_date = dateutil.parser.parse(doc['publicationDate_tdate']).replace(tzinfo=None)
+                curr_date = datetime.now()
+                diff = relativedelta(curr_date, p_date)
 
-                diffMonths = diff.years * 12 + diff.months
-                if diffMonths > max:
+                diff_months = diff.years * 12 + diff.months
+                if diff_months > max:
                     return 1
                 else:
                     return -1
@@ -47,19 +47,19 @@ def calculateMDS(doc):
     score = 0
 
     if 'title_s' in doc:
-        hasTitle = True
+        has_title = True
     else:
-        hasTitle = False
+        has_title = False
 
     if 'doiId_s' in doc:
-        hasDoi = True
+        has_doi = True
     else:
-        hasDoi = False
+        has_doi = False
 
     if 'publicationDate_tdate' in doc:
-        hasPublicationDate = True
+        has_publication_date = True
     else:
-        hasPublicationDate = False
+        has_publication_date = False
 
     keywords = nested_lookup(
         key="_keyword_s",
@@ -69,9 +69,9 @@ def calculateMDS(doc):
     )
 
     if len(keywords) > 0:
-        hasKw = True
+        has_kw = True
     else:
-        hasKw = False
+        has_kw = False
 
     abstracts = nested_lookup(
         key="_abstract_s",
@@ -81,26 +81,26 @@ def calculateMDS(doc):
     )
 
     if len(abstracts) > 0:
-        hasAbstract = True
+        has_abstract = True
     else:
-        hasAbstract = False
+        has_abstract = False
 
     if 'fileMain_s' in doc:
-        hasAttachedFile = True
+        has_attached_file = True
     else:
-        hasAttachedFile = False
+        has_attached_file = False
 
-    if hasTitle:
+    if has_title:
         score += 1 * 0.8
-    if hasPublicationDate:
+    if has_publication_date:
         score += 1 * 0.2
-    if hasKw:
+    if has_kw:
         score += 1 * 1
-    if hasAbstract:
+    if has_abstract:
         score += 1 * 0.8
-    if hasAttachedFile:
+    if has_attached_file:
         score += 1 * 0.4
-    if hasDoi:
+    if has_doi:
         score += 1 * 0.6
 
     return score * 100 / (0.8 + 0.2 + 1 + 0.8 + 0.4 + 0.6)
@@ -108,18 +108,18 @@ def calculateMDS(doc):
 
 def appendToTree(scope, rsr, tree, state):
 
-    rsrData = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
-    rsrId = rsr['ldapId']
+    rsr_data = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
+    rsr_id = rsr['ldapId']
 
     sid = scope['id'].split('.')
 
     print('llllll', end=' ')
     print(scope)
 
-    scopeData = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
+    scope_data = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
                  'children': [],
                  'researchers': [
-                     rsrData
+                     rsr_data
                  ]}
 
     if len(sid) == 1:
@@ -129,14 +129,14 @@ def appendToTree(scope, rsr, tree, state):
                 if 'researchers' in child:
                     for rsr in child['researchers']:
                         rsrexists = False
-                        if rsr['ldapId'] == rsrId:
+                        if rsr['ldapId'] == rsr_id:
                             rsr['state'] = state
                             rsrexists = True
                 if not rsrexists:
-                    child['researchers'].append(rsrData)
+                    child['researchers'].append(rsr_data)
                 exists = True
         if not exists:
-            tree['children'].append(scopeData)
+            tree['children'].append(scope_data)
 
     if len(sid) == 2:
         exists = False
@@ -147,17 +147,17 @@ def appendToTree(scope, rsr, tree, state):
                         if 'researchers' in child1:
                             for rsr in child1['researchers']:
                                 rsrexists = False
-                                if rsr['ldapId'] == rsrId:
+                                if rsr['ldapId'] == rsr_id:
                                     rsr['state'] = state
                                     rsrexists = True
                         if not rsrexists:
-                            child1['researchers'].append(rsrData)
+                            child1['researchers'].append(rsr_data)
                         exists = True
 
         if not exists:
             for child in tree['children']:
                 if 'children' in child and sid[0] == child['id']:
-                    child['children'].append(scopeData)
+                    child['children'].append(scope_data)
 
     if len(sid) == 3:
         exists = False
@@ -170,11 +170,11 @@ def appendToTree(scope, rsr, tree, state):
                                 if 'researchers' in child2:
                                     for rsr in child2['researchers']:
                                         rsrexists = False
-                                        if rsr['ldapId'] == rsrId:
+                                        if rsr['ldapId'] == rsr_id:
                                             rsr['state'] = state
                                             rsrexists = True
                                 if not rsrexists:
-                                    child2['researchers'].append(rsrData)
+                                    child2['researchers'].append(rsr_data)
                                 exists = True
 
         if not exists:
@@ -182,7 +182,7 @@ def appendToTree(scope, rsr, tree, state):
                 if 'children' in child and sid[0] == child['id']:
                     for child1 in child['children']:
                         if sid[0] + '.' + sid[1] == child1['id']:
-                            child1['children'].append(scopeData)
+                            child1['children'].append(scope_data)
 
     return tree
 

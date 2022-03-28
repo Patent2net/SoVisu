@@ -32,11 +32,8 @@ inputs = tree.find_all('input')
 domains = []
 
 for input in inputs:
-    dom = {}
-    dom['id'] = input.get('value')
-    dom['label_en'] = getLabel(input.get('value'), 'en')
-    dom['label_fr'] = getLabel(input.get('value'), 'fr')
-    dom['children'] = []
+    dom = {'id': input.get('value'), 'label_en': getLabel(input.get('value'), 'en'),
+           'label_fr': getLabel(input.get('value'), 'fr'), 'children': []}
     domains.append(dom)
 
 tree = {'id': 'Concepts', 'children': []}

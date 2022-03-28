@@ -172,7 +172,7 @@ def check(request):
             return render(request, 'check.html',
                           {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                            'entity': entity, 'extIds': ['a', 'b', 'c'],
-                           'form': forms.validCredentials(halId_s=entity['halId_s'],
+                           'form': forms.ValidCredentials(halId_s=entity['halId_s'],
                                                           idRef=entity['idRef'], orcId=orcid,
                                                           function=function),
                            'startDate': start_date,
@@ -183,7 +183,7 @@ def check(request):
             return render(request, 'check.html',
                           {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                            'entity': entity,
-                           'form': forms.validLabCredentials(halStructId=entity['halStructId'],
+                           'form': forms.ValidLabCredentials(halStructId=entity['halStructId'],
                                                              rsnr=entity['rsnr'],
                                                              idRef=entity['idRef']),
                            'startDate': start_date,
@@ -210,7 +210,7 @@ def check(request):
         return render(request, 'check.html',
                       {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity, 'extIds': ['a', 'b', 'c'],
-                       'form': forms.setResearchDescription(research_summary=research_summary,
+                       'form': forms.SetResearchDescription(research_summary=research_summary,
                                                             research_projectsInProgress=research_projects_in_progress,
                                                             research_projectsAndFundings=research_projects_and_fundings),
                        'startDate': start_date,
@@ -265,7 +265,7 @@ def check(request):
         return render(request, 'check.html',
                       {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity,
-                       'form': forms.setGuidingKeywords(
+                       'form': forms.SetGuidingKeywords(
                            guidingKeywords=entity['guidingKeywords']),
                        'startDate': start_date,
                        'hasToConfirm': hastoconfirm,
@@ -1024,7 +1024,7 @@ def search(request):  # Revoir la fonction
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
         return render(request, 'search.html',
-                      {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.search(val=search),
+                      {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(val=search),
                        'count': p_res['count'],
                        'timeRange': "from:'" + date_from + "',to:'" + date_to + "'",
                        'filter': search, 'index': index, 'search': search,
@@ -1032,7 +1032,7 @@ def search(request):  # Revoir la fonction
                        'startDate': min_date, 'ldapid': ldapid})
 
     return render(request, 'search.html',
-                  {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.search(), 'from': date_from, 'to': date_to,
+                  {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(), 'from': date_from, 'to': date_to,
                    'startDate': min_date, 'filter': '', 'ldapid': ldapid})
 
 

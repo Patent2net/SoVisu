@@ -22,7 +22,7 @@ def common_data(list1, list2):
     return result
 
 
-def sortReferences(articles, halStructId):
+def sortReferences(articles, halstructid):
 
     # sort by lab
     utln_rsr = []
@@ -30,7 +30,7 @@ def sortReferences(articles, halStructId):
 
     universities = ["198307662", "130015332"]
 
-    sort_param = esActions.scope_p("labHalId", halStructId)
+    sort_param = esActions.scope_p("labHalId", halstructid)
     for univ in universities:
         res = es.search(index=univ + "-*-researchers", body=sort_param)
         for rsr in res['hits']['hits']:
@@ -50,7 +50,7 @@ def sortReferences(articles, halStructId):
 
         article["team"] = ""
 
-        hasPhDCandidate = False
+        has_phd_candidate = False
         if "authIdHal_s" in article:
             for authIdHal_s in article["authIdHal_s"]:
 
@@ -67,7 +67,7 @@ def sortReferences(articles, halStructId):
                                 },
                                 {
                                     "match": {
-                                        "labHalId": halStructId
+                                        "labHalId": halstructid
                                     }
                                 }
                             ]
@@ -80,7 +80,7 @@ def sortReferences(articles, halStructId):
                 if len(res['hits']['hits']) > 0:
 
                     if 'function' in res['hits']['hits'][0]['_source'] and res['hits']['hits'][0]['_source']['function'] == "Doctorant":
-                        hasPhDCandidate = True
+                        has_phd_candidate = True
 
                     if 'axis' in res['hits']['hits'][0]['_source']:
                         axis = res['hits']['hits'][0]['_source']['axis'].replace("axis", "")
@@ -89,12 +89,12 @@ def sortReferences(articles, halStructId):
             if len(article["team"]) > 2:
                 article["team"] = article["team"][:-2]
 
-        if hasPhDCandidate:
+        if has_phd_candidate:
             article["hasPhDCandidate"] = "O"
         else:
             article["hasPhDCandidate"] = "N"
 
-        hasAuthorship = False
+        has_authorship = False
 
         if "authorship" in article:
             for authorship in article["authorship"]:
@@ -102,11 +102,11 @@ def sortReferences(articles, halStructId):
                 # authFullName_s qui est en fait halId_s mais pas toujours
                 try:
                     doc_param = esActions.scope_p(field, authorship["authFullName_s"])
-                    halId_s = authorship["authFullName_s"]
+                    halid_s = authorship["authFullName_s"]
 
-                except:
+                except ValueError:
                     doc_param = esActions.scope_p(field, authorship['halId_s'])
-                    halId_s = authorship["halId_s"]
+                    halid_s = authorship["halId_s"]
 
                 doc_param = {
                     "query": {
@@ -114,12 +114,12 @@ def sortReferences(articles, halStructId):
                             "must": [
                                 {
                                     "match_phrase": {
-                                        "halId_s": halId_s
+                                        "halId_s": halid_s
                                     }
                                 },
                                 {
                                     "match": {
-                                        "labHalId": halStructId
+                                        "labHalId": halstructid
                                     }
                                 }
                             ]
@@ -127,10 +127,10 @@ def sortReferences(articles, halStructId):
                     }
                 }
                 res = es.search(index="*-researchers", body=doc_param)
-                if len(res['hits']['hits']) > 0 and res['hits']['hits'][0]['_source']['labHalId'] == halStructId:
-                    hasAuthorship = True
+                if len(res['hits']['hits']) > 0 and res['hits']['hits'][0]['_source']['labHalId'] == halstructid:
+                    has_authorship = True
 
-        if hasAuthorship:
+        if has_authorship:
             article["hasAuthorship"] = "O"
         else:
             article["hasAuthorship"] = "N"

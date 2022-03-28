@@ -20,41 +20,40 @@ sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
 
 
-def getHalId_s(aureHalId):
+def get_halid_s(aurehal_id):
     # start
     # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur aureHalId et retourne la valeur authIdHal_s associée
-    # example: aureHalId(826859)=>vanessa-richard
+    # commentaire : Cette fonction prend en paramètre la valeur aurehal_id et retourne la valeur authIdHal_s associée
+    # example: aurehal_id(826859)=>vanessa-richard
     # end
     sparql.setQuery("""
     select ?p ?o
     where  {
     <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-    }""" % aureHalId)
+    }""" % aurehal_id)
     results = sparql.query().convert()
-    extIds = [truc for truc in results['results']['bindings'] if
-              truc['p']['value'] == "http://www.openarchives.org/ore/terms/isAggregatedBy"]
+    ext_ids = [truc for truc in results['results']['bindings'] if truc['p']['value'] == "http://www.openarchives.org/ore/terms/isAggregatedBy"]
 
-    authIdHal_s = extIds[0]['o']['value'].split('/')[-1]
-    return authIdHal_s
+    authidhal_s = ext_ids[0]['o']['value'].split('/')[-1]
+    return authidhal_s
 
 
-def getExtId(authIdHal_s):
+def getExtId(authidhal_s):
     # Start
     # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aureHalId associée
+    # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aurehal_id associée
     # example : authIdHal_s(vanessa-richard)=>826859
     # end
     sparql.setQuery("""
     select ?p ?o
     where  {
     <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-    }""" % authIdHal_s)
+    }""" % authidhal_s)
     results = sparql.query().convert()
-    extIds = [truc for truc in results['results']['bindings'] if
+    extids = [truc for truc in results['results']['bindings'] if
               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
-    aureHalId = int(extIds[0]['o']['value'].rsplit('/', 1)[1])
-    return aureHalId
+    aurehalid = int(extids[0]['o']['value'].rsplit('/', 1)[1])
+    return aurehalid
 
 
 def getLabel(label, lang):
@@ -77,7 +76,7 @@ def getLabel(label, lang):
     return label_complet
 
 
-def getArticle(halId_s):
+def getArticle(halid_s):
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre halId_s l'id d'un article et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
@@ -87,13 +86,13 @@ def getArticle(halId_s):
     sparql.setQuery("""select ?p ?o 
 where {
  <https://data.archives-ouvertes.fr/document/%s> ?p ?o
-} """ % halId_s)
+} """ % halid_s)
     results = sparql.query().convert()
     metadone_article = results
     return metadone_article
 
 
-def recupIndividu(authIdHal_s):
+def recupIndividu(authidhal_s):
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre authIdHal_s d'un cherhcheur et retourne sous forme de dictionnaire donnee_individu qui regroupe l'ensemble des données concernant le chercheur
@@ -103,7 +102,7 @@ def recupIndividu(authIdHal_s):
 select ?p ?o
 where  {
 <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-}""" % authIdHal_s)
+}""" % authidhal_s)
     results = sparql.query().convert()
     # result in form of predicat, objet in a list in results['results']['bindings']
     donnee_individu = results
@@ -121,17 +120,17 @@ def exploreBroader(uri):
     concepts = [truc for truc in results['results']['bindings'] if
                 truc['p']['value'] == "http://purl.org/dc/elements/1.1/identifier"]
     # filtres par langues
-    dicoTop = dict()
+    dico_top = dict()
 
-    dicoTop = [top['o']['value'] for top in concepts]
+    dico_top = [top['o']['value'] for top in concepts]
     broader = [truc['o']['value'] for truc in results['results']['bindings'] if
                truc['p']['value'] == "http://www.w3.org/2004/02/skos/core#broader"]
 
     if len(broader) > 0:
         for broad in broader:
-            dicoTop.insert(0, exploreBroader(broad))
+            dico_top.insert(0, exploreBroader(broad))
 
-    return dicoTop
+    return dico_top
 
 
 def extraitSujetsDomaines(data):
@@ -155,22 +154,22 @@ def extraitSujetsDomaines(data):
 
     langues = list(set([top['o']['xml:lang'] for top in topics]))
     # filtres par langues
-    dicoTop = dict()
+    dico_top = dict()
 
     for lang in langues:
-        dicoTop[lang] = [top['o']['value'] for top in topics if top['o']['xml:lang'] == lang]
+        dico_top[lang] = [top['o']['value'] for top in topics if top['o']['xml:lang'] == lang]
 
-    return dicoTop, list(set(sujets))
+    return dico_top, list(set(sujets))
 
 
-def ExplainDomains(domUri):
+def ExplainDomains(dom_uri):
     sparql.setQuery("""
     prefix foaf: <http://xmlns.com/foaf/0.1/>
     prefix skos: <http://www.w3.org/2004/02/skos/core>
     select ?p ?o
     where  {
     <%s> ?p ?o
-    }""" % domUri)
+    }""" % dom_uri)
 
     results = sparql.query().convert()
 
@@ -218,12 +217,12 @@ def extraitMotsCles(dat):
     # récupération des langues
     langues = list(set([top['o']['xml:lang'] for top in topics]))
     # filtres par langues
-    dicoTop = dict()
+    dico_top = dict()
 
     for lang in langues:
-        dicoTop[lang] = [top['o']['value'] for top in topics if top['o']['xml:lang'] == lang]
+        dico_top[lang] = [top['o']['value'] for top in topics if top['o']['xml:lang'] == lang]
 
-    return dicoTop
+    return dico_top
 
 
 # tests
@@ -235,10 +234,10 @@ def extraitMotsCles(dat):
 # print (extraitMotsCles (res) )
 
 
-def getConceptsAndKeywords(aureHalId):
+def getConceptsAndKeywords(aurehalid):
     # start
     # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre aureHalId d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concept et donnée aborder par le chercheur
+    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concept et donnée aborder par le chercheur
     # example : getConceptsAndKeywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 
@@ -246,26 +245,26 @@ def getConceptsAndKeywords(aureHalId):
     keywords = []
 
     # extraction des sujets d'intérêt et domaines d'un chercheur
-    data = recupIndividu(aureHalId)
+    data = recupIndividu(aurehalid)
 
     sujets, domaines = extraitSujetsDomaines(data)
-    Domains = []
+    domains = []
 
     print(sujets, domaines)
     try:
 
         for dom in domaines:
-            Domains.append(ExplainDomains(dom))
+            domains.append(ExplainDomains(dom))
 
             # réseau json hiérarchiques
             #
-            dicoNoeuds = dict()
+            dico_noeuds = dict()
             tree = nx.DiGraph()
 
             tree.add_node('Concepts')
-            Domains = [list(filter(lambda x: x != None, truc)) for truc in Domains]
+            domains = [list(filter(lambda x: x != None, truc)) for truc in domains]
 
-            for dom in Domains:
+            for dom in domains:
                 tree.add_node(dom[0][0])
                 tree.add_edge('Concepts', dom[0][0])
                 if len(dom) > 1:
@@ -296,17 +295,17 @@ def getConceptsAndKeywords(aureHalId):
 
         for lang in sujets.keys():
 
-            treeWords = nx.DiGraph()
-            treeWords.add_node(lang)
+            tree_words = nx.DiGraph()
+            tree_words.add_node(lang)
             for kwd in sujets[lang]:
-                treeWords.add_node(kwd)
-                treeWords.add_edge(lang, kwd)
-            keywords.append({'lang': lang, 'keywords': nx.tree_data(treeWords, lang)})
+                tree_words.add_node(kwd)
+                tree_words.add_edge(lang, kwd)
+            keywords.append({'lang': lang, 'keywords': nx.tree_data(tree_words, lang)})
             # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
             #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
-        ConceptsAndKeywords = {'concepts': concepts, 'keywords': keywords}
-        return ConceptsAndKeywords
+        concepts_and_keywords = {'concepts': concepts, 'keywords': keywords}
+        return concepts_and_keywords
 
-    except:
-        ConceptsAndKeywords = {'concepts': [], 'keywords': []}
-        return ConceptsAndKeywords
+    except FileNotFoundError:
+        concepts_and_keywords = {'concepts': [], 'keywords': []}
+        return concepts_and_keywords

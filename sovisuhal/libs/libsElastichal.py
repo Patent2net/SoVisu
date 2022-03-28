@@ -9,15 +9,15 @@ from sovisuhal.libs import hal
 import time
 
 
-def convertIdHalToStr(idHal_i):
-    res = requests.get('https://aurehal.archives-ouvertes.fr/author/browse?critere=idHal_i:"' + idHal_i + '"')
+def convertIdHalToStr(idhal_i):
+    res = requests.get('https://aurehal.archives-ouvertes.fr/author/browse?critere=idHal_i:"' + idhal_i + '"')
     soup = BeautifulSoup(res.text, 'html.parser')
     return soup.find("td", text="idHal_s").find_next_sibling("td").text.split()[0]
 
 
-def getAureHal(idHal):
+def getAureHal(idhal):
 
-    print(idHal)
+    print(idhal)
 
     sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
     sparql.setReturnFormat(JSON)
@@ -26,7 +26,7 @@ def getAureHal(idHal):
         select ?p ?o
         where  {
         <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-        }""" % idHal)
+        }""" % idhal)
     results = sparql.query().convert()
 
     print(results)
@@ -59,8 +59,8 @@ def findIdRef(name):
     return {}
 
 
-def normalizeName(keyword, type):
-    if type == 'id':
+def normalizeName(keyword, i_type):
+    if i_type == 'id':
         key = 'ppn_z'
     else:
         key = 'persname_t'
@@ -78,8 +78,8 @@ def normalizeName(keyword, type):
     return {}
 
 
-def findNotice(idRef):
-    r = requests.get('https://www.idref.fr/' + idRef + '.xml', stream=True)
+def findNotice(idref):
+    r = requests.get('https://www.idref.fr/' + idref + '.xml', stream=True)
     doc = lxml.etree.parse(r.raw)
 
     idHal_s = None

@@ -14,7 +14,7 @@ from .libs import utils, libsElastichal, esActions
 from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
 
 import pandas as pd
-from io import BytesIO as IO
+from io import BytesIO as B_io
 
 try:
     from decouple import config
@@ -65,32 +65,32 @@ def admin_access_login(request):
 
 
 def create_credentials(request):
-    ldapId = request.GET['ldapid']
-    idRef = request.POST.get('f_IdRef')
+    ldapid = request.GET['ldapid']
+    idref = request.POST.get('f_IdRef')
     idhal = request.POST.get('f_halId_s')
-    orcId = request.POST.get('f_orcId')
+    orcid = request.POST.get('f_orcId')
     # structId = request.POST.get ('structId')
-    tempoLab = request.POST.get('f_labo')  # chaine de caractère
-    tempoLab = tempoLab.replace("'", "")
-    tempoLab = tempoLab.replace('(', '')
-    tempoLab = tempoLab.replace(')', '')
-    tempoLab = tempoLab.split(',')
-    labo = tempoLab[0].strip()  # halid
-    accroLab = tempoLab[1].strip()
+    tempo_lab = request.POST.get('f_labo')  # chaine de caractère
+    tempo_lab = tempo_lab.replace("'", "")
+    tempo_lab = tempo_lab.replace('(', '')
+    tempo_lab = tempo_lab.replace(')', '')
+    tempo_lab = tempo_lab.split(',')
+    labo = tempo_lab[0].strip()  # halid
+    accro_lab = tempo_lab[1].strip()
     # resultat
-    Chercheur = indexe_chercheur(ldapId, accroLab, labo, idhal, idRef, orcId)
+    chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
     idhal_test = idhal_checkout(idhal)
 
     if idhal_test == 0:
         auth_user = request.user.get_username().lower()
         print("idhal not found")
-        return redirect('/create/?ldapid=' + ldapId + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True')
+        return redirect('/create/?ldapid=' + ldapid + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True')
 
     else:
 
         print("idhal found")
-        collecte_docs(Chercheur)
+        collecte_docs(chercheur)
 
         # récupération du struct du nouveau profil pour la redirection
         es = esActions.es_connector()
@@ -104,7 +104,7 @@ def create_credentials(request):
         # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
 
         return redirect(
-            '/check/?struct=' + struct + '&type=rsr&id=' + ldapId + '&orcId=' + orcId + '&from=1990-01-01&to=now&data=credentials')
+            '/check/?struct=' + struct + '&type=rsr&id=' + ldapid + '&orcId=' + orcid + '&from=1990-01-01&to=now&data=credentials')
 
 
 # Redirects
@@ -354,8 +354,8 @@ def validate_credentials(request):
     if request.method == 'POST':
 
         if i_type == "rsr":
-            idRef = request.POST.get("f_IdRef")
-            orcId = request.POST.get("f_orcId")
+            idref = request.POST.get("f_IdRef")
+            orcid = request.POST.get("f_orcId")
             function = request.POST.get("f_status")
 
             scope_param = esActions.scope_p("_id", p_id)
@@ -369,14 +369,14 @@ def validate_credentials(request):
             print(struct + "-" + entity['labHalId'] + '-researchers')
 
             es.update(index=struct + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=p_id,
-                      body={"doc": {"idRef": idRef, "orcId": orcId, "validated": True, "function": function}})
+                      body={"doc": {"idRef": idref, "orcId": orcid, "validated": True, "function": function}})
 
         if i_type == "lab":
             rsnr = request.POST.get("f_rsnr")
-            idRef = request.POST.get("f_IdRef")
+            idref = request.POST.get("f_IdRef")
 
             es.update(index=struct + "-" + p_id + "-laboratories", refresh='wait_for', id=p_id,
-                      body={"doc": {"rsnr": rsnr, "idRef": idRef, "validated": True}})
+                      body={"doc": {"rsnr": rsnr, "idRef": idref, "validated": True}})
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
@@ -409,7 +409,7 @@ def validate_guiding_keywords(request):
 
     if request.method == 'POST':
 
-        guidingKeywords = request.POST.get("f_guidingKeywords").split(";")
+        guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
 
         if i_type == "rsr":
             scope_param = esActions.scope_p("_id", p_id)
@@ -421,11 +421,11 @@ def validate_guiding_keywords(request):
                 return redirect('unknown')
 
             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
-                      body={"doc": {"guidingKeywords": guidingKeywords}})
+                      body={"doc": {"guidingKeywords": guiding_keywords}})
 
         if i_type == "lab":
             es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
-                      body={"doc": {"guidingKeywords": guidingKeywords}})
+                      body={"doc": {"guidingKeywords": guiding_keywords}})
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
@@ -459,17 +459,17 @@ def validate_research_description(request):
     if request.method == 'POST':
 
         research_summary = request.POST.get("f_research_summary")
-        research_projectsInProgress = request.POST.get("f_research_projectsInProgress")
-        research_projectsAndFundings = request.POST.get("f_research_projectsAndFundings")
+        research_projects_in_progress = request.POST.get("f_research_projectsInProgress")
+        research_projects_and_fundings = request.POST.get("f_research_projectsAndFundings")
 
         soup = BeautifulSoup(research_summary, 'html.parser')
         research_summary_raw = soup.getText().replace("\n", " ")
 
-        soup = BeautifulSoup(research_projectsInProgress, 'html.parser')
-        research_projectsInProgress_raw = soup.getText().replace("\n", " ")
+        soup = BeautifulSoup(research_projects_in_progress, 'html.parser')
+        research_projects_in_progress_raw = soup.getText().replace("\n", " ")
 
-        soup = BeautifulSoup(research_projectsAndFundings, 'html.parser')
-        research_projectsAndFundings_raw = soup.getText().replace("\n", " ")
+        soup = BeautifulSoup(research_projects_and_fundings, 'html.parser')
+        research_projects_and_fundings_raw = soup.getText().replace("\n", " ")
 
         if i_type == "rsr":
             scope_param = esActions.scope_p("_id", p_id)
@@ -482,10 +482,10 @@ def validate_research_description(request):
 
             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
                       body={"doc": {"research_summary": research_summary, "research_summary_raw": research_summary_raw,
-                                    "research_projectsInProgress": research_projectsInProgress,
-                                    "research_projectsInProgress_raw": research_projectsInProgress_raw,
-                                    "research_projectsAndFundings": research_projectsAndFundings,
-                                    "research_projectsAndFundings_raw": research_projectsAndFundings_raw,
+                                    "research_projectsInProgress": research_projects_in_progress,
+                                    "research_projectsInProgress_raw": research_projects_in_progress_raw,
+                                    "research_projectsAndFundings": research_projects_and_fundings,
+                                    "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
                                     "research_updatedDate": datetime.today().isoformat()
                                     }})
 
@@ -525,14 +525,14 @@ def refresh_aurehal_id(request):
     except FileNotFoundError:
         return redirect('unknown')
 
-    aurehalId = libsElastichal.getAureHal(entity['halId_s'])
+    aurehal_id = libsElastichal.getAureHal(entity['halId_s'])
     concepts = []
-    if aurehalId != -1:
-        archivesOuvertesData = getConceptsAndKeywords(aurehalId)
-        concepts = utils.filterConcepts(archivesOuvertesData['concepts'], validated_ids=[])
+    if aurehal_id != -1:
+        archives_ouvertes_data = getConceptsAndKeywords(aurehal_id)
+        concepts = utils.filterConcepts(archives_ouvertes_data['concepts'], validated_ids=[])
 
     es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
-              body={"doc": {"aurehalId": aurehalId, 'concepts': concepts}})
+              body={"doc": {"aurehalId": aurehal_id, 'concepts': concepts}})
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
@@ -812,7 +812,7 @@ def export_hceres_xls(request):
     if not (book_df.columns == 'isbn_s').any():
         book_df["isbn_s"] = ""
 
-    output = IO()
+    output = B_io()
 
     writer = pd.ExcelWriter(output, engine='openpyxl')
     if len(art_df.index) > 0:

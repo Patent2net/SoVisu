@@ -7,7 +7,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
-except:
+except ModuleNotFoundError:
     from django.contrib.auth.decorators import login_required
 
     mode = "Dev"
