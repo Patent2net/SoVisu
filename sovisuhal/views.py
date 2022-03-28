@@ -84,7 +84,7 @@ def check(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
     # /
 
@@ -98,7 +98,7 @@ def check(request):
             res = es.search(index=struct + "-" + entity['labHalId'] + "-researchers-" + p_id + "-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-        except FileNotFoundError:
+        except:
             start_date = "2000"
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
@@ -108,7 +108,7 @@ def check(request):
             res = es.search(index=struct + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-        except FileNotFoundError:
+        except :
             start_date = "2000"
     # /
 
@@ -371,7 +371,7 @@ def dashboard(request):
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except :
         return redirect('unknown')
     # /
 
@@ -401,7 +401,7 @@ def dashboard(request):
             start_date_param = esActions.date_all()
             res = es.search(index=indexsearch, body=start_date_param)
 
-        except FileNotFoundError:
+        except:
             start_date_param.pop("sort")
             res = es.search(index=indexsearch, body=start_date_param)
 
@@ -419,7 +419,7 @@ def dashboard(request):
 
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-    except FileNotFoundError:
+    except:
         start_date = "2000"
     # /
 
@@ -479,7 +479,7 @@ def references(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
     # /
 
@@ -593,7 +593,7 @@ def terminology(request):
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
     # /
 
@@ -735,7 +735,7 @@ def wordcloud(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
     # /
 
@@ -818,7 +818,7 @@ def tools(request):
 
     try:
         entity = res['hits']['hits'][0]['_source']
-    except FileNotFoundError:
+    except:
         return redirect('unknown')
     # /
 
@@ -842,7 +842,7 @@ def tools(request):
 
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-    except FileNotFoundError:
+    except:
         start_date = "2000"
     # /
 
