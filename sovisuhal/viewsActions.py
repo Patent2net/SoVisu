@@ -150,7 +150,8 @@ def validate_references(request):
         res = es.search(index=struct + "-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
-        except:
+        except Exception as e:
+            print(e)
             return redirect('unknown')
 
         if request.method == 'POST':
@@ -164,7 +165,9 @@ def validate_references(request):
                     es.update(index=struct + '-' + entity["labHalId"] + "-laboratories-documents", refresh='wait_for',
                               id=docid,
                               body={"doc": {"validated": validate}})
-                except:
+                except Exception as e:
+                    print(struct + '-' + entity["labHalId"] + "-laboratories-documents")
+                    print(e)
                     pass  # doc du chercheur pas dans le labo
 
     if i_type == "lab":
