@@ -1,8 +1,4 @@
 from django import forms
-from django.forms import models
-from elasticsearch import Elasticsearch
-from decouple import config
-from . import viewsActions
 from .libs import esActions
 
 struct = "198307662"  # mesure temporaire, valable tant que seuls les chercheurs UTLN ont le droit de s'inscrire

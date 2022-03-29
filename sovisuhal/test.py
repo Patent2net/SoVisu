@@ -1,16 +1,6 @@
-from django.shortcuts import render, redirect
-from elasticsearch import Elasticsearch, helpers
-from datetime import datetime
-import json
-from . import forms
-from django.views.decorators.clickjacking import xframe_options_exempt
-
-from django.core.mail import mail_admins, send_mail
+from elasticsearch import Elasticsearch
 from decouple import config
-from django.contrib import messages
-# from ssl import create_default_context
-# from elasticsearch.connection import create_ssl_context
-from uniauth.decorators import login_required
+
 
 Mode = config('mode')
 

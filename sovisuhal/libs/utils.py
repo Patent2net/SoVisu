@@ -1,5 +1,4 @@
 from nested_lookup import nested_lookup
-import urllib.request
 import re
 import dateutil.parser
 from datetime import datetime
