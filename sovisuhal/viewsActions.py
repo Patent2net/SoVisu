@@ -5,7 +5,7 @@ from datetime import datetime
 from urllib.request import urlopen
 
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 
 from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs
 from . import settings

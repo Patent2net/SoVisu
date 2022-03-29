@@ -1,13 +1,9 @@
 # import requests
 import re
-from unidecode import unidecode
 import lxml.etree
 from SPARQLWrapper import SPARQLWrapper, JSON
 import requests
 from bs4 import BeautifulSoup
-from sovisuhal.libs import hal
-import time
-
 
 def convert_idhal_to_str(idhal_i):
     res = requests.get('https://aurehal.archives-ouvertes.fr/author/browse?critere=idHal_i:"' + idhal_i + '"')

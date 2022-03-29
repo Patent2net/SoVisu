@@ -1,8 +1,5 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import networkx as nx
-from pprint import pprint
-import matplotlib.pyplot as plt
-
 
 def cycle(liste):
     tempo = []

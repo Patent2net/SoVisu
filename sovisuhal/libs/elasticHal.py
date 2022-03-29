@@ -3,7 +3,7 @@
 from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
 from sovisuhal.libs.libsElastichal import get_aurehal
 from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import helpers
 import json
 import datetime
 
