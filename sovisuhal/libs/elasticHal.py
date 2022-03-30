@@ -53,7 +53,6 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         structid = "198307662"
         ldapid = 'dreymond'
     labo = labhalid
-    connait_lab = labo  # premier labo (au cas où) ???
 
     extrait = dico['dn'].split('uid=')[1].split(',')
     chercheur_type = extrait[1].replace('ou=', '')
@@ -142,6 +141,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
                    body=json.dumps(chercheur))  # ,
     # timestamp=datetime.datetime.now().isoformat()) #pour le suvi modification de ingest plutôt cf. https://kb.objectrocket.com/elasticsearch/how-to-create-a-timestamp-field-for-an-elasticsearch-index-275
     # progress_recorder.set_progress(10, 10)
+    print("statut de la création d'index: ", res['result'])
     return chercheur
 
 

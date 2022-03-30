@@ -312,7 +312,7 @@
                 </div>
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
-                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer delete outline-none whitespace-nowrap">
+                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer expertise_field outline-none whitespace-nowrap">
                         {% if validation == "1" %}
                             Retirer du profil
                         {% endif %}
@@ -1215,7 +1215,7 @@
                 form.submit();
             });
 
-            $('.delete').click(function () {
+            $('.expertise_field').click(function () {
                 toInvalidate = []
                 table2.rows('.selected').data().map(function (row) {
                     toInvalidate.push(row[0])
