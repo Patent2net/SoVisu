@@ -5,11 +5,27 @@ import random
 def find_publications(idhal, field, increment=0):
 
     articles = []
-    flags = 'docid,halId_s,labStructId_i,authIdHal_s,authIdHal_i,doiId_s,authFullName_s,doiId_s,journalIssn_s,' \
+    flags = 'docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,' \
             'publicationDate_tdate,submittedDate_tdate,modifiedDate_tdate,producedDate_tdate,' \
             'fileMain_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,' \
             'version_i,journalDate_s,journalTitle_s,journalPublisher_s,funding_s,' \
-            'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s'
+            'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s,' \
+            'bookTitle_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,' \
+            'conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,' \
+            'isbn_s,' \
+            'publicationDateY_i,' \
+            'defenseDate_tdate,' \
+            'authId_i,' \
+            'country_s, ' \
+            'deptStructCountry_s,' \
+            'labStructCountry_s,' \
+            'location,' \
+            'rgrpInstStructCountry_s,' \
+            'rgrpLabStructCountry_s,' \
+            'rteamStructCountry_s,' \
+            'instStructCountry_s,' \
+            'structCountry_s,' \
+            'structCountry_t'
 
     req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(increment))
 
@@ -20,6 +36,21 @@ def find_publications(idhal, field, increment=0):
             count = data['numFound']
 
             for article in data['docs']:
+                facet_fields_list = ["country_s", "deptStructCountry_s", "labStructCountry_s", "location",
+                                     "rgrpInstStructCountry_s", "rgrpLabStructCountry_s", "rteamStructCountry_s",
+                                     "instStructCountry_s", "structCountry_s", "structCountry_t"]
+                country_list = list()
+                for facet in facet_fields_list:
+                    if facet in article.keys():
+                        if type(article[facet]) == list:
+                            country_list.extend(article[facet])
+                        else:
+                            country_list.append(article[facet])
+
+                country_list = list(set(country_list))
+                country_list_upper = [country.upper() for country in country_list]
+                article["country"] = country_list_upper
+
                 articles.append(article)
             if (count > 30) and (increment < (count)):
                 increment += 30
