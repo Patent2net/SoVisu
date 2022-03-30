@@ -52,7 +52,7 @@ def find_publications(idhal, field, increment=0):
                 article["country"] = country_list_upper
 
                 articles.append(article)
-            if (count > 30) and (increment < (count)):
+            if (count > 30) and (increment < count):
                 increment += 30
                 tmp_articles = find_publications(idhal, field, increment=increment)
                 for tmp_article in tmp_articles:

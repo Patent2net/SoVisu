@@ -1,6 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import networkx as nx
 
+
 def cycle(liste):
     tempo = []
     if len(liste) < 1:
@@ -170,8 +171,6 @@ def explain_domains(dom_uri):
 
     results = sparql.query().convert()
 
-    langues = [truc['o']['xml:lang'] for truc in results['results']['bindings'] if
-               truc['p']['value'] == "http://www.w3.org/2004/02/skos/core#prefLabel"]
     labels = dict()
     labels = [truc['o']['value'] for truc in results['results']['bindings'] if
               truc['p']['value'] == "http://purl.org/dc/elements/1.1/identifier"]
@@ -238,7 +237,6 @@ def get_concepts_and_keywords(aurehalid):
     # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 
-    concept = []
     keywords = []
 
     # extraction des sujets d'intérêt et domaines d'un chercheur
@@ -255,7 +253,6 @@ def get_concepts_and_keywords(aurehalid):
 
             # réseau json hiérarchiques
             #
-            dico_noeuds = dict()
             tree = nx.DiGraph()
 
             tree.add_node('Concepts')

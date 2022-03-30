@@ -130,15 +130,21 @@ def validate_references(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     if int(validation) == 0:
         validate = True
     elif int(validation) == 1:
         validate = False
+    else:
+        return redirect('unknown')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -211,6 +217,8 @@ def validate_guiding_domains(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -263,11 +271,15 @@ def validate_expertise(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     if int(validation) == 0:
         validate = 'validated'
     elif int(validation) == 1:
         validate = 'invalidated'
+    else:
+        return redirect('unknown')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -296,9 +308,9 @@ def validate_expertise(request):
         if request.method == 'POST':
             to_invalidate = request.POST.get("toInvalidate", "").split(",")
 
-            for conceptId in to_invalidate:
+            for conceptid in to_invalidate:
 
-                sid = conceptId.split('.')
+                sid = conceptid.split('.')
                 for children in entity['concepts']['children']:
                     if len(sid) >= 1 and sid[0] == children['id']:
                         lab_tree = utils.append_to_tree(children, entity, lab_tree, validate)
@@ -350,6 +362,8 @@ def validate_credentials(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -406,6 +420,8 @@ def validate_guiding_keywords(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -455,6 +471,8 @@ def validate_research_description(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -516,6 +534,8 @@ def refresh_aurehal_id(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -562,9 +582,8 @@ def force_update_references(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
-
-    if 'validation' in request.GET:
-        validation = request.GET['validation']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -583,8 +602,7 @@ def force_update_references(request):
         collecte_docs(entity)
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation='
-        + validation)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation=1')
 
 
 def update_members(request):
@@ -608,6 +626,8 @@ def update_members(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -655,6 +675,8 @@ def update_authorship(request):
         date_from = request.GET['from']
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -829,7 +851,7 @@ def export_hceres_xls(request):
     else:
         book_df.to_excel(writer, 'OUV', index=False)
     if len(conf_df.index) > 0:
-        if 'page_s' in (conf_df):
+        if 'page_s' in conf_df:
             conf_df[
                 ['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
                  'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
@@ -862,7 +884,6 @@ def export_hceres_xls(request):
 
 
 def idhal_checkout(idhal):
-    confirmation = ""
     # idhal = "luc-quoniam" valeur test
     html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
     response = urlopen(html)
