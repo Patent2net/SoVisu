@@ -78,18 +78,17 @@ def create_credentials(request):
     labo = tempo_lab[0].strip()  # halid
     accro_lab = tempo_lab[1].strip()
     # resultat
-    chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
     idhal_test = idhal_checkout(idhal)
 
     if idhal_test == 0:
-        auth_user = request.user.get_username().lower()
         print("idhal not found")
         return redirect('/create/?ldapid=' + ldapid + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True')
 
     else:
-
         print("idhal found")
+        chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
+
         collecte_docs(chercheur)
 
         # récupération du struct du nouveau profil pour la redirection
