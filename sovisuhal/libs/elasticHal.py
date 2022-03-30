@@ -1,7 +1,6 @@
 # from libs import hal, utils, unpaywall, scanR
 
 from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
-from sovisuhal.libs.libsElastichal import get_aurehal
 from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
 from elasticsearch import helpers
 import json
@@ -26,8 +25,8 @@ except:
 # from celery import shared_task
 # from celery_progress.backend import ProgressRecorder
 
-
-# struct = "198307662"
+from SPARQLWrapper import SPARQLWrapper, JSON
+import requests
 
 
 # @shared_task(bind=True)
@@ -64,10 +63,14 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     mail = dico['attributes']['mail']
     if 'supannAffectation' in dico['attributes'].keys():
         supann_affect = dico['attributes']['supannAffectation']
+    else:
+        supann_affect = []
+
     if 'supannEntiteAffectationPrincipale' in dico['attributes'].keys():
         supann_princ = dico['attributes']['supannEntiteAffectationPrincipale']
     else:
         supann_princ = []
+
     if not len(nom) > 0:
         nom = ['']
     elif not len(emploi) > 0:
@@ -119,6 +122,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     else:
         pass
         # retourne sur check() ?
+
     chercheur["halId_s"] = idhal
     chercheur["validated"] = False
     chercheur["aurehalId"] = aurehal  # heu ?
@@ -309,23 +313,39 @@ def collecte_docs(chercheur):  # self,
     res = helpers.bulk(
         es,
         docs,
-        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur[
-            "ldapId"] + "-documents"
+        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur["ldapId"] + "-documents"
         # -researchers" + row["ldapId"] + "-documents
     )
-    """
-    print("res is stocked in")
-    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] +
-     "-documents")
-
-    res = helpers.bulk(
-        es,
-        docs,
-        index= Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents"
-    )
-    print("res lab is stocked in")
-    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents")
-    """
-    # return docs # pas utile...
 
     return chercheur  # au cas où
+
+
+def get_aurehal(idhal):
+
+    print(idhal)
+
+    sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
+    sparql.setReturnFormat(JSON)
+
+    sparql.setQuery("""
+        select ?p ?o
+        where  {
+        <https://data.archives-ouvertes.fr/author/%s> ?p ?o
+        }""" % idhal)
+    results = sparql.query().convert()
+
+    print(results)
+
+    aurehal = [truc for truc in results['results']['bindings'] if
+               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
+
+    ret_aurehal = -1
+
+    for id in aurehal:
+        print(id['o']['value'])
+        res = requests.get(id['o']['value'])
+
+        if 'Ressource inexistante' not in res.text:
+            ret_aurehal = id['o']['value'].split('/')[-1]
+
+    return ret_aurehal
