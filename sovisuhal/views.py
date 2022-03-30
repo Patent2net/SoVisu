@@ -108,8 +108,10 @@ def check(request):
             res = es.search(index=struct + "-" + entity['halStructId'] + "-laboratories-documents",
                             body=start_date_param)
             start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
-        except :
+        except:
             start_date = "2000"
+    else:
+        return redirect('unknown')
     # /
 
     # Get date parameters
@@ -124,10 +126,12 @@ def check(request):
 
         # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if i_type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
-
-    if i_type == "lab":
+    elif i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
+    else:
+        return redirect('unknown')
 
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
         # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
@@ -313,12 +317,14 @@ def check(request):
                 index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
                 body=ref_param, size=count)
 
-        if i_type == "lab":
+        elif i_type == "lab":
             count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents",
                              body=ref_param)['count']
             references = es.search(
                 index=struct + "-" + entity["halStructId"] + "-laboratories-documents",
                 body=ref_param, size=count)
+        else:
+            return redirect('unknown')
 
         references_cleaned = []
 
@@ -385,16 +391,18 @@ def dashboard(request):
         # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if i_type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
         #  entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
-
-    if i_type == "lab":
+    elif i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+    else:
+        return redirect('unknown')
 
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
+    start_date_param = ''
     if i_type == "rsr":
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         try:
@@ -416,6 +424,8 @@ def dashboard(request):
         filtrechercheur = ''
         filtre_lab_a = 'harvested_from_ids: "' + p_id + '"'
         filtre_lab_b = 'labHalId.keyword: "' + p_id + '"'
+    else:
+        return redirect('unknown')
 
     try:
         start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -534,11 +544,13 @@ def references(request):
             index=struct + "-" + entity["labHalId"] + "-researchers-" + entity['ldapId'] + "-documents",
             body=ref_param, size=count)
 
-    if i_type == "lab":
+    elif i_type == "lab":
         count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)[
             'count']
         references = es.search(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
                                size=count)
+    else:
+        return redirect('unknown')
 
     references_cleaned = []
 
@@ -605,8 +617,10 @@ def terminology(request):
     if i_type == "rsr":
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
-    if i_type == "lab":
+    elif i_type == "lab":
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+    else:
+        return redirect('unknown')
 
     if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
@@ -619,6 +633,8 @@ def terminology(request):
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
+    else:
+        return redirect('unknown')
 
     res = es.search(index=struct + "-*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -745,9 +761,10 @@ def wordcloud(request):
     validate = False
     if i_type == "rsr":
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
-
-    if i_type == "lab":
+    elif i_type == "lab":
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+    else:
+        return redirect('unknown')
 
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
@@ -761,9 +778,10 @@ def wordcloud(request):
         filtrechercheur = '_index: "' + indexsearch + '"'
 
     elif i_type == "lab":
-
         start_date_param = esActions.date_p(field, entity['halStructId'])
         filtrechercheur = ''
+    else:
+        return redirect('unknown')
 
     res = es.search(index=struct + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -828,6 +846,8 @@ def tools(request):
     if i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+    else:
+        return redirect('unknown')
 
     if es.count(index="*-documents", body=hastoconfirm_param)['count'] > 0:  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
@@ -1151,6 +1171,8 @@ def get_scope_data(i_type, p_id):
         key = "halStructId"
         search_id = p_id
         index_pattern = "-laboratories"
+    else:
+        return redirect('unknown')
 
     ext_key = "harvested_from_ids"
 
