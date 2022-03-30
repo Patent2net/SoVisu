@@ -120,6 +120,7 @@ def validate_references(request):
         i_type = request.GET['type']
     else:
         return redirect('unknown')
+
     if 'id' in request.GET and 'validation' in request.GET:
         p_id = request.GET['id']
         validation = request.GET['validation']
@@ -133,6 +134,8 @@ def validate_references(request):
 
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
 
     if 'to' in request.GET:
         date_to = request.GET['to']
@@ -213,8 +216,12 @@ def validate_guiding_domains(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -258,17 +265,23 @@ def validate_expertise(request):
         i_type = request.GET['type']
     else:
         return redirect('unknown')
+
     if 'id' in request.GET and 'validation' in request.GET:
         p_id = request.GET['id']
         validation = request.GET['validation']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -358,8 +371,12 @@ def validate_credentials(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -412,12 +429,17 @@ def validate_guiding_keywords(request):
     else:
         return redirect('unknown')
 
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -467,8 +489,12 @@ def validate_research_description(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -526,12 +552,17 @@ def refresh_aurehal_id(request):
         p_id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -580,6 +611,9 @@ def force_update_references(request):
 
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -622,8 +656,12 @@ def update_members(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
@@ -671,8 +709,12 @@ def update_authorship(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
     else:
