@@ -1,5 +1,5 @@
 # from libs import hal, utils, unpaywall, scanR
-
+from django.shortcuts import redirect
 from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
 from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
 from elasticsearch import helpers
@@ -119,8 +119,8 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         aurehal = get_aurehal(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else:
-        pass
+    else: # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
+        return redirect('unknown')
         # retourne sur check() ?
 
     chercheur["halId_s"] = idhal
