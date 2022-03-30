@@ -7,9 +7,9 @@ from urllib.request import urlopen
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs
+from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs, get_aurehal
 from . import settings
-from .libs import utils, libsElastichal, esActions
+from .libs import utils, esActions
 
 from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
 
@@ -579,7 +579,7 @@ def refresh_aurehal_id(request):
     except:
         return redirect('unknown')
 
-    aurehal_id = libsElastichal.get_aurehal(entity['halId_s'])
+    aurehal_id = get_aurehal(entity['halId_s'])
     concepts = []
     if aurehal_id != -1:
         archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)
