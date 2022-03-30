@@ -58,8 +58,9 @@ def admin_access_login(request):
                 res = es.search(index="*-researchers", body=scope_param, size=count)
                 entity = res['hits']['hits'][0]['_source']
                 struct = entity['structSirene']
+                date_to = datetime.today().strftime('%Y-%m-%d')
                 return redirect(
-                    'check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to=now&data=credentials')
+                    'check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to='+date_to+'&data=credentials')
             else:
                 return redirect('create/?ldapid=' + auth_user + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
@@ -101,9 +102,9 @@ def create_credentials(request):
         struct = entity['structSirene']
         # /
         # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-
+        date_to = datetime.today().strftime('%Y-%m-%d')
         return redirect(
-            '/check/?struct=' + struct + '&type=rsr&id=' + ldapid + '&orcId=' + orcid + '&from=1990-01-01&to=now&data=credentials')
+            '/check/?struct=' + struct + '&type=rsr&id=' + ldapid + '&orcId=' + orcid + '&from=1990-01-01&to='+date_to+'&data=credentials')
 
 
 # Redirects
