@@ -247,7 +247,7 @@ def get_concepts_and_keywords(aurehalid):
 
     print(sujets, domaines)
     try:
-
+        tree = ''
         for dom in domaines:
             domains.append(explain_domains(dom))
 
@@ -300,6 +300,6 @@ def get_concepts_and_keywords(aurehalid):
         concepts_and_keywords = {'concepts': concepts, 'keywords': keywords}
         return concepts_and_keywords
 
-    except FileNotFoundError:
+    except:
         concepts_and_keywords = {'concepts': [], 'keywords': []}
         return concepts_and_keywords
