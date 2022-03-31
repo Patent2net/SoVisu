@@ -106,7 +106,6 @@ def calculate_mds(doc):
 
 
 def append_to_tree(scope, rsr, tree, state):
-
     rsr_data = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
     rsr_id = rsr['ldapId']
 
@@ -116,10 +115,10 @@ def append_to_tree(scope, rsr, tree, state):
     print(scope)
 
     scope_data = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
-                 'children': [],
-                 'researchers': [
-                     rsr_data
-                 ]}
+                  'children': [],
+                  'researchers': [
+                      rsr_data
+                  ]}
 
     if len(sid) == 1:
         exists = False

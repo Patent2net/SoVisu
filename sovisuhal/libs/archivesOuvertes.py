@@ -258,15 +258,15 @@ def get_concepts_and_keywords(aurehalid):
             tree.add_node('Concepts')
             domains = [list(filter(lambda x: x != None, truc)) for truc in domains]
 
-            for dom in domains:
-                tree.add_node(dom[0][0])
-                tree.add_edge('Concepts', dom[0][0])
-                if len(dom) > 1:
-                    tree.add_node(dom[1][0])
-                    tree.add_edge(dom[0][0], dom[1][0])
-                if len(dom) > 2:
-                    tree.add_node(dom[2][0])
-                    tree.add_edge(dom[1][0], dom[2][0])
+            for dom1 in domains:
+                tree.add_node(dom1[0][0])
+                tree.add_edge('Concepts', dom1[0][0])
+                if len(dom1) > 1:
+                    tree.add_node(dom1[1][0])
+                    tree.add_edge(dom1[0][0], dom1[1][0])
+                if len(dom1) > 2:
+                    tree.add_node(dom1[2][0])
+                    tree.add_edge(dom1[1][0], dom1[2][0])
 
         concepts = nx.tree_data(tree, "Concepts")
         # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
