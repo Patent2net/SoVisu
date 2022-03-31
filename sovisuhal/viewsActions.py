@@ -429,7 +429,6 @@ def validate_guiding_keywords(request):
     else:
         return redirect('unknown')
 
-
     if 'data' in request.GET:
         data = request.GET['data']
     else:

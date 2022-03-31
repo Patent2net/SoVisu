@@ -17,22 +17,22 @@ def should_be_open(doc):
                 return 1
             if doc['journalSherpaPostPrint_s'] == 'restricted':
                 matches = re.finditer('(\S+\s+){2}(?=embargo)', doc['journalSherpaPostRest_s'].replace('[', ' '))
-                max = 0
+                maxi = 0
 
                 for m in matches:
 
                     c = m.group().split(' ')[0]
                     if c.isnumeric():
                         # check if sometimes there is year but atm, nope
-                        if int(c) > max:
-                            max = int(c)
+                        if int(c) > maxi:
+                            maxi = int(c)
 
                 p_date = dateutil.parser.parse(doc['publicationDate_tdate']).replace(tzinfo=None)
                 curr_date = datetime.now()
                 diff = relativedelta(curr_date, p_date)
 
                 diff_months = diff.years * 12 + diff.months
-                if diff_months > max:
+                if diff_months > maxi:
                     return 1
                 else:
                     return -1

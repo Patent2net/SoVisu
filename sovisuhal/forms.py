@@ -103,13 +103,13 @@ class SetGuidingKeywords(forms.Form):
 
         super(SetGuidingKeywords, self).__init__(*args, **kwargs)
 
-        str = ""
+        str_value = ""
         for keyword in guiding_keywords:
-            str += keyword + ";"
+            str_value += keyword + ";"
 
-        if len(str) > 0:
-            str = str[:-1]
-        self.fields['f_guidingKeywords'].initial = str
+        if len(str_value) > 0:
+            str_value = str_value[:-1]
+        self.fields['f_guidingKeywords'].initial = str_value
 
     # Set choices to an empty list as it is a required argument.
     f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(
