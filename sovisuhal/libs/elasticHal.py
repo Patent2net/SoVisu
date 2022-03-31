@@ -119,7 +119,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         aurehal = get_aurehal(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else: # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
+    else:  # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
         return redirect('unknown')
         # retourne sur check() ?
 
@@ -149,7 +149,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     return chercheur
 
 
-def propage_concepts(struct_sirene, ldapid, labo_accro, labhalid):
+def propage_concepts(labhalid):
     # for row in csv_reader:
     row = dict()
     # print(row['acronym'])
@@ -341,11 +341,11 @@ def get_aurehal(idhal):
 
     ret_aurehal = -1
 
-    for id in aurehal:
-        print(id['o']['value'])
-        res = requests.get(id['o']['value'])
+    for a_id in aurehal:
+        print(a_id['o']['value'])
+        res = requests.get(a_id['o']['value'])
 
         if 'Ressource inexistante' not in res.text:
-            ret_aurehal = id['o']['value'].split('/')[-1]
+            ret_aurehal = a_id['o']['value'].split('/')[-1]
 
     return ret_aurehal

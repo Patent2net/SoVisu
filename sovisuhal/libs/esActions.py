@@ -119,9 +119,9 @@ def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, 
 # Use that base code in other files to use ref_p_filter function: variable_name = esActions.ref_p_filter(filter,
 # scope_bool_type, ext_key, entity[key], validate, date_range_type, dateFrom, dateTo)
 
-def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
+def ref_p_filter(p_filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
                  scope_date_to):
-    if filter == "uncomplete":
+    if p_filter == "uncomplete":
         ref_param = {
             "query": {
                 "bool": {
@@ -171,7 +171,7 @@ def ref_p_filter(filter, scope_bool_type, scope_field, scope_value, validate, da
             }
         }
 
-    elif filter == "complete":
+    elif p_filter == "complete":
         ref_param = {
             "query": {
                 "bool": {

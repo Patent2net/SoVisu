@@ -377,7 +377,7 @@ def dashboard(request):
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res['hits']['hits'][0]['_source']
-    except :
+    except:
         return redirect('unknown')
     # /
 

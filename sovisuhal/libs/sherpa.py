@@ -1,5 +1,6 @@
 import requests
 
+
 def get_embargo_duration(journal):
 
     api_key = "6569EC86-7B55-11EB-8F47-961C3DE2659A"
