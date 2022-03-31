@@ -46,7 +46,7 @@ def check(request):
     es = esActions.es_connector()
 
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -347,7 +347,7 @@ def check(request):
 def dashboard(request):
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -452,7 +452,7 @@ def dashboard(request):
 def references(request):
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -570,7 +570,7 @@ def references(request):
 def terminology(request):
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -719,7 +719,7 @@ def terminology(request):
 def wordcloud(request):
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -804,7 +804,7 @@ def tools(request):
     start_time = datetime.now()
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
