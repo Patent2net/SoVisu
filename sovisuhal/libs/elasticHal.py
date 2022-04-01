@@ -1,7 +1,6 @@
 # from libs import hal, utils, unpaywall, scanR
-
+from django.shortcuts import redirect
 from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
-from sovisuhal.libs.libsElastichal import get_aurehal
 from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
 from elasticsearch import helpers
 import json
@@ -26,8 +25,8 @@ except:
 # from celery import shared_task
 # from celery_progress.backend import ProgressRecorder
 
-
-# struct = "198307662"
+from SPARQLWrapper import SPARQLWrapper, JSON
+import requests
 
 
 # @shared_task(bind=True)
@@ -53,7 +52,6 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         structid = "198307662"
         ldapid = 'dreymond'
     labo = labhalid
-    connait_lab = labo  # premier labo (au cas où) ???
 
     extrait = dico['dn'].split('uid=')[1].split(',')
     chercheur_type = extrait[1].replace('ou=', '')
@@ -65,10 +63,14 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     mail = dico['attributes']['mail']
     if 'supannAffectation' in dico['attributes'].keys():
         supann_affect = dico['attributes']['supannAffectation']
+    else:
+        supann_affect = []
+
     if 'supannEntiteAffectationPrincipale' in dico['attributes'].keys():
         supann_princ = dico['attributes']['supannEntiteAffectationPrincipale']
     else:
         supann_princ = []
+
     if not len(nom) > 0:
         nom = ['']
     elif not len(emploi) > 0:
@@ -117,9 +119,10 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         aurehal = get_aurehal(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else:
-        pass
+    else:  # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
+        return redirect('unknown')
         # retourne sur check() ?
+
     chercheur["halId_s"] = idhal
     chercheur["validated"] = False
     chercheur["aurehalId"] = aurehal  # heu ?
@@ -142,65 +145,8 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
                    body=json.dumps(chercheur))  # ,
     # timestamp=datetime.datetime.now().isoformat()) #pour le suvi modification de ingest plutôt cf. https://kb.objectrocket.com/elasticsearch/how-to-create-a-timestamp-field-for-an-elasticsearch-index-275
     # progress_recorder.set_progress(10, 10)
+    print("statut de la création d'index: ", res['result'])
     return chercheur
-
-
-def propage_concepts(struct_sirene, ldapid, labo_accro, labhalid):
-    # for row in csv_reader:
-    row = dict()
-    # print(row['acronym'])
-    es = esActions.es_connector(mode)
-    field = "labHalId"
-    rsr_param = esActions.scope_p(field, labhalid)
-
-    res = es.search(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers", body=rsr_param)
-    # tous ces champs (lignes qui suit) sont là (ligne précédente à adapter) ou dans structSirene + "-" +labHalId +
-    # "-" + ldapId +"-researchers" ? structSirene, ldapId, name, type, function, mail, lab, supannAffectation,
-    # supannEntiteAffectationPrincipale, halId_s, labHalId, idRef, structDomain, firstName, lastName, aurehalId
-
-    # car il faudrait que l'update ne (cf. ligne 196)
-    # après le reste devrait rouler même si je ne comprends pas pourquoi ce matin
-    # j'ai dû modifier views pour cause de l'abscence de state dans la boucle équivalent pour l'affichage 'labo' ?
-    row['guidingKeywords'] = []
-
-    # Build laboratory skills
-    tree = {'id': 'Concepts', 'children': []}
-
-    for rsr in res['hits']['hits']:
-
-        concept = rsr['_source']['concepts']
-
-        if len(concept) > 0:
-
-            for child in concept['children']:
-
-                if child['state'] == 'invalidated':
-                    tree = utils.append_to_tree(child, rsr['_source'], tree, 'invalidated')
-                else:
-                    tree = utils.append_to_tree(child, rsr['_source'], tree)
-                if 'children' in child:
-                    for child1 in child['children']:
-
-                        if child1['state'] == 'invalidated':
-                            tree = utils.append_to_tree(child1, rsr['_source'], tree, 'invalidated')
-                        else:
-                            tree = utils.append_to_tree(child1, rsr['_source'], tree)
-
-                        if 'children' in child1:
-                            for child2 in child1['children']:
-
-                                if child2['state'] == 'invalidated':
-                                    tree = utils.append_to_tree(child2, rsr['_source'], tree, 'invalidated')
-                                else:
-                                    tree = utils.append_to_tree(child2, rsr['_source'], tree)
-
-    row['concepts'] = tree
-    row["Created"] = datetime.datetime.now().isoformat()
-    # Insert laboratory data
-    # est-ce qu'update est destructeur ?
-    res = es.index(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories", id=row['halStructId'],
-                   body=json.dumps(row))
-    # timestamp=datetime.datetime.now().isoformat())
 
 
 # @shared_task(bind=True)
@@ -309,23 +255,39 @@ def collecte_docs(chercheur):  # self,
     res = helpers.bulk(
         es,
         docs,
-        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur[
-            "ldapId"] + "-documents"
+        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur["ldapId"] + "-documents"
         # -researchers" + row["ldapId"] + "-documents
     )
-    """
-    print("res is stocked in")
-    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] +
-     "-documents")
-
-    res = helpers.bulk(
-        es,
-        docs,
-        index= Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents"
-    )
-    print("res lab is stocked in")
-    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents")
-    """
-    # return docs # pas utile...
 
     return chercheur  # au cas où
+
+
+def get_aurehal(idhal):
+
+    print(idhal)
+
+    sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
+    sparql.setReturnFormat(JSON)
+
+    sparql.setQuery("""
+        select ?p ?o
+        where  {
+        <https://data.archives-ouvertes.fr/author/%s> ?p ?o
+        }""" % idhal)
+    results = sparql.query().convert()
+
+    print(results)
+
+    aurehal = [truc for truc in results['results']['bindings'] if
+               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
+
+    ret_aurehal = -1
+
+    for a_id in aurehal:
+        print(a_id['o']['value'])
+        res = requests.get(a_id['o']['value'])
+
+        if 'Ressource inexistante' not in res.text:
+            ret_aurehal = a_id['o']['value'].split('/')[-1]
+
+    return ret_aurehal

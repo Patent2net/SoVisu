@@ -1,5 +1,6 @@
 import requests
 
+
 def get_embargo_duration(journal):
 
     api_key = "6569EC86-7B55-11EB-8F47-961C3DE2659A"
@@ -16,11 +17,11 @@ def get_embargo_duration(journal):
 
     publisher_policy = journal_r.json()['items'][0]['publisher_policy'][0]['permitted_oa']
 
-    type = 'published'
+    p_type = 'published'
 
     for version in publisher_policy:
         for lang in version['article_version_phrases']:
-            if lang['value'] == type and lang['language'] == 'en':
+            if lang['value'] == p_type and lang['language'] == 'en':
                 if 'embargo' in version:
                     embargo_duration = version['embargo']
 

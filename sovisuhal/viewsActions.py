@@ -7,9 +7,9 @@ from urllib.request import urlopen
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs
+from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs, get_aurehal
 from . import settings
-from .libs import utils, libsElastichal, esActions
+from .libs import utils, esActions
 
 from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
 
@@ -58,8 +58,9 @@ def admin_access_login(request):
                 res = es.search(index="*-researchers", body=scope_param, size=count)
                 entity = res['hits']['hits'][0]['_source']
                 struct = entity['structSirene']
+                date_to = datetime.today().strftime('%Y-%m-%d')
                 return redirect(
-                    'check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to=now&data=credentials')
+                    'check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to='+date_to+'&data=credentials')
             else:
                 return redirect('create/?ldapid=' + auth_user + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
 
@@ -78,18 +79,17 @@ def create_credentials(request):
     labo = tempo_lab[0].strip()  # halid
     accro_lab = tempo_lab[1].strip()
     # resultat
-    chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
     idhal_test = idhal_checkout(idhal)
 
     if idhal_test == 0:
-        auth_user = request.user.get_username().lower()
         print("idhal not found")
         return redirect('/create/?ldapid=' + ldapid + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True')
 
     else:
-
         print("idhal found")
+        chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
+
         collecte_docs(chercheur)
 
         # récupération du struct du nouveau profil pour la redirection
@@ -102,9 +102,9 @@ def create_credentials(request):
         struct = entity['structSirene']
         # /
         # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-
+        date_to = datetime.today().strftime('%Y-%m-%d')
         return redirect(
-            '/check/?struct=' + struct + '&type=rsr&id=' + ldapid + '&orcId=' + orcid + '&from=1990-01-01&to=now&data=credentials')
+            '/check/?struct=' + struct + '&type=rsr&id=' + ldapid + '&orcId=' + orcid + '&from=1990-01-01&to='+date_to+'&data=credentials')
 
 
 # Redirects
@@ -120,6 +120,7 @@ def validate_references(request):
         i_type = request.GET['type']
     else:
         return redirect('unknown')
+
     if 'id' in request.GET and 'validation' in request.GET:
         p_id = request.GET['id']
         validation = request.GET['validation']
@@ -130,15 +131,23 @@ def validate_references(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     if int(validation) == 0:
         validate = True
     elif int(validation) == 1:
         validate = False
+    else:
+        return redirect('unknown')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -207,10 +216,16 @@ def validate_guiding_domains(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -250,24 +265,34 @@ def validate_expertise(request):
         i_type = request.GET['type']
     else:
         return redirect('unknown')
+
     if 'id' in request.GET and 'validation' in request.GET:
         p_id = request.GET['id']
         validation = request.GET['validation']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     if int(validation) == 0:
         validate = 'validated'
     elif int(validation) == 1:
         validate = 'invalidated'
+    else:
+        return redirect('unknown')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -296,9 +321,9 @@ def validate_expertise(request):
         if request.method == 'POST':
             to_invalidate = request.POST.get("toInvalidate", "").split(",")
 
-            for conceptId in to_invalidate:
+            for conceptid in to_invalidate:
 
-                sid = conceptId.split('.')
+                sid = conceptid.split('.')
                 for children in entity['concepts']['children']:
                     if len(sid) >= 1 and sid[0] == children['id']:
                         lab_tree = utils.append_to_tree(children, entity, lab_tree, validate)
@@ -346,10 +371,16 @@ def validate_credentials(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -402,10 +433,16 @@ def validate_guiding_keywords(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -451,10 +488,16 @@ def validate_research_description(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -508,14 +551,21 @@ def refresh_aurehal_id(request):
         p_id = request.GET['id']
     else:
         return redirect('unknown')
+
     if 'data' in request.GET:
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -528,7 +578,7 @@ def refresh_aurehal_id(request):
     except:
         return redirect('unknown')
 
-    aurehal_id = libsElastichal.get_aurehal(entity['halId_s'])
+    aurehal_id = get_aurehal(entity['halId_s'])
     concepts = []
     if aurehal_id != -1:
         archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)
@@ -560,11 +610,13 @@ def force_update_references(request):
 
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
-
-    if 'validation' in request.GET:
-        validation = request.GET['validation']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -583,8 +635,7 @@ def force_update_references(request):
         collecte_docs(entity)
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation='
-        + validation)
+        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation=1')
 
 
 def update_members(request):
@@ -604,10 +655,16 @@ def update_members(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -651,10 +708,16 @@ def update_authorship(request):
         data = request.GET['data']
     else:
         data = -1
+
     if 'from' in request.GET:
         date_from = request.GET['from']
+    else:
+        date_from = '2000-01-01'
+
     if 'to' in request.GET:
         date_to = request.GET['to']
+    else:
+        date_to = datetime.today().strftime('%Y-%m-%d')
 
     # Connect to DB
     es = esActions.es_connector()
@@ -829,7 +892,7 @@ def export_hceres_xls(request):
     else:
         book_df.to_excel(writer, 'OUV', index=False)
     if len(conf_df.index) > 0:
-        if 'page_s' in (conf_df):
+        if 'page_s' in conf_df:
             conf_df[
                 ['authfullName_s', 'title_s', 'journalTitle_s', 'volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s',
                  'team', 'conferenceTitle_s', 'conferenceDate_s', 'hasPhDCandidate', 'hasAuthorship',
@@ -862,7 +925,6 @@ def export_hceres_xls(request):
 
 
 def idhal_checkout(idhal):
-    confirmation = ""
     # idhal = "luc-quoniam" valeur test
     html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
     response = urlopen(html)
