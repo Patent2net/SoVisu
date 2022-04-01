@@ -301,6 +301,7 @@ def check(request):
                 return redirect('unknown')
         else:
             return redirect('unknown')
+
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
         ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, date_from, date_to)
@@ -781,6 +782,87 @@ def wordcloud(request):
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
+
+def document_location(request):
+    # Get parameters
+    if 'struct' in request.GET:
+        struct = request.GET['struct']
+    else:
+        struct = -1
+
+    if 'ldapid' in request.GET:
+        ldapid = request.GET['ldapid']
+    else:
+        ldapid = None
+
+    if 'type' in request.GET and 'id' in request.GET:  # réutilisation de l'ancien système
+        i_type = request.GET['type']
+        p_id = request.GET['id']
+
+    elif request.user.is_authenticated:
+        basereverse = 'wordcloud'
+        return default_checker(request, basereverse)
+
+    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+        return redirect('unknown')
+    # /
+    # Connect to DB
+    es = esActions.es_connector()
+
+    # Get scope data
+    # l'ext_key n'est pas utilisé dans cette fonction
+    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
+    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    # on pointe sur index générique, car pas de LabHalId ?
+
+    try:
+        entity = res['hits']['hits'][0]['_source']
+    except:
+        return redirect('unknown')
+    # /
+
+    hastoconfirm = False
+
+    field = "harvested_from_ids"
+    validate = False
+    if i_type == "rsr":
+        hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
+
+    if i_type == "lab":
+        hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
+
+    if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
+        hastoconfirm = True
+
+    # Get first submittedDate_tdate date
+    field = "harvested_from_ids"
+
+    if i_type == "rsr":
+        start_date_param = esActions.date_p(field, entity['halId_s'])
+        indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
+        filtrechercheur = '_index: "' + indexsearch + '"'
+
+    elif i_type == "lab":
+
+        start_date_param = esActions.date_p(field, entity['halStructId'])
+        filtrechercheur = ''
+
+    res = es.search(index=struct + "*-documents", body=start_date_param)
+    start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
+    # /
+
+    # Get date parameters
+    date_from, date_to = get_date(request, start_date)
+    # /
+
+    return render(request, 'document_localisation.html',
+                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
+                   'entity': entity,
+                   'hasToConfirm': hastoconfirm,
+                   'filterRsr': filtrechercheur,
+                   'startDate': start_date,
+                   'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 def tools(request):
     start_time = datetime.now()
