@@ -158,12 +158,12 @@ def sort_references(articles, halstructid):
             tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
             if 'conferenceEndDate_tdate' in article:
                 tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
-                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[
-                    2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
             else:
                 article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
         else:
             if 'conferenceEndDate_tdate' in article:
+                tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
                 article["conferenceDate_s"] = tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
 
         if "defenseDate_tdate" in article:

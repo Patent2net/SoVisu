@@ -1,6 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import networkx as nx
 
+
 def cycle(liste):
     tempo = []
     if len(liste) < 1:
@@ -170,8 +171,6 @@ def explain_domains(dom_uri):
 
     results = sparql.query().convert()
 
-    langues = [truc['o']['xml:lang'] for truc in results['results']['bindings'] if
-               truc['p']['value'] == "http://www.w3.org/2004/02/skos/core#prefLabel"]
     labels = dict()
     labels = [truc['o']['value'] for truc in results['results']['bindings'] if
               truc['p']['value'] == "http://purl.org/dc/elements/1.1/identifier"]
@@ -238,7 +237,6 @@ def get_concepts_and_keywords(aurehalid):
     # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 
-    concept = []
     keywords = []
 
     # extraction des sujets d'intérêt et domaines d'un chercheur
@@ -249,27 +247,26 @@ def get_concepts_and_keywords(aurehalid):
 
     print(sujets, domaines)
     try:
-
+        tree = ''
         for dom in domaines:
             domains.append(explain_domains(dom))
 
             # réseau json hiérarchiques
             #
-            dico_noeuds = dict()
             tree = nx.DiGraph()
 
             tree.add_node('Concepts')
             domains = [list(filter(lambda x: x != None, truc)) for truc in domains]
 
-            for dom in domains:
-                tree.add_node(dom[0][0])
-                tree.add_edge('Concepts', dom[0][0])
-                if len(dom) > 1:
-                    tree.add_node(dom[1][0])
-                    tree.add_edge(dom[0][0], dom[1][0])
-                if len(dom) > 2:
-                    tree.add_node(dom[2][0])
-                    tree.add_edge(dom[1][0], dom[2][0])
+            for dom1 in domains:
+                tree.add_node(dom1[0][0])
+                tree.add_edge('Concepts', dom1[0][0])
+                if len(dom1) > 1:
+                    tree.add_node(dom1[1][0])
+                    tree.add_edge(dom1[0][0], dom1[1][0])
+                if len(dom1) > 2:
+                    tree.add_node(dom1[2][0])
+                    tree.add_edge(dom1[1][0], dom1[2][0])
 
         concepts = nx.tree_data(tree, "Concepts")
         # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
@@ -303,6 +300,6 @@ def get_concepts_and_keywords(aurehalid):
         concepts_and_keywords = {'concepts': concepts, 'keywords': keywords}
         return concepts_and_keywords
 
-    except FileNotFoundError:
+    except:
         concepts_and_keywords = {'concepts': [], 'keywords': []}
         return concepts_and_keywords

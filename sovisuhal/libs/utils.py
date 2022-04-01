@@ -17,22 +17,22 @@ def should_be_open(doc):
                 return 1
             if doc['journalSherpaPostPrint_s'] == 'restricted':
                 matches = re.finditer('(\S+\s+){2}(?=embargo)', doc['journalSherpaPostRest_s'].replace('[', ' '))
-                max = 0
+                maxi = 0
 
                 for m in matches:
 
                     c = m.group().split(' ')[0]
                     if c.isnumeric():
                         # check if sometimes there is year but atm, nope
-                        if int(c) > max:
-                            max = int(c)
+                        if int(c) > maxi:
+                            maxi = int(c)
 
                 p_date = dateutil.parser.parse(doc['publicationDate_tdate']).replace(tzinfo=None)
                 curr_date = datetime.now()
                 diff = relativedelta(curr_date, p_date)
 
                 diff_months = diff.years * 12 + diff.months
-                if diff_months > max:
+                if diff_months > maxi:
                     return 1
                 else:
                     return -1
@@ -106,7 +106,6 @@ def calculate_mds(doc):
 
 
 def append_to_tree(scope, rsr, tree, state):
-
     rsr_data = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
     rsr_id = rsr['ldapId']
 
@@ -116,10 +115,10 @@ def append_to_tree(scope, rsr, tree, state):
     print(scope)
 
     scope_data = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
-                 'children': [],
-                 'researchers': [
-                     rsr_data
-                 ]}
+                  'children': [],
+                  'researchers': [
+                      rsr_data
+                  ]}
 
     if len(sid) == 1:
         exists = False
