@@ -32,6 +32,7 @@ urlpatterns = [
     path('references/', views.references, name='references'),
     path('terminology/', views.terminology, name='terminology'),
     path('wordcloud/', views.wordcloud, name='wordcloud'),
+    path('document_localisation/', views.document_location, name='document_localisation'),
 
     path('tools/', views.tools, name='tools'),
 
