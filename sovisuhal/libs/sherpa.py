@@ -9,10 +9,6 @@ def get_embargo_duration(journal):
     journal_r = requests.get(endpoint + '&item-type=publication&format=Json&filter=[["title","equals","' + journal + '"]]')
     journal_id = journal_r.json()['items'][0]['id']
 
-    publisher_id = journal_r.json()['items'][0]['publishers'][0]['publisher']['id']
-
-    publisher_r = requests.get(endpoint + '&item-type=publisher_policy&format=Json&filter=[["id","equals","' + str(journal_id) + '"]]')
-
     print(endpoint + '&item-type=publisher_policy&format=Json&filter=[["id","equals","' + str(journal_id) + '"]]')
 
     publisher_policy = journal_r.json()['items'][0]['publisher_policy'][0]['permitted_oa']
