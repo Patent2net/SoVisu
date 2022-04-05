@@ -123,14 +123,13 @@ def append_to_tree(scope, rsr, tree, state):
     if len(sid) == 1:
         exists = False
         for child in tree['children']:
-            if sid[0] == child['id']:
-                if 'researchers' in child:
-                    for rsr in child['researchers']:
-                        rsrexists = False
-                        if rsr['ldapId'] == rsr_id:
-                            rsr['state'] = state
-                            rsrexists = True
-                if not rsrexists:
+            if sid[0] == child['id'] and 'researchers' in child:
+                for rsr in child['researchers']:
+                    rsr_exists = False
+                    if rsr['ldapId'] == rsr_id:
+                        rsr['state'] = state
+                        rsr_exists = True
+                if not rsr_exists:
                     child['researchers'].append(rsr_data)
                 exists = True
         if not exists:
@@ -141,14 +140,13 @@ def append_to_tree(scope, rsr, tree, state):
         for child in tree['children']:
             if sid[0] == child['id'] and 'children' in child:
                 for child1 in child['children']:
-                    if sid[0] + '.' + sid[1] == child1['id']:
-                        if 'researchers' in child1:
-                            for rsr in child1['researchers']:
-                                rsrexists = False
-                                if rsr['ldapId'] == rsr_id:
-                                    rsr['state'] = state
-                                    rsrexists = True
-                        if not rsrexists:
+                    if sid[0] + '.' + sid[1] == child1['id'] and 'researchers' in child1:
+                        for rsr in child1['researchers']:
+                            rsr_exists = False
+                            if rsr['ldapId'] == rsr_id:
+                                rsr['state'] = state
+                                rsr_exists = True
+                        if not rsr_exists:
                             child1['researchers'].append(rsr_data)
                         exists = True
 
@@ -167,11 +165,11 @@ def append_to_tree(scope, rsr, tree, state):
                             if sid[0] + '.' + sid[1] + '.' + sid[2] == child2['id']:
                                 if 'researchers' in child2:
                                     for rsr in child2['researchers']:
-                                        rsrexists = False
+                                        rsr_exists = False
                                         if rsr['ldapId'] == rsr_id:
                                             rsr['state'] = state
-                                            rsrexists = True
-                                if not rsrexists:
+                                            rsr_exists = True
+                                if not rsr_exists:
                                     child2['researchers'].append(rsr_data)
                                 exists = True
 
