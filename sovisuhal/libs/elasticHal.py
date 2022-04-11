@@ -1,9 +1,8 @@
 # from libs import hal, utils, unpaywall, scanR
-
-from sovisuhal.libs.archivesOuvertes import getConceptsAndKeywords
-from sovisuhal.libs.libsElastichal import getAureHal
+from django.shortcuts import redirect
+from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
 from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import helpers
 import json
 import datetime
 
@@ -26,12 +25,12 @@ except:
 # from celery import shared_task
 # from celery_progress.backend import ProgressRecorder
 
-
-# struct = "198307662"
+from SPARQLWrapper import SPARQLWrapper, JSON
+import requests
 
 
 # @shared_task(bind=True)
-def indexe_chercheur(ldapId, laboAccro, labHalId, idhal, idRef, orcId):  # self,
+def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     es = esActions.es_connector()
     #   progress_recorder = ProgressRecorder(self)
     #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
@@ -39,94 +38,98 @@ def indexe_chercheur(ldapId, laboAccro, labHalId, idhal, idRef, orcId):  # self,
         server = Server('ldap.univ-tln.fr', get_info=ALL)
         conn = Connection(server, 'cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr', config('ldappass'),
                           auto_bind=True)  # recup des données ldap
-        conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid=' + ldapId + '))',
+        conn.search('dc=ldap-univ-tln,dc=fr', '(&(uid=' + ldapid + '))',
                     attributes=['displayName', 'mail', 'typeEmploi', 'ustvstatus', 'supannaffectation',
                                 'supanncodeentite', 'supannEntiteAffectationPrincipale', 'labo'])
         dico = json.loads(conn.response_to_json())['entries'][0]
-        structId = config("structId")
+        structid = config("structId")
     else:
         dico = {'attributes': {'displayName': 'REYMOND David', 'labo': [], 'mail': ['david.reymond@univ-tln.fr'],
                                'supannAffectation': ['IMSIC', 'IUT TC'], 'supannEntiteAffectationPrincipale': 'IUTTCO',
                                'supanncodeentite': [], 'typeEmploi': 'Enseignant Chercheur Titulaire',
                                'ustvStatus': ['OFFI']},
                 'dn': 'uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr'}
-        structId = "198307662"
-        ldapId = 'dreymond'
-    labo = labHalId
-    connaitLab = labo  # premier labo (au cas où) ???
+        structid = "198307662"
+        ldapid = 'dreymond'
+    labo = labhalid
 
     extrait = dico['dn'].split('uid=')[1].split(',')
-    typeGus = extrait[1].replace('ou=', '')
-    suppanId = extrait[0]
-    if suppanId != ldapId:
-        print("aille", ldapId, ' --> ', ldapId)
+    chercheur_type = extrait[1].replace('ou=', '')
+    suppan_id = extrait[0]
+    if suppan_id != ldapid:
+        print("aille", ldapid, ' --> ', ldapid)
     nom = dico['attributes']['displayName']
-    Emploi = dico['attributes']['typeEmploi']
+    emploi = dico['attributes']['typeEmploi']
     mail = dico['attributes']['mail']
     if 'supannAffectation' in dico['attributes'].keys():
-        supannAffect = dico['attributes']['supannAffectation']
-    if 'supannEntiteAffectationPrincipale' in dico['attributes'].keys():
-        supannPrinc = dico['attributes']['supannEntiteAffectationPrincipale']
+        supann_affect = dico['attributes']['supannAffectation']
     else:
-        supannPrinc = []
+        supann_affect = []
+
+    if 'supannEntiteAffectationPrincipale' in dico['attributes'].keys():
+        supann_princ = dico['attributes']['supannEntiteAffectationPrincipale']
+    else:
+        supann_princ = []
+
     if not len(nom) > 0:
         nom = ['']
-    elif not len(Emploi) > 0:
-        Emploi = ['']
+    elif not len(emploi) > 0:
+        emploi = ['']
     elif not len(mail) > 0:
         mail = ['']
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-    Chercheur = dict()
+    chercheur = dict()
     # as-t-on besoin des 3 derniers champs ???
-    Chercheur["name"] = nom
-    Chercheur["type"] = typeGus
-    Chercheur["function"] = Emploi
-    Chercheur["mail"] = mail[0]
-    Chercheur["orcId"] = orcId
-    Chercheur["lab"] = laboAccro  # acronyme
-    Chercheur["supannAffectation"] = ";".join(supannAffect)
-    Chercheur["supannEntiteAffectationPrincipale"] = supannPrinc
-    Chercheur["firstName"] = Chercheur['name'].split(' ')[1]
-    Chercheur["lastName"] = Chercheur['name'].split(' ')[0]
+    chercheur["name"] = nom
+    chercheur["type"] = chercheur_type
+    chercheur["function"] = emploi
+    chercheur["mail"] = mail[0]
+    chercheur["orcId"] = orcid
+    chercheur["lab"] = labo_accro  # acronyme
+    chercheur["supannAffectation"] = ";".join(supann_affect)
+    chercheur["supannEntiteAffectationPrincipale"] = supann_princ
+    chercheur["firstName"] = chercheur['name'].split(' ')[1]
+    chercheur["lastName"] = chercheur['name'].split(' ')[0]
 
     # Chercheur["aurehalId"]
 
     # creation des index
     #  progress_recorder.set_progress(5, 10, description='creation des index')
-    if not es.indices.exists(index=structId + "-structures"):
-        es.indices.create(index=structId + "-structures")
-    if not es.indices.exists(index=structId + "-" + labo + "-researchers"):
-        es.indices.create(index=structId + "-" + labo + "-researchers")
+    if not es.indices.exists(index=structid + "-structures"):
+        es.indices.create(index=structid + "-structures")
+    if not es.indices.exists(index=structid + "-" + labo + "-researchers"):
+        es.indices.create(index=structid + "-" + labo + "-researchers")
         es.indices.create(
-            index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents
+            index=structid + "-" + labo + "-researchers-" + ldapid + "-documents")  # -researchers" + row["ldapId"] + "-documents
     else:
-        if not es.indices.exists(index=structId + "-" + labo + "-researchers-" + ldapId + "-documents"):
+        if not es.indices.exists(index=structid + "-" + labo + "-researchers-" + ldapid + "-documents"):
             es.indices.create(
-                index=structId + "-" + labo + "-researchers-" + ldapId + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                index=structid + "-" + labo + "-researchers-" + ldapid + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
 
-    Chercheur["structSirene"] = structId
-    Chercheur["labHalId"] = labo
-    Chercheur["validated"] = False
-    Chercheur["ldapId"] = ldapId
-    Chercheur["Created"] = datetime.datetime.now().isoformat()
+    chercheur["structSirene"] = structid
+    chercheur["labHalId"] = labo
+    chercheur["validated"] = False
+    chercheur["ldapId"] = ldapid
+    chercheur["Created"] = datetime.datetime.now().isoformat()
 
     # New step ?
 
     if idhal != '':
-        aureHal = getAureHal(idhal)
+        aurehal = get_aurehal(idhal)
         # integration contenus
-        archivesOuvertesData = getConceptsAndKeywords(aureHal)
-    else:
-        pass
+        archives_ouvertes_data = get_concepts_and_keywords(aurehal)
+    else:  # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
+        return redirect('unknown')
         # retourne sur check() ?
-    Chercheur["halId_s"] = idhal
-    Chercheur["validated"] = False
-    Chercheur["aurehalId"] = aureHal  # heu ?
-    Chercheur["concepts"] = archivesOuvertesData['concepts']
-    Chercheur["guidingKeywords"] = []
-    Chercheur["idRef"] = idRef
-    Chercheur["axis"] = laboAccro
+
+    chercheur["halId_s"] = idhal
+    chercheur["validated"] = False
+    chercheur["aurehalId"] = aurehal  # heu ?
+    chercheur["concepts"] = archives_ouvertes_data['concepts']
+    chercheur["guidingKeywords"] = []
+    chercheur["idRef"] = idref
+    chercheur["axis"] = labo_accro
 
     # Chercheur["mappings"]: {
     #     "_default_": {
@@ -137,77 +140,20 @@ def indexe_chercheur(ldapId, laboAccro, labHalId, idhal, idRef, orcId):  # self,
     #             "format": "yyyy-MM-dd HH:m:ss"
     #         }
     #     }}
-    res = es.index(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers",
-                   id=Chercheur["ldapId"],
-                   body=json.dumps(Chercheur))  # ,
+    res = es.index(index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers",
+                   id=chercheur["ldapId"],
+                   body=json.dumps(chercheur))  # ,
     # timestamp=datetime.datetime.now().isoformat()) #pour le suvi modification de ingest plutôt cf. https://kb.objectrocket.com/elasticsearch/how-to-create-a-timestamp-field-for-an-elasticsearch-index-275
     # progress_recorder.set_progress(10, 10)
-    return Chercheur
-
-
-def propage_concepts(structSirene, ldapId, laboAccro, labHalId):
-    # for row in csv_reader:
-    row = dict()
-    # print(row['acronym'])
-    es = esActions.es_connector(mode)
-    field = "labHalId"
-    rsr_param = esActions.scope_p(field, labHalId)
-
-    res = es.search(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers", body=rsr_param)
-    # tous ces champs (lignes qui suit) sont là (ligne précédente à adapter) ou dans structSirene + "-" +labHalId +
-    # "-" + ldapId +"-researchers" ? structSirene, ldapId, name, type, function, mail, lab, supannAffectation,
-    # supannEntiteAffectationPrincipale, halId_s, labHalId, idRef, structDomain, firstName, lastName, aurehalId
-
-    # car il faudrait que l'update ne (cf. ligne 196)
-    # après le reste devrait rouler même si je ne comprends pas pourquoi ce matin
-    # j'ai dû modifier views pour cause de l'abscence de state dans la boucle équivalent pour l'affichage 'labo' ?
-    row['guidingKeywords'] = []
-
-    # Build laboratory skills
-    tree = {'id': 'Concepts', 'children': []}
-
-    for rsr in res['hits']['hits']:
-
-        concept = rsr['_source']['concepts']
-
-        if len(concept) > 0:
-
-            for child in concept['children']:
-
-                if child['state'] == 'invalidated':
-                    tree = utils.appendToTree(child, rsr['_source'], tree, 'invalidated')
-                else:
-                    tree = utils.appendToTree(child, rsr['_source'], tree)
-                if 'children' in child:
-                    for child1 in child['children']:
-
-                        if child1['state'] == 'invalidated':
-                            tree = utils.appendToTree(child1, rsr['_source'], tree, 'invalidated')
-                        else:
-                            tree = utils.appendToTree(child1, rsr['_source'], tree)
-
-                        if 'children' in child1:
-                            for child2 in child1['children']:
-
-                                if child2['state'] == 'invalidated':
-                                    tree = utils.appendToTree(child2, rsr['_source'], tree, 'invalidated')
-                                else:
-                                    tree = utils.appendToTree(child2, rsr['_source'], tree)
-
-    row['concepts'] = tree
-    row["Created"] = datetime.datetime.now().isoformat()
-    # Insert laboratory data
-    # est-ce que update est destructeur ?
-    res = es.index(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories", id=row['halStructId'],
-                   body=json.dumps(row))
-    # timestamp=datetime.datetime.now().isoformat())
+    print("statut de la création d'index: ", res['result'])
+    return chercheur
 
 
 # @shared_task(bind=True)
-def collecte_docs(Chercheur):  # self,
+def collecte_docs(chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
-    docs = hal.findPublications(Chercheur['halId_s'], 'authIdHal_s')
+    docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
@@ -228,25 +174,25 @@ def collecte_docs(Chercheur):  # self,
 
         doc["authorship"] = []
 
-        authHalId_s_filled = []
+        authhalid_s_filled = []
         if "authId_i" in doc:
             for auth in doc["authId_i"]:
                 try:
-                    aureHal = archivesOuvertes.getHalId_s(auth)
-                    authHalId_s_filled.append(aureHal)
+                    aurehal = archivesOuvertes.get_halid_s(auth)
+                    authhalid_s_filled.append(aurehal)
                 except:
-                    authHalId_s_filled.append("")
+                    authhalid_s_filled.append("")
 
-        authors_count = len(authHalId_s_filled)
+        authors_count = len(authhalid_s_filled)
         i = 0
-        for auth in authHalId_s_filled:
+        for auth in authhalid_s_filled:
             i += 1
             if i == 1 and auth != "":
                 doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
             elif i == authors_count and auth != "":
                 doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
 
-        doc["harvested_from_ids"].append(Chercheur['halId_s'])
+        doc["harvested_from_ids"].append(chercheur['halId_s'])
 
         # historique d'appartenance du docId
         # pour attribuer les bons docs aux chercheurs
@@ -260,23 +206,23 @@ def collecte_docs(Chercheur):  # self,
         doc["records"] = []
 
         if 'doiId_s' in doc:
-            tmp_unpaywall = unpaywall.getOa(doc['doiId_s'])
+            tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
             if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
             if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
             if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
 
-        doc["MDS"] = utils.calculateMDS(doc)
+        doc["MDS"] = utils.calculate_mds(doc)
 
         try:
-            shouldBeOpen = utils.shouldBeOpen(doc)
-            if shouldBeOpen == 1:
+            should_be_open = utils.should_be_open(doc)
+            if should_be_open == 1:
                 doc["shouldBeOpen"] = True
-            if shouldBeOpen == -1:
+            if should_be_open == -1:
                 doc["shouldBeOpen"] = False
 
-            if shouldBeOpen == 1 or shouldBeOpen == 2:
+            if should_be_open == 1 or should_be_open == 2:
                 doc['isOaExtra'] = True
-            elif shouldBeOpen == -1:
+            elif should_be_open == -1:
                 doc['isOaExtra'] = False
         except:
             print('publicationDate_tdate error ?')
@@ -286,13 +232,11 @@ def collecte_docs(Chercheur):  # self,
             field = "_id"
             doc_param = esActions.scope_p(field, doc["_id"])
 
-            if not es.indices.exists(index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" +
-                                           Chercheur[
-                                               "ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
-                print("exception ", Chercheur["labHalId"], Chercheur["ldapId"])
+            if not es.indices.exists(index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur["ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
+                print("exception ", chercheur["labHalId"], chercheur["ldapId"])
 
             res = es.search(
-                index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur[
+                index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur[
                     "ldapId"] + "-documents",
                 body=doc_param)  # -researchers" + row["ldapId"] + "-documents
 
@@ -311,24 +255,39 @@ def collecte_docs(Chercheur):  # self,
     res = helpers.bulk(
         es,
         docs,
-        index=Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur[
-            "ldapId"] + "-documents"
+        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur["ldapId"] + "-documents"
         # -researchers" + row["ldapId"] + "-documents
     )
-    """
-    print("res is stocked in")
-    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-researchers-" + Chercheur["ldapId"] +
-     "-documents")
 
-    res = helpers.bulk(
-        es,
-        docs,
-        index= Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents"
-    )
-    print("res lab is stocked in")
-    print(Chercheur["structSirene"] + "-" + Chercheur["labHalId"] + "-laboratories-documents")
-    """
-    # return docs # pas utile...
+    return chercheur  # au cas où
 
 
-    return Chercheur  # au cas où
+def get_aurehal(idhal):
+
+    print(idhal)
+
+    sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
+    sparql.setReturnFormat(JSON)
+
+    sparql.setQuery("""
+        select ?p ?o
+        where  {
+        <https://data.archives-ouvertes.fr/author/%s> ?p ?o
+        }""" % idhal)
+    results = sparql.query().convert()
+
+    print(results)
+
+    aurehal = [truc for truc in results['results']['bindings'] if
+               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
+
+    ret_aurehal = -1
+
+    for a_id in aurehal:
+        print(a_id['o']['value'])
+        res = requests.get(a_id['o']['value'])
+
+        if 'Ressource inexistante' not in res.text:
+            ret_aurehal = a_id['o']['value'].split('/')[-1]
+
+    return ret_aurehal

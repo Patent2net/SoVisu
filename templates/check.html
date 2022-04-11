@@ -85,7 +85,7 @@
                               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
 
-                    <p>Cet onglet vous  permet d'affecter les chercheurs à des groupes. Cette affectation permet de produire des documents de synthèse.
+                    <p>Cet onglet vous permet d'affecter les chercheurs à des groupes. Cette affectation permet de produire des documents de synthèse.
                         Si le labo est la granularité que vous choisissez, laissez "Aucun axe affecté"</p>
 
                 </div>
@@ -170,7 +170,7 @@
                     </svg>
 
                     <ul>
-                        <li>Dans cet onglet, vous devez vérifier renseigner ou corriger vos identifiants externes. Ces
+                        <li>Dans cet onglet, vous devez vérifier, renseigner ou corriger vos identifiants externes. Ces
                             id seront utilisés pour la collecte de données.
                         </li>
                         <li><strong>L'idRef</strong> s'obtient dès la publication de votre thèse. Vous devez le vérifier
@@ -184,7 +184,7 @@
                         <li>Enfin <strong>l'IdHal</strong> est <a
                                 href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline"
                                 target="_blank">l'identifiant sur l'archive nationale Hal</a>. Ce dernier identifiant
-                            permet de regrouper vos publications, produire votre cv automatiquement mais aussi de gérer
+                            permet de regrouper vos publications, produire votre cv automatiquement, mais aussi de gérer
                             les différentes formes auteur. Les trois sont à relier via HAL. Vous avez une petite
                             procédure réalisée par l'UMR 5206 <a href="http://triangle.ens-lyon.fr/spip.php?article8796"
                                                                  class="underline" target="_blank"> sur ce lien.</a>
@@ -193,8 +193,8 @@
                             moissoneurs se chargeront de publier automatiquement vos notices sur ces médias si
                             nécessaire (<i> ; </i>).
                         </li>
-                        <li> Le champ autre (s'il apparait) est libre mais la fonctionnalité n'est pas activée.</li>
-                        <li><strong>merci de vérifier vos identifiants avant de les renseigner; un mauvais identifiant
+                        <li> Le champ autre (s'il apparait) est libre, mais la fonctionnalité n'est pas activée.</li>
+                        <li><strong>merci de vérifier vos identifiants avant de les renseigner ; un mauvais identifiant
                             pouvant faire apparaitre une erreur!</strong></li>
                     </ul>
 
@@ -230,7 +230,7 @@
                         {% csrf_token %}
                         <p class="text-sm">
                             En cas de soucis avec la récupération de l'identifiant AuréHal, déclenchez manuellement un
-                            nouvel essai en cliquant sur le bouton ci-dessous.  Si l'IDhal vient d'être créé, l'AuréHalId peut être indisponible.
+                            nouvel essai en cliquant sur le bouton ci-dessous. Si l'IDhal vient d'être créé, l'AuréHalId peut être indisponible.
                             Si c'est le cas veuillez réessayer plus tard
                         </p>
                         <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none w-64"
@@ -312,7 +312,7 @@
                 </div>
 
                 <div class="dt-bottom-infos-rplc flex justify-between items-center">
-                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer delete outline-none whitespace-nowrap">
+                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer expertise_field outline-none whitespace-nowrap">
                         {% if validation == "1" %}
                             Retirer du profil
                         {% endif %}
@@ -499,7 +499,7 @@
                         raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.
                         <br>Restent ici les publications "annexes" ou qui ne seraient pas de vous par erreur...
                         <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le
-                        bouton "Mettre à jour les références" sert à les importer ici (Notez que Hal prend un délai
+                        bouton "Mettre à jour les références" sert à les importer ici (Notez qu'Hal prend un délai
                         d'indexation de quelques heures et les nouvelles notices ne sont pas immédiatement
                         dispobibles.). </p>
 
@@ -730,7 +730,7 @@
                 .attr("pointer-events", "all");
 
             function update(source) {
-                const duration = d3.event && d3.event.altKey ? 2500 : 250; // eh what?
+                const duration = d3.event && d3.event.altKey ? 2500 : 250;
                 const nodes = root.descendants().reverse();
                 const links = root.links();
 
@@ -747,7 +747,7 @@
                 const height = right.x - left.x + margin.top + margin.bottom;
                 // const height = $('#tree').height();
 
-                // transition the size of the viewbox, i think
+                // transition the size of the viewbox
                 const transition = svg
                     .transition()
                     .duration(duration)
@@ -1215,7 +1215,7 @@
                 form.submit();
             });
 
-            $('.delete').click(function () {
+            $('.expertise_field').click(function () {
                 toInvalidate = []
                 table2.rows('.selected').data().map(function (row) {
                     toInvalidate.push(row[0])
