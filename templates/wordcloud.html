@@ -18,9 +18,8 @@
             </div>
         </div>
 
-        <!-- Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#  -->
         <div class="w-full h-full">
-            <iframe src="/kibana/app/dashboards#/view/84aeeba0-bf7f-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+            <iframe src="{{ url }}/app/dashboards#/view/84aeeba0-bf7f-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
         </div>
 
     </div>

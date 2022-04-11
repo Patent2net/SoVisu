@@ -437,6 +437,9 @@ def dashboard(request):
     # Get date parameters
     date_from, date_to = get_date(request, start_date)
     # /
+
+    url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
     return render(request, 'dashboard.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
@@ -446,6 +449,7 @@ def dashboard(request):
                    'filterRsr': filtrechercheur,
                    'filterlabA': filtre_lab_a,
                    'filterlabB': filtre_lab_b,
+                   'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
@@ -792,11 +796,14 @@ def wordcloud(request):
     date_from, date_to = get_date(request, start_date)
     # /
 
+    url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
     return render(request, 'wordcloud.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
@@ -874,11 +881,14 @@ def document_location(request):
     date_from, date_to = get_date(request, start_date)
     # /
 
+    url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
     return render(request, 'document_localisation.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
@@ -1125,13 +1135,16 @@ def search(request):  # Revoir la fonction
             res_cleaned.append(result['_source'])
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
+
+        url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
         return render(request, 'search.html',
                       {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(val=search),
                        'count': p_res['count'],
                        'timeRange': "from:'" + date_from + "',to:'" + date_to + "'",
                        'filter': search, 'index': index, 'search': search,
                        'results': res_cleaned, 'from': date_from, 'to': date_to,
-                       'startDate': min_date, 'ldapid': ldapid})
+                       'startDate': min_date, 'url': url, 'ldapid': ldapid})
 
     return render(request, 'search.html',
                   {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(), 'from': date_from, 'to': date_to,
