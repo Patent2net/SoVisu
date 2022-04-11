@@ -1,8 +1,8 @@
-{% include "includes/header.html" with title="Nuage de Mots" %}
+{% include "includes/header.html" with title="Localisation de Document" %}
 
 <div class="h-full w-full flex ">
 
-    {% include "includes/menu.html" with title="Nuage de Mots" %}
+    {% include "includes/menu.html" with title="Localisation de Document" %}
 
     <div class="w-full h-full p-1 relative" style="background: #fafbfd;">
 
@@ -20,9 +20,13 @@
 
         <!-- Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#  -->
         <div class="w-full h-full">
-            <iframe src="/kibana/app/dashboards#/view/84aeeba0-bf7f-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+
+              <iframe src="http://localhost:5601/app/dashboards#/view/a3a74a40-b0bd-11ec-bda7-9f71a5ee153d?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+
         </div>
 
     </div>
 </div>
 {% include "includes/footer.html" %}
+
+
