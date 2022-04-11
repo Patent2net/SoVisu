@@ -939,3 +939,14 @@ def idhal_checkout(idhal):
         confirmation = 1
     return confirmation
 
+
+def vizualisation_url():
+    print("mode: ")
+    print(mode)
+    if mode == "dev":
+        url = "http://127.0.0.1:5601"
+    else:
+        url ="/kibana"
+
+    return url
+
