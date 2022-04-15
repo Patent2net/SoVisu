@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
 from . import views, viewsActions
 
 urlpatterns = [
+    path('admin/logout/', lambda request: redirect('/accounts/logout/', permanent=False)),  # need to be placed before admin.site.urls to overide default redirect. return to uniauth logout instead default admin/logout page
     path('admin/', admin.site.urls),
+
 
     path('', viewsActions.admin_access_login, name='login'),
 

@@ -1,17 +1,18 @@
 import json
 from bs4 import BeautifulSoup
 from datetime import datetime
-
+from time import process_time
 from urllib.request import urlopen
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs, get_aurehal
+from elasticHal.libs.elastichal import indexe_chercheur, collecte_docs, get_aurehal
 from . import settings
-from .libs import utils, esActions
+from .libs import esActions
+from elasticHal.libs import utils
 
-from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
 
 import pandas as pd
 from io import BytesIO as B_io
@@ -90,8 +91,12 @@ def create_credentials(request):
         print("idhal found")
         chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
+        start = process_time()
+        print("collecte started at: ", start)
         collecte_docs(chercheur)
-
+        end = process_time()
+        print("collecte ended at: ", end)
+        print("total duration in sec: ", end - start)
         # récupération du struct du nouveau profil pour la redirection
         es = esActions.es_connector()
         field = "halId_s"
