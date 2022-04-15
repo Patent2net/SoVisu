@@ -1184,8 +1184,8 @@ def default_checker(request, basereverse, default_data=None):
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
-    
-    if p_id == "guestutln": # il me semble que django passe en lower...
+
+    if p_id == "guestutln" or p_id == "guestUtln": # il me semble que django passe en lower...
         indexcat = "rsr"
         base_url = reverse('index')
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
