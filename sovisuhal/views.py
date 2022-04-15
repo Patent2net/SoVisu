@@ -1191,7 +1191,13 @@ def default_checker(request, basereverse, default_data=None):
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '130015332'})
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
-
+    if p_id == "guestUtln" or p_id == "visiteur":
+        indexcat = "rsr"
+        base_url = reverse('index')
+        query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
+        url = '{}?{}'.format(base_url, query_string)
+        return redirect(url)
+    
     elif not p_id == 'adminlab' and not p_id == 'visiteur' and not p_id == 'invitamu' and not p_id == 'guestUtln' and not p_id == -1:
         # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
         i_type = "rsr"
