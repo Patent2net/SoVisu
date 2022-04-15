@@ -39,7 +39,7 @@ def create(request):
 
 
 def check(request):
-    if request.user.is_authenticated and request.user.get_username() == 'visiteur':
+    if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
         return redirect('unknown')
 
     # Connect to DB
@@ -1205,7 +1205,7 @@ def default_checker(request, basereverse, default_data=None):
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
 
-    elif not p_id == 'adminlab' and not p_id == 'visiteur' and not p_id == 'invitamu' and not p_id == -1:
+    elif not p_id == 'adminlab' and not p_id == 'visiteur' and not p_id == 'invitamu' and not p_id == 'guestUtln' and not p_id == -1:
         # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
         i_type = "rsr"
         base_url = reverse(basereverse)  # élément à changer en fonction de la fonction effectuant le call
