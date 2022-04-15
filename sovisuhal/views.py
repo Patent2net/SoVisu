@@ -1191,7 +1191,15 @@ def default_checker(request, basereverse, default_data=None):
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '130015332'})
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
-    if (p_id == "guestUtln") or (p_id == "visiteur"):
+
+    if p_id == "visiteur":
+        indexcat = "rsr"
+        base_url = reverse('index')
+        query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
+        url = '{}?{}'.format(base_url, query_string)
+        return redirect(url)
+
+    if p_id == "guestUtln":
         indexcat = "rsr"
         base_url = reverse('index')
         query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
