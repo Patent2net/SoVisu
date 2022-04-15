@@ -39,7 +39,7 @@ def create(request):
 
 
 def check(request):
-    if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
+    if request.user.is_authenticated:
         return redirect('unknown')
 
     # Connect to DB
