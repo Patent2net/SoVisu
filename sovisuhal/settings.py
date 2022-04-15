@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     'uniauth',
     # 'celery',
     # 'celery_progress',
+    'elasticHal',
 ]
 
 MIDDLEWARE = [

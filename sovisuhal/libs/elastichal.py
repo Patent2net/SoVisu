@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
-from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
-from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
+from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes
 from elasticsearch import helpers
 import json
 import datetime

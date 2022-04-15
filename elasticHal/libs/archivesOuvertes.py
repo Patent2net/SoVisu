@@ -85,8 +85,7 @@ def get_article(halid_s):
 where {
  <https://data.archives-ouvertes.fr/document/%s> ?p ?o
 } """ % halid_s)
-    results = sparql.query().convert()
-    metadone_article = results
+    metadone_article = sparql.query().convert()
     return metadone_article
 
 
@@ -101,9 +100,8 @@ select ?p ?o
 where  {
 <https://data.archives-ouvertes.fr/author/%s> ?p ?o
 }""" % authidhal_s)
-    results = sparql.query().convert()
+    donnee_individu = sparql.query().convert()
     # result in form of predicat, objet in a list in results['results']['bindings']
-    donnee_individu = results
     return donnee_individu
 
 
