@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import path, reverse
@@ -22,16 +22,22 @@ class StructureAdmin(admin.ModelAdmin):
 
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
-            csv_name = request.FILES["csv_upload"].name  # will be used to check which split is needed and also the fields to complete
-            print(csv_name)
+
+            if not csv_file.name.endswith('.csv'):
+                messages.warning(request, "Le fichier importé n'est pas un .csv")
+                return HttpResponseRedirect(request.path_info)
 
             file_data = csv_file.read().decode("utf-8")
-            csv_data = file_data.split("\n")  # split by line
+            csv_data = file_data.split("\n")  # sépare le fichier par ligne
 
-            csv_data.pop(0)  # delete the header of the csv
+            csv_data.pop(0)  # supprime l'en-tête du csv
 
-            for x in csv_data:
-                fields = x.split(",")
+            csv_data = list(map(str.strip, csv_data))  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+
+            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
+
+            for line in csv_data:
+                fields = line.split(",")
                 created = Structure.objects.update_or_create(
                     structSirene=fields[0],
                     label=fields[1],
@@ -39,6 +45,7 @@ class StructureAdmin(admin.ModelAdmin):
                     domain=fields[3],
 
                 )
+                print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -59,16 +66,22 @@ class LaboratoryAdmin(admin.ModelAdmin):
 
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
-            csv_name = request.FILES["csv_upload"].name  # will be used to check which split is needed and also the fields to complete
-            print(csv_name)
+
+            if not csv_file.name.endswith('.csv'):
+                messages.warning(request, "Le fichier importé n'est pas un .csv")
+                return HttpResponseRedirect(request.path_info)
 
             file_data = csv_file.read().decode("utf-8")
-            csv_data = file_data.split("\n")  # split by line
+            csv_data = file_data.split("\n")  # sépare le fichier par ligne
 
-            csv_data.pop(0)  # delete the header of the csv
+            csv_data.pop(0)  # supprime l'en-tête du csv
+
+            csv_data = list(map(str.strip, csv_data)) # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+
+            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
 
             for x in csv_data:
-                fields = x.split(";")
+                fields = x.split(";")  # sépare les lignes en champs
                 created = Laboratory.objects.update_or_create(
                     structSirene=fields[0],
                     acronym=fields[1],
@@ -97,13 +110,20 @@ class ResearcherAdmin(admin.ModelAdmin):
 
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
-            csv_name = request.FILES["csv_upload"].name  # will be used to check which split is needed and also the fields to complete
-            print(csv_name)
+
+            if not csv_file.name.endswith('.csv'):
+                messages.warning(request, "Le fichier importé n'est pas un .csv")
+                return HttpResponseRedirect(request.path_info)
+
 
             file_data = csv_file.read().decode("utf-8")
-            csv_data = file_data.split("\n")  # split by line
+            csv_data = file_data.split("\n")  # sépare le fichier par ligne
 
-            csv_data.pop(0)  # delete the header of the csv
+            csv_data.pop(0)  # supprime l'en-tête du csv
+
+            csv_data = list(map(str.strip, csv_data)) # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+
+            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
 
             for x in csv_data:
                 fields = x.split(",")
