@@ -1,5 +1,7 @@
+import csv
+
 from django.contrib import admin, messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
@@ -11,8 +13,30 @@ class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
 
 
-class StructureAdmin(admin.ModelAdmin):
+class ExportCsv:
+    def export_as_csv(self, request, queryset):
+
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        response.write(u'\ufeff'.encode('utf8'))
+
+        writer = csv.writer(response)
+
+        writer.writerow(field_names)
+        for obj in queryset:
+            row = writer.writerow([getattr(obj, field) for field in field_names])
+
+        return response
+
+    export_as_csv.short_description = "Exporter les éléments sélectionnés"
+
+
+class StructureAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('structSirene', 'acronym', 'label')
+    actions = ["export_as_csv"]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -56,9 +80,10 @@ class StructureAdmin(admin.ModelAdmin):
         return render(request, "admin/csv_upload.html", data)
 
 
-class LaboratoryAdmin(admin.ModelAdmin):
+class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('acronym', 'label', 'halStructId', 'idRef', 'structSirene')
     list_filter = ('structSirene',)
+    actions = ["export_as_csv"]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -103,10 +128,10 @@ class LaboratoryAdmin(admin.ModelAdmin):
         return render(request, "admin/csv_upload.html", data)
 
 
-class ResearcherAdmin(admin.ModelAdmin):
+class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('ldapId', 'name', 'function', 'lab')
-
-    list_filter = ('structSirene','lab','function',)
+    list_filter = ('structSirene', 'lab', 'function',)
+    actions = ["export_as_csv"]
 
     def get_urls(self):
         urls = super().get_urls()
