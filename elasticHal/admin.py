@@ -5,6 +5,7 @@ from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
 from django import forms
 
+admin.site.site_header = "Administration de SoVisu"
 
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
@@ -18,7 +19,8 @@ class StructureAdmin(admin.ModelAdmin):
         new_urls = [path('upload-csv/', self.upload_csv), ]
         return new_urls + urls
 
-    def upload_csv(self, request):
+    @staticmethod
+    def upload_csv(request):
 
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
@@ -55,14 +57,16 @@ class StructureAdmin(admin.ModelAdmin):
 
 
 class LaboratoryAdmin(admin.ModelAdmin):
-    list_display = ('acronym', 'label', 'idRef')
+    list_display = ('acronym', 'label', 'halStructId', 'idRef', 'structSirene')
+    list_filter = ('structSirene',)
 
     def get_urls(self):
         urls = super().get_urls()
         new_urls = [path('upload-csv/', self.upload_csv), ]
         return new_urls + urls
 
-    def upload_csv(self, request):
+    @staticmethod
+    def upload_csv(request):
 
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
@@ -90,6 +94,7 @@ class LaboratoryAdmin(admin.ModelAdmin):
                     rsnr=fields[4],
                     idRef=fields[5],
                 )
+                print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -101,12 +106,15 @@ class LaboratoryAdmin(admin.ModelAdmin):
 class ResearcherAdmin(admin.ModelAdmin):
     list_display = ('ldapId', 'name', 'function', 'lab')
 
+    list_filter = ('structSirene','lab','function',)
+
     def get_urls(self):
         urls = super().get_urls()
         new_urls = [path('upload-csv/', self.upload_csv), ]
         return new_urls + urls
 
-    def upload_csv(self, request):
+    @staticmethod
+    def upload_csv(request):
 
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
@@ -146,6 +154,7 @@ class ResearcherAdmin(admin.ModelAdmin):
                     aurehalId=fields[15],
 
                 )
+                print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
