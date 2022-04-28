@@ -825,7 +825,7 @@ def document_location(request):
         p_id = request.GET['id']
 
     elif request.user.is_authenticated:
-        basereverse = 'wordcloud'
+        basereverse = 'document_localisation'
         return default_checker(request, basereverse)
 
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
@@ -891,6 +891,8 @@ def document_location(request):
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
+
+
 
 def tools(request):
     start_time = datetime.now()
