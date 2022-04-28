@@ -118,20 +118,22 @@
                                 </div>
                             {%  endif %}
                         </div>
+        <!-- Si version dev changer   src="/kibana/app/visualize#  en   src="http://127.0.0.1:5601/app/visualize#  -->
 
                         <div class="px-2">
                             {% if results.0.docid %}
 
                                 <h3 class="text-xs font-semibold my-2">Mots-clés associés</h3> <!--4ec4e950-8716-11eb-b61e-8702cc892037--->
-                                <iframe src="{{ url }}/app/visualize#/edit/4ec4e950-8716-11eb-b61e-8702cc892037?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="800"></iframe>
+                                <iframe src="/kibana/app/visualize#/edit/4ec4e950-8716-11eb-b61e-8702cc892037?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="800"></iframe>
                             {%  endif %}
                             {% if results.0.ldapId %}
                                 <h3 class="text-xs font-semibold my-2">Mots-clés associés</h3> <!--2e53bf70-568d-11eb-af7f-91fed5e816d9 -->
-                                <iframe src="{{ url }}/app/visualize#/edit/4ec4e950-8716-11eb-b61e-8702cc892037?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="800"></iframe>
+                                <!--if local use : http://127.0.0.1:5601/app    else /kibana/app -->
+                                <iframe src="/kibana/app/visualize#/edit/4ec4e950-8716-11eb-b61e-8702cc892037?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="800"></iframe>
 
                             {%  endif %}
                             {% if results.0.rsnr %}
-                                <iframe src="{{ url }}/app/visualize#/edit/4ec4e950-8716-11eb-b61e-8702cc892037?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="800"></iframe>
+                                <iframe src="/kibana/app/visualize#/edit/4ec4e950-8716-11eb-b61e-8702cc892037?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="800"></iframe>
                             {%  endif %}
                         </div>
                     </div>

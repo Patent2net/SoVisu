@@ -15,16 +15,28 @@
                 Chargement des données
             </div>
         </div>
+        {% comment %}
+        Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#
+        {% endcomment %}
         {% if type == "rsr" %}
-            <div class="w-full h-full">
-               <iframe src="{{ url }}/app/dashboards#/view/2e1ef800-c1f2-11eb-b466-1b2443e30920?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%" title="Tableau de bord chercheur"></iframe>
-            </div>
+        <div class="w-full h-full">
+           <iframe src="/kibana/app/dashboards#/view/2e1ef800-c1f2-11eb-b466-1b2443e30920?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%" title="Tableau de bord chercheur"></iframe>
+
+        </div>
         {% else %}
-            <div class="w-full h-full overflow-auto">
-                <iframe src="{{ url }}/app/dashboards#/view/99379510-a113-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabB }}')))" height="100%" width="100%"></iframe>
-                <iframe src="{{ url }}/app/dashboards#/view/4a37d8e0-a112-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
-                <iframe src="{{ url }}/app/dashboards#/view/13661560-a122-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
+            {% comment %}
+            <div class="w-full h-full">
+            <iframe src="/kibana/app/dashboards#/view/3426d960-c1fd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlab  }}')))" height="100%" width="100%"></iframe>
             </div>
+            {% endcomment %}
+
+            <div class="w-full h-full overflow-auto">
+                <iframe src="/kibana/app/dashboards#/view/99379510-a113-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabB }}')))" height="100%" width="100%"></iframe>
+                <iframe src="/kibana/app/dashboards#/view/4a37d8e0-a112-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
+                <iframe src="/kibana/app/dashboards#/view/13661560-a122-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
+
+        </div>
+
         {% endif %}
 
     </div>
