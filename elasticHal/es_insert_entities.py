@@ -3,25 +3,21 @@ import datetime
 import json
 import sys
 import time
-
 from decouple import config
-
 # Custom libs
 from sovisuhal.libs import esActions
 from elasticHal.libs import archivesOuvertes, utils
-
-# Parameters
+# Global variables
 structIdlist = None
 Labolist = None
-
 # Connect to DB
 es = esActions.es_connector()
 
 print(__name__)
 
+# parameters
 csv_open = None  # Si csv_open = True, prise en compte des csv pour le processus en addition des données ES. Est à True par défaut dans le cas ou le fichier est lancé en tant que script (voir en bas du code)
 init = True
-
 
 def get_structid_list():
     print(csv_open)
@@ -174,7 +170,7 @@ def process_researchers():
             if cleaned_es_researchers:
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
-                    if any(dictlist['aurehalId'] == csv_row['aurehalId'] for dictlist in cleaned_es_researchers):
+                    if any(dictlist['aurehalId'] == csv_row['aurehalId'] for dictlist in cleaned_es_researchers):  # Si l'aurehalid de la ligne du csv (=chercheur) est présente dans les données récupérées d'ES : on ignore. Sinon on rajoute le chercheur à la liste.
                         print(print(csv_row["halId_s"] + " is already in cleaned_es_researchers"))
 
                     else:
@@ -211,45 +207,26 @@ def process_researchers():
 
             time.sleep(1)
 
-            if not init:
-                # Get researcher data
-                rsr_param = esActions.scope_p("ldapId", row["ldapId"])
+            if "guidingKeywords" not in row:  # si le champ n'existe pas (ou vide) met la valeur à [], sinon persistance des données
+                row['guidingKeywords'] = []
 
-                if row['labHalId'] != "non-labo":
-                    res = es.search(index=row["structSirene"] + "-" + connaitLab + "-researchers", body=rsr_param)
-                else:
-                    res = es.search(index=row["structSirene"] + "-" + row['labHalId'] + "-researchers", body=rsr_param)
-                try:
-                    rsr_prev = res['hits']['hits'][0]['_source']
-                except:
-                    print(res['hits']['hits'])
-                    sys.exit(0)
-                row['validated'] = rsr_prev['validated']
-                if 'idRef' in rsr_prev:
-                    row['idRef'] = rsr_prev['idRef']
-                if 'orcId' in rsr_prev:
-                    row['orcId'] = rsr_prev['orcId']
-                if 'lab' in rsr_prev:
-                    if len(rsr_prev['lab']) > 0:
-                        row['lab'] = rsr_prev['lab']
-                    else:
-                        row['lab'] = connaitLab  # ?
-                else:
-                    row['lab'] = connaitLab  # ?
+            if "orcId" not in row:  # si le champ n'existe pas (ou vide) met la valeur à "", sinon persistance des données
+                row['orcId'] = ""
 
-                validated_ids = []
+            if "validated" not in row:  # si le champ n'existe pas (ou vide) met la valeur à "", sinon persistance des données
+                row['validated'] = False
 
-                if 'researchDescription' in rsr_prev:
-                    row['researchDescription'] = rsr_prev['researchDescription']
-                else:
-                    row['researchDescription'] = ''
-                if len(rsr_prev['guidingKeywords']):
-                    row['guidingKeywords'] = rsr_prev['guidingKeywords']
-                else:
-                    row['guidingKeywords'] = []
+            if "researchDescription" not in row:  # si le champ n'existe pas (ou vide) met la valeur à "", sinon persistance des données
+                row['researchDescription'] = ''
 
-                if 'children' in rsr_prev['concepts']:
-                    for children in rsr_prev['concepts']['children']:
+            if "axis" not in row:
+                row["axis"] = row['lab']
+                print("affectations automatique d'un axis : " + row["axis"])
+
+            validated_ids = []
+            if 'concepts' in row:  # si le champ existe : mise à jour des concepts existant avec persistance des données validées, sinon création des concepts.
+                if 'children' in row['concepts']:
+                    for children in row['concepts']['children']:
                         if children['state'] == 'validated':
                             validated_ids.append(children['id'])
                         if 'children' in children:
@@ -260,21 +237,12 @@ def process_researchers():
                                     for children2 in children1['children']:
                                         if children2['state'] == 'validated':
                                             validated_ids.append(children2['id'])
-
-                print(validated_ids)
-
-                row['concepts'] = utils.filter_concepts(archivesOuvertesData['concepts'], validated_ids)
-
-            else:
-                row['concepts'] = utils.filter_concepts(archivesOuvertesData['concepts'], validated_ids=[])
-
-            if "axis" not in row:
-                row["axis"] = row['lab']
-                print("affectations automatique d'un axis : " + row["axis"])
+            row['concepts'] = utils.filter_concepts(archivesOuvertesData['concepts'], validated_ids)
 
             # Insert researcher data
-
             if init:
+                print("Process researcher init path")
+
                 res = es.index(index=row['structSirene'] + "-" + connaitLab + "-researchers", id=row['ldapId'],
                                body=json.dumps(row))
             else:
@@ -333,7 +301,7 @@ def process_laboratories():
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
                     if any(dictlist['halStructId'] == csv_row['halStructId'] for dictlist in cleaned_es_laboratories):
-                        print(print(csv_row["acronym"] + " is already in cleaned_es_laboratories"))
+                        print(csv_row["acronym"] + " is already in cleaned_es_laboratories")
 
                     else:
                         print("adding " + csv_row["acronym"] + " to cleaned_es_laboratories")
@@ -368,14 +336,14 @@ def process_laboratories():
                     if child['state'] == 'invalidated':
                         tree = utils.append_to_tree(child, rsr['_source'], tree, 'invalidated')
                     else:
-                        tree = utils.append_to_tree(child, rsr['_source'], tree)
+                        tree = utils.append_to_tree(child, rsr['_source'], tree, 'validated')
                     if 'children' in child:
                         for child1 in child['children']:
 
                             if child1['state'] == 'invalidated':
                                 tree = utils.append_to_tree(child1, rsr['_source'], tree, 'invalidated')
                             else:
-                                tree = utils.append_to_tree(child1, rsr['_source'], tree)
+                                tree = utils.append_to_tree(child1, rsr['_source'], tree, 'validated')
 
                             if 'children' in child1:
                                 for child2 in child1['children']:
@@ -383,7 +351,7 @@ def process_laboratories():
                                     if child2['state'] == 'invalidated':
                                         tree = utils.append_to_tree(child2, rsr['_source'], tree, 'invalidated')
                                     else:
-                                        tree = utils.append_to_tree(child2, rsr['_source'], tree)
+                                        tree = utils.append_to_tree(child2, rsr['_source'], tree, 'validated')
 
         row["Created"] = datetime.datetime.now().isoformat()
         row['concepts'] = tree
@@ -406,6 +374,11 @@ def process_laboratories():
                 pp.pprint(row)
                 print(row['structSirene'] + "-" + row["halStructId"] + "-laboratories")
                 sys.exit()
+        # create laboratory document repertory
+        if not es.indices.exists(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents"):
+            print("creating document directory for: ", row["acronym"])
+            es.indices.create(
+                index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
 
 
 if __name__ == '__main__':
