@@ -231,7 +231,7 @@ def extrait_mots_cles(dat):
 def get_concepts_and_keywords(aurehalid):
     # start
     # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concept et donnée aborder par le chercheur
+    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concepts et données abordées par le chercheur
     # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 

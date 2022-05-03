@@ -32,7 +32,7 @@ if __name__ == '__main__':
     dicoAcronym = dict()
     # if not init:
 
-    with open('doc/data/laboratories.csv', encoding='utf-8') as csv_file:
+    with open('data/laboratories.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=';')
         for row in csv_reader:
             print('Processing : ' + row['acronym'])
@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 )
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     Labos = []
-    with open('doc/data/laboratories.csv', encoding='utf-8') as csv_file:
+    with open('data/laboratories.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=';')
         for row in csv_reader:
             row["halStructId"] = row["halStructId"].strip()
@@ -124,7 +124,7 @@ if __name__ == '__main__':
                 dicoAcronym[row['halStructId']] = row['acronym']
     # Process researchers
     print(Labos)
-    with open('doc/data/researchers.csv', encoding='utf-8') as csv_file:
+    with open('data/researchers.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=',')
         for row in csv_reader:
             if row["structSirene"] == structId:  # seulement les chercheurs de la structure
