@@ -3,21 +3,25 @@ import datetime
 import json
 import sys
 import time
-from decouple import config
 # Custom libs
 from sovisuhal.libs import esActions
 from elasticHal.libs import archivesOuvertes, utils
+
 # Global variables
 structIdlist = None
 Labolist = None
+
+# parameters
+csv_open = None  # Si csv_open = True, prise en compte des csv pour le processus en addition des données ES. Est à True par défaut dans le cas ou le fichier est lancé en tant que script (voir en bas du code)
+djangodb_open = True  # Si djangodb_open = True, prise en compte des données dans la partie admin de django pour le processus en addition des données ES.
+
+init = True
+
 # Connect to DB
 es = esActions.es_connector()
 
 print(__name__)
 
-# parameters
-csv_open = None  # Si csv_open = True, prise en compte des csv pour le processus en addition des données ES. Est à True par défaut dans le cas ou le fichier est lancé en tant que script (voir en bas du code)
-init = True
 
 def get_structid_list():
     print(csv_open)
@@ -59,20 +63,21 @@ def get_labo_list():
 
     scope_param = esActions.scope_all()
 
-    for structId in structIdlist:
-        count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
-        res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
+    es_laboratories = []
+    for struct_id in structIdlist:
+        count = es.count(index=struct_id + "*-laboratories", body=scope_param)['count']
+        res = es.search(index=struct_id + "*-laboratories", body=scope_param, size=count)
 
-        esLaboratories = res['hits']['hits']
+        es_laboratories = res['hits']['hits']
 
-    for row in esLaboratories:
+    for row in es_laboratories:
         row = row['_source']
         try:
             if " " in row["halStructId"]:
-                connaitLab = "non-labo"
+                connait_lab = "non-labo"
             else:
-                connaitLab = row["halStructId"]
-                Labolist.append(connaitLab)
+                connait_lab = row["halStructId"]
+                Labolist.append(connait_lab)
         except:
             print("exception found")
             print(row)
@@ -86,52 +91,51 @@ def get_labo_list():
                 row["halStructId"] = row["halStructId"].strip()
                 if " " in row["halStructId"]:
                     print('couac in labo Id : ', row["halStructId"])
-                    connaitLab = "non-labo"
+                    connait_lab = "non-labo"
                 else:
-                    connaitLab = row["halStructId"]
-                    if connaitLab not in Labolist:
-                        Labolist.append(connaitLab)
+                    connait_lab = row["halStructId"]
+                    if connait_lab not in Labolist:
+                        Labolist.append(connait_lab)
 
                 if not es.indices.exists(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories"):
                     try:
                         es.indices.create(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories")
                     except:
                         print("devrait pas passer par là, couac labo encore ?", row["halStructId"])
-                        connaitLab = "non-labo"
+                        connait_lab = "non-labo"
 
-                        if not es.indices.exists(index=row['structSirene'] + "-" + connaitLab + "-laboratories"):
-                            es.indices.create(index=row['structSirene'] + "-" + connaitLab + "-laboratories")
+                        if not es.indices.exists(index=row['structSirene'] + "-" + connait_lab + "-laboratories"):
+                            es.indices.create(index=row['structSirene'] + "-" + connait_lab + "-laboratories")
                 if not es.indices.exists(index=row['structSirene'] + "-structures"):
                     es.indices.create(index=row['structSirene'] + "-structures")
-                if not es.indices.exists(index=row['structSirene'] + "-" + connaitLab + "-researchers"):
-                    es.indices.create(index=row['structSirene'] + "-" + connaitLab + "-researchers")
-
+                if not es.indices.exists(index=row['structSirene'] + "-" + connait_lab + "-researchers"):
+                    es.indices.create(index=row['structSirene'] + "-" + connait_lab + "-researchers")
 
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             for row in csv_reader:
                 row["labHalId"] = row["labHalId"].strip()
                 if row["labHalId"] not in Labolist:
-                    connaitLab = "non-labo"
+                    connait_lab = "non-labo"
                 else:
-                    connaitLab = row["labHalId"]  # valeur à la noix des fois
+                    connait_lab = row["labHalId"]  # valeur à la noix des fois
                 if row["structSirene"] in structIdlist:
-                    if not es.indices.exists(index=row["structSirene"] + "-" + connaitLab + "-laboratories"):
+                    if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-laboratories"):
                         try:
-                            es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-laboratories")
+                            es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories")
                         except:
-                            connaitLab = "non-labo"  # devrait jamais être là
-                            if not es.indices.exists(index=row["structSirene"] + "-" + connaitLab + "-laboratories"):
-                                es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-laboratories")
+                            connait_lab = "non-labo"  # devrait jamais être là
+                            if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-laboratories"):
+                                es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories")
                     if not es.indices.exists(index=row["structSirene"] + "-structures"):
                         es.indices.create(index=row["structSirene"] + "-structures")
-                    if not es.indices.exists(index=row["structSirene"] + "-" + connaitLab + "-researchers"):
-                        es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-researchers")
-                        es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-researchers-" + row[
+                    if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers"):
+                        es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers")
+                        es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                             "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents
                     else:
-                        if not es.indices.exists(index=row["structSirene"] + "-" + connaitLab + "-researchers-" + row["ldapId"] + "-documents"):
-                            es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                        if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
+                            es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                 else:
                     print("get_labo_list data/resarchers.csv create skipped for ", row["ldapId"])
 
@@ -155,13 +159,13 @@ def process_researchers():
     for structId in structIdlist:
         count = es.count(index=structId + "*-researchers", body=scope_param)['count']
         res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
-        esResearchers = res['hits']['hits']
+        es_researchers = res['hits']['hits']
         cleaned_es_researchers = []
-        for row in esResearchers:
+        for row in es_researchers:
             row = row['_source']
             cleaned_es_researchers.append(row)
 
-        esResearchers = None
+        es_researchers = None
 
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
@@ -194,16 +198,16 @@ def process_researchers():
                     row["validated"] = True
             row["Created"] = datetime.datetime.now().isoformat()
             if row['labHalId'] not in Labolist:
-                oldLab = row['labHalId']
+                old_lab = row['labHalId']
                 row['labHalId'] = "non-labo"
-                print('labo changé --> ', oldLab, ' en ', row['labHalId'], ' pour ', row["ldapId"])
-                connaitLab = "non-labo"
+                print('labo changé --> ', old_lab, ' en ', row['labHalId'], ' pour ', row["ldapId"])
+                connait_lab = "non-labo"
 
             else:
-                connaitLab = row["labHalId"]
-                oldLab = row['labHalId']
+                connait_lab = row["labHalId"]
+                old_lab = row['labHalId']
 
-            archivesOuvertesData = archivesOuvertes.get_concepts_and_keywords(row['aurehalId'])
+            archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(row['aurehalId'])
 
             time.sleep(1)
 
@@ -237,40 +241,40 @@ def process_researchers():
                                     for children2 in children1['children']:
                                         if children2['state'] == 'validated':
                                             validated_ids.append(children2['id'])
-            row['concepts'] = utils.filter_concepts(archivesOuvertesData['concepts'], validated_ids)
+            row['concepts'] = utils.filter_concepts(archives_ouvertes_data['concepts'], validated_ids)
 
             # Insert researcher data
             if init:
                 print("Process researcher init path")
 
-                res = es.index(index=row['structSirene'] + "-" + connaitLab + "-researchers", id=row['ldapId'],
+                res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                                body=json.dumps(row))
             else:
                 # print("row : ", row)
-                print("index : ", row['structSirene'] + "-" + connaitLab + "-researchers")
-                if not es.indices.exists(index=row["structSirene"] + "-" + connaitLab + "-researchers"):
-                    es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-researchers")
-                    es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-researchers-" + row[
+                print("index : ", row['structSirene'] + "-" + connait_lab + "-researchers")
+                if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers"):
+                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers")
+                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                         "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents
-                    res = es.index(index=row['structSirene'] + "-" + connaitLab + "-researchers", id=row['ldapId'],
+                    res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                                    body=json.dumps(row))
-                elif not es.indices.exists(index=row["structSirene"] + "-" + connaitLab + "-researchers-" + row["ldapId"] + "-documents"):
-                    es.indices.create(index=row["structSirene"] + "-" + connaitLab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                elif not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
+                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                 else:
                     try:
                         docu = dict()  # from https://stackoverflow.com/questions/57564374/elasticsearch-update-gives-unknown-field-error
                         docu["doc"] = row  # MAIS : https://github.com/elastic/elasticsearch-py/issues/1698
-                        res = es.update(index=row['structSirene'] + "-" + connaitLab + "-researchers", id=row['ldapId'],
+                        res = es.update(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                                         body=json.dumps(docu))
                     except:
-                        print("changement d'index : ", connaitLab)
+                        print("changement d'index : ", connait_lab)
                         print(row)
                         try:
-                            res = es.index(index=row['structSirene'] + "-" + connaitLab + "-researchers", id=row['ldapId'], body=json.dumps(row))
+                            res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'], body=json.dumps(row))
                         except:
-                            print("boum 2 ???", connaitLab, row['ldapId'])
-                if connaitLab != oldLab:
-                    print(" détruire l'entrée ", row['structSirene'] + "-" + oldLab + "-researchers/" + row['ldapId'])
+                            print("boum 2 ???", connait_lab, row['ldapId'])
+                if connait_lab != old_lab:
+                    print(" détruire l'entrée ", row['structSirene'] + "-" + old_lab + "-researchers/" + row['ldapId'])
 
         else:
             print('chercheur hors structure ', row['ldapId'], ", structure : ", row['structSirene'])
@@ -280,18 +284,18 @@ def process_laboratories():
     # Process laboratories
     scope_param = esActions.scope_all()
 
+    cleaned_es_laboratories = []
     for structId in structIdlist:
         count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
         res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
 
-        esLaboratories = res['hits']['hits']
-        cleaned_es_laboratories = []
+        es_laboratories = res['hits']['hits']
 
-        for row in esLaboratories:
+        for row in es_laboratories:
             row = row['_source']
             cleaned_es_laboratories.append(row)
 
-        esLaboratories = None
+        es_laboratories = None
 
     if csv_open:
         with open('data/laboratories.csv', encoding='utf-8') as csv_file:
@@ -383,6 +387,7 @@ def process_laboratories():
 
 if __name__ == '__main__':
     csv_open = True
+    djangodb_open = None
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('get_structid_list')
     get_structid_list()
