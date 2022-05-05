@@ -508,8 +508,8 @@ def process_laboratories():
 
 
 if __name__ == '__main__':
-    csv_open = None
-    djangodb_open = True
+    csv_open = True
+    djangodb_open = None
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('get_structid_list')
     get_structid_list()
