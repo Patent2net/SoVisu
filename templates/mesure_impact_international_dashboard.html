@@ -20,8 +20,8 @@
 
         <!-- Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#  -->
         <div class="w-full h-full">
-                <H1>{{ filterRsr }} </H1>
-              <iframe src="http://127.0.0.1:5601/app/dashboards#/view/616a54b0-c47c-11ec-9ceb-757388633802?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+
+            <iframe src="{{ url }}/app/dashboards#/view/7c7e9580-cbc1-11ec-bab0-a364bb07e3c6?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
 
         </div>
 
