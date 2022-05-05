@@ -7,7 +7,7 @@ from elasticsearch import helpers
 # Custom libs
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, unpaywall
+from elasticHal.libs import hal, utils, unpaywall ,location_docs
 
 
 try:
@@ -39,6 +39,7 @@ if __name__ == '__main__':
             # Collect publications
             if len(row['halStructId']) > 0:
                 docs = hal.find_publications(row['halStructId'], 'labStructId_i')
+                docs = location_docs.generate_countrys_fields(docs)
                 # Insert documents collection
                 for num, doc in enumerate(docs):
                     print('- sub processing : ' + str(doc['docid']))
@@ -133,6 +134,7 @@ if __name__ == '__main__':
                     row["labHalId"] = "non-labo"
                 # Collect publications
                 docs = hal.find_publications(row['halId_s'], 'authIdHal_s')
+                docs = location_docs.generate_countrys_fields(docs)
 
                 # Insert documents collection
                 for num, doc in enumerate(docs):

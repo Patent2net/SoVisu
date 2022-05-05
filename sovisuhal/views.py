@@ -808,7 +808,7 @@ def wordcloud(request):
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
-def document_location(request):
+def mesure_impact_international_dashboard(request):
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -825,7 +825,7 @@ def document_location(request):
         p_id = request.GET['id']
 
     elif request.user.is_authenticated:
-        basereverse = 'document_localisation'
+        basereverse = 'mesure_impact_international_dashboard'
         return default_checker(request, basereverse)
 
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
@@ -883,7 +883,7 @@ def document_location(request):
 
     url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
 
-    return render(request, 'document_localisation.html',
+    return render(request, 'mesure_impact_international_dashboard.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
