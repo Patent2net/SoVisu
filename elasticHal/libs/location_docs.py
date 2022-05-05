@@ -27,13 +27,13 @@ def generate_countrys_fields(docs):
                 else:
                     country_list.append(doc[facet])
             else:
-                doc[facet] = [""]
+                doc[facet] = ["document non Renseignés"]
 
         country_list = list(set(country_list))
         country_list_upper = [country.upper() for country in country_list]
         if len(country_list_upper) == 0:
             print("country_origin empty")
-            country_list_upper.append("")
+            country_list_upper =["document non Renseignés"]
         doc["country_origin"] = country_list_upper
 
         # generate country colaboration : country colaboration est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
@@ -47,7 +47,7 @@ def generate_countrys_fields(docs):
                 else:
                     country_list.append(doc[facet])
             else:
-                doc[facet] = [""]
+                doc[facet] = ["document non Renseignés"]
 
         country_list = list(set(country_list))
         country_list_upper = [country.upper() for country in country_list]
@@ -57,7 +57,7 @@ def generate_countrys_fields(docs):
             pass
 
         if len(country_list_upper) == 0:
-            country_list_upper.append("")
+            country_list_upper = ["document non Renseignés"]
         doc["country_colaboration"]= country_list_upper
 
 
@@ -67,7 +67,7 @@ def generate_countrys_fields(docs):
         country_list = list()
         #country_list.append("")
         if not "publicationLocation_s" in doc.keys():
-            doc["publicationLocation_s"] = ""
+            doc["publicationLocation_s"] = ["document non Renseignés"]
         else:
             try:
                 app = Nominatim(user_agent="JournalDev")
@@ -84,11 +84,11 @@ def generate_countrys_fields(docs):
                 country_list.append(code)
             except :
 
-                country_list.append("")
+                country_list = ["document non Renseignés"]
 
         country_list_upper = [country.upper() for country in country_list]
         if len(country_list_upper) == 0:
-            country_list_upper.append("")
+            country_list_upper = ["document non Renseignés"]
 
         doc["country_publication"] = country_list_upper
 
