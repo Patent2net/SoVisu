@@ -1110,7 +1110,6 @@ def search(request):  # Revoir la fonction
 
         # Connect to DB
         es = esActions.es_connector()
-
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
@@ -1123,17 +1122,22 @@ def search(request):  # Revoir la fonction
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
-        else:
+        else: # =='researchers': par défaut
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
 
         p_res = es.count(index=index, body=search_param)
+
+
         res = es.search(index=index, body=search_param, size=p_res['count'])
+
 
         res_cleaned = []
 
         for result in res['hits']['hits']:
+            print(result)
+            print("\r")
             res_cleaned.append(result['_source'])
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
