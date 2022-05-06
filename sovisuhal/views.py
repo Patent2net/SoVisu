@@ -1136,8 +1136,6 @@ def search(request):  # Revoir la fonction
         res_cleaned = []
 
         for result in res['hits']['hits']:
-            print(result)
-            print("\r")
             res_cleaned.append(result['_source'])
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
