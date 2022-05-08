@@ -242,11 +242,11 @@ def process_researchers():
     # Process researchers
     scope_param = esActions.scope_all()
 
+    cleaned_es_researchers = []
     for structId in structIdlist:
         count = es.count(index=structId + "*-researchers", body=scope_param)['count']
         res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
         es_researchers = res['hits']['hits']
-        cleaned_es_researchers = []
         for row in es_researchers:
             row = row['_source']
             cleaned_es_researchers.append(row)

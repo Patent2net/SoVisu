@@ -107,7 +107,7 @@ def extract_locations_from_docid_list(docid):
         url = url + "&facet=true&facet.field=" + facet_field
         # https://api.archives-ouvertes.fr/search/?q=docid:854050&wt=json&indent=true&facet=true&facet.field=publicationLocation_s
     print(url)
-    res = requests.get(url,timeout=50).json()
+    res = requests.get(url, timeout=50).json()
 
     country_list = list()
     for facet_field in facet_fields_list:

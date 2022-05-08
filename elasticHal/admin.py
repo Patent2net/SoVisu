@@ -9,6 +9,7 @@ from django import forms
 
 admin.site.site_header = "Administration de SoVisu"
 
+
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
 
@@ -105,7 +106,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
             csv_data.pop(0)  # supprime l'en-tête du csv
 
-            csv_data = list(map(str.strip, csv_data)) # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+            csv_data = list(map(str.strip, csv_data))  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
 
             csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
 
@@ -148,13 +149,12 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
                 return HttpResponseRedirect(request.path_info)
 
-
             file_data = csv_file.read().decode("utf-8")
             csv_data = file_data.split("\n")  # sépare le fichier par ligne
 
             csv_data.pop(0)  # supprime l'en-tête du csv
 
-            csv_data = list(map(str.strip, csv_data)) # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+            csv_data = list(map(str.strip, csv_data))  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
 
             csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
 
