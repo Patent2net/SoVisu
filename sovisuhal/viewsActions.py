@@ -945,7 +945,7 @@ def vizualisation_url():
     if mode == "dev":
         url = "http://127.0.0.1:5601"
     else:
-        url ="/kibana"
+        url = "/kibana"
 
     return url
 
