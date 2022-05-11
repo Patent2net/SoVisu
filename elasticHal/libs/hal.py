@@ -1,5 +1,4 @@
 import requests
-import random
 
 
 def find_publications(idhal, field, increment=0):

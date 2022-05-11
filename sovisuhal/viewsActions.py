@@ -1,17 +1,17 @@
 import json
 from bs4 import BeautifulSoup
 from datetime import datetime
-
 from urllib.request import urlopen
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from sovisuhal.libs.elasticHal import indexe_chercheur, collecte_docs, get_aurehal
+from sovisuhal.libs.elastichal import indexe_chercheur, collecte_docs, get_aurehal
 from . import settings
-from .libs import utils, esActions
+from .libs import esActions
+from elasticHal.libs import utils
 
-from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
 
 import pandas as pd
 from io import BytesIO as B_io
@@ -93,7 +93,6 @@ def create_credentials(request):
         chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
         collecte_docs(chercheur)
-
         # récupération du struct du nouveau profil pour la redirection
         es = esActions.es_connector()
         field = "halId_s"
@@ -940,4 +939,15 @@ def idhal_checkout(idhal):
     else:
         confirmation = 1
     return confirmation
+
+
+def vizualisation_url():
+    print("mode: ")
+    print(mode)
+    if mode == "dev":
+        url = "http://127.0.0.1:5601"
+    else:
+        url = "/kibana"
+
+    return url
 

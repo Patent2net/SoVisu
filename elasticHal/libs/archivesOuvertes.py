@@ -85,8 +85,7 @@ def get_article(halid_s):
 where {
  <https://data.archives-ouvertes.fr/document/%s> ?p ?o
 } """ % halid_s)
-    results = sparql.query().convert()
-    metadone_article = results
+    metadone_article = sparql.query().convert()
     return metadone_article
 
 
@@ -101,9 +100,8 @@ select ?p ?o
 where  {
 <https://data.archives-ouvertes.fr/author/%s> ?p ?o
 }""" % authidhal_s)
-    results = sparql.query().convert()
+    donnee_individu = sparql.query().convert()
     # result in form of predicat, objet in a list in results['results']['bindings']
-    donnee_individu = results
     return donnee_individu
 
 
@@ -233,7 +231,7 @@ def extrait_mots_cles(dat):
 def get_concepts_and_keywords(aurehalid):
     # start
     # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concept et donnée aborder par le chercheur
+    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concepts et données abordées par le chercheur
     # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
     # end
 

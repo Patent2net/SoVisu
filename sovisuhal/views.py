@@ -781,6 +781,7 @@ def wordcloud(request):
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
+        filtreLab = ''
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
