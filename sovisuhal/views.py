@@ -437,6 +437,9 @@ def dashboard(request):
     # Get date parameters
     date_from, date_to = get_date(request, start_date)
     # /
+
+    url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
     return render(request, 'dashboard.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
@@ -446,6 +449,7 @@ def dashboard(request):
                    'filterRsr': filtrechercheur,
                    'filterlabA': filtre_lab_a,
                    'filterlabB': filtre_lab_b,
+                   'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
@@ -780,7 +784,9 @@ def wordcloud(request):
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
+        indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
         filtrechercheur = ''
+        filtreLab = '_index: "' + indexsearch + '"'
     else:
         return redirect('unknown')
 
@@ -792,16 +798,20 @@ def wordcloud(request):
     date_from, date_to = get_date(request, start_date)
     # /
 
+    url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
     return render(request, 'wordcloud.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'filterLab': filtreLab,
+                   'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
-def document_location(request):
+def mesure_impact_international_dashboard(request):
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -818,7 +828,7 @@ def document_location(request):
         p_id = request.GET['id']
 
     elif request.user.is_authenticated:
-        basereverse = 'wordcloud'
+        basereverse = 'mesure_impact_international_dashboard'
         return default_checker(request, basereverse)
 
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
@@ -874,13 +884,18 @@ def document_location(request):
     date_from, date_to = get_date(request, start_date)
     # /
 
-    return render(request, 'document_localisation.html',
+    url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
+    return render(request, 'mesure_impact_international_dashboard.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
+
+
 
 def tools(request):
     start_time = datetime.now()
@@ -1098,7 +1113,6 @@ def search(request):  # Revoir la fonction
 
         # Connect to DB
         es = esActions.es_connector()
-
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
@@ -1111,13 +1125,16 @@ def search(request):  # Revoir la fonction
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
-        else:
+        else: # =='researchers': par défaut
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
 
         p_res = es.count(index=index, body=search_param)
+
+
         res = es.search(index=index, body=search_param, size=p_res['count'])
+
 
         res_cleaned = []
 
@@ -1125,13 +1142,16 @@ def search(request):  # Revoir la fonction
             res_cleaned.append(result['_source'])
         messages.add_message(request, messages.INFO,
                              'Résultats de la recherche "{}" dans la collection "{}"'.format(search, index))
+
+        url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
+
         return render(request, 'search.html',
                       {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(val=search),
                        'count': p_res['count'],
                        'timeRange': "from:'" + date_from + "',to:'" + date_to + "'",
                        'filter': search, 'index': index, 'search': search,
                        'results': res_cleaned, 'from': date_from, 'to': date_to,
-                       'startDate': min_date, 'ldapid': ldapid})
+                       'startDate': min_date, 'url': url, 'ldapid': ldapid})
 
     return render(request, 'search.html',
                   {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(), 'from': date_from, 'to': date_to,
@@ -1185,13 +1205,6 @@ def default_checker(request, basereverse, default_data=None):
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
 
-    if p_id == "guestutln" or p_id == "guestUtln": # il me semble que django passe en lower...
-        indexcat = "rsr"
-        base_url = reverse('index')
-        query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
-        url = '{}?{}'.format(base_url, query_string)
-        return redirect(url)
-
     if p_id == "invitamu":
         indexcat = "rsr"
         base_url = reverse('index')
@@ -1199,16 +1212,7 @@ def default_checker(request, basereverse, default_data=None):
         url = '{}?{}'.format(base_url, query_string)
         return redirect(url)
 
-    if p_id == "visiteur":
-        indexcat = "rsr"
-        base_url = reverse('index')
-        query_string = urlencode({'indexcat': indexcat, 'indexstruct': '198307662'})
-        url = '{}?{}'.format(base_url, query_string)
-        return redirect(url)
-
-
-
-    elif not p_id == 'adminlab' and not p_id == 'guestutln' and not p_id == 'visiteur' and not p_id == 'invitamu' and not p_id == -1:
+    elif not p_id == 'adminlab' and not p_id == 'visiteur' and not p_id == 'invitamu' and not p_id == 'guestUtln' and not p_id == -1:
         # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
         i_type = "rsr"
         base_url = reverse(basereverse)  # élément à changer en fonction de la fonction effectuant le call
