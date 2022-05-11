@@ -1,49 +1,45 @@
 import datetime
 import time
+
+from decouple import config
 from elasticsearch import helpers
+
 # Custom libs
+# Custom libs
+
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, unpaywall, archivesOuvertes, location_docs
+from elasticHal.libs import hal, utils, unpaywall, archivesOuvertes ,location_docs ,doi_enrichissement
 
-# init Global variables
-structIdlist = []
-
-init = False
-force_hal = True
-forceAuthorship = True
-
-# Connect to DB
-es = esActions.es_connector()
-
-# get structId for already existing structures in ES
-scope_param = esActions.scope_all()
-count = es.count(index="*-structures", body=scope_param)['count']
-res = es.search(index="*-structures", body=scope_param, size=count)
-es_struct = res['hits']['hits']
-
-# stock structId from ES in structIdlist
-for row in es_struct:
-    row = row['_source']
-    structsirene = row['structSirene']
-    structIdlist.append(structsirene)
-
+try:
+    structId = config("structId")
+except:
+    structId = "198307662"  # UTLN
 
 if __name__ == '__main__':
+
+    init = False
+    force_hal = True
+    forceAuthorship = True
 
     harvet_history = []
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('harvesting started')
 
+    # Parameters
+    # Connect to DB
+    es = esActions.es_connector()
+
     # Process laboratories
     # astuce pour passer vite
     dicoAcronym = dict()
+    # if not init:
 
     scope_param = esActions.scope_all()
 
-    # init esLaboratories
-    count = es.count(index="*-laboratories", body=scope_param)['count']
-    res = es.search(index="*-laboratories", body=scope_param, size=count)
+    count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
+    res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
+
     esLaboratories = res['hits']['hits']
 
     for row in esLaboratories:
@@ -52,7 +48,10 @@ if __name__ == '__main__':
         # Collect publications
         if len(row['halStructId']) > 0:
             docs = hal.find_publications(row['halStructId'], 'labStructId_i')
+            # Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
+            docs = doi_enrichissement.docs_enrichissement_doi(docs)
+
             # Insert documents collection
             for num, doc in enumerate(docs):
                 # print('- sub processing : ' + str(doc['docid']))
@@ -96,13 +95,13 @@ if __name__ == '__main__':
                 for h in harvet_history:
                     if h['docid'] == doc['docid']:
                         doc["harvested_from_ids"].append(h['from'])
-
+                """
                 if 'doiId_s' in doc:
                     tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
                     if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
                     if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
                     if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
-
+                """
                 doc["MDS"] = utils.calculate_mds(doc)
 
                 doc["records"] = []
@@ -156,8 +155,9 @@ if __name__ == '__main__':
             print(res)
 
     # initialisation liste labos supposée plus fiables que données issues Ldap.
-    Labos = []  # initialisation variable contenant la liste labhalId des labos enregistrés
+    Labos = []
     for row in esLaboratories:
+        row = row['_source']
         row["halStructId"] = row["halStructId"].strip()
         if " " in row["halStructId"]:
             connaitLab = "non-labo"
@@ -170,19 +170,22 @@ if __name__ == '__main__':
     print(Labos)
     scope_param = esActions.scope_all()
 
-    count = es.count(index="*-researchers", body=scope_param)['count']
-    res = es.search(index="*-researchers", body=scope_param, size=count)
+    count = es.count(index=structId + "*-researchers", body=scope_param)['count']
+    res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
+
     esResearchers = res['hits']['hits']
 
     for row in esResearchers:
         row = row['_source']
-        if row["structSirene"] in structIdlist:  # seulement les chercheurs des structures recensées
+        if row["structSirene"] == structId:  # seulement les chercheurs de la structure
             print('Processing : ' + row['halId_s'])
             if row["labHalId"] not in Labos:
                 row["labHalId"] = "non-labo"
             # Collect publications
             docs = hal.find_publications(row['halId_s'], 'authIdHal_s')
+            #Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
+            docs = doi_enrichissement.docs_enrichissement_doi(docs)
 
             # Insert documents collection
             for num, doc in enumerate(docs):
@@ -222,13 +225,13 @@ if __name__ == '__main__':
                             doc["harvested_from_ids"].append(h['from'])
 
                 doc["records"] = []
-
+                """
                 if 'doiId_s' in doc:
                     tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
                     if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
                     if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
                     if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
-
+                """
                 doc["MDS"] = utils.calculate_mds(doc)
 
                 try:
