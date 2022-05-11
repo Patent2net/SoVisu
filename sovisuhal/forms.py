@@ -32,9 +32,9 @@ class CreateCredentials(forms.Form):
     #     if 'halStructId' in truc ['fields'].keys():
     #         labos.append(truc ['fields']['halStructId'] [0])
     # labos = [((truc ['fields']['halStructId'] [0], truc ['fields']['acronym'] [0]), truc ['fields']['label'][0]) for truc in entities]
-    labos = [((truc['_source']['halStructId'], truc['_source']['acronym']), truc['_source']['label']) for truc in
-             entities]
-    f_labo = forms.CharField(label='Labo', widget=forms.Select(choices=labos))
+    labos = [('', '')]  # empty default field
+    labos.extend([((truc['_source']['halStructId'], truc['_source']['acronym']), truc['_source']['label']) for truc in entities])
+    f_labo = forms.CharField(label='Laboratoire', widget=forms.Select(choices=labos))
 
 
 class ValidCredentials(forms.Form):

@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
-from sovisuhal.libs.archivesOuvertes import get_concepts_and_keywords
-from sovisuhal.libs import utils, hal, unpaywall, archivesOuvertes
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
+from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs
 from elasticsearch import helpers
 import json
 import datetime
@@ -154,6 +154,7 @@ def collecte_docs(chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
+    docs =  location_docs.generate_countrys_fields(docs)
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')

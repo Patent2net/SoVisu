@@ -95,7 +95,7 @@
                                 <td>{{ ref.authFullName_s | join:", " }}</td>
                             {% endif %}
 
-                            <td>{{ ref.MDS|floatformat:'3' }}</td>
+                            <td>{{ ref.MDS|floatformat:'0' }}</td>
 
 							{% if filter == "uncomplete" %}
                                 <td>{{ ref.shouldBeOpen }}</td>
@@ -120,7 +120,7 @@
 <script>
 
     $.fn.dataTable.ext.buttons.zotero = {
-        text: 'BibTex',
+        text: 'Zotero',
         action: function ( e, dt, node, config ) {
             var BibTex_export = ""
             dt.data().map( function (row) {
