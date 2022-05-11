@@ -781,10 +781,13 @@ def wordcloud(request):
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
+        filtreLab = ''
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
+        indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
         filtrechercheur = ''
+        filtreLab = '_index: "' + indexsearch + '"'
     else:
         return redirect('unknown')
 
@@ -803,6 +806,7 @@ def wordcloud(request):
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'filterLab': filtreLab,
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
