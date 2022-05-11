@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
 from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
-from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs
+from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs ,doi_enrichissement
 from elasticsearch import helpers
 import json
 import datetime
@@ -154,7 +154,9 @@ def collecte_docs(chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
-    docs =  location_docs.generate_countrys_fields(docs)
+    docs = location_docs.generate_countrys_fields(docs)
+    docs = doi_enrichissement.docs_enrichissement_doi(docs)
+
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
@@ -206,11 +208,14 @@ def collecte_docs(chercheur):  # self,
 
         doc["records"] = []
 
+
+        """
         if 'doiId_s' in doc:
             tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
             if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
             if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
             if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
+        """
 
         doc["MDS"] = utils.calculate_mds(doc)
 
