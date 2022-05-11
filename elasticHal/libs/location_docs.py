@@ -82,6 +82,7 @@ def generate_countrys_fields(docs):
                 if pays[-1] == ' ':
                     pays = pays[:-1]
 
+
                 code = country_alpha2_to_continent_code(pays)
                 country_list.append(code)
             except :
