@@ -14,12 +14,6 @@ es = esActions.es_connector()
 # get structId for already existing structures in ES
 scope_param = esActions.scope_all()
 res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
-print(res)
-
-filler = ['acronym', 'structSirene']
-scope_filler = esActions.scope_filter(filler)
-res2 = res = es.search(index="*-structures", body=scope_filler, filter_path=["hits.hits._source"])
-print(res2)
 
 es_struct = res['hits']['hits']
 # stock structId from ES in structIdlist
