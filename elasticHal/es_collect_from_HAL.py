@@ -1,45 +1,46 @@
 import datetime
 import time
-
-from decouple import config
 from elasticsearch import helpers
-
 # Custom libs
-# Custom libs
-
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, unpaywall, archivesOuvertes ,location_docs ,doi_enrichissement
+from elasticHal.libs import hal, utils, unpaywall, archivesOuvertes, location_docs, doi_enrichissement
 
-try:
-    structId = config("structId")
-except:
-    structId = "198307662"  # UTLN
+# Global variables
+structIdlist = []
+
+init = False
+force_hal = True
+forceAuthorship = True
+
+# Connect to DB
+es = esActions.es_connector()
+
+scope_param = esActions.scope_all()
+res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+print(res)
+es_struct = res['hits']['hits']
+# stock structId from ES in structIdlist
+for row in es_struct:
+    row = row['_source']
+    structsirene = row['structSirene']
+    structIdlist.append(structsirene)
 
 if __name__ == '__main__':
-
-    init = False
-    force_hal = True
-    forceAuthorship = True
 
     harvet_history = []
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('harvesting started')
 
-    # Parameters
-    # Connect to DB
-    es = esActions.es_connector()
-
     # Process laboratories
     # astuce pour passer vite
     dicoAcronym = dict()
-    # if not init:
 
     scope_param = esActions.scope_all()
 
-    count = es.count(index=structId + "*-laboratories", body=scope_param)['count']
-    res = es.search(index=structId + "*-laboratories", body=scope_param, size=count)
-
+    # init esLaboratories
+    count = es.count(index="*-laboratories", body=scope_param)['count']
+    res = es.search(index="*-laboratories", body=scope_param, size=count)
     esLaboratories = res['hits']['hits']
 
     for row in esLaboratories:
@@ -170,14 +171,13 @@ if __name__ == '__main__':
     print(Labos)
     scope_param = esActions.scope_all()
 
-    count = es.count(index=structId + "*-researchers", body=scope_param)['count']
-    res = es.search(index=structId + "*-researchers", body=scope_param, size=count)
-
+    count = es.count(index="*-researchers", body=scope_param)['count']
+    res = es.search(index="*-researchers", body=scope_param, size=count)
     esResearchers = res['hits']['hits']
 
     for row in esResearchers:
         row = row['_source']
-        if row["structSirene"] == structId:  # seulement les chercheurs de la structure
+        if row["structSirene"] in structIdlist:  # seulement les chercheurs des structures recensées
             print('Processing : ' + row['halId_s'])
             if row["labHalId"] not in Labos:
                 row["labHalId"] = "non-labo"

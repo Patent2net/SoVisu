@@ -1,31 +1,38 @@
 import csv
 import time
-
-from decouple import config
 from elasticsearch import helpers
-
-# Custom libs
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, unpaywall ,location_docs
+from elasticHal.libs import hal, utils, unpaywall, location_docs
 
+# Global variables
+structIdlist = []
 
-try:
-    structId = config("structId")
-except:
-    structId = "198307662"  # UTLN
+# Connect to DB
+es = esActions.es_connector()
+
+# get structId for already existing structures in ES
+scope_param = esActions.scope_all()
+res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+print(res)
+
+filler = ['acronym', 'structSirene']
+scope_filler = esActions.scope_filter(filler)
+res2 = res = es.search(index="*-structures", body=scope_filler, filter_path=["hits.hits._source"])
+print(res2)
+
+es_struct = res['hits']['hits']
+# stock structId from ES in structIdlist
+for row in es_struct:
+    row = row['_source']
+    structsirene = row['structSirene']
+    structIdlist.append(structsirene)
 
 if __name__ == '__main__':
-
-    init = True
-
+    init = True  # if init = True overwrite the validated status
     harvet_history = []
-
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('harvesting started')
-
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Process laboratories
     # astuce pour passer vite
@@ -128,7 +135,7 @@ if __name__ == '__main__':
     with open('data/researchers.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=',')
         for row in csv_reader:
-            if row["structSirene"] == structId:  # seulement les chercheurs de la structure
+            if row["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
                 print('Processing : ' + row['halId_s'])
                 if row["labHalId"] not in Labos:
                     row["labHalId"] = "non-labo"
@@ -139,7 +146,7 @@ if __name__ == '__main__':
                 # Insert documents collection
                 for num, doc in enumerate(docs):
                     doc["_id"] = doc['docid']
-                    doc["validated"] = False
+                    doc["validated"] = True
 
                     doc["harvested_from"] = "researcher"
 
