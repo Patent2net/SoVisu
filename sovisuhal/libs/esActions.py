@@ -33,11 +33,8 @@ def es_connector(mode=mode):
 # Elastic match query call
 
 # Use that base code in other files to use scope_all function: variable_name = esActions.scope_all()
-def scope_all(_source_fields=None):
-    if _source_fields is None:
-        _source_fields = []
+def scope_all():
     scope = {
-        "_source": _source_fields,
         "query": {
             "match_all": {}
         }
@@ -46,11 +43,8 @@ def scope_all(_source_fields=None):
 
 
 # Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
-def scope_p(scope_field, scope_value, _source_fields=None):
-    if _source_fields is None:
-        _source_fields = []
+def scope_p(scope_field, scope_value):
     scope = {
-        "_source": _source_fields,
         "query": {
             "match": {
                 scope_field: scope_value
