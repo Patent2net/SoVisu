@@ -22,10 +22,10 @@ if djangodb_open == True:
     print("init django DB access (standalone mode)")
     import os
     import django
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
     django.setup()  # allow to use the elastichal.models under independantly from Django
     from elasticHal.models import Structure, Laboratory, Researcher
-
 
 # Connect to DB
 es = esActions.es_connector()
@@ -36,10 +36,14 @@ print("__name__ value is : ", __name__)
 def get_structid_list():
     print("csv_open value is : ", csv_open)
     global structIdlist
+    structIdlist = []
     # get structId for already existing structures in ES
     scope_param = esActions.scope_all()
-    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
-    structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
+    count = es.count(index="*-structures", body=scope_param)['count']
+    if count > 0:
+        print(count, " structures found in ES")
+        res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+        structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
 
     # get structId for structures in csv and compare with structIdlist
     if csv_open:
