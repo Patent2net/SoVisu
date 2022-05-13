@@ -35,7 +35,8 @@ urlpatterns = [
     path('references/', views.references, name='references'),
     path('terminology/', views.terminology, name='terminology'),
     path('wordcloud/', views.wordcloud, name='wordcloud'),
-    path('mesure_impact_international_dashboard/', views.mesure_impact_international_dashboard, name='mesure_impact_international_dashboard'),
+    path('impact_international/', views.impact_international, name='impact_international'),
+
 
     path('tools/', views.tools, name='tools'),
 

@@ -63,38 +63,6 @@ def generate_countrys_fields(docs):
         doc["country_colaboration"]= country_list_upper
 
 
-    # generate country publication est à pars dans la fonction. Ce champs est pour le momment rarement renseigner , quand ce champs
-    # est renseigner il est renseigner avec des nom de ville. Récupérer le pays sous forme de code  ISO on passe dans un premier temps
-    # par la librairie  Geopy pour determiner le pays et ensuite par la librairies pycountry_convert pour determiner le code ISO du pays
-        country_list = list()
-        #country_list.append("")
-        if not "publicationLocation_s" in doc.keys():
-            doc["publicationLocation_s"] = [""]
-        else:
-            try:
-                app = Nominatim(user_agent="JournalDev")
-                location = app.geocode(doc["publicationLocation_s"])
-                address = location.raw["display_name"]
-                address = address.split(',')
-                pays = address[-1]
-                if pays[0] == ' ':
-                    pays = pays[1:]
-                if pays[-1] == ' ':
-                    pays = pays[:-1]
-
-
-                code = country_alpha2_to_continent_code(pays)
-                country_list.append(code)
-            except :
-
-                country_list = [""]
-
-        country_list_upper = [country.upper() for country in country_list]
-        if len(country_list_upper) == 0:
-            country_list_upper = [""]
-
-        doc["country_publication"] = country_list_upper
-
 
     print(" fin de génération des champs country")
 
