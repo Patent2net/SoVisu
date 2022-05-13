@@ -1,3 +1,11 @@
+installer docker service
+lancer docker-compose up dans un terminal à partir du dossier doc\stackElk
+
+installer python 3.9
+créer un environnement sovi
+pip install -r requirements.txt 
+puis
+
 python manage.py migrate
 
 python manage.py add_institution utln https://cas.univ-utln.fr/cas/login
@@ -8,4 +16,5 @@ adminlab
 visiteur
 qui vous voudrez (prendre le ldapid pour simuler)
 
+Dans Kibana, importer les "saved objects" à partir de doc\Daskboards
 
