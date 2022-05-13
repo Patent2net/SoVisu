@@ -36,20 +36,10 @@ print("__name__ value is : ", __name__)
 def get_structid_list():
     print("csv_open value is : ", csv_open)
     global structIdlist
-    structIdlist = []
     # get structId for already existing structures in ES
     scope_param = esActions.scope_all()
-    count = es.count(index="*-structures", body=scope_param)['count']
-    res = es.search(index="*-structures", body=scope_param, size=count)
-    es_struct = res['hits']['hits']
-
-    # stock structId from ES in structIdlist
-    for row in es_struct:
-        row = row['_source']
-        structsirene = row['structSirene']
-        structIdlist.append(structsirene)
-
-    es_struct = None
+    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+    structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
 
     # get structId for structures in csv and compare with structIdlist
     if csv_open:
@@ -256,7 +246,7 @@ def process_researchers():
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
-            csv_reader = list(csv_reader)
+            csv_reader = list([searcher for searcher in csv_reader if searcher['halId_s'] is not ''])
             if cleaned_es_researchers:
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
