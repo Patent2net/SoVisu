@@ -6,25 +6,18 @@ from sovisuhal.libs import esActions
 from elasticHal.libs import hal, utils, unpaywall, archivesOuvertes, location_docs, doi_enrichissement
 
 # Global variables
-structIdlist = []
-
 init = False
 force_hal = True
 forceAuthorship = True
 
 # Connect to DB
 es = esActions.es_connector()
-
+# get structId for already existing structures in ES
 scope_param = esActions.scope_all()
 res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
-print(res)
-es_struct = res['hits']['hits']
-# stock structId from ES in structIdlist
-for row in es_struct:
-    row = row['_source']
-    structsirene = row['structSirene']
-    structIdlist.append(structsirene)
 
+structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
+print(structIdlist)
 if __name__ == '__main__':
 
     harvet_history = []

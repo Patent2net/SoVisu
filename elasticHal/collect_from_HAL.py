@@ -5,22 +5,13 @@ from elasticsearch import helpers
 from sovisuhal.libs import esActions
 from elasticHal.libs import hal, utils, unpaywall, location_docs
 
-# Global variables
-structIdlist = []
-
 # Connect to DB
 es = esActions.es_connector()
-
 # get structId for already existing structures in ES
 scope_param = esActions.scope_all()
 res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
-
-es_struct = res['hits']['hits']
-# stock structId from ES in structIdlist
-for row in es_struct:
-    row = row['_source']
-    structsirene = row['structSirene']
-    structIdlist.append(structsirene)
+structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
+print(structIdlist)
 
 if __name__ == '__main__':
     init = True  # if init = True overwrite the validated status
