@@ -22,10 +22,10 @@ if djangodb_open == True:
     print("init django DB access (standalone mode)")
     import os
     import django
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
     django.setup()  # allow to use the elastichal.models under independantly from Django
     from elasticHal.models import Structure, Laboratory, Researcher
-
 
 # Connect to DB
 es = esActions.es_connector()
@@ -36,10 +36,14 @@ print("__name__ value is : ", __name__)
 def get_structid_list():
     print("csv_open value is : ", csv_open)
     global structIdlist
+    structIdlist = []
     # get structId for already existing structures in ES
     scope_param = esActions.scope_all()
-    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
-    structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
+    count = es.count(index="*-structures", body=scope_param)['count']
+    if count > 0:
+        print(count, " structures found in ES")
+        res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+        structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
 
     # get structId for structures in csv and compare with structIdlist
     if csv_open:
@@ -51,7 +55,8 @@ def get_structid_list():
                 else:
                     if csv_row["structSirene"] not in structIdlist:
                         structIdlist.append(csv_row["structSirene"])
-                        print("Rajout de la structure ", csv_row["acronym"], " (", csv_row["structSirene"], ") dans structIdlist")
+                        print("Rajout de la structure ", csv_row["acronym"], " (", csv_row["structSirene"],
+                              ") dans structIdlist")
                     else:
                         print(csv_row["acronym"], " is already listed")
     print("listed structId: ", structIdlist)
@@ -145,10 +150,13 @@ def get_labo_list():
                         es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                             "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents
                     else:
-                        if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
-                            es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                        if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
+                            "ldapId"] + "-documents"):
+                            es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
+                                "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                 else:
-                    print("Indice creation process cancelled for ", row['ldapId'], ", StructSirene unknown. Please check it or add the Structure beforehand")
+                    print("Indice creation process cancelled for ", row['ldapId'],
+                          ", StructSirene unknown. Please check it or add the Structure beforehand")
 
     print("Labhalid listed: ")
     print(Labolist)
@@ -201,10 +209,13 @@ def get_labo_list():
                     es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                         "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents
                 else:
-                    if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
-                        es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                    if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
+                        "ldapId"] + "-documents"):
+                        es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
+                            "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
             else:
-                print("Indice creation process cancelled for ", row['ldapId'], ", StructSirene unknown. Please check it or add the Structure beforehand")
+                print("Indice creation process cancelled for ", row['ldapId'],
+                      ", StructSirene unknown. Please check it or add the Structure beforehand")
 
 
 def process_structures():
@@ -250,7 +261,8 @@ def process_researchers():
             if cleaned_es_researchers:
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
-                    if any(dictlist['halId_s'] == csv_row['halId_s'] for dictlist in cleaned_es_researchers):  # Si l'aurehalid de la ligne du csv (=chercheur) est présente dans les données récupérées d'ES : on ignore. Sinon on rajoute le chercheur à la liste.
+                    if any(dictlist['halId_s'] == csv_row['halId_s'] for dictlist in
+                           cleaned_es_researchers):  # Si l'aurehalid de la ligne du csv (=chercheur) est présente dans les données récupérées d'ES : on ignore. Sinon on rajoute le chercheur à la liste.
                         print(csv_row["halId_s"] + " is already in cleaned_es_researchers")
 
                     else:
@@ -352,19 +364,23 @@ def process_researchers():
                         "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents
                     res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                                    body=json.dumps(row))
-                elif not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
-                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                elif not es.indices.exists(
+                        index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
+                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
+                        "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                 else:
                     try:
                         docu = dict()  # from https://stackoverflow.com/questions/57564374/elasticsearch-update-gives-unknown-field-error
                         docu["doc"] = row  # MAIS : https://github.com/elastic/elasticsearch-py/issues/1698
-                        res = es.update(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
+                        res = es.update(index=row['structSirene'] + "-" + connait_lab + "-researchers",
+                                        id=row['ldapId'],
                                         body=json.dumps(docu))
                     except:
                         print("changement d'index : ", connait_lab)
                         print(row)
                         try:
-                            res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'], body=json.dumps(row))
+                            res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers",
+                                           id=row['ldapId'], body=json.dumps(row))
                         except:
                             print("boum 2 ???", connait_lab, row['ldapId'])
                 if connait_lab != old_lab:
@@ -435,7 +451,8 @@ def process_laboratories():
         # Get researchers from the laboratory
         rsr_param = esActions.scope_p("labHalId", row["halStructId"])
 
-        es.indices.refresh(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers")  # force le refresh des indices(index) de elasticsearch
+        es.indices.refresh(index=row['structSirene'] + "-" + row[
+            "halStructId"] + "-researchers")  # force le refresh des indices(index) de elasticsearch
         res = es.search(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers", body=rsr_param)
 
         # Build laboratory skills
