@@ -55,15 +55,15 @@ def docs_enrichissement_doi (docs):
 
 
 
-        if 'publisher' not in data: doc["oa_host_type"] = 'open archive'
+            if 'publisher' not in data: doc["oa_host_type"] = 'open archive'
 
-        elif 'has_repository_copy' not in data: doc["oa_host_type"] = 'editor'
+            elif 'has_repository_copy' not in data: doc["oa_host_type"] = 'editor'
 
-        elif 'publisher' in data and 'has_repository_copy' in data: doc["oa_host_type"] = 'editor and open archive'
+            elif 'publisher' in data and 'has_repository_copy' in data: doc["oa_host_type"] = 'editor and open archive'
 
-        elif not data['is_oa']: doc["oa_host_type"] = 'closed access'
+            elif not data['is_oa']: doc["oa_host_type"] = 'closed access'
 
-        else: doc["oa_host_type"] = 'N/A'
+            else: doc["oa_host_type"] = 'N/A'
 
         #initialisation des champs vide pour eviter les porblémes de mapping
         """
