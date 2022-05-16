@@ -309,6 +309,7 @@ def check(request):
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
         ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, date_from, date_to)
+        print(ref_param)
 
         if i_type == "rsr":
             count = \
@@ -812,7 +813,8 @@ def wordcloud(request):
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
-def mesure_impact_international_dashboard(request):
+
+def impact_international(request):
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -829,7 +831,7 @@ def mesure_impact_international_dashboard(request):
         p_id = request.GET['id']
 
     elif request.user.is_authenticated:
-        basereverse = 'mesure_impact_international_dashboard'
+        basereverse = 'impact_international'
         return default_checker(request, basereverse)
 
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
@@ -887,7 +889,7 @@ def mesure_impact_international_dashboard(request):
 
     url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
 
-    return render(request, 'mesure_impact_international_dashboard.html',
+    return render(request, 'impact_international.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
