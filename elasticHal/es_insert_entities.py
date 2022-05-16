@@ -250,7 +250,7 @@ def process_researchers():
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
-            csv_reader = list([searcher for searcher in csv_reader if searcher['halId_s'] is not ''])
+            csv_reader = list([searcher for searcher in csv_reader if searcher['halId_s'] is not ''])  # Only keep researchers with known 'halId_s'
             if cleaned_es_researchers:
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
@@ -266,9 +266,10 @@ def process_researchers():
                 cleaned_es_researchers = csv_reader
 
     if djangodb_open:
+        django_researchers = Researcher.objects.all().values()
+        django_researchers = list([researcher for researcher in django_researchers if researcher['halId_s'] is not '' and researcher.pop('id')])  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
         if cleaned_es_researchers:
-            for researcher in Researcher.objects.all().values():
-                researcher.pop('id')
+            for researcher in django_researchers:
                 print(researcher)
                 if any(dictlist['halId_s'] == researcher["halId_s"] for dictlist in cleaned_es_researchers):
                     print(researcher["halId_s"] + " is already in cleaned_es_researchers")
@@ -277,10 +278,7 @@ def process_researchers():
                     cleaned_es_researchers.append(researcher)
         else:
             print("cleaned_es_researchers is empty, adding djangoDb content to values")
-            for researcher in Researcher.objects.all().values():
-                researcher.pop('id')
-                print(researcher)
-                cleaned_es_researchers.append(researcher)
+            cleaned_es_researchers = django_researchers
 
     for row in cleaned_es_researchers:
 
@@ -502,8 +500,8 @@ def process_laboratories():
 
 
 if __name__ == '__main__':
-    csv_open = True
-    djangodb_open = None
+    csv_open = None
+    djangodb_open = True
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('get_structid_list')
     get_structid_list()
