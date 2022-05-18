@@ -8,33 +8,43 @@ import time
 from sovisuhal.libs import esActions
 from elasticHal.libs import archivesOuvertes, utils
 
-# Global variables
+"""
+django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
+Turn django_init value at "True" only if you intend to use the script as standalone and want to use the Database by turning djangodb_open from N.
+Default Value: "django_init = False"
+"""
+django_init = False
+if __name__ == '__main__':
+    if django_init:
+        print("init django DB access (standalone mode)")
+        import os
+        import django
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
+        django.setup()  # allow to use the elastichal.models under independantly from Django
+
+        from elasticHal.models import Structure, Laboratory, Researcher
+else:
+    from elasticHal.models import Structure, Laboratory, Researcher
+
+# Global variables declaration
 structIdlist = None
 Labolist = None
 
-# parameters
-csv_open = None  # Si csv_open = True, prise en compte des csv pour le processus en addition des données ES. Est à True par défaut dans le cas ou le fichier est lancé en tant que script (voir en bas du code)
-djangodb_open = True  # Si djangodb_open = True, prise en compte des données dans la partie admin de django pour le processus en addition des données ES.
+csv_open = None  # If csv_open = True script will use .csv stocked in elasticHal > data to generate index for ES. Default Value is True when used as a script and False when called by SoVisu.(check the code at the bottom of the file)
+djangodb_open = None  # If djangodb_open = True script will use django Db to generate index for ES. Default Value is False vhen used as a script and True when called by SoVisu. (check the code at the bottom of the file)
 
 init = True
 
-if djangodb_open == True:
-    print("init django DB access (standalone mode)")
-    import os
-    import django
-
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
-    django.setup()  # allow to use the elastichal.models under independantly from Django
-    from elasticHal.models import Structure, Laboratory, Researcher
 
 # Connect to DB
 es = esActions.es_connector()
 
-print("__name__ value is : ", __name__)
+# print("__name__ value is : ", __name__)
 
 
 def get_structid_list():
     print("csv_open value is : ", csv_open)
+    print("djangodb_open value is : ", djangodb_open)
     global structIdlist
     structIdlist = []
     # get structId for already existing structures in ES
@@ -499,23 +509,41 @@ def process_laboratories():
                 index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
 
 
-if __name__ == '__main__':
-    csv_open = None
-    djangodb_open = True
+def autorun(structure, researcher, laboratories, csv_enabler=True, django_enabler=None):
+    global csv_open, djangodb_open
+    csv_open = csv_enabler
+    djangodb_open = django_enabler
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('get_structid_list')
     get_structid_list()
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('get_labo_list')
     get_labo_list()
+
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('process_structures')
-    process_structures()
+    if structure:
+        print('processing structures')
+        process_structures()
+    else:
+        print('structure is disabled, skipping to next process')
+
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('process_researchers')
-    process_researchers()
+    if researcher:
+        print('processing researchers')
+        process_researchers()
+    else:
+        print('researcher is disabled, skipping to next process')
+
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('process_laboratories')
-    process_laboratories()
+    if laboratories:
+        print('processing laboratories')
+        process_laboratories()
+    else:
+        print('researcher is disabled, skipping to next process')
+
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('harvesting finished')
+
+
+if __name__ == '__main__':
+    autorun(structure='on', researcher='on', laboratories='on')
