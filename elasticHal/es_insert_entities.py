@@ -10,7 +10,7 @@ from elasticHal.libs import archivesOuvertes, utils
 
 """
 django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
-Turn django_init value at "True" only if you intend to use the script as standalone and want to use the Database by turning djangodb_open from N.
+Turn django_init value at "True" only if you intend to use the script as standalone and want to use the Database by turning djangodb_open value at "True".
 Default Value: "django_init = False"
 """
 django_init = False
