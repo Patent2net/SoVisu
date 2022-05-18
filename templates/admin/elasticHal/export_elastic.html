@@ -1,0 +1,30 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify %}
+{% load admin_urls %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />{% endblock %}
+{% block bodyclass %}{{ block.super }} {{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+            &rsaquo;{% comment %} <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> {% endcomment %}
+            &rsaquo; {% block breadcrumbs_last %}
+            Export ElasticHal
+            {% endblock %}
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block content %}
+<div>
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <div class="submit-row">
+            <button type="submit" class="button" >Soumettre</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -7,11 +7,19 @@ from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
 from django import forms
 
+from .es_insert_entities import autorun
+
 admin.site.site_header = "Administration de SoVisu"
 
 
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
+
+
+class ElasticExportForm(forms.Form):
+    Structures = forms.BooleanField(initial=True, required=False)
+    Laboratoires = forms.BooleanField(initial=True, required=False)
+    Chercheurs = forms.BooleanField(initial=True, required=False)
 
 
 class ExportCsv:
@@ -35,13 +43,19 @@ class ExportCsv:
     export_as_csv.short_description = "Exporter les éléments sélectionnés"
 
 
+# Models are under that line+
+
+
 class StructureAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('structSirene', 'acronym', 'label')
     actions = ["export_as_csv"]
 
     def get_urls(self):
         urls = super().get_urls()
-        new_urls = [path('upload-csv/', self.upload_csv), ]
+        new_urls = [
+            path('upload-csv/', self.upload_csv),
+            path('export-elastic/', self.export_elastic),
+        ]
         return new_urls + urls
 
     @staticmethod
@@ -80,6 +94,21 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
 
+    @staticmethod
+    def export_elastic(request):
+
+        if request.method == "POST":
+            structure = request.POST.get('Structures')
+            laboratoires = request.POST.get('Laboratoires')
+            chercheurs = request.POST.get('Chercheurs')
+            print(structure, laboratoires, chercheurs)
+
+            autorun(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+
+        form = ElasticExportForm()
+        data = {"form": form}
+        return render(request, "admin/elasticHal/export_elastic.html", data)
+
 
 class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('acronym', 'label', 'halStructId', 'idRef', 'structSirene')
@@ -88,7 +117,10 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
     def get_urls(self):
         urls = super().get_urls()
-        new_urls = [path('upload-csv/', self.upload_csv), ]
+        new_urls = [
+            path('upload-csv/', self.upload_csv),
+            path('export-elastic/', self.export_elastic),
+        ]
         return new_urls + urls
 
     @staticmethod
@@ -128,15 +160,34 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
 
+    @staticmethod
+    def export_elastic(request):
+
+        if request.method == "POST":
+            structure = request.POST.get('Structures')
+            laboratoires = request.POST.get('Laboratoires')
+            chercheurs = request.POST.get('Chercheurs')
+            print(structure, laboratoires, chercheurs)
+
+            autorun(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+
+        form = ElasticExportForm()
+        data = {"form": form}
+        return render(request, "admin/elasticHal/export_elastic.html", data)
+
 
 class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('ldapId', 'name', 'function', 'lab')
     list_filter = ('structSirene', 'lab', 'function',)
+    search_fields = ('name',)
     actions = ["export_as_csv"]
 
     def get_urls(self):
         urls = super().get_urls()
-        new_urls = [path('upload-csv/', self.upload_csv), ]
+        new_urls = [
+            path('upload-csv/', self.upload_csv),
+            path('export-elastic/', self.export_elastic),
+        ]
         return new_urls + urls
 
     @staticmethod
@@ -186,6 +237,21 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         form = CsvImportForm()
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
+
+    @staticmethod
+    def export_elastic(request):
+
+        if request.method == "POST":
+            structure = request.POST.get('Structures')
+            laboratoires = request.POST.get('Laboratoires')
+            chercheurs = request.POST.get('Chercheurs')
+            print(structure, laboratoires, chercheurs)
+
+            autorun(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+
+        form = ElasticExportForm()
+        data = {"form": form}
+        return render(request, "admin/elasticHal/export_elastic.html", data)
 
 
 # Register your models here.
