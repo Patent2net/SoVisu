@@ -7,7 +7,7 @@ from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
 from django import forms
 
-from .es_insert_entities import autorun
+from .es_insert_entities import create_index
 
 admin.site.site_header = "Administration de SoVisu"
 
@@ -103,7 +103,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
             chercheurs = request.POST.get('Chercheurs')
             print(structure, laboratoires, chercheurs)
 
-            autorun(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
         form = ElasticExportForm()
         data = {"form": form}
@@ -169,7 +169,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
             chercheurs = request.POST.get('Chercheurs')
             print(structure, laboratoires, chercheurs)
 
-            autorun(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
         form = ElasticExportForm()
         data = {"form": form}
@@ -247,7 +247,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
             chercheurs = request.POST.get('Chercheurs')
             print(structure, laboratoires, chercheurs)
 
-            autorun(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
         form = ElasticExportForm()
         data = {"form": form}
