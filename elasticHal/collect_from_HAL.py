@@ -5,6 +5,32 @@ from elasticsearch import helpers
 from sovisuhal.libs import esActions
 from elasticHal.libs import hal, utils, unpaywall, location_docs
 
+"""
+django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
+Turn django_init value at "True" only if you intend to use the script as standalone and want to use the Database by turning djangodb_open value at "True".
+Default Value: "django_init = False"
+"""
+django_init = False
+if __name__ == '__main__':
+    if django_init:
+        print("init django DB access (standalone mode)")
+        import os
+        import django
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
+        django.setup()  # allow to use the elastichal.models under independantly from Django
+
+        from elasticHal.models import Structure, Laboratory, Researcher
+else:
+    from elasticHal.models import Structure, Laboratory, Researcher
+
+# Global variables
+init = True  # if init = True overwrite the validated status
+
+csv_open = None  # If csv_open = True script will use .csv stocked in elasticHal > data to generate index for ES. Default Value is True when used as a script and False when called by SoVisu.(check the code at the bottom of the file)
+djangodb_open = None  # If djangodb_open = True script will use django Db to generate index for ES. Default Value is False vhen used as a script and True when called by SoVisu. (check the code at the bottom of the file)
+
+harvet_history = []
+
 # Connect to DB
 es = esActions.es_connector()
 # get structId for already existing structures in ES
@@ -13,17 +39,9 @@ res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits.
 structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
 print(structIdlist)
 
-if __name__ == '__main__':
-    init = True  # if init = True overwrite the validated status
-    harvet_history = []
-    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('harvesting started')
 
+def collect_laboratories_data():
     # Process laboratories
-    # astuce pour passer vite
-    dicoAcronym = dict()
-    # if not init:
-
     with open('data/laboratories.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=';')
         for row in csv_reader:
@@ -102,8 +120,13 @@ if __name__ == '__main__':
                     docs,
                     index=row["structSirene"] + "-" + row["halStructId"] + "-laboratories-documents",
                 )
+
+
+def collect_researchers_data():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     Labos = []
+    dicoAcronym = dict()
+
     with open('data/laboratories.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=';')
         for row in csv_reader:
@@ -113,10 +136,12 @@ if __name__ == '__main__':
             else:
                 connaitLab = row["halStructId"]
                 Labos.append(connaitLab)
+
             if row['acronym'] not in dicoAcronym.values():
                 dicoAcronym[row['halStructId']] = row['acronym']
-    # Process researchers
     print(Labos)
+
+    # Process researchers
     with open('data/researchers.csv', encoding='utf-8') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=',')
         for row in csv_reader:
@@ -205,6 +230,19 @@ if __name__ == '__main__':
                 )
             else:
                 print('chercheur hors structure ', row['ldapId'], ", structure : ", row['structSirene'])
+
+
+if __name__ == '__main__':
+    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print('harvesting started')
+
+    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print('collecting laboratories data')
+    collect_laboratories_data()
+
+    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print('collecting researchers data')
+    collect_researchers_data()
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('harvesting finished')
