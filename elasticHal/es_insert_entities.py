@@ -221,10 +221,9 @@ def get_labo_list():
                 print("Indice creation process cancelled for ", row['ldapId'], ", StructSirene unknown. Please check it or add the Structure beforehand")
 
 
-def process_structures():
+def create_structures_index():
     # Process structures
     if csv_open:
-        print("processing from csv source")
         with open('data/structures.csv', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             for row in csv_reader:
@@ -232,7 +231,6 @@ def process_structures():
                 res = es.index(index=row["structSirene"] + "-structures", id=row['structSirene'], body=json.dumps(row))
 
     elif djangodb_open:
-        print("processing from django db source")
         for row in Structure.objects.all().values():
             row.pop('id')  # delete unique id added by django DB from the dict
             print(row)
@@ -242,7 +240,7 @@ def process_structures():
         print("No source enabled to add structure. Please check the parameters")
 
 
-def process_researchers():
+def create_researchers_index():
     # Process researchers
     scope_param = esActions.scope_all()
 
@@ -259,8 +257,8 @@ def process_researchers():
 
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=',')
-            csv_reader = list([searcher for searcher in csv_reader if searcher['halId_s'] is not ''])  # Only keep researchers with known 'halId_s'
+            csv_reader = list(csv.DictReader(csv_file, delimiter=','))
+            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] is not '']  # Only keep researchers with known 'halId_s'
             if cleaned_es_researchers:
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
@@ -386,7 +384,7 @@ def process_researchers():
             print('chercheur hors structure ', row['ldapId'], ", structure : ", row['structSirene'])
 
 
-def process_laboratories():
+def create_laboratories_index():
     # Process laboratories
     scope_param = esActions.scope_all()
 
@@ -405,8 +403,7 @@ def process_laboratories():
 
     if csv_open:
         with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=';')
-            csv_reader = list(csv_reader)
+            csv_reader = list(csv.DictReader(csv_file, delimiter=';'))
             if cleaned_es_laboratories:
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
@@ -423,7 +420,7 @@ def process_laboratories():
 
     if djangodb_open:
         if cleaned_es_laboratories:
-            print("checking csv researcher list:")
+            print("checking DjangoDb laboratory list:")
             for lab in Laboratory.objects.all().values():
                 lab.pop('id')
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in cleaned_es_laboratories):
@@ -509,7 +506,7 @@ def process_laboratories():
                 index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
 
 
-def autorun(structure, researcher, laboratories, csv_enabler=True, django_enabler=None):
+def create_index(structure, researcher, laboratories, csv_enabler=True, django_enabler=None):
     global csv_open, djangodb_open
     csv_open = csv_enabler
     djangodb_open = django_enabler
@@ -523,27 +520,27 @@ def autorun(structure, researcher, laboratories, csv_enabler=True, django_enable
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if structure:
         print('processing structures')
-        process_structures()
+        create_structures_index()
     else:
         print('structure is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
         print('processing researchers')
-        process_researchers()
+        create_researchers_index()
     else:
         print('researcher is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
         print('processing laboratories')
-        process_laboratories()
+        create_laboratories_index()
     else:
-        print('researcher is disabled, skipping to next process')
+        print('laboratories is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('harvesting finished')
 
 
 if __name__ == '__main__':
-    autorun(structure='on', researcher='on', laboratories='on')
+    create_index(structure='on', researcher='on', laboratories='on')
