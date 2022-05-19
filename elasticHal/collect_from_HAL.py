@@ -76,11 +76,11 @@ def collect_laboratories_data():
                 laboratories_list.append(lab)
 
     print(f'laboratories_list values = {laboratories_list}')
-    for row in laboratories_list:
-        print(f"Processing : {row['acronym']}")
+    for lab in laboratories_list:
+        print(f"Processing : {lab['acronym']}")
         # Collect publications
-        if len(row['halStructId']) > 0:
-            docs = hal.find_publications(row['halStructId'], 'labStructId_i')
+        if len(lab['halStructId']) > 0:
+            docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
             docs = location_docs.generate_countrys_fields(docs)
             # Insert documents collection
             for num, doc in enumerate(docs):
@@ -90,11 +90,11 @@ def collect_laboratories_data():
                 doc["harvested_from"] = "lab"
                 doc["harvested_from_ids"] = []
 
-                doc["harvested_from_ids"].append(row['halStructId'])
+                doc["harvested_from_ids"].append(lab['halStructId'])
                 doc["harvested_from_label"] = []
-                doc["harvested_from_label"].append(row['acronym'])
+                doc["harvested_from_label"].append(lab['acronym'])
 
-                harvet_history.append({'docid': doc['docid'], 'from': row['halStructId']})
+                harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
 
                 for h in harvet_history:
                     if h['docid'] == doc['docid']:
@@ -129,11 +129,11 @@ def collect_laboratories_data():
                     doc_param = esActions.scope_p("_id", doc["_id"])
 
                     if not es.indices.exists(
-                            index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents"):
+                            index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
                         es.indices.create(
-                            index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
+                            index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
                     res = es.search(
-                        index=row["structSirene"] + "-" + row["halStructId"] + "-laboratories-documents",
+                        index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
                         body=doc_param)
 
                     if len(res['hits']['hits']) > 0:
@@ -150,29 +150,16 @@ def collect_laboratories_data():
             res = helpers.bulk(
                 es,
                 docs,
-                index=row["structSirene"] + "-" + row["halStructId"] + "-laboratories-documents",
+                index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
             )
 
 
 def collect_researchers_data():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
-    Labos = []
-    dicoAcronym = dict()
+    Labos, dicoAcronym = init_labo()
 
-    with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=';')
-        for row in csv_reader:
-            row["halStructId"] = row["halStructId"].strip()
-            if " " in row["halStructId"]:
-                connaitLab = "non-labo"
-            else:
-                connaitLab = row["halStructId"]
-                Labos.append(connaitLab)
-
-            if row['acronym'] not in dicoAcronym.values():
-                dicoAcronym[row['halStructId']] = row['acronym']
-    print(f"labos variable values ={Labos}")
-
+    print(f"labos values ={Labos}")
+    print(f"dicoAcronym values ={dicoAcronym}")
     # Process researchers
     researchers_list = []
     if csv_open:
@@ -180,7 +167,6 @@ def collect_researchers_data():
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
             if researchers_list:
                 print("checking researchers.csv list: ")
-
                 for searcher in csv_reader:
                     if any(dictlist['halStructId'] == searcher['halStructId'] for dictlist in researchers_list):
                         print(f'{searcher["acronym"]} is already in researchers_list')
@@ -207,14 +193,14 @@ def collect_researchers_data():
                 searcher.pop('id')
                 researchers_list.append(searcher)
 
-    print(researchers_list)
-    for row in researchers_list:
-        if row["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
-            print(f"Processing : {row['halId_s']}")
-            if row["labHalId"] not in Labos:
-                row["labHalId"] = "non-labo"
+    print(f'researchers_list content = {researchers_list}')
+    for searcher in researchers_list:
+        if searcher["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
+            print(f"Processing : {searcher['halId_s']}")
+            if searcher["labHalId"] not in Labos:
+                searcher["labHalId"] = "non-labo"
             # Collect publications
-            docs = hal.find_publications(row['halId_s'], 'authIdHal_s')
+            docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             docs = location_docs.generate_countrys_fields(docs)
 
             # Insert documents collection
@@ -227,14 +213,14 @@ def collect_researchers_data():
                 doc["harvested_from_ids"] = []
                 doc["harvested_from_label"] = []
                 try:
-                    doc["harvested_from_label"].append(dicoAcronym[row["labHalId"]])
+                    doc["harvested_from_label"].append(dicoAcronym[searcher["labHalId"]])
                 except:
                     doc["harvested_from_label"].append("non-labo")
 
-                doc["harvested_from_ids"].append(row['halId_s'])
+                doc["harvested_from_ids"].append(searcher['halId_s'])
                 # historique d'appartenance du docId
                 # pour attribuer les bons docs aux chercheurs
-                harvet_history.append({'docid': doc['docid'], 'from': row['halId_s']})
+                harvet_history.append({'docid': doc['docid'], 'from': searcher['halId_s']})
 
                 for h in harvet_history:
                     if h['docid'] == doc['docid']:
@@ -269,11 +255,11 @@ def collect_researchers_data():
 
                     doc_param = esActions.scope_p("_id", doc["_id"])
 
-                    if not es.indices.exists(index=row["structSirene"] + "-" + row["labHalId"] + "-researchers-" + row["ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
-                        print(f'exception {row["labHalId"]}, {row["ldapId"]}')
+                    if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
+                        print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
                         break
-                    res = es.search(index=row["structSirene"] + "-" + row["labHalId"] + "-researchers-" + row[
-                        "ldapId"] + "-documents", body=doc_param)  # -researchers" + row["ldapId"] + "-documents
+                    res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                        "ldapId"] + "-documents", body=doc_param)  # -researchers" + searcher["ldapId"] + "-documents
 
                     if len(res['hits']['hits']) > 0:
                         doc['validated'] = res['hits']['hits'][0]['_source']['validated']
@@ -289,14 +275,48 @@ def collect_researchers_data():
             res = helpers.bulk(
                 es,
                 docs,
-                index=row["structSirene"] + "-" + row["labHalId"] + "-researchers-" + row["ldapId"] + "-documents",
-                # -researchers" + row["ldapId"] + "-documents
+                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
+                # -researchers" + searcher["ldapId"] + "-documents
             )
         else:
-            print(f"chercheur hors structure, {row['ldapId']}, structure : {row['structSirene']}")
+            print(f"chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
 
 
-def autorun(laboratories, researcher, csv_enabler=True, django_enabler=None):
+def init_labo():
+    # initialisation liste labos supposée plus fiables que données issues Ldap.
+    Labos = []
+    dicoAcronym = dict()
+    if csv_open:
+        with open('data/laboratories.csv', encoding='utf-8') as csv_file:
+            csv_reader = csv.DictReader(csv_file, delimiter=';')
+            for lab in csv_reader:
+                lab["halStructId"] = lab["halStructId"].strip()
+                if " " in lab["halStructId"]:
+                    connaitLab = "non-labo"
+                else:
+                    connaitLab = lab["halStructId"]
+                    Labos.append(connaitLab)
+
+                if lab['acronym'] not in dicoAcronym.values():
+                    dicoAcronym[lab['halStructId']] = lab['acronym']
+
+    if djangodb_open:
+        for lab in Laboratory.objects.all().values():
+            lab.pop('id')
+            lab["halStructId"] = lab["halStructId"].strip()
+            if " " in lab["halStructId"]:
+                connaitLab = "non-labo"
+            else:
+                connaitLab = lab["halStructId"]
+                Labos.append(connaitLab)
+
+            if lab['acronym'] not in dicoAcronym.values():
+                dicoAcronym[lab['halStructId']] = lab['acronym']
+
+    return Labos, dicoAcronym
+
+
+def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None):
     global csv_open, djangodb_open
     csv_open = csv_enabler
     djangodb_open = django_enabler
@@ -322,4 +342,4 @@ def autorun(laboratories, researcher, csv_enabler=True, django_enabler=None):
 
 
 if __name__ == '__main__':
-    autorun(researcher='on', laboratories='on')
+    collect_data(laboratories='on', researcher='on')
