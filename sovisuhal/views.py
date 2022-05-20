@@ -247,13 +247,13 @@ def check(request):
                         if "state" in children1.keys():
                             if children1['state'] == validate:
                                 concepts.append(
-                                    {'id': children1['id'], 'label_fr': children1['label_fr'], 'state': validate})
+                                    {'id': children1['id'], 'label_fr': "&nbsp;&nbsp;&nbsp;&nbsp;&bull; " + children1['label_fr'], 'state': validate})
                             else:
                                 print(children1)
                         if 'children' in children1:
                             for children2 in children1['children']:
                                 if "state" in children2.keys() and children2['state'] == validate:
-                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'],
+                                    concepts.append({'id': children2['id'], 'label_fr':  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- " +children2['label_fr'],
                                                      'state': validate})
 
         return render(request, 'check.html',

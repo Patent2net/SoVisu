@@ -301,7 +301,7 @@
                         {% for concept in concepts %}
                             <tr class="text-gray-500">
                                 <td>{{ concept.id }}</td>
-                                <td>{{ concept.label_fr }}</td>
+                                <td>{{ concept.label_fr | safe }} </td>
                             </tr>
                         {% endfor %}
 
