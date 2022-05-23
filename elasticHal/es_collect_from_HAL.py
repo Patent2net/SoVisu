@@ -45,6 +45,7 @@ if __name__ == '__main__':
             # Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
             docs = doi_enrichissement.docs_enrichissement_doi(docs)
+            
 
             # Insert documents collection
             for num, doc in enumerate(docs):

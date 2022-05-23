@@ -873,11 +873,13 @@ def impact_international(request):
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
+        filtreLab = ''
 
     elif i_type == "lab":
-
         start_date_param = esActions.date_p(field, entity['halStructId'])
+        indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
         filtrechercheur = ''
+        filtreLab = '_index: "' + indexsearch + '"'
 
     res = es.search(index=struct + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -894,6 +896,7 @@ def impact_international(request):
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'filtreLab':filtreLab,
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
