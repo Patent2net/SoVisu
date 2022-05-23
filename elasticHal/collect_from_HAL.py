@@ -60,10 +60,11 @@ def collect_laboratories_data():
                 laboratories_list = csv_reader
 
     if djangodb_open:
+        djangolab = Laboratory.objects.all().values()
+        djangolab = list([lab.pop('id') for lab in djangolab])
         if laboratories_list:
             print("checking DjangoDb laboratory list:")
-            for lab in Laboratory.objects.all().values():
-                lab.pop('id')
+            for lab in djangolab:
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
                     print(f'{lab["acronym"]} is already in laboratories_list')
                 else:
@@ -71,9 +72,7 @@ def collect_laboratories_data():
                     laboratories_list.append(lab)
         else:
             print("laboratories_list is empty, adding DjangoDb content to values")
-            for lab in Laboratory.objects.all().values():
-                lab.pop('id')
-                laboratories_list.append(lab)
+            laboratories_list = djangolab
 
     print(f'laboratories_list values = {laboratories_list}')
     for lab in laboratories_list:
@@ -111,15 +110,15 @@ def collect_laboratories_data():
                 doc["records"] = []
 
                 try:
-                    shouldBeOpen = utils.should_be_open(doc)
-                    if shouldBeOpen == 1:
+                    should_be_open = utils.should_be_open(doc)
+                    if should_be_open == 1:
                         doc["should_be_open"] = True
-                    if shouldBeOpen == -1:
+                    if should_be_open == -1:
                         doc["should_be_open"] = False
 
-                    if shouldBeOpen == 1 or shouldBeOpen == 2:
+                    if should_be_open == 1 or should_be_open == 2:
                         doc['isOaExtra'] = True
-                    elif shouldBeOpen == -1:
+                    elif should_be_open == -1:
                         doc['isOaExtra'] = False
                 except:
                     print('publicationDate_tdate error ?')
@@ -156,15 +155,16 @@ def collect_laboratories_data():
 
 def collect_researchers_data():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
-    Labos, dicoAcronym = init_labo()
+    labos, dico_acronym = init_labo()
 
-    print(f"labos values ={Labos}")
-    print(f"dicoAcronym values ={dicoAcronym}")
+    print(f"labos values ={labos}")
+    print(f"dicoAcronym values ={dico_acronym}")
     # Process researchers
     researchers_list = []
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
+            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] is not '']  # Only keep researchers with known 'halId_s'
             if researchers_list:
                 print("checking researchers.csv list: ")
                 for searcher in csv_reader:
@@ -178,10 +178,11 @@ def collect_researchers_data():
                 researchers_list = csv_reader
 
     if djangodb_open:
+        django_researchers = Researcher.objects.all().values()
+        django_researchers = list([researcher for researcher in django_researchers if researcher['halId_s'] is not '' and researcher.pop('id')])  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
         if researchers_list:
             print("checking DjangoDb laboratory list:")
-            for searcher in Researcher.objects.all().values():
-                searcher.pop('id')
+            for searcher in django_researchers:
                 if any(dictlist['halStructId'] == searcher['halStructId'] for dictlist in researchers_list):
                     print(f'{searcher["acronym"]} is already in researchers_list')
                 else:
@@ -189,20 +190,19 @@ def collect_researchers_data():
                     researchers_list.append(searcher)
         else:
             print("researchers_list is empty, adding DjangoDb content to values")
-            for searcher in Researcher.objects.all().values():
-                searcher.pop('id')
-                researchers_list.append(searcher)
+            researchers_list = django_researchers
 
     print(f'researchers_list content = {researchers_list}')
     for searcher in researchers_list:
         if searcher["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
             print(f"Processing : {searcher['halId_s']}")
-            if searcher["labHalId"] not in Labos:
+            if searcher["labHalId"] not in labos:
                 searcher["labHalId"] = "non-labo"
             # Collect publications
             docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
+            print("find publication done")
             docs = location_docs.generate_countrys_fields(docs)
-
+            print("generate country field done")
             # Insert documents collection
             for num, doc in enumerate(docs):
                 doc["_id"] = doc['docid']
@@ -213,7 +213,7 @@ def collect_researchers_data():
                 doc["harvested_from_ids"] = []
                 doc["harvested_from_label"] = []
                 try:
-                    doc["harvested_from_label"].append(dicoAcronym[searcher["labHalId"]])
+                    doc["harvested_from_label"].append(dico_acronym[searcher["labHalId"]])
                 except:
                     doc["harvested_from_label"].append("non-labo")
 
@@ -238,15 +238,15 @@ def collect_researchers_data():
                 doc["MDS"] = utils.calculate_mds(doc)
 
                 try:
-                    shouldBeOpen = utils.should_be_open(doc)
-                    if shouldBeOpen == 1:
+                    should_be_open = utils.should_be_open(doc)
+                    if should_be_open == 1:
                         doc["should_be_open"] = True
-                    if shouldBeOpen == -1:
+                    if should_be_open == -1:
                         doc["should_be_open"] = False
 
-                    if shouldBeOpen == 1 or shouldBeOpen == 2:
+                    if should_be_open == 1 or should_be_open == 2:
                         doc['isOaExtra'] = True
-                    elif shouldBeOpen == -1:
+                    elif should_be_open == -1:
                         doc['isOaExtra'] = False
                 except:
                     print('publicationDate_tdate error ?')
@@ -284,36 +284,37 @@ def collect_researchers_data():
 
 def init_labo():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
-    Labos = []
-    dicoAcronym = dict()
+    labos = []
+    dico_acronym = dict()
     if csv_open:
         with open('data/laboratories.csv', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=';')
             for lab in csv_reader:
                 lab["halStructId"] = lab["halStructId"].strip()
                 if " " in lab["halStructId"]:
-                    connaitLab = "non-labo"
+                    connait_lab = "non-labo"
                 else:
-                    connaitLab = lab["halStructId"]
-                    Labos.append(connaitLab)
+                    connait_lab = lab["halStructId"]
+                    labos.append(connait_lab)
 
-                if lab['acronym'] not in dicoAcronym.values():
-                    dicoAcronym[lab['halStructId']] = lab['acronym']
+                if lab['acronym'] not in dico_acronym.values():
+                    dico_acronym[lab['halStructId']] = lab['acronym']
 
     if djangodb_open:
-        for lab in Laboratory.objects.all().values():
-            lab.pop('id')
+        djangolab = Laboratory.objects.all().values()
+        djangolab = list([lab.pop('id') for lab in djangolab])
+        for lab in djangolab:
             lab["halStructId"] = lab["halStructId"].strip()
             if " " in lab["halStructId"]:
-                connaitLab = "non-labo"
+                connait_lab = "non-labo"
             else:
-                connaitLab = lab["halStructId"]
-                Labos.append(connaitLab)
+                connait_lab = lab["halStructId"]
+                labos.append(connait_lab)
 
-            if lab['acronym'] not in dicoAcronym.values():
-                dicoAcronym[lab['halStructId']] = lab['acronym']
+            if lab['acronym'] not in dico_acronym.values():
+                dico_acronym[lab['halStructId']] = lab['acronym']
 
-    return Labos, dicoAcronym
+    return labos, dico_acronym
 
 
 def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None):
