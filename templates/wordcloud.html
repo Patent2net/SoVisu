@@ -23,11 +23,11 @@
         {% if type == "lab" %}
         <div class="w-full h-full">
             <iframe src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%"></iframe>
-        </div>
+        </div>                                          4ec4e950-8716-11eb-b61e-8702cc892037
         {%  else %}
                     <div class="w-full h-full">
             <iframe src="{{ url }}/app/dashboards#/view/84aeeba0-bf7f-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
-        </div>
+        </div>                                          eb38ebe0-d050-11ec-9593-851110e50703?
         {%  endif %}
 
     </div>
