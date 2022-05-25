@@ -65,9 +65,9 @@ def get_structid_list():
                 else:
                     if csv_row["structSirene"] not in structIdlist:
                         structIdlist.append(csv_row["structSirene"])
-                        print("Rajout de la structure ", csv_row["acronym"], " (", csv_row["structSirene"], ") dans structIdlist")
+                        print(f"Rajout de la structure  {csv_row['acronym']} (structSirene: {csv_row['structSirene']}) dans structIdlist")
                     else:
-                        print(csv_row["acronym"], " is already listed")
+                        print(f"{csv_row['acronym']} is already listed (structSirene: {csv_row['structSirene']})")
     print("listed structId: ", structIdlist)
 
     # get structId for structures in django db and compare with structIdlist
@@ -164,8 +164,7 @@ def get_labo_list():
                 else:
                     print("Indice creation process cancelled for ", row['ldapId'], ", StructSirene unknown. Please check it or add the Structure beforehand")
 
-    print("Labhalid listed: ")
-    print(Labolist)
+    print(f"Labhalid listed: {Labolist}")
 
     if djangodb_open:
         for row in Laboratory.objects.all().values():
@@ -263,7 +262,7 @@ def create_researchers_index():
                 print("checking csv researcher list:")
                 for csv_row in csv_reader:
                     if any(dictlist['halId_s'] == csv_row['halId_s'] for dictlist in cleaned_es_researchers):  # Si l'aurehalid de la ligne du csv (=chercheur) est présente dans les données récupérées d'ES : on ignore. Sinon on rajoute le chercheur à la liste.
-                        print(csv_row["halId_s"] + " is already in cleaned_es_researchers")
+                        print(f"{csv_row['halId_s']} is already in cleaned_es_researchers")
 
                     else:
                         print("adding " + csv_row["halId_s"] + " to cleaned_es_researchers")
@@ -501,7 +500,7 @@ def create_laboratories_index():
                 sys.exit()
         # create laboratory document repertory
         if not es.indices.exists(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents"):
-            print("creating document directory for: ", row["acronym"])
+            print(f"creating document directory for: {row['acronym']}(struct: {row['structSirene']})")
             es.indices.create(
                 index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
 
@@ -511,29 +510,29 @@ def create_index(structure, researcher, laboratories, csv_enabler=True, django_e
     csv_open = csv_enabler
     djangodb_open = django_enabler
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('get_structid_list')
+    print('processing get_structid_list')
     get_structid_list()
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('get_labo_list')
+    print('processing get_labo_list')
     get_labo_list()
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if structure:
-        print('processing structures')
+        print('processing create_structures_index')
         create_structures_index()
     else:
         print('structure is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
-        print('processing researchers')
+        print('processing create_researchers_index')
         create_researchers_index()
     else:
         print('researcher is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
-        print('processing laboratories')
+        print('processing create_laboratories_index')
         create_laboratories_index()
     else:
         print('laboratories is disabled, skipping to next process')
