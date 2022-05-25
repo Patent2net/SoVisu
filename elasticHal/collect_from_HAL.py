@@ -1,9 +1,10 @@
+import datetime
 import csv
 import time
 from elasticsearch import helpers
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, unpaywall, location_docs
+from elasticHal.libs import hal, utils, archivesOuvertes, location_docs, doi_enrichissement
 
 """
 django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
@@ -24,7 +25,10 @@ else:
     from elasticHal.models import Laboratory, Researcher
 
 # Global variables
-init = True  # if init = True overwrite the validated status
+init = False  # if init = True overwrite the validated status
+
+force_hal = True
+forceAuthorship = True
 
 csv_open = None  # If csv_open = True script will use .csv stocked in elasticHal > data to generate index for ES. Default Value is True when used as a script and False when called by SoVisu.(check the code at the bottom of the file)
 djangodb_open = None  # If djangodb_open = True script will use django Db to generate index for ES. Default Value is False vhen used as a script and True when called by SoVisu. (check the code at the bottom of the file)
@@ -61,9 +65,9 @@ def collect_laboratories_data():
 
                 for lab in csv_reader:
                     if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                        print(f'{lab["acronym"]} is already in laboratories_list')
+                        print(f'{lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
                     else:
-                        print(f'adding {lab["acronym"]} to laboratories_list')
+                        print(f'adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
                         laboratories_list.append(lab)
             else:
                 print("laboratories_list is empty, adding csv content to values")
@@ -76,22 +80,24 @@ def collect_laboratories_data():
             print("checking DjangoDb laboratory list:")
             for lab in djangolab:
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                    print(f'{lab["acronym"]} is already in laboratories_list')
+                    print(f'{lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
                 else:
-                    print(f'adding {lab["acronym"]} to laboratories_list')
+                    print(f'adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
                     laboratories_list.append(lab)
         else:
             print("laboratories_list is empty, adding DjangoDb content to values")
             laboratories_list = djangolab
 
-    print(f'laboratories_list values = {laboratories_list}')
+    # print(f'laboratories_list values = {laboratories_list}')
     # Process laboratories
     for lab in laboratories_list:
         print(f"Processing : {lab['acronym']}")
         # Collect publications
         if len(lab['halStructId']) > 0:
             docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
+            # Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
+            docs = doi_enrichissement.docs_enrichissement_doi(docs)
             # Insert documents collection
             for num, doc in enumerate(docs):
                 print(f"- sub processing : {str(doc['docid'])}")
@@ -103,6 +109,28 @@ def collect_laboratories_data():
                 doc["harvested_from_ids"].append(lab['halStructId'])
                 doc["harvested_from_label"] = []
                 doc["harvested_from_label"].append(lab['acronym'])
+                if "Created" not in doc:
+                    doc['Created'] = datetime.datetime.now().isoformat()
+
+                doc["authorship"] = []
+
+                authHalId_s_filled = []
+                if "authId_i" in doc:
+                    for auth in doc["authId_i"]:
+                        try:
+                            aureHal = archivesOuvertes.get_halid_s(auth)
+                            authHalId_s_filled.append(aureHal)
+                        except:
+                            authHalId_s_filled.append("")
+
+                authors_count = len(authHalId_s_filled)
+                i = 0
+                for auth in authHalId_s_filled:
+                    i += 1
+                    if i == 1 and auth != "":
+                        doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
+                    elif i == authors_count and auth != "":
+                        doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
 
                 harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
 
@@ -110,14 +138,7 @@ def collect_laboratories_data():
                     if h['docid'] == doc['docid']:
                         doc["harvested_from_ids"].append(h['from'])
 
-                if 'doiId_s' in doc:
-                    tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
-                    if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
-                    if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
-                    if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
-
                 doc["MDS"] = utils.calculate_mds(doc)
-
                 doc["records"] = []
 
                 try:
@@ -142,17 +163,20 @@ def collect_laboratories_data():
                             index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
                         es.indices.create(
                             index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
-                    res = es.search(
-                        index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                        body=doc_param)
+                    res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                                    body=doc_param)
 
                     if len(res['hits']['hits']) > 0:
-                        doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                        if "authorship" in res['hits']['hits'][0]['_source'] and not forceAuthorship:
+                            doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                        if "validated" in res['hits']['hits'][0]['_source']:
+                            doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                        if force_hal:
+                            doc['validated'] = True
 
                         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
                             doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
                                                    'MDS': res['hits']['hits'][0]['_source']['MDS']})
-
                     else:
                         doc["validated"] = True
             time.sleep(1)
@@ -220,9 +244,9 @@ def collect_researchers_data():
                 searcher["labHalId"] = "non-labo"
             # Collect publications
             docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
-            print("find publication done")
+            # Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
-            print("generate country field done")
+            docs = doi_enrichissement.docs_enrichissement_doi(docs)
             # Insert documents collection
             for num, doc in enumerate(docs):
                 doc["_id"] = doc['docid']
@@ -237,6 +261,20 @@ def collect_researchers_data():
                 except:
                     doc["harvested_from_label"].append("non-labo")
 
+                doc["authorship"] = []
+
+                if "authIdHal_s" in doc:
+                    authors_count = len(doc["authIdHal_s"])
+                    i = 0
+                    for auth in doc["authIdHal_s"]:
+                        i += 1
+                        if i == 1:
+                            doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
+                        elif i == authors_count:
+                            doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
+                if "Created" not in doc:
+                    doc['Created'] = datetime.datetime.now().isoformat()
+
                 doc["harvested_from_ids"].append(searcher['halId_s'])
                 # historique d'appartenance du docId
                 # pour attribuer les bons docs aux chercheurs
@@ -248,13 +286,6 @@ def collect_researchers_data():
                             doc["harvested_from_ids"].append(h['from'])
 
                 doc["records"] = []
-
-                if 'doiId_s' in doc:
-                    tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
-                    if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
-                    if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
-                    if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
-
                 doc["MDS"] = utils.calculate_mds(doc)
 
                 try:
@@ -272,7 +303,6 @@ def collect_researchers_data():
                     print('publicationDate_tdate error ?')
 
                 if not init:
-
                     doc_param = esActions.scope_p("_id", doc["_id"])
 
                     if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
@@ -282,7 +312,12 @@ def collect_researchers_data():
                         "ldapId"] + "-documents", body=doc_param)  # -researchers" + searcher["ldapId"] + "-documents
 
                     if len(res['hits']['hits']) > 0:
-                        doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                        if "authorship" in res['hits']['hits'][0]['_source'] and not forceAuthorship:
+                            doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                        if "validated" in res['hits']['hits'][0]['_source']:
+                            doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                        if force_hal:
+                            doc['validated'] = True
 
                         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
                             doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
