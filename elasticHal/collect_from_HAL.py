@@ -41,8 +41,18 @@ print(structIdlist)
 
 
 def collect_laboratories_data():
-    # Process laboratories
+    # Init laboratories
     laboratories_list = []
+
+    # init esLaboratories
+    count = es.count(index="*-laboratories", body=scope_param)['count']
+    if count > 0:
+        print(count, " laboratories found in ES, checking es_laboratories list")
+        res = es.search(index="*-laboratories", body=scope_param, size=count)
+        esLaboratories = res['hits']['hits']
+        for lab in esLaboratories:
+            laboratories_list.append(lab['_source'])
+
     if csv_open:
         with open('data/laboratories.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=';'))
@@ -75,6 +85,7 @@ def collect_laboratories_data():
             laboratories_list = djangolab
 
     print(f'laboratories_list values = {laboratories_list}')
+    # Process laboratories
     for lab in laboratories_list:
         print(f"Processing : {lab['acronym']}")
         # Collect publications
@@ -156,11 +167,19 @@ def collect_laboratories_data():
 def collect_researchers_data():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     labos, dico_acronym = init_labo()
-
     print(f"labos values ={labos}")
     print(f"dicoAcronym values ={dico_acronym}")
-    # Process researchers
+    # Init researchers
     researchers_list = []
+
+    count = es.count(index="*-researchers", body=scope_param)['count']
+    if count > 0:
+        print(count, " researchers found in ES, checking es_researchers list")
+        res = es.search(index="*-researchers", body=scope_param, size=count)
+        esResearchers = res['hits']['hits']
+        for searcher in esResearchers:
+            researchers_list.append(searcher['_source'])
+
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
@@ -168,10 +187,10 @@ def collect_researchers_data():
             if researchers_list:
                 print("checking researchers.csv list: ")
                 for searcher in csv_reader:
-                    if any(dictlist['halStructId'] == searcher['halStructId'] for dictlist in researchers_list):
-                        print(f'{searcher["acronym"]} is already in researchers_list')
+                    if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
+                        print(f'{searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
                     else:
-                        print(f'adding {searcher["acronym"]} to researchers_list')
+                        print(f'adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
                         researchers_list.append(searcher)
             else:
                 print("researchers_list is empty, adding csv content to values")
@@ -183,16 +202,17 @@ def collect_researchers_data():
         if researchers_list:
             print("checking DjangoDb laboratory list:")
             for searcher in django_researchers:
-                if any(dictlist['halStructId'] == searcher['halStructId'] for dictlist in researchers_list):
-                    print(f'{searcher["acronym"]} is already in researchers_list')
+                if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
+                    print(f'{searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
                 else:
-                    print(f'adding {searcher["acronym"]} to researchers_list')
+                    print(f'adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
                     researchers_list.append(searcher)
         else:
             print("researchers_list is empty, adding DjangoDb content to values")
             researchers_list = django_researchers
 
     print(f'researchers_list content = {researchers_list}')
+    # Process researchers
     for searcher in researchers_list:
         if searcher["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
             print(f"Processing : {searcher['halId_s']}")
@@ -286,6 +306,25 @@ def init_labo():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     labos = []
     dico_acronym = dict()
+
+    # init esLaboratories
+    count = es.count(index="*-laboratories", body=scope_param)['count']
+    if count > 0:
+        print(count, " laboratories to init found in ES, processing es to init_labo")
+        res = es.search(index="*-laboratories", body=scope_param, size=count)
+        esLaboratories = res['hits']['hits']
+        for lab in esLaboratories:
+            lab = lab['_source']
+            lab["halStructId"] = lab["halStructId"].strip()
+            if " " in lab["halStructId"]:
+                connait_lab = "non-labo"
+            else:
+                connait_lab = lab["halStructId"]
+                labos.append(connait_lab)
+
+            if lab['acronym'] not in dico_acronym.values():
+                dico_acronym[lab['halStructId']] = lab['acronym']
+
     if csv_open:
         with open('data/laboratories.csv', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=';')
@@ -343,4 +382,4 @@ def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None
 
 
 if __name__ == '__main__':
-    collect_data(laboratories='on', researcher='on')
+    collect_data(laboratories=None, researcher='on')
