@@ -1,0 +1,10 @@
+procedure pour backup:
+1. modifier elastic.yaml pour affecter un chemin pour les backup
+path.repo: ['/usr/share/elasticsearch/backup']
+
+2. créer l'entrée pour snapshots:
+a. avec curl : curl -X PUT "localhost:9200/_snapshot/backup?pretty" -H 'Content-Type: application/json' -d' {"type": "fs", "settings": {"location": "backup","compress": true}}'
+b. vérifier que tout est bon
+curl --user -X GET "localhost:9200/_snapshot/_all?pretty"
+c. lancer le snapshots
+curl --user log:pass -X PUT "localhost:9200/_snapshot/backup2/snapshot_001?wait_for_completion=true&pretty"
