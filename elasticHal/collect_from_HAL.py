@@ -25,10 +25,10 @@ else:
     from elasticHal.models import Laboratory, Researcher
 
 # Global variables
-init = False  # if init = True overwrite the validated status
+check_existing_docs = True  # if True, check all the existing data in ES index to compare with those gathered to keep part of totality of data persistence
 
-force_hal = True
-forceAuthorship = True
+force_doc_validated = False  # if True, overwrite the doc['validated'] status to True for all the docs existing in ES (work only if Check_existing_docs = True)
+force_doc_authorship = False  # if True, overwrite the doc["authorship"] status for all the docs existing in ES (work only if Check_existing_docs = True)
 
 csv_open = None  # If csv_open = True script will use .csv stocked in elasticHal > data to generate index for ES. Default Value is True when used as a script and False when called by SoVisu.(check the code at the bottom of the file)
 djangodb_open = None  # If djangodb_open = True script will use django Db to generate index for ES. Default Value is False vhen used as a script and True when called by SoVisu. (check the code at the bottom of the file)
@@ -48,13 +48,13 @@ def collect_laboratories_data():
     # Init laboratories
     laboratories_list = []
 
-    # init esLaboratories
+    # init es_laboratories
     count = es.count(index="*-laboratories", body=scope_param)['count']
     if count > 0:
         print(count, " laboratories found in ES, checking es_laboratories list")
         res = es.search(index="*-laboratories", body=scope_param, size=count)
-        esLaboratories = res['hits']['hits']
-        for lab in esLaboratories:
+        es_laboratories = res['hits']['hits']
+        for lab in es_laboratories:
             laboratories_list.append(lab['_source'])
 
     if csv_open:
@@ -114,18 +114,18 @@ def collect_laboratories_data():
 
                 doc["authorship"] = []
 
-                authHalId_s_filled = []
+                authid_s_filled = []
                 if "authId_i" in doc:
                     for auth in doc["authId_i"]:
                         try:
-                            aureHal = archivesOuvertes.get_halid_s(auth)
-                            authHalId_s_filled.append(aureHal)
+                            aurehal = archivesOuvertes.get_halid_s(auth)
+                            authid_s_filled.append(aurehal)
                         except:
-                            authHalId_s_filled.append("")
+                            authid_s_filled.append("")
 
-                authors_count = len(authHalId_s_filled)
+                authors_count = len(authid_s_filled)
                 i = 0
-                for auth in authHalId_s_filled:
+                for auth in authid_s_filled:
                     i += 1
                     if i == 1 and auth != "":
                         doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
@@ -155,7 +155,7 @@ def collect_laboratories_data():
                 except:
                     print('publicationDate_tdate error ?')
 
-                if not init:
+                if check_existing_docs:
 
                     doc_param = esActions.scope_p("_id", doc["_id"])
 
@@ -167,11 +167,11 @@ def collect_laboratories_data():
                                     body=doc_param)
 
                     if len(res['hits']['hits']) > 0:
-                        if "authorship" in res['hits']['hits'][0]['_source'] and not forceAuthorship:
+                        if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
                             doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
                         if "validated" in res['hits']['hits'][0]['_source']:
                             doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                        if force_hal:
+                        if force_doc_validated:
                             doc['validated'] = True
 
                         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
@@ -200,14 +200,14 @@ def collect_researchers_data():
     if count > 0:
         print(count, " researchers found in ES, checking es_researchers list")
         res = es.search(index="*-researchers", body=scope_param, size=count)
-        esResearchers = res['hits']['hits']
-        for searcher in esResearchers:
+        es_researchers = res['hits']['hits']
+        for searcher in es_researchers:
             researchers_list.append(searcher['_source'])
 
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
-            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] is not '']  # Only keep researchers with known 'halId_s'
+            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] != '']  # Only keep researchers with known 'halId_s'
             if researchers_list:
                 print("checking researchers.csv list: ")
                 for searcher in csv_reader:
@@ -222,7 +222,7 @@ def collect_researchers_data():
 
     if djangodb_open:
         django_researchers = Researcher.objects.all().values()
-        django_researchers = list([researcher for researcher in django_researchers if researcher['halId_s'] is not '' and researcher.pop('id')])  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
+        django_researchers = list([researcher for researcher in django_researchers if researcher['halId_s'] != '' and researcher.pop('id')])  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
         if researchers_list:
             print("checking DjangoDb laboratory list:")
             for searcher in django_researchers:
@@ -302,7 +302,7 @@ def collect_researchers_data():
                 except:
                     print('publicationDate_tdate error ?')
 
-                if not init:
+                if check_existing_docs:
                     doc_param = esActions.scope_p("_id", doc["_id"])
 
                     if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
@@ -312,11 +312,11 @@ def collect_researchers_data():
                         "ldapId"] + "-documents", body=doc_param)  # -researchers" + searcher["ldapId"] + "-documents
 
                     if len(res['hits']['hits']) > 0:
-                        if "authorship" in res['hits']['hits'][0]['_source'] and not forceAuthorship:
+                        if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
                             doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
                         if "validated" in res['hits']['hits'][0]['_source']:
                             doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                        if force_hal:
+                        if force_doc_validated:
                             doc['validated'] = True
 
                         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
@@ -342,13 +342,13 @@ def init_labo():
     labos = []
     dico_acronym = dict()
 
-    # init esLaboratories
+    # init es_laboratories
     count = es.count(index="*-laboratories", body=scope_param)['count']
     if count > 0:
         print(count, " laboratories to init found in ES, processing es to init_labo")
         res = es.search(index="*-laboratories", body=scope_param, size=count)
-        esLaboratories = res['hits']['hits']
-        for lab in esLaboratories:
+        es_laboratories = res['hits']['hits']
+        for lab in es_laboratories:
             lab = lab['_source']
             lab["halStructId"] = lab["halStructId"].strip()
             if " " in lab["halStructId"]:
@@ -417,4 +417,4 @@ def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None
 
 
 if __name__ == '__main__':
-    collect_data(laboratories='on', researcher='on')
+    collect_data(laboratories=None, researcher='on')
