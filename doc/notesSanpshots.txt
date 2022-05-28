@@ -13,7 +13,7 @@ curl --user log:pass -X PUT "localhost:9200/_snapshot/backup/snapshot_001?wait_f
 HACK
 4. 	a. décompresser snap.tar.gz dans le dossier backup et écraser le contenu
 	b. renommer les snap*.dat meta*.dat pour écraser les homonymes correspondant au snap du point 3 par ceux issus de la décompression
-5. restaurer (j'ai fait avec Kibana donc j'ai pas le curl correspondant mais ce doit pas être bien compliqué).
+5. restaurer (j'ai fait avec Kibana donc j'ai pas le curl correspondant).
 
 
 
