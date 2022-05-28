@@ -2,3 +2,6 @@
 __py*
 db*
 venv/
+doc/stackELK/data/
+doc/OpenSearch/dataOS/
+doc/OpenSearch/data/
