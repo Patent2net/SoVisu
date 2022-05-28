@@ -193,7 +193,7 @@ for structu in machin:
         #
 for cher in lstRetenus:
     OSclient.index(index=cher['_index'], body=cher['_source'], id=cher['_id'], refresh=True)
-    if response['_shards']['successful']:
-        print(cher['_id'] + " " + cher['_source']['ldap'] + ' indexé et dédoubloné')
+    if response['acknowledged']:
+        print(cher['_id'] + " " + cher['_source']['ldap'] + ' indexé et dédoublonné')
     else:
         print(response)
