@@ -42,7 +42,7 @@ def es_connector(mode=True):
     #                        timeout=10)
     # else:
     #
-    es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    es = Elasticsearch([{'host': 'localhost', 'port': 9200, "timeout": 150}])
     return es
 
 def scope_all():
@@ -128,6 +128,7 @@ for structu in machin:
 
     for lab in esLaboratories:
         print (lab)
+        #lab="527028"
         response = OSclient.indices.create(lab['_index'])
         response = OSclient.index(index=lab['_index'], body=lab['_source'], id=lab ['_id'], refresh=True)
         if response ['_shards']['successful']:
@@ -146,6 +147,7 @@ for structu in machin:
         else:
             print (response)
         cpt =0
+        print (len(esDocs), " documents")
         for doc in esDocs:
             cpt +=1
             OSclient.index(index=indexLabDoc, body=doc ['_source'], id=doc['_id'], refresh=True)
@@ -159,11 +161,12 @@ for structu in machin:
         if response['acknowledged']:
             print(indexLabCher + ' créé')
         cpt = 0
+        print (len(esChers), " chercheurs")
         for cher in esChers:
             if 'ldap' in cher['_source'] .keys():
                 if cher['_source']['ldap'] not in deDoub:
                     OSclient.index(index=indexLabCher, body=cher['_source'], id=cher['_id'], refresh=True)
-                    if response['_shards']['successful']:
+                    if response['acknowledged']:
                         print(cher['_id'] + " " + cher['_source']['ldap'] + ' indexé')
                     else:
                         print(response)
@@ -171,29 +174,27 @@ for structu in machin:
                     pass # on les traitera à la fin
             else: #cas AMU
                 OSclient.index(index=indexLabCher, body=cher['_source'], id=cher['_id'], refresh=True)
-                if response['_shards']['successful']:
-                    print(cher['_id'] + " " + cher['_source']['ldap'] + ' indexé')
+                if response['acknowledged']:
+                    print(cher['_id'], " " ,cher['_source'], ' indexé')
                 else:
                     print(response)
-            indexDocCher=indexLabCher + "-documents"
+            indexDocCher=indexLabCher + "-" + cher ['_source']['ldapId'] + "-documents"
             # recup des doc chercheurs
-            count = es.count(index=indexDocCher, body=scope_param)['count']
-            res = es.search(index=indexDocCher, body=scope_param, size=count)
-            esResearchersDocs = res['hits']['hits']
-            response = OSclient.indices.create(indexDocCher)
-            if response['acknowledged']:
-                print(indexDocCher + ' créé')
-            cpt =0
-            for doc in esResearchersDocs:
-                cpt += 1
-                OSclient.index(index=indexDocCher, body=doc['_source'], id=doc['_id'], refresh=True)
-            print(cpt, ' docs indexés sur ', count)
+
+            try:
+                count = es.count(index=indexDocCher, body=scope_param)['count']
+                res = es.search(index=indexDocCher, body=scope_param, size=count)
+                esResearchersDocs = res['hits']['hits']
+                response = OSclient.indices.create(indexDocCher)
+                if response['acknowledged']:
+                    print(indexDocCher + ' créé')
+                cpt =0
+                for doc in esResearchersDocs:
+                    cpt += 1
+                    OSclient.index(index=indexDocCher, body=doc['_source'], id=doc['_id'], refresh=True)
+                print(cpt, ' docs indexés sur ', count)
+            except:
+                print ("pas d'index : ", indexDocCher)
             #
         #
         #
-for cher in lstRetenus:
-    OSclient.index(index=cher['_index'], body=cher['_source'], id=cher['_id'], refresh=True)
-    if response['acknowledged']:
-        print(cher['_id'] + " " + cher['_source']['ldap'] + ' indexé et dédoublonné')
-    else:
-        print(response)
