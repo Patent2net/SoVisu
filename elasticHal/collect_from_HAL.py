@@ -417,4 +417,4 @@ def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None
 
 
 if __name__ == '__main__':
-    collect_data(laboratories=None, researcher='on')
+    collect_data(laboratories='on', researcher='on')
