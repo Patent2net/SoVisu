@@ -7,7 +7,8 @@ from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
 from django import forms
 
-from .es_insert_entities import create_index
+from .insert_entities import create_index
+from .collect_from_HAL import collect_data
 
 admin.site.site_header = "Administration de SoVisu"
 
@@ -16,7 +17,7 @@ class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
 
 
-class ElasticExportForm(forms.Form):
+class ExportToElasticForm(forms.Form):
     Structures = forms.BooleanField(initial=True, required=False)
     Laboratoires = forms.BooleanField(initial=True, required=False)
     Chercheurs = forms.BooleanField(initial=True, required=False)
@@ -54,7 +55,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
-            path('export-elastic/', self.export_elastic),
+            path('export-elastic/', self.export_to_elastic),
         ]
         return new_urls + urls
 
@@ -95,19 +96,20 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         return render(request, "admin/csv_upload.html", data)
 
     @staticmethod
-    def export_elastic(request):
+    def export_to_elastic(request):
 
         if request.method == "POST":
             structure = request.POST.get('Structures')
             laboratoires = request.POST.get('Laboratoires')
             chercheurs = request.POST.get('Chercheurs')
-            print(structure, laboratoires, chercheurs)
+            print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
             create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
-        form = ElasticExportForm()
+        form = ExportToElasticForm()
         data = {"form": form}
-        return render(request, "admin/elasticHal/export_elastic.html", data)
+        return render(request, "admin/elasticHal/export_to_elastic.html", data)
 
 
 class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
@@ -119,7 +121,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
-            path('export-elastic/', self.export_elastic),
+            path('export-elastic/', self.export_to_elastic),
         ]
         return new_urls + urls
 
@@ -161,19 +163,20 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         return render(request, "admin/csv_upload.html", data)
 
     @staticmethod
-    def export_elastic(request):
+    def export_to_elastic(request):
 
         if request.method == "POST":
             structure = request.POST.get('Structures')
             laboratoires = request.POST.get('Laboratoires')
             chercheurs = request.POST.get('Chercheurs')
-            print(structure, laboratoires, chercheurs)
+            print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
             create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
-        form = ElasticExportForm()
+        form = ExportToElasticForm()
         data = {"form": form}
-        return render(request, "admin/elasticHal/export_elastic.html", data)
+        return render(request, "admin/elasticHal/export_to_elastic.html", data)
 
 
 class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
@@ -186,7 +189,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
-            path('export-elastic/', self.export_elastic),
+            path('export-elastic/', self.export_to_elastic),
         ]
         return new_urls + urls
 
@@ -217,7 +220,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     name=fields[2],
                     type=fields[3],
                     function=fields[4],
-                    mail= fields[5],
+                    mail=fields[5],
                     lab=fields[6],
                     supannAffectation=fields[7],
                     supannEntiteAffectationPrincipale=fields[8],
@@ -239,19 +242,20 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         return render(request, "admin/csv_upload.html", data)
 
     @staticmethod
-    def export_elastic(request):
+    def export_to_elastic(request):
 
         if request.method == "POST":
             structure = request.POST.get('Structures')
             laboratoires = request.POST.get('Laboratoires')
             chercheurs = request.POST.get('Chercheurs')
-            print(structure, laboratoires, chercheurs)
+            print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
             create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
-        form = ElasticExportForm()
+        form = ExportToElasticForm()
         data = {"form": form}
-        return render(request, "admin/elasticHal/export_elastic.html", data)
+        return render(request, "admin/elasticHal/export_to_elastic.html", data)
 
 
 # Register your models here.

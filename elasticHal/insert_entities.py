@@ -43,15 +43,15 @@ es = esActions.es_connector()
 
 
 def get_structid_list():
-    print("csv_open value is : ", csv_open)
-    print("djangodb_open value is : ", djangodb_open)
+    print("\u00A0 \u21D2 csv_open value is : ", csv_open)
+    print("\u00A0 \u21D2 djangodb_open value is : ", djangodb_open)
     global structIdlist
     structIdlist = []
     # get structId for already existing structures in ES
     scope_param = esActions.scope_all()
     count = es.count(index="*-structures", body=scope_param)['count']
     if count > 0:
-        print(count, " structures found in ES")
+        print("\u00A0 \u21D2 ", count, " structures found in ES")
         res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
         structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
 
@@ -61,24 +61,22 @@ def get_structid_list():
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             for csv_row in csv_reader:
                 if " " in csv_row["structSirene"]:
-                    print("StructSirerene missing for ", csv_row["acronym"])
+                    print("\u00A0 \u21D2 StructSirerene missing for ", csv_row["acronym"])
                 else:
                     if csv_row["structSirene"] not in structIdlist:
                         structIdlist.append(csv_row["structSirene"])
-                        print(f"Rajout de la structure  {csv_row['acronym']} (structSirene: {csv_row['structSirene']}) dans structIdlist")
+                        print(f"\u00A0 \u21D2 Rajout de la structure  {csv_row['acronym']} (structSirene: {csv_row['structSirene']}) dans structIdlist")
                     else:
-                        print(f"{csv_row['acronym']} is already listed (structSirene: {csv_row['structSirene']})")
-    print("listed structId: ", structIdlist)
+                        print(f"\u00A0 \u21D2 {csv_row['acronym']} is already listed (structSirene: {csv_row['structSirene']})")
 
     # get structId for structures in django db and compare with structIdlist
     if djangodb_open:
         for structure in Structure.objects.all():
             if structure.structSirene not in structIdlist:
                 structIdlist.append(structure.structSirene)
-                print("Rajout de la structure ", structure.acronym, " (", structure.structSirene, ") dans structIdlist")
+                print("\u00A0 \u21D2 Rajout de la structure ", structure.acronym, " (", structure.structSirene, ") dans structIdlist")
             else:
-                print(structure.acronym, " is already listed")
-        print(structIdlist)
+                print("\u00A0 \u21D2 ", structure.acronym, " is already listed")
 
 
 def get_labo_list():
@@ -164,7 +162,7 @@ def get_labo_list():
                 else:
                     print("Indice creation process cancelled for ", row['ldapId'], ", StructSirene unknown. Please check it or add the Structure beforehand")
 
-    print(f"Labhalid listed: {Labolist}")
+    print(f"\u00A0 \u21D2 Labhalid listed: {Labolist}")
 
     if djangodb_open:
         for row in Laboratory.objects.all().values():
@@ -259,17 +257,17 @@ def create_researchers_index():
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
             csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] is not '']  # Only keep researchers with known 'halId_s'
             if cleaned_es_researchers:
-                print("checking csv researcher list:")
+                print("\u00A0 \u21D2 checking csv researcher list:")
                 for csv_row in csv_reader:
                     if any(dictlist['halId_s'] == csv_row['halId_s'] for dictlist in cleaned_es_researchers):  # Si l'aurehalid de la ligne du csv (=chercheur) est présente dans les données récupérées d'ES : on ignore. Sinon on rajoute le chercheur à la liste.
-                        print(f"{csv_row['halId_s']} is already in cleaned_es_researchers")
+                        print(f"\u00A0 \u21D2 {csv_row['halId_s']} is already in cleaned_es_researchers")
 
                     else:
-                        print("adding " + csv_row["halId_s"] + " to cleaned_es_researchers")
+                        print("\u00A0 \u21D2 adding " + csv_row["halId_s"] + " to cleaned_es_researchers")
                         cleaned_es_researchers.append(csv_row)
 
             else:
-                print("cleaned_es_researchers is empty, adding csv content to values")
+                print("\u00A0 \u21D2 cleaned_es_researchers is empty, adding csv content to values")
                 cleaned_es_researchers = csv_reader
 
     if djangodb_open:
@@ -279,18 +277,18 @@ def create_researchers_index():
             for researcher in django_researchers:
                 print(researcher)
                 if any(dictlist['halId_s'] == researcher["halId_s"] for dictlist in cleaned_es_researchers):
-                    print(researcher["halId_s"] + " is already in cleaned_es_researchers")
+                    print("\u00A0 \u21D2 ",researcher["halId_s"] + " is already in cleaned_es_researchers")
                 else:
-                    print("adding " + researcher["halId_s"] + " to cleaned_es_researchers")
+                    print("\u00A0 \u21D2 adding " + researcher["halId_s"] + " to cleaned_es_researchers")
                     cleaned_es_researchers.append(researcher)
         else:
-            print("cleaned_es_researchers is empty, adding djangoDb content to values")
+            print("\u00A0 \u21D2 cleaned_es_researchers is empty, adding djangoDb content to values")
             cleaned_es_researchers = django_researchers
 
     for row in cleaned_es_researchers:
 
         if row["structSirene"] in structIdlist:
-            print('Processing : ' + row['halId_s'])
+            print('\u00A0 \u21D2 Processing : ' + row['halId_s'])
             # connaitLab = row["labHalId"] # valeur à la noix des fois
             row["labHalId"] = row["labHalId"].strip()
             if 'validated' in row.keys():
@@ -348,7 +346,7 @@ def create_researchers_index():
 
             # Insert researcher data
             if init:
-                print("Process researcher init path")
+                print("\u00A0 \u21D2 Process researcher init path")
 
                 res = es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                                body=json.dumps(row))
@@ -380,7 +378,7 @@ def create_researchers_index():
                     print(" détruire l'entrée ", row['structSirene'] + "-" + old_lab + "-researchers/" + row['ldapId'])
 
         else:
-            print('chercheur hors structure ', row['ldapId'], ", structure : ", row['structSirene'])
+            print('\u00A0 \u21D2 chercheur hors structure ', row['ldapId'], ", structure : ", row['structSirene'])
 
 
 def create_laboratories_index():
@@ -404,40 +402,38 @@ def create_laboratories_index():
         with open('data/laboratories.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=';'))
             if cleaned_es_laboratories:
-                print("checking csv researcher list:")
+                print("\u00A0 \u21D2 checking csv researcher list:")
                 for csv_row in csv_reader:
                     if any(dictlist['halStructId'] == csv_row['halStructId'] for dictlist in cleaned_es_laboratories):
-                        print(csv_row["acronym"] + " is already in cleaned_es_laboratories")
+                        print("\u00A0 \u21D2 ", csv_row["acronym"] + " is already in cleaned_es_laboratories")
 
                     else:
-                        print("adding " + csv_row["acronym"] + " to cleaned_es_laboratories")
+                        print("\u00A0 \u21D2 adding " + csv_row["acronym"] + " to cleaned_es_laboratories")
                         cleaned_es_laboratories.append(csv_row)
 
             else:
-                print("cleaned_es_laboratories is empty, adding csv content to values")
+                print("\u00A0 \u21D2 cleaned_es_laboratories is empty, adding csv content to values")
                 cleaned_es_laboratories = csv_reader
 
     if djangodb_open:
         if cleaned_es_laboratories:
-            print("checking DjangoDb laboratory list:")
+            print("\u00A0 \u21D2 checking DjangoDb laboratory list:")
             for lab in Laboratory.objects.all().values():
                 lab.pop('id')
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in cleaned_es_laboratories):
                     print(lab["acronym"] + " is already in cleaned_es_laboratories")
 
                 else:
-                    print("adding " + lab["acronym"] + " to cleaned_es_laboratories")
+                    print("\u00A0 \u21D2 adding " + lab["acronym"] + " to cleaned_es_laboratories")
                     cleaned_es_laboratories.append(lab)
 
         else:
-            print("cleaned_es_laboratories is empty, adding djangoDb content to values")
+            print("\u00A0 \u21D2 cleaned_es_laboratories is empty, adding djangoDb content to values")
             for lab in Laboratory.objects.all().values():
                 lab.pop('id')
                 cleaned_es_laboratories.append(lab)
 
     for row in cleaned_es_laboratories:
-        print(row['acronym'])
-
         row['guidingKeywords'] = []
 
         # Get researchers from the laboratory
@@ -510,27 +506,29 @@ def create_index(structure, researcher, laboratories, csv_enabler=True, django_e
     csv_open = csv_enabler
     djangodb_open = django_enabler
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print('Begin Index creation')
+    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('processing get_structid_list')
     get_structid_list()
-    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('processing get_labo_list')
     get_labo_list()
 
-    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if structure:
         print('processing create_structures_index')
         create_structures_index()
     else:
         print('structure is disabled, skipping to next process')
 
-    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
         print('processing create_researchers_index')
         create_researchers_index()
     else:
         print('researcher is disabled, skipping to next process')
 
-    print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
         print('processing create_laboratories_index')
         create_laboratories_index()
@@ -538,7 +536,7 @@ def create_index(structure, researcher, laboratories, csv_enabler=True, django_e
         print('laboratories is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('harvesting finished')
+    print('Index creation finished')
 
 
 if __name__ == '__main__':
