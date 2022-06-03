@@ -8,7 +8,6 @@
     {% block breadcrumbs %}
         <div class="breadcrumbs">
             <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-            &rsaquo;{% comment %} <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> {% endcomment %}
             &rsaquo; {% block breadcrumbs_last %}
             Export ElasticHal
             {% endblock %}
@@ -20,6 +19,7 @@
 <div>
 
     <form action="" method="POST" enctype="multipart/form-data">
+        <h1>Sélectionnez les entités à exporter vers Elastic et nécessitant une mise à jour à partir des Archives HAL:</h1>
         {{ form.as_p }}
         {% csrf_token %}
         <div class="submit-row">
