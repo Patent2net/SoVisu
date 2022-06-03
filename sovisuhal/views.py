@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-
+import time
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -1049,44 +1049,44 @@ def tools(request):
 
 
 def index(request):
+    start = time.time()
     # Get parameters
     indexcat = request.GET['indexcat']
     indexstruct = request.GET['indexstruct']
 
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
-    # /
     # Connect to DB
     es = esActions.es_connector()
+
+    scope_param = esActions.scope_all()
+    # création dynamique des tabs sur la page à partir de struct_tab
+    struct_tab = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene, hits.hits._source.acronym"])
+    struct_tab = [hit['_source'] for hit in struct_tab['hits']['hits']]
 
     indextype = ""
     if indexcat == "lab":
         indextype = "*-laboratories"
-
     elif indexcat == "rsr":
         indextype = "*-researchers"
 
-    scope_param = esActions.scope_all()
     count = es.count(index=indexstruct + indextype, body=scope_param)['count']
     res = es.search(index=indexstruct + indextype, body=scope_param, size=count)
-    entities = res['hits']['hits']
-    cleaned_entities = []
-
-    for entity in entities:
-        cleaned_entities.append(entity['_source'])
+    cleaned_entities = [hit['_source'] for hit in res['hits']['hits']]
 
     if indexcat == "lab":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['acronym'])
     elif indexcat == "rsr":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['lastName'])
     # /
+    print(f'For process: {time.time() - start} seconds')
     if i_type == -1 and p_id == -1:  # Si l'i_type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
         # → évite des erreurs lors des vérifications pour les autres pages dans le cas d'un -1
         return render(request, 'index.html',
-                      {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                      {'struct_tab': struct_tab, 'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,
                        'ldapid': ldapid})
     else:  # L'i_type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
         return render(request, 'index.html',
-                      {'entities': cleaned_entities, 'type': i_type, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                      {'struct_tab': struct_tab, 'entities': cleaned_entities, 'type': i_type, 'indexcat': indexcat, 'indexstruct': indexstruct,
                        'id': p_id, 'struct': struct, 'ldapid': ldapid})
 
 
