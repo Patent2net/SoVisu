@@ -1,6 +1,10 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import networkx as nx
 
+# lets go
+sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
+sparql.setReturnFormat(JSON)
+
 
 def cycle(liste):
     tempo = []
@@ -11,11 +15,6 @@ def cycle(liste):
         for indice in range(taille):
             tempo.append((liste[indice], liste[indice + 1]))
         return tempo
-
-
-# lets go
-sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
-sparql.setReturnFormat(JSON)
 
 
 def get_halid_s(aurehal_id):
@@ -219,15 +218,6 @@ def extrait_mots_cles(dat):
     return dico_top
 
 
-# tests
-# Extraction des mots clés d'un article
-# à faire valider par article
-# res = get_article("hal-00000001v2")
-
-# print (extrait_mots_cles (res) )
-# print (extrait_mots_cles (res) )
-
-
 def get_concepts_and_keywords(aurehalid):
     # start
     # auteur :Joseph
@@ -243,7 +233,7 @@ def get_concepts_and_keywords(aurehalid):
     sujets, domaines = extrait_sujets_domaines(data)
     domains = []
 
-    print(sujets, domaines)
+    print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
     try:
         tree = ''
         for dom in domaines:
