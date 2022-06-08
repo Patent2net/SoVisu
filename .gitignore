@@ -2,5 +2,7 @@
 __py*
 db*
 venv/
-sovisuhal/.env
-.env
+doc/stackELK/data/
+doc/OpenSearch/dataOS/
+doc/OpenSearch/data/
+doc/stackELK/backup/

@@ -301,7 +301,7 @@
                         {% for concept in concepts %}
                             <tr class="text-gray-500">
                                 <td>{{ concept.id }}</td>
-                                <td>{{ concept.label_fr }}</td>
+                                <td>{{ concept.label_fr | safe }} </td>
                             </tr>
                         {% endfor %}
 
@@ -612,7 +612,7 @@
                             {% endfor %}
 
                             {% if  type == "rsr" %}
-                                <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'auctorialité">
+                                <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'autorat">
                             {% endif %}
 
                         </form>
