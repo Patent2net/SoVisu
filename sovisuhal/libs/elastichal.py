@@ -28,10 +28,12 @@ except:
 from SPARQLWrapper import SPARQLWrapper, JSON
 import requests
 
+# Connect to DB
+es = esActions.es_connector()
+
 
 # @shared_task(bind=True)
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
-    es = esActions.es_connector()
     #   progress_recorder = ProgressRecorder(self)
     #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
     if mode == "Prod":
@@ -157,7 +159,6 @@ def collecte_docs(chercheur):  # self,
     docs = location_docs.generate_countrys_fields(docs)
     docs = doi_enrichissement.docs_enrichissement_doi(docs)
 
-    es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
