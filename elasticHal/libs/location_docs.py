@@ -78,6 +78,7 @@ def extract_locations_from_docid_list(docid):
 
     country_list = list()
     for facet_field in facet_fields_list:
+        pre_element = []
         try:
             if facet_field in res["facet_counts"]["facet_fields"]:
                 for element in res["facet_counts"]["facet_fields"][facet_field]:

@@ -807,11 +807,10 @@ def wordcloud(request):
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
-
 def impact_international(request):
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -848,30 +847,30 @@ def impact_international(request):
 
     field = "harvested_from_ids"
     validate = False
+    hastoconfirm_param = ''
     if i_type == "rsr":
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
     if i_type == "lab":
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
 
+    start_date_param = ''
+    filtrechercheur = ''
+    filtrelab = ''
     if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
-        filtrelab = ''
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
         indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
-        filtrechercheur = ''
         filtrelab = '_index: "' + indexsearch + '"'
-
     res = es.search(index=struct + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
