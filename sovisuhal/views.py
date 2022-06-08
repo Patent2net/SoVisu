@@ -12,6 +12,10 @@ from django.urls import reverse
 from .libs import halConcepts, esActions
 
 
+# Connect to DB
+es = esActions.es_connector()
+
+
 # /Pages
 def unknown(request):
     return render(request, '404.html')
@@ -42,8 +46,6 @@ def check(request):
     if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
         return redirect('unknown')
 
-    # Connect to DB
-    es = esActions.es_connector()
 
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -253,7 +255,7 @@ def check(request):
                         if 'children' in children1:
                             for children2 in children1['children']:
                                 if "state" in children2.keys() and children2['state'] == validate:
-                                    concepts.append({'id': children2['id'], 'label_fr':  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- " +children2['label_fr'],
+                                    concepts.append({'id': children2['id'], 'label_fr':  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- " + children2['label_fr'],
                                                      'state': validate})
 
         return render(request, 'check.html',
@@ -369,8 +371,6 @@ def dashboard(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -484,8 +484,6 @@ def references(request):
         i_filter = -1
 
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -601,8 +599,6 @@ def terminology(request):
     else:
         export = False
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -745,8 +741,6 @@ def wordcloud(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     # l'ext_key n'est pas utilisé dans cette fonction
@@ -782,13 +776,13 @@ def wordcloud(request):
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
-        filtreLab = ''
+        filtrelab = ''
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
         indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
         filtrechercheur = ''
-        filtreLab = '_index: "' + indexsearch + '"'
+        filtrelab = '_index: "' + indexsearch + '"'
     else:
         return redirect('unknown')
 
@@ -807,7 +801,7 @@ def wordcloud(request):
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
-                   'filterLab': filtreLab,
+                   'filterLab': filtrelab,
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
@@ -837,9 +831,6 @@ def impact_international(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
-
     # Get scope data
     # l'ext_key n'est pas utilisé dans cette fonction
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -873,13 +864,13 @@ def impact_international(request):
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
-        filtreLab = ''
+        filtrelab = ''
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
         indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
         filtrechercheur = ''
-        filtreLab = '_index: "' + indexsearch + '"'
+        filtrelab = '_index: "' + indexsearch + '"'
 
     res = es.search(index=struct + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
@@ -896,11 +887,10 @@ def impact_international(request):
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
-                   'filtreLab':filtreLab,
+                   'filtreLab': filtrelab,
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
-
 
 
 def tools(request):
@@ -927,8 +917,6 @@ def tools(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     # la fonction n'utilise que la partie i_type =="lab" de get_scope_data
@@ -1055,8 +1043,6 @@ def index(request):
     indexstruct = request.GET['indexstruct']
 
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
-    # Connect to DB
-    es = esActions.es_connector()
 
     scope_param = esActions.scope_all()
     # création dynamique des tabs sur la page à partir de struct_tab
@@ -1091,8 +1077,6 @@ def index(request):
 
 
 def search(request):  # Revoir la fonction
-    # Connect to DB
-    es = esActions.es_connector()
 
     date_param = {
         "aggs": {
@@ -1117,8 +1101,6 @@ def search(request):  # Revoir la fonction
 
     if request.method == 'POST':
 
-        # Connect to DB
-        es = esActions.es_connector()
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
@@ -1131,16 +1113,14 @@ def search(request):  # Revoir la fonction
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
-        else: # =='researchers': par défaut
+        else:  # =='researchers': par défaut
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
 
         p_res = es.count(index=index, body=search_param)
 
-
         res = es.search(index=index, body=search_param, size=p_res['count'])
-
 
         res_cleaned = []
 
