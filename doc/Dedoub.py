@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from opensearchpy import OpenSearch
-import datetime
+from datetime import datetime
 # Custom libs
 # from sovisuhal.libs import esActions
 # from elasticHal.libs import archivesOuvertes, utils

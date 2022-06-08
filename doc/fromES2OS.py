@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from opensearchpy import OpenSearch
-import datetime
+from datetime import datetime
 # Custom libs
 # from sovisuhal.libs import esActions
 # from elasticHal.libs import archivesOuvertes, utils
@@ -120,7 +120,7 @@ for structu in machin:
     print(response, "remplissage")
     body = structu['_source']
     scope_param = scope_all()
-    response = OSclient.search(scope_param, index=index_name)
+    response = OSclient.search(body=scope_param, index=index_name)
     print(response, "check")
     struct = id
     # init esLaboratories
