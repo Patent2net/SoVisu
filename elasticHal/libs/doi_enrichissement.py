@@ -26,8 +26,8 @@ def docs_enrichissement_doi(docs):
     print("début docs_enrichissement_doi_date")
     for index, doc in enumerate(docs):
         if "doiId_s" in doc.keys():  # Si Le Doi est renseigner dans le document pris en parametre
-            url ="https://api.unpaywall.org/v2/"+doc["doiId_s"]+"?email=SOVisuHAL@univ-tln.fr"
-            req = requests.get(url,timeout=50)  # envoie une requete sur l'API Unpaywall pour récupére des information
+            url = "https://api.unpaywall.org/v2/"+doc["doiId_s"]+"?email=SOVisuHAL@univ-tln.fr"
+            req = requests.get(url, timeout=50)  # envoie une requete sur l'API Unpaywall pour récupére des information
             data = req.json()
 
             if req.status_code == 200:
@@ -36,9 +36,9 @@ def docs_enrichissement_doi(docs):
                     if data['is_oa'] == True:  # Test si le doi est en open access sur l'api Unpaywall
                         doc['is_oa'] = 'open access'
                         if data["first_oa_location"]["oa_date"] != None:
-                            doc["date_depot_oa"] = data["first_oa_location"]["oa_date"] [0:4]
+                            doc["date_depot_oa"] = (data["first_oa_location"]["oa_date"])
                         elif data["first_oa_location"]["updated"] != None:
-                            doc["date_depot_oa"] = data["first_oa_location"]["updated"][0:4]
+                            doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                         else:
                             doc["date_depot_oa"] = "-1"
                     else:
@@ -68,18 +68,5 @@ def docs_enrichissement_doi(docs):
             if key not in  doc.keys():
                 doc[key]=""
         """
-    auj = datetime.datetime.today()
-    for index, doc in enumerate(docs):
-        if "doiId_s" in doc.keys():
-            if doc ['is_oa'] == 'open access':
-
-                dateOa = [dat <= doc["date_depot_oa"]  for dat in range(doc ['publicationDate_tdate'], auj.year +1)]
-                # False, ..., True, ... de date pub à aujourd'hui
-            else:
-                dateOa = [ False for dat in range(doc['publicationDate_tdate'], auj.year + 1)]
-
     print("fin docs_enrichissement_doi_date")
     return docs
-
-
-
