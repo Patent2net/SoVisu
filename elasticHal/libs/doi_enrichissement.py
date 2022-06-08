@@ -24,8 +24,8 @@ def docs_enrichissement_doi(docs):
     print("début docs_enrichissement_doi_date")
     for index, doc in enumerate(docs):
         if "doiId_s" in doc.keys():  # Si Le Doi est renseigner dans le document pris en parametre
-            url ="https://api.unpaywall.org/v2/"+doc["doiId_s"]+"?email=SOVisuHAL@univ-tln.fr"
-            req = requests.get(url,timeout=50)  # envoie une requete sur l'API Unpaywall pour récupére des information
+            url = "https://api.unpaywall.org/v2/"+doc["doiId_s"]+"?email=SOVisuHAL@univ-tln.fr"
+            req = requests.get(url, timeout=50)  # envoie une requete sur l'API Unpaywall pour récupére des information
             data = req.json()
 
             if req.status_code == 200:
@@ -68,6 +68,3 @@ def docs_enrichissement_doi(docs):
         """
     print("fin docs_enrichissement_doi_date")
     return docs
-
-
-

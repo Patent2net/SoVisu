@@ -10,7 +10,7 @@ from datetime import datetime
 
 host = 'localhost'
 port = 9400
-auth = ('admin', 'admin') # For testing only. Don't store credentials in code.
+auth = ('admin', 'admin')  # For testing only. Don't store credentials in code.
 # ca_certs_path = '/full/path/to/root-ca.pem' # Provide a CA bundle if you use intermediate CAs with your root CA.
 
 OSclient = OpenSearch(
@@ -89,9 +89,9 @@ for ind, doudou in enumerate(doublons):
             Vus .append(doudou['_source']['ldapId'])
             retenu = doudou
             if ind < len(doublons)-1:
-                Autres = [doub for doub in doublons[ind+1:] if doub['_source']['ldapId'] == doudou ['_source']['ldapId']]
+                Autres = [doub for doub in doublons[ind+1:] if doub['_source']['ldapId'] == doudou['_source']['ldapId']]
                 for dub in Autres:
-                    if dub ['_source']["Created"] > dateCrea:
+                    if dub['_source']["Created"] > dateCrea:
                         retenu = dub
             lstRetenus .append(retenu)
 
