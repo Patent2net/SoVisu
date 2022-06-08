@@ -1,5 +1,4 @@
-from elasticsearch import Elasticsearch, helpers
-import requests
+from elasticsearch import Elasticsearch
 from datetime import datetime
 import time
 

@@ -2,28 +2,28 @@ from elasticsearch import Elasticsearch
 from opensearchpy import OpenSearch
 import datetime
 # Custom libs
-#from sovisuhal.libs import esActions
-#from elasticHal.libs import archivesOuvertes, utils
+# from sovisuhal.libs import esActions
+# from elasticHal.libs import archivesOuvertes, utils
 
 
-#from elasticHal.models import Structure, Laboratory, Researcher
+# from elasticHal.models import Structure, Laboratory, Researcher
 
 host = 'localhost'
 port = 9400
-auth = ('admin', 'admin') # For testing only. Don't store credentials in code.
+auth = ('admin', 'admin')  # For testing only. Don't store credentials in code.
 # ca_certs_path = '/full/path/to/root-ca.pem' # Provide a CA bundle if you use intermediate CAs with your root CA.
 
 OSclient = OpenSearch(
-    hosts = [{'host': host, 'port': port}],
-    http_compress = True, # enables gzip compression for request bodies
-    http_auth = auth,
+    hosts=[{'host': host, 'port': port}],
+    http_compress=True,  # enables gzip compression for request bodies
+    http_auth=auth,
     # client_cert = client_cert_path,
     # client_key = client_key_path,
-    use_ssl = True,
-    verify_certs = False,
-    ssl_assert_hostname = False,
-    ssl_show_warn = False#,
-    #ca_certs = ca_certs_path
+    use_ssl=True,
+    verify_certs=False,
+    ssl_assert_hostname=False,
+    ssl_show_warn=False  # ,
+    # ca_certs = ca_certs_path
 )
 
 
@@ -45,6 +45,7 @@ def es_connector(mode=True):
     es = Elasticsearch([{'host': 'localhost', 'port': 9200, "timeout": 150}])
     return es
 
+
 def scope_all():
     scope = {
         "query": {
@@ -65,6 +66,7 @@ def scope_p(scope_field, scope_value):
     }
     return scope
 
+
 es = es_connector()
 
 # memo des pbs.
@@ -76,8 +78,8 @@ count = es.count(index="*-researchers", body=scope_param)['count']
 res = es.search(index="*-researchers", body=scope_param, size=count)
 chercheurs = res['hits']['hits']
 
-ldapList= [cher['_source']['ldapId'] for cher in chercheurs]
-doublons =  [cher for cher in chercheurs if ldapList .count(cher['_source']['ldapId']) >1]
+ldapList = [cher['_source']['ldapId'] for cher in chercheurs]
+doublons = [cher for cher in chercheurs if ldapList .count(cher['_source']['ldapId']) > 1]
 cpt = 0
 Vus, lstRetenus = [], []
 for ind, doudou in enumerate(doublons):
@@ -86,10 +88,10 @@ for ind, doudou in enumerate(doublons):
         if doudou['_source']['ldapId'] not in Vus:
             Vus .append(doudou['_source']['ldapId'])
             retenu = doudou
-            if ind< len(doublons)-1:
-                Autres = [doub for doub in doublons [ind+1:] if doub ['_source']['ldapId'] == doudou ['_source']['ldapId']]
+            if ind < len(doublons)-1:
+                Autres = [doub for doub in doublons[ind+1:] if doub['_source']['ldapId'] == doudou['_source']['ldapId']]
                 for dub in Autres:
-                    if dub ['_source']["Created"] > dateCrea:
+                    if dub['_source']["Created"] > dateCrea:
                         retenu = dub
             lstRetenus .append(retenu)
 
@@ -101,24 +103,24 @@ for ind, doudou in enumerate(doublons):
         if len(Autres) == 0:
             doudou['_source']["Created"] = datetime.now().isoformat()
             lstRetenus.append(doudou)
-print (len(lstRetenus), " sur ", len(doublons), " et ", len(set(ldapList))," ldapId uniques ")
+print(len(lstRetenus), " sur ", len(doublons), " et ", len(set(ldapList)), " ldapId uniques ")
 deDoub = [cher['_source']['ldapId'] for cher in lstRetenus]
 # print("__name__ value is : ", __name__)
 scope_param = scope_all()
-res = es.search(index="*-structures", body=scope_param)#, filter_path=["hits.hits._source.structSirene"])
+res = es.search(index="*-structures", body=scope_param)  # , filter_path=["hits.hits._source.structSirene"])
 machin = res['hits']['hits']
 for structu in machin:
-    print (structu)
+    print(structu)
     index_name = structu['_index']
     id = structu['_id']
-    #OSclient.indices.delete(index=index_name)
-    response = OSclient.indices.create(index_name)
+    # OSclient.indices.delete(index=index_name)
+    OSclient.indices.create(index_name)
     print("creation ", index_name)
     response = OSclient.index(index=index_name, body=structu['_source'], id=id, refresh=True)
     print(response, "remplissage")
     body = structu['_source']
     scope_param = scope_all()
-    response =OSclient.search(scope_param,index=index_name)
+    response = OSclient.search(scope_param, index=index_name)
     print(response, "check")
     struct = id
     # init esLaboratories
@@ -127,15 +129,15 @@ for structu in machin:
     esLaboratories = res['hits']['hits']
 
     for lab in esLaboratories:
-        print (lab)
-        #lab="527028"
-        response = OSclient.indices.create(lab['_index'])
-        response = OSclient.index(index=lab['_index'], body=lab['_source'], id=lab ['_id'], refresh=True)
-        if response ['_shards']['successful']:
-            print (lab['_id'] + " " + lab['_source']['acronym'] + ' créé')
+        print(lab)
+        # lab="527028"
+        OSclient.indices.create(lab['_index'])
+        response = OSclient.index(index=lab['_index'], body=lab['_source'], id=lab['_id'], refresh=True)
+        if response['_shards']['successful']:
+            print(lab['_id'] + " " + lab['_source']['acronym'] + ' créé')
         else:
-            print (response)
-        indexLabDoc =lab['_index'] + "-documents"
+            print(response)
+        indexLabDoc = lab['_index'] + "-documents"
         # Remplissage des docs
         count = es.count(index=indexLabDoc, body=scope_param)['count']
         res = es.search(index=indexLabDoc, body=scope_param, size=count)
@@ -145,13 +147,13 @@ for structu in machin:
         if response['acknowledged']:
             print(indexLabDoc + ' créé')
         else:
-            print (response)
-        cpt =0
-        print (len(esDocs), " documents")
+            print(response)
+        cpt = 0
+        print(len(esDocs), " documents")
         for doc in esDocs:
-            cpt +=1
-            OSclient.index(index=indexLabDoc, body=doc ['_source'], id=doc['_id'], refresh=True)
-        print (cpt, ' docs indexés sur ', count)
+            cpt += 1
+            OSclient.index(index=indexLabDoc, body=doc['_source'], id=doc['_id'], refresh=True)
+        print(cpt, ' docs indexés sur ', count)
         # Récup des chercheurs
         indexLabCher = structu['_id'] + '-' + lab['_source']['halStructId'] + "-researchers"
         count = es.count(index=indexLabCher, body=scope_param)['count']
@@ -161,7 +163,7 @@ for structu in machin:
         if response['acknowledged']:
             print(indexLabCher + ' créé')
         cpt = 0
-        print (len(esChers), " chercheurs")
+        print(len(esChers), " chercheurs")
         for cher in esChers:
             if 'ldap' in cher['_source'] .keys():
                 if cher['_source']['ldap'] not in deDoub:
@@ -171,15 +173,15 @@ for structu in machin:
                     else:
                         print(response)
                 else:
-                    pass # on les traitera à la fin
-            else: #cas AMU
+                    pass  # on les traitera à la fin
+            else:  # cas AMU
                 OSclient.index(index=indexLabCher, body=cher['_source'], id=cher['_id'], refresh=True)
                 if response['acknowledged']:
-                    print(cher['_id'], " " ,cher['_source'], ' indexé')
+                    print(cher['_id'], " ", cher['_source'], ' indexé')
                 else:
                     print(response)
-            indexDocCher=indexLabCher + "-" + cher ['_source']['ldapId'] + "-documents"
-            # recup des doc chercheurs
+            indexDocCher = indexLabCher + "-" + cher['_source']['ldapId'] + "-documents"
+            # recup des docs chercheurs
 
             try:
                 count = es.count(index=indexDocCher, body=scope_param)['count']
@@ -188,13 +190,13 @@ for structu in machin:
                 response = OSclient.indices.create(indexDocCher)
                 if response['acknowledged']:
                     print(indexDocCher + ' créé')
-                cpt =0
+                cpt = 0
                 for doc in esResearchersDocs:
                     cpt += 1
                     OSclient.index(index=indexDocCher, body=doc['_source'], id=doc['_id'], refresh=True)
                 print(cpt, ' docs indexés sur ', count)
             except:
-                print ("pas d'index : ", indexDocCher)
+                print("pas d'index : ", indexDocCher)
             #
         #
         #

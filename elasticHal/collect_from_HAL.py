@@ -205,7 +205,7 @@ def collect_researchers_data():
 
     count = es.count(index="*-researchers", body=scope_param)['count']
     if count > 0:
-        print("\u00A0 \u21D2 ",count, " researchers found in ES, checking es_researchers list")
+        print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
         res = es.search(index="*-researchers", body=scope_param, size=count)
         es_researchers = res['hits']['hits']
         for searcher in es_researchers:
