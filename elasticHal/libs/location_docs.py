@@ -1,17 +1,14 @@
 import requests
-from geopy.geocoders import Nominatim
-from pycountry_convert import country_alpha2_to_continent_code
-
 
 
 def generate_countrys_fields(docs):
-    #TO DO LIST DE LA FONCTION#
+    # TO DO LIST DE LA FONCTION#
     # Il faudrait se pencher sur l'amélioration du systéme d'extraction des codes ISO permettant de determiner la valeur de doc["country_publication"]
-    #dans l'état actuelle elle fonctionne mais est moyennement efficace.
-    #réflechir si il y'a besoin de faire une fonction permettant de génerer la variable DOCS pour des cas particulier (ex: enrichissement externe de la base es)
+    # dans l'état actuelle elle fonctionne mais est moyennement efficace.
+    # réflechir si il y'a besoin de faire une fonction permettant de génerer la variable DOCS pour des cas particulier (ex: enrichissement externe de la base es)
 
     # Cette function permet de génner les champs country_origin , country_colaboration , country_publication. ces champs
-    #sont générer à partir  documents contenue dans la variable Docs elle même produite par la fonction hal.find_publications
+    # sont générer à partir  documents contenue dans la variable Docs elle même produite par la fonction hal.find_publications
 
     print(" début de génération des champs country")
     for index, doc in enumerate(docs):
@@ -33,7 +30,7 @@ def generate_countrys_fields(docs):
         country_list_upper = [country.upper() for country in country_list]
         if len(country_list_upper) == 0:
             print("country_origin empty")
-            country_list_upper =[""]
+            country_list_upper = [""]
         doc["country_origin"] = country_list_upper
 
         # generate country colaboration : country colaboration est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
@@ -53,20 +50,19 @@ def generate_countrys_fields(docs):
 
         country_list = list(set(country_list))
         country_list_upper = [country.upper() for country in country_list]
-        if "FR" in  country_list_upper :
+        if "FR" in country_list_upper:
             country_list_upper.remove('FR')
-        else :
+        else:
             pass
 
         if len(country_list_upper) == 0:
             country_list_upper = [""]
-        doc["country_colaboration"]= country_list_upper
-
-
+        doc["country_colaboration"] = country_list_upper
 
     print(" fin de génération des champs country")
 
     return docs
+
 
 def extract_locations_from_docid_list(docid):
     facet_fields_list = ["country_s", "deptStructCountry_s", "labStructCountry_s", "location",
