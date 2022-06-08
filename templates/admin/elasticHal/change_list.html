@@ -2,7 +2,14 @@
 {% load static %}
 {% block object-tools-items %}
 <li>
-    <a href="upload-csv/">Importer un fichier CSV</a>
+    <a href="export-elastic/">
+        Exporter les données vers Elastic
+    </a>
+</li>
+<li>
+    <a href="upload-csv/">
+        Importer un fichier CSV
+    </a>
 </li>
 {{ block.super }}
 {% endblock %}

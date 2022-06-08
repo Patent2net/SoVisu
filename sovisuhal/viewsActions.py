@@ -29,6 +29,9 @@ except:
     mode = "Dev"
     patternCas = ''  # motif à enlever aux identifiants CAS
 
+# Connect to DB
+es = esActions.es_connector()
+
 
 @login_required
 def admin_access_login(request):
@@ -50,8 +53,6 @@ def admin_access_login(request):
         else:
             # auth_user = request.user.get_username()
             auth_user = auth_user.replace(patternCas, '').lower()
-            # check présence auth_user
-            es = esActions.es_connector()
 
             field = "_id"
             scope_param = esActions.scope_p(field, auth_user)
@@ -94,7 +95,6 @@ def create_credentials(request):
 
         collecte_docs(chercheur)
         # récupération du struct du nouveau profil pour la redirection
-        es = esActions.es_connector()
         field = "halId_s"
         scope_param = esActions.scope_p(field, idhal)
         count = es.count(index="*-researchers", body=scope_param)['count']
@@ -149,9 +149,6 @@ def validate_references(request):
         validate = False
     else:
         return redirect('unknown')
-
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope information
     if i_type == "rsr":
@@ -228,9 +225,6 @@ def validate_guiding_domains(request):
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
 
-    # Connect to DB
-    es = esActions.es_connector()
-
     if request.method == 'POST':
 
         to_validate = request.POST.get("toValidate", "").split(',')
@@ -294,9 +288,6 @@ def validate_expertise(request):
         validate = 'invalidated'
     else:
         return redirect('unknown')
-
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope information
     if i_type == "rsr":
@@ -383,9 +374,6 @@ def validate_credentials(request):
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
 
-    # Connect to DB
-    es = esActions.es_connector()
-
     if request.method == 'POST':
 
         if i_type == "rsr":
@@ -445,9 +433,6 @@ def validate_guiding_keywords(request):
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
 
-    # Connect to DB
-    es = esActions.es_connector()
-
     if request.method == 'POST':
 
         guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
@@ -499,9 +484,6 @@ def validate_research_description(request):
         date_to = request.GET['to']
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
-
-    # Connect to DB
-    es = esActions.es_connector()
 
     if request.method == 'POST':
 
@@ -568,9 +550,6 @@ def refresh_aurehal_id(request):
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
 
-    # Connect to DB
-    es = esActions.es_connector()
-
     scope_param = esActions.scope_p("_id", p_id)
 
     res = es.search(index=struct + "*-researchers", body=scope_param)
@@ -619,9 +598,6 @@ def force_update_references(request):
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
 
-    # Connect to DB
-    es = esActions.es_connector()
-
     # if request.method == 'POST':
     # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
 
@@ -666,9 +642,6 @@ def update_members(request):
         date_to = request.GET['to']
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
-
-    # Connect to DB
-    es = esActions.es_connector()
 
     if request.method == 'POST':
         to_update = request.POST.get("toUpdate", "").split(",")
@@ -719,9 +692,6 @@ def update_authorship(request):
         date_to = request.GET['to']
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
-
-    # Connect to DB
-    es = esActions.es_connector()
 
     scope_param = esActions.scope_p("ldapId", p_id)
 
@@ -822,8 +792,6 @@ def export_hceres_xls(request):
 
     key = "halStructId"
     ext_key = "harvested_from_ids"
-
-    es = esActions.es_connector()
 
     res = es.search(index=struct + "-" + p_id + "-laboratories", body=scope_param)
     try:

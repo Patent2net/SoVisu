@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-
+import time
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -10,6 +10,10 @@ from urllib.parse import urlencode
 from django.urls import reverse
 
 from .libs import halConcepts, esActions
+
+
+# Connect to DB
+es = esActions.es_connector()
 
 
 # /Pages
@@ -42,8 +46,6 @@ def check(request):
     if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
         return redirect('unknown')
 
-    # Connect to DB
-    es = esActions.es_connector()
 
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -247,13 +249,13 @@ def check(request):
                         if "state" in children1.keys():
                             if children1['state'] == validate:
                                 concepts.append(
-                                    {'id': children1['id'], 'label_fr': children1['label_fr'], 'state': validate})
+                                    {'id': children1['id'], 'label_fr': "&nbsp;&nbsp;&nbsp;&nbsp;&bull; " + children1['label_fr'], 'state': validate})
                             else:
                                 print(children1)
                         if 'children' in children1:
                             for children2 in children1['children']:
                                 if "state" in children2.keys() and children2['state'] == validate:
-                                    concepts.append({'id': children2['id'], 'label_fr': children2['label_fr'],
+                                    concepts.append({'id': children2['id'], 'label_fr':  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- " + children2['label_fr'],
                                                      'state': validate})
 
         return render(request, 'check.html',
@@ -309,6 +311,7 @@ def check(request):
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
         ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, date_from, date_to)
+        print(ref_param)
 
         if i_type == "rsr":
             count = \
@@ -368,8 +371,6 @@ def dashboard(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -483,8 +484,6 @@ def references(request):
         i_filter = -1
 
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -600,8 +599,6 @@ def terminology(request):
     else:
         export = False
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -744,8 +741,6 @@ def wordcloud(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     # l'ext_key n'est pas utilisé dans cette fonction
@@ -781,13 +776,13 @@ def wordcloud(request):
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
-        filtreLab = ''
+        filtrelab = ''
 
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity['halStructId'])
         indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
         filtrechercheur = ''
-        filtreLab = '_index: "' + indexsearch + '"'
+        filtrelab = '_index: "' + indexsearch + '"'
     else:
         return redirect('unknown')
 
@@ -806,16 +801,16 @@ def wordcloud(request):
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
-                   'filterLab': filtreLab,
+                   'filterLab': filtrelab,
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
 
-def mesure_impact_international_dashboard(request):
+def impact_international(request):
     # Get parameters
     if 'struct' in request.GET:
-        struct = request.GET['struct']
+        struct = str(request.GET['struct'])
     else:
         struct = -1
 
@@ -829,15 +824,12 @@ def mesure_impact_international_dashboard(request):
         p_id = request.GET['id']
 
     elif request.user.is_authenticated:
-        basereverse = 'mesure_impact_international_dashboard'
+        basereverse = 'impact_international'
         return default_checker(request, basereverse)
 
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
-
     # Get scope data
     # l'ext_key n'est pas utilisé dans cette fonction
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -855,28 +847,30 @@ def mesure_impact_international_dashboard(request):
 
     field = "harvested_from_ids"
     validate = False
+    hastoconfirm_param = ''
     if i_type == "rsr":
         hastoconfirm_param = esActions.confirm_p(field, entity['halId_s'], validate)
 
     if i_type == "lab":
         hastoconfirm_param = esActions.confirm_p(field, entity['halStructId'], validate)
-
     if es.count(index=struct + "*-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
     field = "harvested_from_ids"
 
+    start_date_param = ''
+    filtrechercheur = ''
+    filtrelab = ''
     if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity['halId_s'])
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
         filtrechercheur = '_index: "' + indexsearch + '"'
 
     elif i_type == "lab":
-
         start_date_param = esActions.date_p(field, entity['halStructId'])
-        filtrechercheur = ''
-
+        indexsearch = struct + '-' + entity['halStructId'] + "-laboratories" + "-documents"
+        filtrelab = '_index: "' + indexsearch + '"'
     res = es.search(index=struct + "*-documents", body=start_date_param)
     start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
     # /
@@ -887,15 +881,15 @@ def mesure_impact_international_dashboard(request):
 
     url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
 
-    return render(request, 'mesure_impact_international_dashboard.html',
+    return render(request, 'impact_international.html',
                   {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'filterRsr': filtrechercheur,
+                   'filtreLab': filtrelab,
                    'url': url,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
-
 
 
 def tools(request):
@@ -922,8 +916,6 @@ def tools(request):
     else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
         return redirect('unknown')
     # /
-    # Connect to DB
-    es = esActions.es_connector()
 
     # Get scope data
     # la fonction n'utilise que la partie i_type =="lab" de get_scope_data
@@ -1044,50 +1036,46 @@ def tools(request):
 
 
 def index(request):
+    start = time.time()
     # Get parameters
     indexcat = request.GET['indexcat']
     indexstruct = request.GET['indexstruct']
 
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
-    # /
-    # Connect to DB
-    es = esActions.es_connector()
+
+    scope_param = esActions.scope_all()
+    # création dynamique des tabs sur la page à partir de struct_tab
+    struct_tab = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene, hits.hits._source.acronym"])
+    struct_tab = [hit['_source'] for hit in struct_tab['hits']['hits']]
 
     indextype = ""
     if indexcat == "lab":
         indextype = "*-laboratories"
-
     elif indexcat == "rsr":
         indextype = "*-researchers"
 
-    scope_param = esActions.scope_all()
     count = es.count(index=indexstruct + indextype, body=scope_param)['count']
     res = es.search(index=indexstruct + indextype, body=scope_param, size=count)
-    entities = res['hits']['hits']
-    cleaned_entities = []
-
-    for entity in entities:
-        cleaned_entities.append(entity['_source'])
+    cleaned_entities = [hit['_source'] for hit in res['hits']['hits']]
 
     if indexcat == "lab":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['acronym'])
     elif indexcat == "rsr":
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k['lastName'])
     # /
+    print(f'For process: {time.time() - start} seconds')
     if i_type == -1 and p_id == -1:  # Si l'i_type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
         # → évite des erreurs lors des vérifications pour les autres pages dans le cas d'un -1
         return render(request, 'index.html',
-                      {'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                      {'struct_tab': struct_tab, 'entities': cleaned_entities, 'indexcat': indexcat, 'indexstruct': indexstruct,
                        'ldapid': ldapid})
     else:  # L'i_type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
         return render(request, 'index.html',
-                      {'entities': cleaned_entities, 'type': i_type, 'indexcat': indexcat, 'indexstruct': indexstruct,
+                      {'struct_tab': struct_tab, 'entities': cleaned_entities, 'type': i_type, 'indexcat': indexcat, 'indexstruct': indexstruct,
                        'id': p_id, 'struct': struct, 'ldapid': ldapid})
 
 
 def search(request):  # Revoir la fonction
-    # Connect to DB
-    es = esActions.es_connector()
 
     date_param = {
         "aggs": {
@@ -1112,8 +1100,6 @@ def search(request):  # Revoir la fonction
 
     if request.method == 'POST':
 
-        # Connect to DB
-        es = esActions.es_connector()
         index = request.POST.get("f_index")
         search = request.POST.get("f_search")
 
@@ -1126,16 +1112,14 @@ def search(request):  # Revoir la fonction
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
-        else: # =='researchers': par défaut
+        else:  # =='researchers': par défaut
             search_param = {
                 "query": {"query_string": {"query": search}}
             }
 
         p_res = es.count(index=index, body=search_param)
 
-
         res = es.search(index=index, body=search_param, size=p_res['count'])
-
 
         res_cleaned = []
 
