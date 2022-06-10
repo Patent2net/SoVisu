@@ -98,7 +98,7 @@ for ind, doudou in enumerate(doublons):
         else:
             pass
     else:
-        #pas venu depuis changement de mode avec Created
+        # pas venu depuis changement de mode avec Created
         Autres = [doub for doub in doublons[ind + 1:] if doub['_source']['ldapId'] == doudou['_source']['ldapId']]
         if len(Autres) == 0:
             doudou['_source']["Created"] = datetime.now().isoformat()
@@ -142,7 +142,7 @@ for structu in machin:
         count = es.count(index=indexLabDoc, body=scope_param)['count']
         res = es.search(index=indexLabDoc, body=scope_param, size=count)
         esDocs = res['hits']['hits']
-        ## création index doc
+        # création index doc
         response = OSclient.indices.create(indexLabDoc)
         if response['acknowledged']:
             print(indexLabDoc + ' créé')
