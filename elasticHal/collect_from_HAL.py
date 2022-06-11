@@ -47,6 +47,7 @@ def get_structid_list():
     global structIdlist
     structIdlist = []
     res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+    print(res)
     structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
     print("\u00A0 \u21D2 ", structIdlist)
 
