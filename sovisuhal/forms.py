@@ -8,14 +8,14 @@ class CreateCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
     # f_more = forms.CharField()
 
-    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'),
+    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'), ('doctorant', 'doctorant'),
              ('visiteur', 'visiteur')
              ]
     f_role = forms.CharField(label='Role', widget=forms.Select(choices=roles))
 
-    f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
-    f_IdRef = forms.CharField(label='IdRef - identifiant de la notice champ facultatif', required=False)
-    f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594) champ facultatif',
+    f_halId_s = forms.CharField(label='ID HAL (texte, exemple. david-reymond)')
+    f_IdRef = forms.CharField(label='IdRef (identifiant de la notice, exemple : 166695475) - champ facultatif', required=False)
+    f_orcId = forms.CharField(label='ORCID (exemple : 0000-0003-2071-6594) - champ facultatif',
                               required=False)
     # f_more = forms.CharField(label='autres')
 

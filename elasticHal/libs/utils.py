@@ -87,7 +87,10 @@ def calculate_mds(doc):
     if 'fileMain_s' in doc:
         has_attached_file = True
     else:
-        has_attached_file = False
+        if doc["openAccess_bool"] == 1:
+            has_attached_file = True
+        else:
+            has_attached_file = False
 
     if has_title:
         score += 1 * 0.8

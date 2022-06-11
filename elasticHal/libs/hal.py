@@ -1,6 +1,5 @@
 import requests
 
-
 def find_publications(idhal, field, increment=0):
 
     articles = []
@@ -11,6 +10,7 @@ def find_publications(idhal, field, increment=0):
             'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s,' \
             'bookTitle_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,' \
             'conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,' \
+            'contributorFullName_s,' \
             'isbn_s,' \
             'publicationDateY_i,' \
             'defenseDate_tdate,' \

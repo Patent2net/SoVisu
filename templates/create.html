@@ -153,7 +153,7 @@
 
         sel_role = document.querySelector('#id_f_role')
         sel_role.addEventListener("change", function () {
-            if (sel_role.value == 'chercheur') {
+            if (sel_role.value == 'chercheur' || sel_role.value == 'doctorant') {
                 for (var i = 0; i < slides.length; i++) {
                     console.log(slides.item(i));
                     slides.item(i).style.display = "block";
