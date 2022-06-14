@@ -18,7 +18,7 @@ import requests
     # Les mots clés sont obtenus à partir de l'api Teeft (https://objectif-tdm.inist.fr/2021/12/20/extraction-de-termes-teeft/s
 
 ###############################################################################################################################
-
+"""
 def extract_key_words(text,extractor):
     # Déclaration d'une fonction permettant de d'extraire les mots clés d'un texte
     try:
@@ -46,7 +46,7 @@ def exctract_enties(docs):
     stop_word_list = {"nouvelles"}
     for index, doc in enumerate(docs):
         list_keyword =list()
-        """
+        
         if "fr_keyword_s" in doc.keys():
             # Cette partie de la fonction est un traitement des mots clés existant dans le champ fr_keyword_s
             # Si le document possède des mots clés, ces mots clés sont concaténés pour être traité avec spacy 
@@ -58,7 +58,7 @@ def exctract_enties(docs):
             particular_pos = [token.text for token in nlp_ if (token.pos_  in ("PROPN") or token.is_punct or token.is_space)]
             list_keyword = [keyword for keyword in doc["fr_keyword_s"] if keyword not in entites]
             list_keyword = [keyword for keyword in list_keyword if keyword not in particular_pos]
-        """
+        
 
         if  "fr_abstract_s" in doc.keys():
             #Cette partie de la fonction génère une liste de mots clés à partir du champ fr_abstract_s.
@@ -78,6 +78,7 @@ def exctract_enties(docs):
     print("Fin exctract_enties")
     return docs
 
+"""
 
 def keyword_from_teeft(docs):
 
