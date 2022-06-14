@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
 from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
-from elasticHal.libs import utils, hal, archivesOuvertes, location_docs, doi_enrichissement
+from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs ,doi_enrichissement , keyword_enrichissement
 from elasticsearch import helpers
 import json
 import datetime
@@ -28,12 +28,10 @@ except:
 from SPARQLWrapper import SPARQLWrapper, JSON
 import requests
 
-# Connect to DB
-es = esActions.es_connector()
-
 
 # @shared_task(bind=True)
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
+    es = esActions.es_connector()
     #   progress_recorder = ProgressRecorder(self)
     #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
     if mode == "Prod":
@@ -158,7 +156,10 @@ def collecte_docs(chercheur):  # self,
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
     docs = location_docs.generate_countrys_fields(docs)
     docs = doi_enrichissement.docs_enrichissement_doi(docs)
+    docs = keyword_enrichissement.keyword_from_teeft(docs)
+    docs = keyword_enrichissement.return_entities(docs)
 
+    es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
@@ -208,6 +209,7 @@ def collecte_docs(chercheur):  # self,
         #             doc["harvested_from_ids"].append(h['from'])
 
         doc["records"] = []
+
 
         """
         if 'doiId_s' in doc:

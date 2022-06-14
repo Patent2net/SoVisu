@@ -68,7 +68,6 @@ def extract_locations_from_docid_list(docid):
     facet_fields_list = ["country_s", "deptStructCountry_s", "labStructCountry_s", "location",
                          "rgrpInstStructCountry_s", "rgrpLabStructCountry_s", "rteamStructCountry_s",
                          "deptStructAddress_s", "instStructCountry_s", "structCountry_s", "structCountry_t"]
-
     url = 'https://api.archives-ouvertes.fr/search/?q=docid:"' + str(docid) + '"&wt=json&indent=true'
     for facet_field in facet_fields_list:
         url = url + "&facet=true&facet.field=" + facet_field
