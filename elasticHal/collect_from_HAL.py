@@ -4,7 +4,7 @@ import time
 from elasticsearch import helpers
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, archivesOuvertes, location_docs, doi_enrichissement
+from elasticHal.libs import hal, utils, archivesOuvertes, location_docs, doi_enrichissement ,keyword_enrichissement
 
 """
 django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
@@ -106,6 +106,9 @@ def collect_laboratories_data():
             # Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
             docs = doi_enrichissement.docs_enrichissement_doi(docs)
+            docs = keyword_enrichissement.keyword_from_teeft(docs)
+            docs = keyword_enrichissement.return_entities(docs)
+
             # Insert documents collection
             for num, doc in enumerate(docs):
                 print(f"- sub processing : {str(doc['docid'])}")
@@ -255,6 +258,9 @@ def collect_researchers_data():
             # Enrichssements des documents récoltés
             docs = location_docs.generate_countrys_fields(docs)
             docs = doi_enrichissement.docs_enrichissement_doi(docs)
+            docs = keyword_enrichissement.keyword_from_teeft(docs)
+            docs = keyword_enrichissement.return_entities(docs)
+
             # Insert documents collection
             for num, doc in enumerate(docs):
                 doc["_id"] = doc['docid']
