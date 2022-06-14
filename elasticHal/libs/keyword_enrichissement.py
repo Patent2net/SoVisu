@@ -1,5 +1,5 @@
 from spacy.lang.fr.stop_words import STOP_WORDS
-import pke
+
 import spacy
 import requests
 
@@ -7,6 +7,7 @@ import requests
 
 
 ##############################################################################################################################
+import pke
 #Ce fichier contient deux fonction principale :
 
     #Une fonction permettant d'enrichir une list de document en ajoutant une liste de mots clés complémentaire
