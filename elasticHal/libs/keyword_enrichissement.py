@@ -1,5 +1,4 @@
 from spacy.lang.fr.stop_words import STOP_WORDS
-
 import spacy
 import requests
 
@@ -7,79 +6,16 @@ import requests
 
 
 ##############################################################################################################################
-import pke
 #Ce fichier contient deux fonction principale :
-
-    #Une fonction permettant d'enrichir une list de document en ajoutant une liste de mots clés complémentaire
-    #Cette liste de mots clés complémentaire peux être constitué de deux list  disctinct :
-    #-Une première liste constituée des mots clés auquel les entités nommée on était soustraite
-    #-Une seconde liste constituée de mots clés générer à partir des abstracts en français des documents
 
     # Une  fonction  qui renvois une liste de mots clés générer à partir des résumés en français des documents
     # Les mots clés sont obtenus à partir de l'api Teeft (https://objectif-tdm.inist.fr/2021/12/20/extraction-de-termes-teeft/s
 
+    #Une fonction qui renvois les entités nommée d'un resumer en anglais ou  français. L'exctraction se fais à partir des modéles
+    #fr_core_news_md pour le français et en_core_web_md pour l'anglai
+
 ###############################################################################################################################
-"""
-def extract_key_words(text,extractor):
-    # Déclaration d'une fonction permettant de d'extraire les mots clés d'un texte
-    try:
-        extractor.load_document(input=text, language='fr', normalization="stemming")
-        extractor.candidate_selection()
-        extractor.candidate_weighting()
-        keyphrases = extractor.get_n_best(n=5)
-        list_keyword = list()
-        for key_word in keyphrases:
-            list_keyword.append(key_word[0])
-        list_keyword = list(set(list_keyword))
-        return list_keyword
-    except Exception as e:
-        return (e)
 
-
-def exctract_enties(docs):
-    #Cette fonction prend en entrer une liste de document pour chaque document avec un résumé en français génére une list de mots clés sans entité
-    # à partir de spacy et pke
-    #cette liste de mots clés est générer à partir de la librairie Pke
-    print("début exctract_enties")
-    extractor = pke.unsupervised.TopicalPageRank()
-    nlp = spacy.load("fr_core_news_md")  # chargement du modéle dans Spacy
-    nlp.Defaults.stop_words |= STOP_WORDS
-    stop_word_list = {"nouvelles"}
-    for index, doc in enumerate(docs):
-        list_keyword =list()
-        
-        if "fr_keyword_s" in doc.keys():
-            # Cette partie de la fonction est un traitement des mots clés existant dans le champ fr_keyword_s
-            # Si le document possède des mots clés, ces mots clés sont concaténés pour être traité avec spacy 
-            # À partir de la concaténation, on extrait les entités nommées  contenues dans les mots pour les 
-            # filtrer dans la liste de mots clés
-            join_keword = " ".join(doc["fr_keyword_s"])       
-            nlp_ = nlp(join_keword)
-            entites = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
-            particular_pos = [token.text for token in nlp_ if (token.pos_  in ("PROPN") or token.is_punct or token.is_space)]
-            list_keyword = [keyword for keyword in doc["fr_keyword_s"] if keyword not in entites]
-            list_keyword = [keyword for keyword in list_keyword if keyword not in particular_pos]
-        
-
-        if  "fr_abstract_s" in doc.keys():
-            #Cette partie de la fonction génère une liste de mots clés à partir du champ fr_abstract_s.
-            #Cette liste est générée avec la librairie PKE , une fois la liste de mots clés générer elle
-            #est nettoyée en procédant à l'extraction des entités nommée ,Les entités nommée sont détectées
-            #avec Spacy.
-            abstract_keyword = extract_key_words(str(doc["fr_abstract_s"]), extractor)
-            abstract_keyword = [keyword for keyword in abstract_keyword if keyword not in STOP_WORDS]
-            abstract_keyword = [keyword for keyword in abstract_keyword if keyword not in stop_word_list]
-            nlp_ = nlp(str(doc["fr_abstract_s"]))
-            entites = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
-            abstract_keyword = [keyword for keyword in abstract_keyword if keyword not in entites]
-            list_keyword.extend(abstract_keyword)
-
-        list_keyword = list(set(list_keyword))
-        doc["pke_keywords"]=list_keyword
-    print("Fin exctract_enties")
-    return docs
-
-"""
 
 def keyword_from_teeft(docs):
 
