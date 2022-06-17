@@ -46,7 +46,6 @@ def check(request):
     if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
         return redirect('unknown')
 
-
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
     else:
