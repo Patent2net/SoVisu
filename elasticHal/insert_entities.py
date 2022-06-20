@@ -205,7 +205,7 @@ def create_researchers_index():
                 connait_lab = row["labHalId"]
                 old_lab = row['labHalId']
 
-            row['aurehalId'] = row['aurehalId'].strip()  # supprime les '\r' empéchant une erreur venant de SPARQL
+            row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empéchant une erreur venant de SPARQL
             archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(row['aurehalId'])
 
             time.sleep(1)
