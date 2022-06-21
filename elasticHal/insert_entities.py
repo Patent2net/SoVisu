@@ -206,8 +206,10 @@ def create_researchers_index():
                 old_lab = row['labHalId']
 
             row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empéchant une erreur venant de SPARQL
-            archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(row['aurehalId'])
-
+            try:
+                archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(int(row['aurehalId']))
+            except:
+                print("aille archives_ouvertes_data, ", row['aurehalId'])
             time.sleep(1)
 
             if "guidingKeywords" not in row:  # si le champ n'existe pas (ou vide) met la valeur à [], sinon persistance des données

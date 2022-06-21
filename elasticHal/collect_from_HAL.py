@@ -46,7 +46,7 @@ scope_param = esActions.scope_all()
 def get_structid_list():
     global structIdlist
     structIdlist = []
-    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
+    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"], request_timeout=50)
     print(res)
     structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
     print("\u00A0 \u21D2 ", structIdlist)
@@ -57,10 +57,10 @@ def collect_laboratories_data():
     laboratories_list = []
 
     # init es_laboratories
-    count = es.count(index="*-laboratories", body=scope_param)['count']
+    count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
     if count > 0:
         print("\u00A0 \u21D2", count, "laboratories found in ES, checking es_laboratories list")
-        res = es.search(index="*-laboratories", body=scope_param, size=count)
+        res = es.search(index="*-laboratories", body=scope_param, size=count, request_timeout=50)
         es_laboratories = res['hits']['hits']
         for lab in es_laboratories:
             laboratories_list.append(lab['_source'])
@@ -175,7 +175,7 @@ def collect_laboratories_data():
                         es.indices.create(
                             index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
                     res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                                    body=doc_param)
+                                    body=doc_param, request_timeout=50)
 
                     if len(res['hits']['hits']) > 0:
                         if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
@@ -196,6 +196,7 @@ def collect_laboratories_data():
                 es,
                 docs,
                 index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                request_timeout = 50
             )
 
 
@@ -207,10 +208,10 @@ def collect_researchers_data():
     # Init researchers
     researchers_list = []
 
-    count = es.count(index="*-researchers", body=scope_param)['count']
+    count = es.count(index="*-researchers", body=scope_param, request_timeout=50)['count']
     if count > 0:
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
-        res = es.search(index="*-researchers", body=scope_param, size=count)
+        res = es.search(index="*-researchers", body=scope_param, size=count, request_timeout=50)
         es_researchers = res['hits']['hits']
         for searcher in es_researchers:
             researchers_list.append(searcher['_source'])
@@ -323,7 +324,7 @@ def collect_researchers_data():
                         print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
                         break
                     res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
-                        "ldapId"] + "-documents", body=doc_param)  # -researchers" + searcher["ldapId"] + "-documents
+                        "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
 
                     if len(res['hits']['hits']) > 0:
                         if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
@@ -343,7 +344,7 @@ def collect_researchers_data():
 
             res = helpers.bulk(
                 es,
-                docs,
+                docs, request_timeout=50,
                 index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
                 # -researchers" + searcher["ldapId"] + "-documents
             )
@@ -357,10 +358,10 @@ def init_labo():
     dico_acronym = dict()
 
     # init es_laboratories
-    count = es.count(index="*-laboratories", body=scope_param)['count']
+    count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
     if count > 0:
         print(count, " laboratories to init found in ES, processing es to init_labo")
-        res = es.search(index="*-laboratories", body=scope_param, size=count)
+        res = es.search(index="*-laboratories", body=scope_param, size=count, request_timeout=50)
         es_laboratories = res['hits']['hits']
         for lab in es_laboratories:
             lab = lab['_source']

@@ -13,14 +13,14 @@ pandas==1.2.2
 requests==2.27.1
 certifi==2021.10.8 #sécurité dans le cas ou requests n'installe pas ou mal la librairie
 networkx==2.5
-beautifulsoup4~=4.11.1
+beautifulsoup4==4.11.1
 bs4==0.0.1
 SPARQLWrapper==2.0.0
 ldap3~=2.9.1
 lxml==4.8.0
 nested-lookup==0.2.23
 six==1.16.0
-install==1.3.5 # https://pypi.org/project/install/
+# install==1.3.5 # https://pypi.org/project/install/
 idna==3.3
 asgiref==3.5.1
 sqlparse==0.4.2
