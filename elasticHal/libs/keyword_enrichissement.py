@@ -6,12 +6,12 @@ import requests
 
 
 ##############################################################################################################################
-#Ce fichier contient deux fonction principale :
+#Ce fichier contient deux fonctions principales :
 
-    # Une  fonction  qui renvois une liste de mots clés générer à partir des résumés en français des documents
+    # Une  fonction  qui renvoie une liste de mots clés générés à partir des résumés en français des documents
     # Les mots clés sont obtenus à partir de l'api Teeft (https://objectif-tdm.inist.fr/2021/12/20/extraction-de-termes-teeft/s
 
-    #Une fonction qui renvois les entités nommée d'un resumer en anglais ou  français. L'exctraction se fais à partir des modéles
+    #Une fonction qui renvoie les entités nommée d'un resumer en anglais ou  français. L'exctraction se fais à partir des modéles
     #fr_core_news_md pour le français et en_core_web_md pour l'anglai
 
 ###############################################################################################################################
@@ -38,24 +38,31 @@ def keyword_from_teeft(docs):
 
         #Pour chaque document ayant un résumer en français
         if "fr_abstract_s" in doc.keys():
-            json_data_fr.append({
-            'id': index,
-            'value':doc["fr_abstract_s"][0]
-        })
-
+            if len(doc["fr_abstract_s"][0]) > 100:
+                json_data_fr.append({
+                'id': index,
+                'value':doc["fr_abstract_s"][0]
+                })
+                response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers,
+                                     json=json_data_fr)
+                data_fr = response.json()
+            else:
+                data_fr = []
+        else:
+            data_fr = []
         # Pour chaque document ayant un résumer en français anglais
         if "en_abstract_s" in doc.keys():
-            json_data_en.append({
-                'id': index,
-                'value': doc["en_abstract_s"][0]
-            })
-
-    response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers, json=json_data_fr)
-    data_fr = response.json()
-
-    response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
-    data_en = response.json()
-
+            if len(doc["en_abstract_s"][0])>100:
+                json_data_en.append({
+                    'id': index,
+                    'value': doc["en_abstract_s"][0]
+                })
+                response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
+                data_en = response.json()
+            else:
+                data_en =[]
+        else:
+            data_en = []
     for value in data_fr:
         docs[int(value["id"])]["teeft_keywords_fr"]= value["value"]
 
@@ -78,7 +85,23 @@ def return_entities(docs):
         if "fr_abstract_s" in doc.keys():
             nlp_ = nlp_fr(str(doc["fr_abstract_s"]))
             doc["entities_fr"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
-
+            # curl -X 'POST' \
+            #   'https://loterre-resolvers.services.inist.fr/v1/9SD/identify?indent=true' \
+            #   -H 'accept: application/json' \
+            #   -H 'Content-Type: application/json' \
+            #   -d '[
+            #   {
+            #     "id": 1,
+            #     "value": "Toulon"
+            #   },
+            #   {
+            #     "id": 2,
+            #     "value": "PACA"
+            #   },
+            #   {
+            #     "id": 3,
+            #     "value": "Sao Paulo"
+            #   }
         if "en_abstract_s" in doc.keys():
             nlp_ = nlp_en(str(doc["en_abstract_s"]))
             doc["entities_en"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
