@@ -2,7 +2,12 @@ from spacy.lang.fr.stop_words import STOP_WORDS
 import spacy
 import requests
 
+global nlp_fr
+nlp_fr = spacy.load("fr_core_news_md")  # chargement du modéle dans Spacy
+# nlp_fr.Defaults.stop_words |= STOP_WORDS
 
+global nlp_en
+nlp_en = spacy.load("en_core_web_md")
 
 
 ##############################################################################################################################
@@ -17,7 +22,7 @@ import requests
 ###############################################################################################################################
 
 
-def keyword_from_teeft(docs):
+def keyword_from_teeft(doc):
 
     # Cette fonction prend en entrer une liste de document pour chaque document avec un résumé en français ou un résumer en anglais
     # la fonction interroge l'api de teeft , l'api renvois une liste de mots clés décrivant le document en fonction de langue du résumer (français ou anglais )
@@ -34,28 +39,28 @@ def keyword_from_teeft(docs):
     # initialisations des variables pour stocker les requetes  json
     json_data_fr=list()
     json_data_en = list()
-    for index , doc in enumerate(docs):
+    #for index , doc in enumerate(docs):
 
         #Pour chaque document ayant un résumer en français
-        if "fr_abstract_s" in doc.keys():
-            if len(doc["fr_abstract_s"][0]) > 100:
+    if "fr_abstract_s" in doc.keys():
+        if len(doc["fr_abstract_s"]) > 100:
                 json_data_fr.append({
-                'id': index,
-                'value':doc["fr_abstract_s"][0]
+                'id': 1,
+                'value':doc["fr_abstract_s"]
                 })
                 response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers,
                                      json=json_data_fr)
                 data_fr = response.json()
-            else:
-                data_fr = []
         else:
             data_fr = []
+    else:
+        data_fr = []
         # Pour chaque document ayant un résumer en français anglais
         if "en_abstract_s" in doc.keys():
-            if len(doc["en_abstract_s"][0])>100:
+            if len(doc["en_abstract_s"])>100:
                 json_data_en.append({
-                    'id': index,
-                    'value': doc["en_abstract_s"][0]
+                    'id': 1,
+                    'value': doc["en_abstract_s"]
                 })
                 response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
                 data_en = response.json()
@@ -64,27 +69,25 @@ def keyword_from_teeft(docs):
         else:
             data_en = []
     for value in data_fr:
-        docs[int(value["id"])]["teeft_keywords_fr"]= value["value"]
+        doc[int(value["id"])]["teeft_keywords_fr"]= value["value"]
 
     for value in data_en:
-        docs[int(value["id"])]["teeft_keywords_en"] = value["value"]
+        doc[int(value["id"])]["teeft_keywords_en"] = value["value"]
 
-    return(docs)
+    return(doc)
 
 
-def return_entities(docs):
+def return_entities(doc):
     #Cette fonction renvois les entité nommée des abstract d'un document
     # Actuellement la fonction gére le français et l'anglais
     #
-    nlp_fr = spacy.load("fr_core_news_md")  # chargement du modéle dans Spacy
-    nlp_fr.Defaults.stop_words |= STOP_WORDS
 
-    nlp_en = spacy.load("en_core_web_md")
 
-    for index, doc in enumerate(docs):
-        if "fr_abstract_s" in doc.keys():
+    #for index, doc in enumerate(docs):
+    if "fr_abstract_s" in doc.keys():
             nlp_ = nlp_fr(str(doc["fr_abstract_s"]))
             doc["entities_fr"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
+            # vérifier les entités avec loterre ?
             # curl -X 'POST' \
             #   'https://loterre-resolvers.services.inist.fr/v1/9SD/identify?indent=true' \
             #   -H 'accept: application/json' \
@@ -102,8 +105,8 @@ def return_entities(docs):
             #     "id": 3,
             #     "value": "Sao Paulo"
             #   }
-        if "en_abstract_s" in doc.keys():
-            nlp_ = nlp_en(str(doc["en_abstract_s"]))
-            doc["entities_en"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
+    if "en_abstract_s" in doc.keys():
+        nlp_ = nlp_en(str(doc["en_abstract_s"]))
+        doc["entities_en"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
 
-    return(docs)
+    return(doc)
