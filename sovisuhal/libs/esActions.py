@@ -22,11 +22,12 @@ def es_connector(mode=mode):
         es = Elasticsearch('localhost',
                            http_auth=('elastic', secret),
                            scheme="http",
-                           port=9200,
+                           port=9200)
                            # ssl_context=context,
-                           timeout=10)
+
     else:
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+
     return es
 
 

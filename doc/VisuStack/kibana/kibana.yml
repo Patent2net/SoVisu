@@ -1,0 +1,43 @@
+server:
+  name: "kibanahal"
+  host: localhost
+  port: 5601
+  #basePath: kibana/
+  #rewriteBasePath: true
+
+# When enabling encryption between Kibana and Elasticsearch, change "http" to "https" below:
+server.host: 0.0.0.0
+elasticsearch.hosts: [ "http://elastichal1:9200", "http://elastichal2:9201" ]
+#monitoring.ui.container.elasticsearch.enabled: true
+
+
+#pack.security.authc.providers:
+ # token.token1:
+ #   order: 0
+
+
+
+xpack.monitoring.ui.container.elasticsearch.enabled: false
+xpack.reporting.enabled: false
+
+xpack.encryptedSavedObjects.encryptionKey: 'fhjskloppd678ehkdfdlliverpipofcr'
+## X-Pack security credentials
+# elasticsearch.username: kibana_system
+# elasticsearch.password: MonMdp
+csp.strict: false
+
+# SSL settings
+#
+server.ssl.enabled: false
+#erver.ssl.certificate: ./config/certs/kibana.crt
+#erver.ssl.key: ./config/certs/kibana.key
+#erver.ssl.certificateAuthorities: ./config/certs/ca.crt
+
+## X-Pack security credentials
+#elasticsearch.ssl.certificateAuthorities: ./config/certs/ca.crt
+#xpack.reporting.kibanaServer.hostname: sovisu.univ-tln.fr
+xpack.reporting.kibanaServer.protocol: http
+
+#explorer in dashboard
+xpack.discoverEnhanced.actions.exploreDataInChart.enabled: true
+
