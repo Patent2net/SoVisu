@@ -22,12 +22,12 @@ services:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
     volumes:
-      #- ./opensearch.yml:/usr/share/opensearch/config/opensearch.yml:ro
+      - ./opensearch.yml:/usr/share/opensearch/config/opensearch.yml:ro
       - opensearch-data1:/usr/share/opensearch/data
       - opensearch-backup:/usr/share/opensearch/backup
     ports:
       - 9400:9200
-      - 9600:9600 # required for Performance Analyzer
+      - 9800:9300 # required for Performance Analyzer
     networks:
       - opensearch-net
 

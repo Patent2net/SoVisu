@@ -1,31 +1,45 @@
 ---
 version: "3.8"
 services:
-
-  metricbeat:
-    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-7.16.2}
-    # https://github.com/docker/swarmkit/issues/1951
-    hostname: "metricbeathal"
-    user: root
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.16.2 
+    container_name: logstash
+    user: root      
+    ports:
+      - 5044:5044       
+      - 9600:9600  
+    depends_on:
+      - elastichal
+    environment:
+      - "xpack.security.enabled=false"
+      - "INPUT1=/var/tmp/log"
+      - "XPACK_MONITORING_ENABLED=false"
+    restart: unless-stopped
+    volumes:
+      - ./volume/logstash/pipeline/test.yml:/usr/share/logstash/test.yml
+      - ./volume/logstash/pipeline:/usr/share/logstash/pipeline
     networks:
       - elk
-    volumes:
-      #- /proc:/hostfs/proc:ro
-      #- /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-      #- /:/hostfs:ro
-      #- /var/run/docker.sock:/var/run/docker.sock
-      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-      - metricbeat:/usr/share/metricbeat/data
-      - ./metricbeat/modules.d/elasticsearch.yml:/usr/share/metricbeat/modules.d/elasticsearch.yml
-    environment:
-      - ELASTICSEARCH_HOST=elastichal
-      - KIBANA_HOST=kibanahal
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=MonMdp
-    # disable strict permission checks
-    command: ["--strict.perms=false"] #, "-system.hostfs=/hostfs"]
     
-
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.16.2
+    container_name: metricbeat   
+    user: root            
+    environment:
+      - "WAIT_FOR_HOSTS=elastichal:9200 kibana:kibanahal"
+      - "HOST_ELASTICSEARCH=elastichal:9200"
+      - "HOST_KIBANA=kibanahal:5601"
+    depends_on:
+      - kibanahal
+    volumes:      
+      - ./volume/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - ./volume/metricbeat/modules.d/system.yml:/usr/share/metricbeat/modules.d/system.yml    
+    command:
+      - -e
+      - --strict.perms=false
+      - --system.hostfs=/hostfs
+    networks:
+      - elk
   elastichal:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     container_name: elastichal
@@ -43,7 +57,7 @@ services:
       - xpack.security.enabled=false
       - ELASTIC_USERNAME=elastic
       - ELASTIC_PASSWORD=MonMdp
-      - "ES_JAVA_OPTS=-Xms4G -Xmx4g"
+      - "ES_JAVA_OPTS=-Xms512M -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -97,8 +111,6 @@ volumes:
         o: bind
         type: none
         device: ./metricbeat/modules.d/elasticsearch.yml
-  metricbeat:
-
 
 networks:
   elk:

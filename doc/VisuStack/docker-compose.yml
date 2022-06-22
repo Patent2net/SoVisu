@@ -1,0 +1,167 @@
+---
+version: "3.8"
+services:
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-7.16.2}
+    # https://github.com/docker/swarmkit/issues/1951
+    hostname: "metricbeathal"
+    user: root
+    networks:
+      - elk
+    volumes:
+      #- /proc:/hostfs/proc:ro
+      #- /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      #- /:/hostfs:ro
+      #- /var/run/docker.sock:/var/run/docker.sock
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - metricbeatvolum:/usr/share/metricbeat/data
+      - ./metricbeat/modules.d/elasticsearch.yml:/usr/share/metricbeat/modules.d/elasticsearch.yml
+    environment:
+      - ELASTICSEARCH_HOST=elastichal
+      - KIBANA_HOST=kibanahal
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=MonMdp
+    # disable strict permission checks
+    command: ["--strict.perms=false"] #, "-system.hostfs=/hostfs"]
+    
+
+  elastichal1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    container_name: elastichal1
+
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - node.name=elastichal1
+      - node.master=true
+      - node.data=true
+      - cluster.name=sovisucluster
+      #- cluster.name=sovisucluster
+      - discovery.seed_hosts=elastichal2:9301
+      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - "path.repo=/usr/share/elasticsearch/backup"
+      - cluster.routing.allocation.enable=all
+      - bootstrap.memory_lock=true
+      #- "discovery.type=single-node"
+      - xpack.security.enabled=false
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=MonMdp
+      - "ES_JAVA_OPTS=-Xms2G -Xmx2g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    networks:
+      - elk
+    volumes:
+      - es-data1:/usr/share/elasticsearch/data
+      - es-backup1:/usr/share/elasticsearch/backup
+
+  elastichal2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    container_name: elastichal2
+
+    ports:
+      - "9201:9201"
+      - "9301:9301"
+    environment:
+      - node.name=elastichal2
+      - node.master=true
+      - node.data=true
+      - cluster.name=sovisucluster
+      - discovery.seed_hosts=elastichal1:9300
+      #- discovery.seed_providers=elastichal1:9300
+      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - "path.repo=/usr/share/elasticsearch/backup"
+      - bootstrap.memory_lock=true
+      #- "discovery.type=single-node"
+      - xpack.security.enabled=false
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=MonMdp
+      - "ES_JAVA_OPTS=-Xms2G -Xmx2g"
+    depends_on:
+      - elastichal1
+    links:
+      - elastichal1
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - elk
+    volumes:
+      - es-data2:/usr/share/elasticsearch/data
+      - es-backup1:/usr/share/elasticsearch/backup
+
+
+  kibanahal:
+    image: docker.elastic.co/kibana/kibana:7.16.2
+    container_name: kibanahal
+
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elastichal1
+      - elastichal2
+    links:
+      - elastichal1
+      - elastichal2
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    environment:
+      KIBANA_USERNAME: kibana_system
+      KIBANA_PASSWORD: MonMdp
+      ELASTICSEARCH_PASSWORD: MonMdp
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_HOST_PORT: "http://elastichal:9200"
+    networks:
+      - elk
+     
+volumes:
+  es-data1:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: "/d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/data1"
+
+  es-backup1:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: "/d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/backup1"
+
+  es-data2:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "/d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/data2"
+
+  modules:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: ./metricbeat/modules.d/elasticsearch.yml
+  metricbeatvolum:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: /d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/MB-data
+
+networks:
+  elk:
+    driver: bridge
+    
