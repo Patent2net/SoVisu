@@ -9,12 +9,14 @@ services:
     user: root
     networks:
       - elk
+    configs:
+      - source: mb_config
+        target: /usr/share/metricbeat/metricbeat.yml
     volumes:
       #- /proc:/hostfs/proc:ro
       #- /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
       #- /:/hostfs:ro
       #- /var/run/docker.sock:/var/run/docker.sock
-      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
       - metricbeat:/usr/share/metricbeat/data
       - ./metricbeat/modules.d/elasticsearch.yml:/usr/share/metricbeat/modules.d/elasticsearch.yml
     environment:
@@ -43,7 +45,7 @@ services:
       - xpack.security.enabled=false
       - ELASTIC_USERNAME=elastic
       - ELASTIC_PASSWORD=MonMdp
-      - "ES_JAVA_OPTS=-Xms4G -Xmx4g"
+      - "ES_JAVA_OPTS=-Xms512M -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -99,6 +101,9 @@ volumes:
         device: ./metricbeat/modules.d/elasticsearch.yml
   metricbeat:
 
+configs:
+  mb_config:
+    file: ./metricbeat/metricbeat.yml
 
 networks:
   elk:
