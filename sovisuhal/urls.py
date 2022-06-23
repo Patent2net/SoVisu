@@ -14,15 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.shortcuts import redirect
 from . import views, viewsActions
 
 urlpatterns = [
     path('admin/logout/', lambda request: redirect('/accounts/logout/', permanent=False)),  # need to be placed before admin.site.urls to overide default redirect. return to uniauth logout instead default admin/logout page
     path('admin/', admin.site.urls),
-
-
+    re_path(r'^celery-progress/', include('celery_progress.urls')),  # the endpoint is configurable
     path('', viewsActions.admin_access_login, name='login'),
 
     path('create/', views.create, name='creation'),

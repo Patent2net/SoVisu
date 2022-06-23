@@ -7,7 +7,10 @@ import time
 # Custom libs
 from sovisuhal.libs import esActions
 from elasticHal.libs import archivesOuvertes, utils
-
+# Celery
+from celery import shared_task
+# Celery-progress
+from celery_progress.backend import ProgressRecorder
 """
 django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
 Turn django_init value at "True" only if you intend to use the script as standalone and want to use the Database by turning djangodb_open value at "True".
@@ -119,7 +122,7 @@ def get_labo_list():
             temp_laboratories(row)
 
 
-def create_structures_index():
+def create_structures_index(pg):
     # Process structures
     if csv_open:
         with open('data/structures.csv', encoding='utf-8') as csv_file:
@@ -129,19 +132,25 @@ def create_structures_index():
                 es.index(index=row["structSirene"] + "-structures", id=row['structSirene'], body=json.dumps(row))
 
     elif djangodb_open:
+        percentage = 0.0
         for row in Structure.objects.all().values():
             row.pop('id')  # delete unique id added by django DB from the dict
             print(row)
             es.index(index=row["structSirene"] + "-structures", id=row['structSirene'], body=json.dumps(row))
+            progress_description = "processing structure"
+            percentage += 33 / len(Structure.objects.all().values())
+            pg.set_progress(int(percentage), 100, description=progress_description)
 
     else:
         print("No source enabled to add structure. Please check the parameters")
+    pg.set_progress(33, 100, description= "processing structure finished")
 
-
-def create_researchers_index():
+def create_researchers_index(pg):
     # Process researchers
     scope_param = esActions.scope_all()
-
+    percentage = 66.0
+    progress_description = "processing researchers"
+    pg.set_progress(int(percentage), 100, description=progress_description)
     cleaned_es_researchers = []
     for structid in structIdlist:
         count = es.count(index=structid + "*-researchers", body=scope_param)['count']
@@ -150,7 +159,8 @@ def create_researchers_index():
         for row in es_researchers:
             row = row['_source']
             cleaned_es_researchers.append(row)
-
+    progress_description = "processing ", len(cleaned_es_researchers)," researchers"
+    pg.set_progress(int(percentage), 100, description=progress_description)
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
@@ -283,20 +293,26 @@ def create_researchers_index():
             if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-laboratories"):
                 es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories")
                 es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents")
-
+            percentage += (33.0 / len(cleaned_es_researchers))
+            progress_description = row["ldapId"] + " updated"
+            pg.set_progress(int(percentage), 100, description=progress_description)
         else:
             print('\u00A0 \u21D2 chercheur hors structure ', row['ldapId'], ", structure : ", row['structSirene'])
 
 
-def create_laboratories_index():
+def create_laboratories_index(pg):
     # Process laboratories
     scope_param = esActions.scope_all()
-
+    percentage = 33
+    progress_description = "Processing laboratories indexes"
+    pg.set_progress(int(percentage), 100, description=progress_description)
     cleaned_es_laboratories = []
     for structid in structIdlist:
         count = es.count(index=structid + "*-laboratories", body=scope_param)['count']
         res = es.search(index=structid + "*-laboratories", body=scope_param, size=count)
-
+        progress_description = 'processing create_laboratories_index'
+        percentage = 66
+        pg.set_progress(int(percentage), 100, description=progress_description)
         es_laboratories = res['hits']['hits']
 
         for row in es_laboratories:
@@ -339,6 +355,7 @@ def create_laboratories_index():
                 cleaned_es_laboratories.append(lab)
 
     for row in cleaned_es_laboratories:
+
         row['guidingKeywords'] = []
 
         # Get researchers from the laboratory
@@ -399,7 +416,9 @@ def create_laboratories_index():
             print(f"creating document directory for: {row['acronym']}(struct: {row['structSirene']})")
             es.indices.create(
                 index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
-
+        percentage += (33.0/len(cleaned_es_laboratories))
+        progress_description = row ["acronym"] + " updated"
+        pg.set_progress(int(percentage), 100, description=progress_description)
 
 def temp_laboratories(row):
     global Labolist
@@ -412,9 +431,10 @@ def temp_laboratories(row):
         if connait_lab not in Labolist:
             Labolist.append(connait_lab)
 
-
-def create_index(structure, researcher, laboratories, csv_enabler=True, django_enabler=None):
+@shared_task(bind=True)
+def create_index(self, structure, researcher, laboratories, csv_enabler=True, django_enabler=None):
     global csv_open, djangodb_open
+    progress_recorder = ProgressRecorder(self)
     csv_open = csv_enabler
     djangodb_open = django_enabler
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
@@ -425,31 +445,48 @@ def create_index(structure, researcher, laboratories, csv_enabler=True, django_e
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('processing get_labo_list')
     get_labo_list()
-
+    percentage = 0
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if structure:
-        print('processing create_structures_index')
-        create_structures_index()
+        progress_description ='processing create_structures_index'
+        percentage = 33
+        progress_recorder.set_progress(int(percentage), 100, description=progress_description)
+        create_structures_index(progress_recorder)
     else:
+        progress_recorder.set_progress(int(percentage), 100, description='structure is disabled, skipping to next process')
         print('structure is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
-        print('processing create_researchers_index')
-        create_researchers_index()
+
+        progress_description ='processing create_researchers_index'
+        create_researchers_index(progress_recorder)
+        percentage = 100
+        progress_recorder.set_progress(int(percentage), 100, description=progress_description)
     else:
+        progress_recorder.set_progress(int(percentage), 100, description='researcher is disabled, skipping to next process')
         print('researcher is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
-        print('processing create_laboratories_index')
-        create_laboratories_index()
+
+
+        progress_description ='processing create_laboratories_index'
+        create_laboratories_index(progress_recorder)
+        percentage = 66
+        progress_recorder.set_progress(int(percentage), 100, description=progress_description)
     else:
+        progress_recorder.set_progress(int(percentage), 100, description='laboratories is disabled, skipping to next process')
         print('laboratories is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    print('Index creation finished')
+    #print('Index creation finished')
 
+
+    progress_description = 'Index creation finished'
+    percentage = 100
+    progress_recorder.set_progress(int(percentage), 100, description=progress_description)
+    return "finished"
 
 if __name__ == '__main__':
     create_index(structure='on', researcher='on', laboratories='on')
