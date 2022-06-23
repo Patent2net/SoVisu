@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 import datetime
 import csv
 import time
@@ -5,6 +6,11 @@ from elasticsearch import helpers
 # Custom libs
 from sovisuhal.libs import esActions
 from elasticHal.libs import hal, utils, archivesOuvertes, location_docs, doi_enrichissement ,keyword_enrichissement
+
+# Celery
+from celery import shared_task
+# Celery-progress
+from celery_progress.backend import ProgressRecorder
 
 """
 django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
@@ -52,12 +58,13 @@ def get_structid_list():
     print("\u00A0 \u21D2 ", structIdlist)
 
 
-def collect_laboratories_data():
+def collect_laboratories_data(self, progress_recorder, doc_progress_recorder):
     # Init laboratories
     laboratories_list = []
 
     # init es_laboratories
     count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
+    progress_recorder.set_progress(0, count, " labo traités ")
     if count > 0:
         print("\u00A0 \u21D2", count, "laboratories found in ES, checking es_laboratories list")
         res = es.search(index="*-laboratories", body=scope_param, size=count, request_timeout=50)
@@ -98,20 +105,31 @@ def collect_laboratories_data():
 
     # print(f'laboratories_list values = {laboratories_list}')
     # Process laboratories
+    nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
+        progress_recorder.set_progress(nblab, count, {lab['acronym']}, " labo en cours")
+        nblab +=1
         # Collect publications
         if len(lab['halStructId']) > 0:
             docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
-            # Enrichssements des documents récoltés
-            docs = location_docs.generate_countrys_fields(docs)
-            docs = doi_enrichissement.docs_enrichissement_doi(docs)
-            docs = keyword_enrichissement.keyword_from_teeft(docs)
-            docs = keyword_enrichissement.return_entities(docs)
+
+            # docs = doi_enrichissement.docs_enrichissement_doi(docs)
+            # docs = keyword_enrichissement.keyword_from_teeft(docs)
+            # docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
             for num, doc in enumerate(docs):
+                doc_progress_recorder.set_progress(num, len(docs), "Collection ", {lab['acronym']}, " en cours")
                 print(f"- sub processing : {str(doc['docid'])}")
+                # Enrichssements des documents récoltés
+                doc = location_docs.generate_countrys_fields(doc)
+                lstResum = [cle for cle in doc.keys() if "abstract" in cle]
+                for cle in lstResum:
+                    if isinstance(doc[cle], list):
+                        doc [cle] =  ' ' .join( doc [cle] )
+                    else:
+                        pass
                 doc["_id"] = doc['docid']
                 doc["validated"] = True
                 doc["harvested_from"] = "lab"
@@ -198,9 +216,12 @@ def collect_laboratories_data():
                 index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
                 request_timeout = 50
             )
+            doc_progress_recorder.set_progress(nblab, count, {lab['acronym']}, " indexée, ", count, " documents")
+        progress_recorder.set_progress(nblab, count, {lab['acronym']}, " labo traité")
 
-
-def collect_researchers_data():
+    return "finished"
+#@shared_task(bind=True)
+def collect_researchers_data(self, progress_recorder, doc_progress_recorder):
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     labos, dico_acronym = init_labo()
     print(f"\u00A0 \u21D2 labos values ={labos}")
@@ -213,7 +234,9 @@ def collect_researchers_data():
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
         res = es.search(index="*-researchers", body=scope_param, size=count, request_timeout=50)
         es_researchers = res['hits']['hits']
+        i=0
         for searcher in es_researchers:
+
             researchers_list.append(searcher['_source'])
 
     if csv_open:
@@ -250,6 +273,8 @@ def collect_researchers_data():
     print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
     for searcher in researchers_list:
+        progress_recorder.set_progress(i + 1, count, " chercheurs traités ")
+
         if searcher["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
             print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             if searcher["labHalId"] not in labos:
@@ -257,13 +282,15 @@ def collect_researchers_data():
             # Collect publications
             docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
-            docs = location_docs.generate_countrys_fields(docs)
-            docs = doi_enrichissement.docs_enrichissement_doi(docs)
-            docs = keyword_enrichissement.keyword_from_teeft(docs)
-            docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
+
             for num, doc in enumerate(docs):
+                doc_progress_recorder.set_progress(num, len(docs), " document traités ")
+                doc = location_docs.generate_countrys_fields(doc)
+                doc = doi_enrichissement.docs_enrichissement_doi(doc)
+                doc = keyword_enrichissement.keyword_from_teeft(doc)
+                doc = keyword_enrichissement.return_entities(doc)
                 doc["_id"] = doc['docid']
                 doc["validated"] = True
 
@@ -348,9 +375,10 @@ def collect_researchers_data():
                 index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
                 # -researchers" + searcher["ldapId"] + "-documents
             )
+
         else:
             print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
-
+    return "finished"
 
 def init_labo():
     # initialisation liste labos supposée plus fiables que données issues Ldap.
@@ -405,9 +433,11 @@ def init_labo():
 
     return labos, dico_acronym
 
-
-def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None):
+@shared_task(bind=True)
+def collect_data(self, laboratories=False, researcher=False, csv_enabler=True, django_enabler=None):
     global csv_open, djangodb_open
+    doc_progress_recorder = ProgressRecorder(self)
+    progress_recorder = ProgressRecorder(self)
     csv_open = csv_enabler
     djangodb_open = django_enabler
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
@@ -420,20 +450,20 @@ def collect_data(laboratories, researcher, csv_enabler=True, django_enabler=None
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
         print('collecting laboratories data')
-        collect_laboratories_data()
+        collect_laboratories_data(progress_recorder, doc_progress_recorder)
     else:
         print('laboratories is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
         print('collecting researchers data')
-        collect_researchers_data()
+        collect_researchers_data(progress_recorder, doc_progress_recorder)
     else:
         print('researcher is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('Index completion finished')
-
+    return "finished"
 
 if __name__ == '__main__':
     collect_data(laboratories='on', researcher='on')

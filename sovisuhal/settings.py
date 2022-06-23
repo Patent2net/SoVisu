@@ -91,8 +91,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'uniauth',
-    # 'celery',
-    # 'celery_progress',
+    'celery',
+    'celery_progress',
     'elasticHal',
 ]
 
@@ -215,3 +215,8 @@ MANAGERS = (
     ('BU_1', '')
 )
 # Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés. Dans le cas ou un seul admin est présent pour le système, merci de laisser le 2e profil sans adresse mail renseignée.
+
+# Celery Settings
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+

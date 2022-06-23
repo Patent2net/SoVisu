@@ -1,5 +1,5 @@
+from __future__ import absolute_import, unicode_literals
 import csv
-
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -12,6 +12,12 @@ from .collect_from_HAL import collect_data
 
 admin.site.site_header = "Administration de SoVisu"
 
+
+# Celery
+from celery import shared_task
+
+# Celery-progress
+from celery_progress.backend import ProgressRecorder
 
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
@@ -45,6 +51,7 @@ class ExportCsv:
 
 
 # Models are under that line+
+
 
 
 class StructureAdmin(admin.ModelAdmin, ExportCsv):
@@ -241,21 +248,45 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
 
+
+
     @staticmethod
     def export_to_elastic(request):
 
         if request.method == "POST":
-            structure = request.POST.get('Structures')
-            laboratoires = request.POST.get('Laboratoires')
-            chercheurs = request.POST.get('Chercheurs')
-            print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+            form = ExportToElasticForm(request.POST)
+            if form.is_valid():
+                structure = form.cleaned_data['Structures']
+                laboratoires = form.cleaned_data['Laboratoires']
+                chercheurs = form.cleaned_data['Chercheurs']
+                print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
-            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
-            collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                result = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
-        form = ExportToElasticForm()
-        data = {"form": form}
-        return render(request, "admin/elasticHal/export_to_elastic.html", data)
+                task_id1 = result.task_id
+                print(f'Celery Task ID: {task_id1}')
+                result = collect_data.delay(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                print (dir(result))
+                print (result.queue)
+                print (result.task_id)
+                task_id2 = result.task_id
+                print(f'Celery Task ID: {task_id2}')
+
+                return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id2': task_id2, 'task_id1': task_id1})
+            else:
+                form = ExportToElasticForm()
+                return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})
+        else:
+            # Get form instance
+            form = ExportToElasticForm()
+            # Return
+            return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})
+        #form = ExportToElasticForm()
+
+
+            #return render(request, "admin/elasticHal/export_to_elastic.html", data)
+
+
 
 
 # Register your models here.
