@@ -54,8 +54,9 @@ def find_publications(idhal, field, increment=0):
             if (count > 30) and (increment < count):
                 increment += 30
                 tmp_articles = find_publications(idhal, field, increment=increment)
-                for tmp_article in tmp_articles:
-                    articles.append(tmp_article)
+                if tmp_articles != -1:
+                    for tmp_article in tmp_articles:
+                        articles.append(tmp_article)
                 return articles
             else:
                 return articles

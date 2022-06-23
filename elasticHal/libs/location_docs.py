@@ -1,7 +1,7 @@
 import requests
 
 
-def generate_countrys_fields(docs):
+def generate_countrys_fields(doc):
     # TO DO LIST DE LA FONCTION#
     # Il faudrait se pencher sur l'amélioration du systéme d'extraction des codes ISO permettant de determiner la valeur de doc["country_publication"]
     # dans l'état actuelle elle fonctionne mais est moyennement efficace.
@@ -11,57 +11,57 @@ def generate_countrys_fields(docs):
     # sont générer à partir  documents contenue dans la variable Docs elle même produite par la fonction hal.find_publications
 
     print(" début de génération des champs country")
-    for index, doc in enumerate(docs):
-        # generate country originine : country origines est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
-        # une des valeurs de facet_fields_list. Les champs de facet fields ont été selectioner pour avoir les pays d'origine  d'un document
-        facet_fields_list = ["deptStructCountry_s", "labStructCountry_s", "structCountry_s", "structCountry_t",
-                             "rgrpInstStructCountry_s", "rgrpLabStructCountry_s", ]
-        country_list = list()
-        for facet in facet_fields_list:
-            if facet in doc.keys():
-                if type(doc[facet]) == list:
-                    country_list.extend(doc[facet])
-                else:
-                    country_list.append(doc[facet])
+#for index, doc in enumerate(docs):
+    # generate country originine : country origines est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
+    # une des valeurs de facet_fields_list. Les champs de facet fields ont été selectioner pour avoir les pays d'origine  d'un document
+    facet_fields_list = ["deptStructCountry_s", "labStructCountry_s", "structCountry_s", "structCountry_t",
+                         "rgrpInstStructCountry_s", "rgrpLabStructCountry_s", ]
+    country_list = list()
+    for facet in facet_fields_list:
+        if facet in doc.keys():
+            if type(doc[facet]) == list:
+                country_list.extend(doc[facet])
             else:
-                doc[facet] = [""]
-
-        country_list = list(set(country_list))
-        country_list_upper = [country.upper() for country in country_list]
-        if len(country_list_upper) == 0:
-            print("country_origin empty")
-            country_list_upper = [""]
-        doc["country_origin"] = country_list_upper
-
-        # generate country colaboration : country colaboration est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
-        # une des valeurs de facet_fields_list. Les champs de facet fields ont été selectioner pour avoir les pays collaborant à la production d'un document
-
-        facet_fields_list = ["country_s", "country_t", "rteamStructCountry_s", "instStructCountry_s"]
-        
-        country_list = list()
-        for facet in facet_fields_list:
-            if facet in doc.keys():
-                if type(doc[facet]) == list:
-                    country_list.extend(doc[facet])
-                else:
-                    country_list.append(doc[facet])
-            else:
-                doc[facet] = [""]
-
-        country_list = list(set(country_list))
-        country_list_upper = [country.upper() for country in country_list]
-        if "FR" in country_list_upper:
-            country_list_upper.remove('FR')
+                country_list.append(doc[facet])
         else:
-            pass
+            doc[facet] = [""]
 
-        if len(country_list_upper) == 0:
-            country_list_upper = [""]
-        doc["country_colaboration"] = country_list_upper
+    country_list = list(set(country_list))
+    country_list_upper = [country.upper() for country in country_list]
+    if len(country_list_upper) == 0:
+        print("country_origin empty")
+        country_list_upper = [""]
+    doc["country_origin"] = country_list_upper
+
+    # generate country colaboration : country colaboration est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
+    # une des valeurs de facet_fields_list. Les champs de facet fields ont été selectioner pour avoir les pays collaborant à la production d'un document
+
+    facet_fields_list = ["country_s", "country_t", "rteamStructCountry_s", "instStructCountry_s"]
+
+    country_list = list()
+    for facet in facet_fields_list:
+        if facet in doc.keys():
+            if type(doc[facet]) == list:
+                country_list.extend(doc[facet])
+            else:
+                country_list.append(doc[facet])
+        else:
+            doc[facet] = [""]
+
+    country_list = list(set(country_list))
+    country_list_upper = [country.upper() for country in country_list]
+    if "FR" in country_list_upper:
+        country_list_upper.remove('FR')
+    else:
+        pass
+
+    if len(country_list_upper) == 0:
+        country_list_upper = [""]
+    doc["country_colaboration"] = country_list_upper
 
     print(" fin de génération des champs country")
 
-    return docs
+    return doc
 
 
 def extract_locations_from_docid_list(docid):
