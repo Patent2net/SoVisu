@@ -80,14 +80,14 @@
 
 <script type="text/javascript">
 	function processProgress(progressBarElement, progressBarMessageElement, progress) {
-            //console.log(progress)
+            console.log(progress)
 			progressBarElement.style.width = progress.percent + "%";
 			var description = progress.description || "En attente du démarrage1...";
 			progressBarMessageElement.innerHTML = description;
 		}
 
 	function processProgress1(progressBarElement, progressBarMessageElement, progress) {
-            //console.log(progress)
+            console.log(progress)
 			progressBarElement.style.width = progress.percent + "%";
 			var description = progress.description || "En attente du démarrage2...";
 			progressBarMessageElement.innerHTML = description;
@@ -103,20 +103,21 @@
 			);
 		}
 	}
-
+{% if task_id1 %}
 	// Progress Bar (JQuery)
 	$(function () {
-		var progressUrl1 = "{% url 'celery_progress:task_status' task_id2 %}";
-        console.log(progressUrl1)
+		var progressUrl1 = "{% url 'celery_progress:task_status' task_id1 %}";
+        //console.log(progressUrl1)
 		CeleryProgressBar.initProgressBar(progressUrl1, {
 			onProgress: processProgress1,
             progressBarId: "progress-bar1",
             progressBarMessageId: "progress-bar-message1",
             resultElementId: 'celery-result1'
 		});
-
+{% endif %}
+{% if task_id2 %}
         var progressUrl2 = "{% url 'celery_progress:task_status' task_id2 %}";
-        // console.log(progressUrl2)
+        //console.log(progressUrl2)
         CeleryProgressBar.initProgressBar(progressUrl2, {
 			onProgress: processProgress,
             progressBarId: "progress-bar2",
@@ -127,6 +128,7 @@
 </script>
 
 {% endif %}
+    {% endif %}
 {% endblock progress_bar_js  %}
 
 

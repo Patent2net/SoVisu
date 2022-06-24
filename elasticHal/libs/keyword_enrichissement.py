@@ -51,10 +51,13 @@ def keyword_from_teeft(doc):
                 response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers,
                                      json=json_data_fr)
                 data_fr = response.json()
+                if len(data_fr) == 1 :
+                    doc["teeft_keywords_fr"] = data_fr[0]["value"]
         else:
             data_fr = []
+
     else:
-        data_fr = []
+        data_en = []
         # Pour chaque document ayant un résumer en français anglais
         if "en_abstract_s" in doc.keys():
             if len(doc["en_abstract_s"])>100:
@@ -64,13 +67,14 @@ def keyword_from_teeft(doc):
                 })
                 response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
                 data_en = response.json()
+
+                #doc["teeft_keywords_en"] = data_en[0]["value"]
             else:
                 data_en =[]
         else:
             data_en = []
-    doc["teeft_keywords_fr"]= data_fr [0]["value"]
-
-    doc["teeft_keywords_en"] = data_fr [0]["value"]
+        if len(data_en) == 1:
+            doc["teeft_keywords_en"] = data_en[0]["value"]
 
     return(doc)
 
