@@ -261,18 +261,25 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                 chercheurs = form.cleaned_data['Chercheurs']
                 print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
-                #result = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                result = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
 
-                #task_id1 = result.task_id
-                #print(f'Celery Task ID: {task_id1}')
+                task_id1 = result.task_id
+                print(f'Celery Task ID: {task_id1}')
                 result = collect_data.delay(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
-                print (dir(result))
-                print (result.queue)
-                print (result.task_id)
+
                 task_id2 = result.task_id
                 print(f'Celery Task ID: {task_id2}')
-
-                return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id2': task_id2})
+                if (task_id2 is not None and task_id1 is not None):
+                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
+                if task_id1 is not None:
+                    return render(request, "admin/elasticHal/export_to_elastic.html",
+                                  context={'form': form, 'task_id1': task_id1})
+                elif task_id2 is not None:
+                    return render(request, "admin/elasticHal/export_to_elastic.html",
+                                  context={'form': form, 'task_id2': task_id2})
+                else:
+                    return render(request, "admin/elasticHal/export_to_elastic.html",
+                                  context={'form': form})
             else:
                 form = ExportToElasticForm()
                 return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})

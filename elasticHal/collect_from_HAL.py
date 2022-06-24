@@ -108,7 +108,7 @@ def collect_laboratories_data(progress_recorder, doc_progress_recorder):
     nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
-        progress_recorder.set_progress(nblab, count, {lab['acronym']}, " labo en cours")
+        progress_recorder.set_progress( nblab, count, {lab['acronym']} + " labo en cours")
         nblab +=1
         # Collect publications
         if len(lab['halStructId']) > 0:
@@ -458,7 +458,7 @@ def collect_data(self, laboratories=False, researcher=False, csv_enabler=True, d
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
         print('collecting researchers data')
-        collect_researchers_data(progress_rec,doc_progress_rec)
+        collect_researchers_data(progress_rec, doc_progress_rec)
     else:
         print('researcher is disabled, skipping to next process')
 
