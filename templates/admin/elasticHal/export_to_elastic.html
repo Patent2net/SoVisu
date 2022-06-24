@@ -106,7 +106,7 @@
 
 	// Progress Bar (JQuery)
 	$(function () {
-		var progressUrl1 = "{% url 'celery_progress:task_status' task_id1 %}";
+		var progressUrl1 = "{% url 'celery_progress:task_status' task_id2 %}";
         console.log(progressUrl1)
 		CeleryProgressBar.initProgressBar(progressUrl1, {
 			onProgress: processProgress1,
