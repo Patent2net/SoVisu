@@ -24,7 +24,7 @@ nlp_en = spacy.load("en_core_web_md")
 
 def keyword_from_teeft(doc):
 
-    # Cette fonction prend en entrer une liste de document pour chaque document avec un résumé en français ou un résumer en anglais
+    # Cette fonction prend en entrée un document avec un résumé en français ou un résumé en anglais
     # la fonction interroge l'api de teeft , l'api renvois une liste de mots clés décrivant le document en fonction de langue du résumer (français ou anglais )
     # Le résultat de la requête est stocké dans le champ teeft_keywords_fr  pour les mots clés français et teeft_keywords_en pour les mots clés anglais
     # Source de l'api : https://openapi.services.inist.fr/?urls.primaryName=Extraction%20de%20termes
@@ -59,7 +59,7 @@ def keyword_from_teeft(doc):
         if "en_abstract_s" in doc.keys():
             if len(doc["en_abstract_s"])>100:
                 json_data_en.append({
-                    'id': 1,
+                    'id': 0,
                     'value': doc["en_abstract_s"]
                 })
                 response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
@@ -68,11 +68,9 @@ def keyword_from_teeft(doc):
                 data_en =[]
         else:
             data_en = []
-    for value in data_fr:
-        doc[int(value["id"])]["teeft_keywords_fr"]= value["value"]
+    doc["teeft_keywords_fr"]= data_fr [0]["value"]
 
-    for value in data_en:
-        doc[int(value["id"])]["teeft_keywords_en"] = value["value"]
+    doc["teeft_keywords_en"] = data_fr [0]["value"]
 
     return(doc)
 
@@ -87,7 +85,7 @@ def return_entities(doc):
     if "fr_abstract_s" in doc.keys():
             nlp_ = nlp_fr(str(doc["fr_abstract_s"]))
             doc["entities_fr"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
-            # vérifier les entités avec loterre ?
+            # vérifier les entités avec loterre et ne garder que celles qui matchent avec le complément d'info
             # curl -X 'POST' \
             #   'https://loterre-resolvers.services.inist.fr/v1/9SD/identify?indent=true' \
             #   -H 'accept: application/json' \
