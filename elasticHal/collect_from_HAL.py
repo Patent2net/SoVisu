@@ -58,7 +58,7 @@ def get_structid_list():
     print("\u00A0 \u21D2 ", structIdlist)
 
 
-def collect_laboratories_data(self, progress_recorder, doc_progress_recorder):
+def collect_laboratories_data(progress_recorder, doc_progress_recorder):
     # Init laboratories
     laboratories_list = []
 
@@ -221,7 +221,7 @@ def collect_laboratories_data(self, progress_recorder, doc_progress_recorder):
 
     return "finished"
 #@shared_task(bind=True)
-def collect_researchers_data(self, progress_recorder, doc_progress_recorder):
+def collect_researchers_data(progress_recorder, doc_progress_recorder):
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     labos, dico_acronym = init_labo()
     print(f"\u00A0 \u21D2 labos values ={labos}")
@@ -272,8 +272,9 @@ def collect_researchers_data(self, progress_recorder, doc_progress_recorder):
 
     print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
+    i = 1
     for searcher in researchers_list:
-        progress_recorder.set_progress(i + 1, count, " chercheurs traités ")
+        progress_recorder.set_progress(i, count, " chercheurs traités ")
 
         if searcher["structSirene"] in structIdlist:  # seulement les chercheurs de la structure
             print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
@@ -375,7 +376,7 @@ def collect_researchers_data(self, progress_recorder, doc_progress_recorder):
                 index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
                 # -researchers" + searcher["ldapId"] + "-documents
             )
-
+            i += 1
         else:
             print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
     return "finished"
@@ -436,8 +437,8 @@ def init_labo():
 @shared_task(bind=True)
 def collect_data(self, laboratories=False, researcher=False, csv_enabler=True, django_enabler=None):
     global csv_open, djangodb_open
-    doc_progress_recorder = ProgressRecorder(self)
-    progress_recorder = ProgressRecorder(self)
+    doc_progress_rec = ProgressRecorder(self)
+    progress_rec = ProgressRecorder(self)
     csv_open = csv_enabler
     djangodb_open = django_enabler
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
@@ -450,14 +451,14 @@ def collect_data(self, laboratories=False, researcher=False, csv_enabler=True, d
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
         print('collecting laboratories data')
-        collect_laboratories_data(progress_recorder, doc_progress_recorder)
+        collect_laboratories_data(progress_rec, doc_progress_rec)
     else:
         print('laboratories is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
         print('collecting researchers data')
-        collect_researchers_data(progress_recorder, doc_progress_recorder)
+        collect_researchers_data(progress_rec,doc_progress_rec)
     else:
         print('researcher is disabled, skipping to next process')
 
