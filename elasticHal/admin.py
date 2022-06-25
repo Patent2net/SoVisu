@@ -260,8 +260,9 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                 laboratoires = form.cleaned_data['Laboratoires']
                 chercheurs = form.cleaned_data['Chercheurs']
                 print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
-                result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
-                task_id1 = result1.task_id
+                # result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                # task_id1 = result1.task_id
+                task_id1 = None
                 #print(f'Celery Task ID: {task_id1}')
                 result2 = collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
                 if result2[0] is not None:
@@ -274,7 +275,8 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     task_id3 = None
 
                 #
-                print(f'Celery Task ID: {task_id2}')
+                print(f'Celery Task ID2: {task_id2}')
+                print(f'Celery Task ID3: {task_id3}')
                 if (task_id3 is not None and task_id2 is not None and task_id1 is not None):
                     return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2, 'task_id3': task_id3})
                 if (task_id2 is not None and task_id1 is not None):

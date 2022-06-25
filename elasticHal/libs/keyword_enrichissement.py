@@ -22,7 +22,7 @@ nlp_en = spacy.load("en_core_web_md")
 ###############################################################################################################################
 
 
-def keyword_from_teeft(doc):
+def keyword_from_teeft(txt, lang):
 
     # Cette fonction prend en entrée un document avec un résumé en français ou un résumé en anglais
     # la fonction interroge l'api de teeft , l'api renvois une liste de mots clés décrivant le document en fonction de langue du résumer (français ou anglais )
@@ -42,53 +42,47 @@ def keyword_from_teeft(doc):
     #for index , doc in enumerate(docs):
 
         #Pour chaque document ayant un résumer en français
-    if "fr_abstract_s" in doc.keys():
-        if len(doc["fr_abstract_s"]) > 100:
-                json_data_fr.append({
+    if lang=="fr":
+       json_data_fr.append({
                 'id': 1,
-                'value':doc["fr_abstract_s"]
+                'value': txt
                 })
-                response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers,
+       response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers,
                                      json=json_data_fr)
-                data_fr = response.json()
-                if len(data_fr) == 1 :
-                    doc["teeft_keywords_fr"] = data_fr[0]["value"]
-        else:
-            data_fr = []
+       data_fr = response.json()
+       if len(data_fr) == 1 :
+           return data_fr[0]["value"]
+       else:
+           return []
 
-    else:
+    if lang == "en":
         data_en = []
         # Pour chaque document ayant un résumer en français anglais
-        if "en_abstract_s" in doc.keys():
-            if len(doc["en_abstract_s"])>100:
-                json_data_en.append({
+        json_data_en.append({
                     'id': 0,
-                    'value': doc["en_abstract_s"]
+                    'value': txt
                 })
-                response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
-                data_en = response.json()
+        response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
+        data_en = response.json()
 
-                #doc["teeft_keywords_en"] = data_en[0]["value"]
-            else:
-                data_en =[]
-        else:
-            data_en = []
         if len(data_en) == 1:
-            doc["teeft_keywords_en"] = data_en[0]["value"]
+            return data_en[0]["value"]
+        else:
+            return []
 
-    return(doc)
 
-
-def return_entities(doc):
+def return_entities(txt, lang):
     #Cette fonction renvois les entité nommée des abstract d'un document
     # Actuellement la fonction gére le français et l'anglais
     #
 
-
+    entites_fr, entities_en = [],[]
     #for index, doc in enumerate(docs):
-    if "fr_abstract_s" in doc.keys():
-            nlp_ = nlp_fr(str(doc["fr_abstract_s"]))
-            doc["entities_fr"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
+
+    if lang == "fr":
+        nlp_ = nlp_fr(txt)
+        entities_fr = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
+        return entites_fr
             # vérifier les entités avec loterre et ne garder que celles qui matchent avec le complément d'info
             # curl -X 'POST' \
             #   'https://loterre-resolvers.services.inist.fr/v1/9SD/identify?indent=true' \
@@ -107,8 +101,8 @@ def return_entities(doc):
             #     "id": 3,
             #     "value": "Sao Paulo"
             #   }
-    if "en_abstract_s" in doc.keys():
-        nlp_ = nlp_en(str(doc["en_abstract_s"]))
-        doc["entities_en"] = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
+    if lang == "en":
+        nlp_ = nlp_en(txt)
+        entities_en = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
 
-    return(doc)
+        return entities_en
