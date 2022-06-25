@@ -57,11 +57,9 @@ def generate_countrys_fields(doc):
 
     if len(country_list_upper) == 0:
         country_list_upper = [""]
-    doc["country_colaboration"] = country_list_upper
-
     print(" fin de génération des champs country")
+    return country_list_upper
 
-    return doc
 
 
 def extract_locations_from_docid_list(docid):
