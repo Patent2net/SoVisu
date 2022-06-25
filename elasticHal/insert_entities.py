@@ -159,7 +159,7 @@ def create_researchers_index(pg):
         for row in es_researchers:
             row = row['_source']
             cleaned_es_researchers.append(row)
-    progress_description = "processing ", len(cleaned_es_researchers)," researchers"
+    progress_description = "processing " + str(len(cleaned_es_researchers)) + " researchers"
     pg.set_progress(int(percentage), 100, description=progress_description)
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
@@ -193,9 +193,11 @@ def create_researchers_index(pg):
         else:
             print("\u00A0 \u21D2 cleaned_es_researchers is empty, adding djangoDb content to values")
             cleaned_es_researchers = django_researchers
-
+    cpt=0
     for row in cleaned_es_researchers:
-
+        cpt+=1
+        percentage =  66 +  33 *(cpt /len(cleaned_es_researchers))
+        pg.set_progress(int(percentage), 100, description=progress_description)
         if row["structSirene"] in structIdlist:
             print('\u00A0 \u21D2 Processing : ' + row['halId_s'])
             row["labHalId"] = row["labHalId"].strip()
@@ -419,6 +421,8 @@ def create_laboratories_index(pg):
         percentage += (33.0/len(cleaned_es_laboratories))
         progress_description = row ["acronym"] + " updated"
         pg.set_progress(int(percentage), 100, description=progress_description)
+    pg.set_progress(100, 100, description="finished")
+    return "finished"
 
 def temp_laboratories(row):
     global Labolist
@@ -457,17 +461,7 @@ def create_index(self, structure, researcher, laboratories, csv_enabler=True, dj
         print('structure is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    if researcher:
 
-        progress_description ='processing create_researchers_index'
-        create_researchers_index(progress_recorder)
-        percentage = 100
-        progress_recorder.set_progress(int(percentage), 100, description=progress_description)
-    else:
-        progress_recorder.set_progress(int(percentage), 100, description='researcher is disabled, skipping to next process')
-        print('researcher is disabled, skipping to next process')
-
-    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
 
 
@@ -482,6 +476,17 @@ def create_index(self, structure, researcher, laboratories, csv_enabler=True, dj
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     #print('Index creation finished')
 
+    if researcher:
+
+        progress_description ='processing create_researchers_index'
+        create_researchers_index(progress_recorder)
+        percentage = 99
+        progress_recorder.set_progress(int(percentage), 100, description=progress_description)
+    else:
+        progress_recorder.set_progress(int(percentage), 100, description='researcher is disabled, skipping to next process')
+        print('researcher is disabled, skipping to next process')
+
+    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
 
     progress_description = 'Index creation finished'
     percentage = 100
