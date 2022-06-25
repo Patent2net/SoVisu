@@ -57,11 +57,12 @@ def get_structid_list():
     structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
     print("\u00A0 \u21D2 ", structIdlist)
 
-
-def collect_laboratories_data(progress_recorder, doc_progress_recorder):
+@shared_task(bind=True)
+def collect_laboratories_data(self):
     # Init laboratories
     laboratories_list = []
-
+    progress_recorder = ProgressRecorder(self)
+    doc_progress_recorder = ProgressRecorder(self)
     # init es_laboratories
     count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
     progress_recorder.set_progress(0, count, " labo traités ")
@@ -108,7 +109,7 @@ def collect_laboratories_data(progress_recorder, doc_progress_recorder):
     nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
-        progress_recorder.set_progress( nblab, count, {lab['acronym']} + " labo en cours")
+        progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
         nblab +=1
         # Collect publications
         if len(lab['halStructId']) > 0:
@@ -120,7 +121,7 @@ def collect_laboratories_data(progress_recorder, doc_progress_recorder):
 
             # Insert documents collection
             for num, doc in enumerate(docs):
-                doc_progress_recorder.set_progress(num, len(docs), "Collection ", {lab['acronym']}, " en cours")
+                doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
                 print(f"- sub processing : {str(doc['docid'])}")
                 # Enrichssements des documents récoltés
                 doc = location_docs.generate_countrys_fields(doc)
@@ -216,13 +217,15 @@ def collect_laboratories_data(progress_recorder, doc_progress_recorder):
                 index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
                 request_timeout = 50
             )
-            doc_progress_recorder.set_progress(nblab, count, {lab['acronym']}, " indexée, ", count, " documents")
-        progress_recorder.set_progress(nblab, count, {lab['acronym']}, " labo traité")
+            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
+        progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
-#@shared_task(bind=True)
-def collect_researchers_data(progress_recorder, doc_progress_recorder):
+@shared_task(bind=True)
+def collect_researchers_data(self):
     # initialisation liste labos supposée plus fiables que données issues Ldap.
+    progress_recorder= ProgressRecorder(self)
+    doc_progress_recorder= ProgressRecorder(self)
     labos, dico_acronym = init_labo()
     print(f"\u00A0 \u21D2 labos values ={labos}")
     print(f"\u00A0 \u21D2 dicoAcronym values ={dico_acronym}")
@@ -379,6 +382,8 @@ def collect_researchers_data(progress_recorder, doc_progress_recorder):
             i += 1
         else:
             print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
+        doc_progress_recorder.set_progress(len(docs), len(docs), " document traités ")
+    progress_recorder.set_progress(count, count, " chercheurs traités ")
     return "finished"
 
 def init_labo():
@@ -434,11 +439,10 @@ def init_labo():
 
     return labos, dico_acronym
 
-@shared_task(bind=True)
-def collect_data(self, laboratories=False, researcher=False, csv_enabler=True, django_enabler=None):
+
+def collect_data(laboratories=False, researcher=False, csv_enabler=True, django_enabler=None):
     global csv_open, djangodb_open
-    doc_progress_rec = ProgressRecorder(self)
-    progress_rec = ProgressRecorder(self)
+
     csv_open = csv_enabler
     djangodb_open = django_enabler
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
@@ -451,20 +455,22 @@ def collect_data(self, laboratories=False, researcher=False, csv_enabler=True, d
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
         print('collecting laboratories data')
-        collect_laboratories_data(progress_rec, doc_progress_rec)
+        tache1 = collect_laboratories_data.delay()
     else:
+        tache1 = None
         print('laboratories is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if researcher:
         print('collecting researchers data')
-        collect_researchers_data(progress_rec, doc_progress_rec)
+        tache2 = collect_researchers_data.delay()
     else:
+        tache2 = None
         print('researcher is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('Index completion finished')
-    return "finished"
+    return (tache1, tache2)
 
 if __name__ == '__main__':
     collect_data(laboratories='on', researcher='on')
