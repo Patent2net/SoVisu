@@ -260,9 +260,9 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                 laboratoires = form.cleaned_data['Laboratoires']
                 chercheurs = form.cleaned_data['Chercheurs']
                 print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
-                # result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
-                # task_id1 = result1.task_id
-                task_id1 = None
+                result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                task_id1 = result1.task_id
+
                 #print(f'Celery Task ID: {task_id1}')
                 result2 = collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
                 if result2[0] is not None:
