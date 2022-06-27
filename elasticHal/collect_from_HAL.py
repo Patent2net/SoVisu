@@ -59,6 +59,7 @@ def get_structid_list():
     return structIdlist
 @shared_task(bind=True)
 def collect_laboratories_data(self):
+    print("uuuuuuuu")
     # Init laboratories
     laboratories_list = []
     progress_recorder = ProgressRecorder(self)
@@ -275,21 +276,24 @@ def collect_researchers_data(self, struct):
 
     print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
-    i = 1
+    j = 0
     for searcher in researchers_list:
-        progress_recorder.set_progress(i, count, " chercheurs traités ")
+        progress_recorder.set_progress(j, count, " chercheurs traités ")
 
         if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
             print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             if searcher["labHalId"] not in labos:
                 searcher["labHalId"] = "non-labo"
             # Collect publications
+            j += 1
+            k = 0
             docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
 
             # Insert documents collection
             if len(docs)>1:
                 for num, doc in enumerate(docs):
+                    k += 1
                     doc_progress_recorder.set_progress(num, len(docs), " document traités " + searcher['halId_s'])
                     doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
@@ -392,10 +396,7 @@ def collect_researchers_data(self, struct):
                 index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
                 # -researchers" + searcher["ldapId"] + "-documents
             )
-            i += 1
-            doc_progress_recorder.set_progress(i, len(docs), " document traités "+ searcher["labHalId"])
-            if i %10==1:
-                print (doc)
+            doc_progress_recorder.set_progress(k, len(docs), " document traités "+ searcher["labHalId"])
         else:
             print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
 
