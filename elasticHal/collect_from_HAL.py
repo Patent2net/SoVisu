@@ -290,7 +290,7 @@ def collect_researchers_data(self, struct):
             # Insert documents collection
             if len(docs)>1:
                 for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), " document traités ")
+                    doc_progress_recorder.set_progress(num, len(docs), " document traités ", searcher['halId_s'])
                     doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
                     if "fr_abstract_s" in doc.keys():
