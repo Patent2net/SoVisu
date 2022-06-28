@@ -282,7 +282,7 @@ def collect_researchers_data(self, struct):
         progress_recorder.set_progress(j, count, " chercheurs traités ")
 
         if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
-            print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
+            #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             if searcher["labHalId"] not in labos:
                 searcher["labHalId"] = "non-labo"
             # Collect publications
