@@ -10,7 +10,7 @@ def generate_countrys_fields(doc):
     # Cette function permet de génner les champs country_origin , country_colaboration , country_publication. ces champs
     # sont générer à partir  documents contenue dans la variable Docs elle même produite par la fonction hal.find_publications
 
-    print(" début de génération des champs country")
+    #print(" début de génération des champs country")
 #for index, doc in enumerate(docs):
     # generate country originine : country origines est l'agrégation de l'ensemble des valeurs unique contenue dans les document ayant pour valeur
     # une des valeurs de facet_fields_list. Les champs de facet fields ont été selectioner pour avoir les pays d'origine  d'un document
@@ -29,7 +29,7 @@ def generate_countrys_fields(doc):
     country_list = list(set(country_list))
     country_list_upper = [country.upper() for country in country_list]
     if len(country_list_upper) == 0:
-        print("country_origin empty")
+        #print("country_origin empty")
         country_list_upper = [""]
     doc["country_origin"] = country_list_upper
 
@@ -57,7 +57,7 @@ def generate_countrys_fields(doc):
 
     if len(country_list_upper) == 0:
         country_list_upper = [""]
-    print(" fin de génération des champs country")
+    #print(" fin de génération des champs country")
     return country_list_upper
 
 
@@ -70,7 +70,7 @@ def extract_locations_from_docid_list(docid):
     for facet_field in facet_fields_list:
         url = url + "&facet=true&facet.field=" + facet_field
         # https://api.archives-ouvertes.fr/search/?q=docid:854050&wt=json&indent=true&facet=true&facet.field=publicationLocation_s
-    print(url)
+    #print(url)
     res = requests.get(url, timeout=50).json()
 
     country_list = list()
@@ -96,6 +96,6 @@ def extract_locations_from_docid_list(docid):
     country_list = list(set(country_list))
     country_list_upper = [country.upper() for country in country_list]
 
-    print(country_list_upper)
-    print("\r")
+    #print(country_list_upper)
+    #print("\r")
     return country_list_upper
