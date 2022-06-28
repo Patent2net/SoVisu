@@ -45,7 +45,7 @@ def docs_enrichissement_doi(doc):
                     elif data["first_oa_location"]["updated"] != None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
-                        doc["date_depot_oa"] = ""
+                        pass # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type
                 else:
                     doc['is_oa'] = 'closed access'
 
