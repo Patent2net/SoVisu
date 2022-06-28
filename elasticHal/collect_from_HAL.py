@@ -121,95 +121,96 @@ def collect_laboratories_data(self):
             # docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
-            for num, doc in enumerate(docs):
-                doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
-                print(f"- sub processing : {str(doc['docid'])}")
-                # Enrichssements des documents récoltés
-                doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
-                lstResum = [cle for cle in doc.keys() if "abstract" in cle]
-                for cle in lstResum:
-                    if isinstance(doc[cle], list):
-                        doc [cle] =  ' ' .join( doc [cle] )
-                    else:
-                        pass
-                doc["_id"] = doc['docid']
-                doc["validated"] = True
-                doc["harvested_from"] = "lab"
-                doc["harvested_from_ids"] = []
+            if len(docs)>1:
+                for num, doc in enumerate(docs):
+                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
+                    print(f"- sub processing : {str(doc['docid'])}")
+                    # Enrichssements des documents récoltés
+                    doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                    lstResum = [cle for cle in doc.keys() if "abstract" in cle]
+                    for cle in lstResum:
+                        if isinstance(doc[cle], list):
+                            doc [cle] =  ' ' .join( doc [cle] )
+                        else:
+                            pass
+                    doc["_id"] = doc['docid']
+                    doc["validated"] = True
+                    doc["harvested_from"] = "lab"
+                    doc["harvested_from_ids"] = []
 
-                doc["harvested_from_ids"].append(lab['halStructId'])
-                doc["harvested_from_label"] = []
-                doc["harvested_from_label"].append(lab['acronym'])
-                if "Created" not in doc:
-                    doc['Created'] = datetime.datetime.now().isoformat()
+                    doc["harvested_from_ids"].append(lab['halStructId'])
+                    doc["harvested_from_label"] = []
+                    doc["harvested_from_label"].append(lab['acronym'])
+                    if "Created" not in doc:
+                        doc['Created'] = datetime.datetime.now().isoformat()
 
-                doc["authorship"] = []
+                    doc["authorship"] = []
 
-                authid_s_filled = []
-                if "authId_i" in doc:
-                    for auth in doc["authId_i"]:
-                        try:
-                            aurehal = archivesOuvertes.get_halid_s(auth)
-                            authid_s_filled.append(aurehal)
-                        except:
-                            authid_s_filled.append("")
+                    authid_s_filled = []
+                    if "authId_i" in doc:
+                        for auth in doc["authId_i"]:
+                            try:
+                                aurehal = archivesOuvertes.get_halid_s(auth)
+                                authid_s_filled.append(aurehal)
+                            except:
+                                authid_s_filled.append("")
 
-                authors_count = len(authid_s_filled)
-                i = 0
-                for auth in authid_s_filled:
-                    i += 1
-                    if i == 1 and auth != "":
-                        doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
-                    elif i == authors_count and auth != "":
-                        doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
+                    authors_count = len(authid_s_filled)
+                    i = 0
+                    for auth in authid_s_filled:
+                        i += 1
+                        if i == 1 and auth != "":
+                            doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
+                        elif i == authors_count and auth != "":
+                            doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
 
-                harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
+                    harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
 
-                for h in harvet_history:
-                    if h['docid'] == doc['docid']:
-                        doc["harvested_from_ids"].append(h['from'])
+                    for h in harvet_history:
+                        if h['docid'] == doc['docid']:
+                            doc["harvested_from_ids"].append(h['from'])
 
-                doc["MDS"] = utils.calculate_mds(doc)
-                doc["records"] = []
+                    doc["MDS"] = utils.calculate_mds(doc)
+                    doc["records"] = []
 
-                try:
-                    should_be_open = utils.should_be_open(doc)
-                    if should_be_open == 1:
-                        doc["should_be_open"] = True
-                    if should_be_open == -1:
-                        doc["should_be_open"] = False
+                    try:
+                        should_be_open = utils.should_be_open(doc)
+                        if should_be_open == 1:
+                            doc["should_be_open"] = True
+                        if should_be_open == -1:
+                            doc["should_be_open"] = False
 
-                    if should_be_open == 1 or should_be_open == 2:
-                        doc['isOaExtra'] = True
-                    elif should_be_open == -1:
-                        doc['isOaExtra'] = False
-                except:
-                    print('publicationDate_tdate error ?')
+                        if should_be_open == 1 or should_be_open == 2:
+                            doc['isOaExtra'] = True
+                        elif should_be_open == -1:
+                            doc['isOaExtra'] = False
+                    except:
+                        print('publicationDate_tdate error ?')
 
-                if check_existing_docs:
+                    if check_existing_docs:
 
-                    doc_param = esActions.scope_p("_id", doc["_id"])
+                        doc_param = esActions.scope_p("_id", doc["_id"])
 
-                    if not es.indices.exists(
-                            index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
-                        es.indices.create(
-                            index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
-                    res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                                    body=doc_param, request_timeout=50)
+                        if not es.indices.exists(
+                                index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
+                            es.indices.create(
+                                index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
+                        res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                                        body=doc_param, request_timeout=50)
 
-                    if len(res['hits']['hits']) > 0:
-                        if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                            doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                        if "validated" in res['hits']['hits'][0]['_source']:
-                            doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                        if force_doc_validated:
-                            doc['validated'] = True
+                        if len(res['hits']['hits']) > 0:
+                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                            if "validated" in res['hits']['hits'][0]['_source']:
+                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                            if force_doc_validated:
+                                doc['validated'] = True
 
-                        if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                            doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                   'MDS': res['hits']['hits'][0]['_source']['MDS']})
-                    else:
-                        doc["validated"] = True
+                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
+                        else:
+                            doc["validated"] = True
             time.sleep(1)
 
             res = helpers.bulk(
