@@ -81,8 +81,10 @@ def return_entities(txt, lang):
     nlp_fr.Defaults.stop_words.add("-")
     if lang == "fr":
         nlp_ = nlp_fr(txt)
-        entities_fr = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop and not token.is_punct and not token .like_num]
-        entities_fr = [tok for tok in entities_fr if not tok .isdigit() and tok not in nlp_fr .Defaults.stop_words]
+
+        entities_fr = [token.text for token in nlp_.ents ]
+        #if not token.is_punct and not token .like_num and not token .isdigit() and token not in nlp_fr .Defaults.stop_words]
+
         return entities_fr
             # vérifier les entités avec loterre et ne garder que celles qui matchent avec le complément d'info
             # curl -X 'POST' \
@@ -104,6 +106,6 @@ def return_entities(txt, lang):
             #   }
     if lang == "en":
         nlp_ = nlp_en(txt)
-        entities_en = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop and not token.is_punct and not token .like_num]
-        entities_en = [tok for tok in entities_en if not tok.isdigit() and tok not in nlp_en.Defaults.stop_words]
+        entities_en = [token.text for token in nlp_.ents]
+        print("taille du texte " + str(len(txt)))
         return entities_en
