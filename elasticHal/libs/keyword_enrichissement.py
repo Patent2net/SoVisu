@@ -82,7 +82,7 @@ def return_entities(txt, lang):
     if lang == "fr":
         nlp_ = nlp_fr(txt)
 
-        entities_fr = [token.text for token in nlp_.ents ]
+        entities_fr = [token.text for token in nlp_.ents if not token .text.isdigit() and not token .text in nlp_fr .Defaults.stop_words]
         #if not token.is_punct and not token .like_num and not token .isdigit() and token not in nlp_fr .Defaults.stop_words]
 
         return entities_fr
@@ -106,6 +106,6 @@ def return_entities(txt, lang):
             #   }
     if lang == "en":
         nlp_ = nlp_en(txt)
-        entities_en = [token.text for token in nlp_.ents]
+        entities_en = [token.text for token in nlp_.ents if not token .text.isdigit() and not token .text in nlp_fr .Defaults.stop_words]
         print("taille du texte " + str(len(txt)))
         return entities_en
