@@ -76,14 +76,14 @@ def return_entities(txt, lang):
     # Actuellement la fonction gére le français et l'anglais
     #
 
-    entites_fr, entities_en = [],[]
+    entities_fr, entities_en = [],[]
     #for index, doc in enumerate(docs):
 
     if lang == "fr":
         nlp_ = nlp_fr(txt)
         entities_fr = [token.text for token in nlp_ if token.ent_type_ and not token.is_stop]
         entities_fr = [tok for tok in entities_fr if not tok .isdigit() and tok not in nlp_fr .Defaults.stop_words]
-        return entites_fr
+        return entities_fr
             # vérifier les entités avec loterre et ne garder que celles qui matchent avec le complément d'info
             # curl -X 'POST' \
             #   'https://loterre-resolvers.services.inist.fr/v1/9SD/identify?indent=true' \
