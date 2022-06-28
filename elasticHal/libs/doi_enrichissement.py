@@ -45,7 +45,7 @@ def docs_enrichissement_doi(doc):
                     elif data["first_oa_location"]["updated"] != None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
-                        doc["date_depot_oa"] = "-1"
+                        doc["date_depot_oa"] = ""
                 else:
                     doc['is_oa'] = 'closed access'
 
@@ -55,7 +55,7 @@ def docs_enrichissement_doi(doc):
             if req.status_code == 200:
                 pass
             else:
-                doc["doiId_s"] = "-1"
+                doc["doiId_sPasCorrect"] = True
 
         if 'publisher' not in data:
             doc["oa_host_type"] = 'open archive'
@@ -78,5 +78,5 @@ def docs_enrichissement_doi(doc):
         if key not in  doc.keys():
             doc[key]=""
     """
-    print("fin docs_enrichissement_doi_date")
+    #print("fin docs_enrichissement_doi_date")
     return doc
