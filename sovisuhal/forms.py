@@ -153,3 +153,5 @@ class Search(forms.Form):
 
     f_search = forms.CharField(label='Recherche', max_length=100, widget=forms.TextInput(
         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
+
+

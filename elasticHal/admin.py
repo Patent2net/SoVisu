@@ -8,7 +8,7 @@ from .models import Structure, Laboratory, Researcher
 from django import forms
 
 from .insert_entities import create_index
-from .collect_from_HAL import collect_data
+from .collect_from_HAL import collect_data, init_labo, collect_laboratories_data2, collect_researchers_data2
 
 admin.site.site_header = "Administration de SoVisu"
 
@@ -27,6 +27,32 @@ class ExportToElasticForm(forms.Form):
     Structures = forms.BooleanField(initial=True, required=False)
     Laboratoires = forms.BooleanField(initial=True, required=False)
     Chercheurs = forms.BooleanField(initial=True, required=False)
+
+
+class PopulateLab(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        if 'val' in kwargs:
+            val = kwargs.pop('val')
+
+        super(PopulateLab, self).__init__(*args, **kwargs)
+
+    # Set choices to an empty list as it is a required argument.
+    labos, dico_acronym = init_labo()
+    structur = "198*-" # on doit pouvoir faire un init_struct
+    indexes = [] # ("198*-" + labos [ind] + "*-laboratories", dico_acronym  [ind]) ))
+
+    for labId in dico_acronym .keys():
+            idx = structur + labId + "-laboratories"
+
+            indexes.append((idx, dico_acronym [labId] ))
+    indexes = tuple(indexes)
+    f_index = forms.ChoiceField(widget=forms.RadioSelect, label='Laboratoire', choices=indexes)
+    collectionLabo = forms.BooleanField(initial=False, required=False)
+    chercheurs = forms.BooleanField(initial=True, required=False)
+
+    #f_search = forms.CharField(label='Peuplement entités', max_length=100, widget=forms.TextInput(
+     #   attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
 class ExportCsv:
@@ -173,17 +199,52 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
     def export_to_elastic(request):
 
         if request.method == "POST":
-            structure = request.POST.get('Structures')
-            laboratoires = request.POST.get('Laboratoires')
-            chercheurs = request.POST.get('Chercheurs')
-            print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+            form = PopulateLab(request.POST)
+            # structure = request.POST.get('Structures')
+            # laboratoires = request.POST.get('Laboratoires')
+            # chercheurs = request.POST.get('Chercheurs')
+            #  laboratoires =
+            #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
-            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
-            collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            if "chercheurs" in form. fields .keys():
+                chercheurs = True
+            else:
+                chercheurs = False
+            if "collectionLabo" in form.fields .keys():
+                collectionLabo = True
+            else:
+                collectionLabo = False
+            collection = form ["f_index"] .as_text()
+            laboratoire = collection . split("-")[1]
+            structure = collection .split("-")[0]
+            # chercheurs = True
+            # create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            if collectionLabo:
+                if chercheurs:
+                    result1 = collect_laboratories_data2 .delay(laboratoire)
+                    task_id1 = result1.task_id
+                    result2 = collect_researchers_data2.delay(struct=structure, idx=collection)
+                    task_id2 = result2.task_id
 
-        form = ExportToElasticForm()
-        data = {"form": form}
-        return render(request, "admin/elasticHal/export_to_elastic.html", data)
+                else:
+                    result1 = collect_laboratories_data2 .delay(collectionLabo, False)
+                    task_id1 = result1.task_id
+                    task_id2 = None
+
+            elif chercheurs:
+                result2 = collect_researchers_data2 .delay(struct = structure, idx = collection )
+                task_id2 = result2.task_id
+                task_id1 = None
+
+            else:
+                pass # pas sûr
+
+            return render(request, "admin/elasticHal/export_to_elasticLabs.html",
+                          context={'form': form, 'task_id2': task_id2})
+        form = PopulateLab()
+        data = {'form': form
+        }
+        return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
 
 
 class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
