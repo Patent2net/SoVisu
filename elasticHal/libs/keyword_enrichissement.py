@@ -49,9 +49,13 @@ def keyword_from_teeft(txt, lang):
                 })
        response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/fr', headers=headers,
                                      json=json_data_fr)
-       data_fr = response.json()
-       if len(data_fr) == 1 :
-           return data_fr[0]["value"]
+       if response .ok:
+            data_fr = response.json()
+            if len(data_fr) == 1 :
+               return data_fr[0]["value"]
+            else:
+               return []
+
        else:
            return []
 
@@ -63,10 +67,12 @@ def keyword_from_teeft(txt, lang):
                     'value': txt
                 })
         response = requests.post('https://terms-extraction.services.inist.fr/v1/teeft/en', headers=headers,json=json_data_en)
-        data_en = response.json()
-
-        if len(data_en) == 1:
-            return data_en[0]["value"]
+        if response.ok:
+            data_en = response.json()
+            if len(data_en) == 1:
+                return data_en[0]["value"]
+            else:
+                return []
         else:
             return []
 
