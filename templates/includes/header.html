@@ -244,12 +244,17 @@
                     } else {
                         filter_cond = "";
                     }
-                    window.location.href = "/" + document.URL.split("/")[3] + "/?struct="+ getUrlParameter('struct') +"&type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + "&ldapid=" + getUrlParameter('ldapid') + filter_cond + "&from=" + start + "&to=" + end + "&lang=" + lang;
+                    if (getUrlParameter('ldapid') != undefined) {
+                        ldapid_cond = "&ldapid=" + getUrlParameter('ldapid');
+                    } else {
+                        ldapid_cond = "";
+                    }
+                    window.location.href = "/" + document.URL.split("/")[3] + "/?struct="+ getUrlParameter('struct') +"&type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + ldapid_cond + filter_cond + "&from=" + start + "&to=" + end + "&lang=" + lang;
                 }
 
-                var sel_from = getUrlParameter('from');
-                var sel_to = getUrlParameter('to');
-                var sel_lang = getUrlParameter('lang');
+                var sel_from = getUrlParameter('from').split('-')[0];
+                var sel_to = getUrlParameter('to').split('-')[0];
+                var sel_lang = getUrlParameter('lang').split('-')[0];
 
                 if (getUrlParameter('lang') == undefined) {
                     sel_lang = "all";
@@ -270,7 +275,7 @@
                 });
 
                 document.getElementById("update-filters").addEventListener('click', function() {
-                    updateFilters(sel_from, sel_to, sel_lang);
+                    updateFilters(sel_from + "-01-01", sel_to + "-01-01", sel_lang);
                 });
 
 
