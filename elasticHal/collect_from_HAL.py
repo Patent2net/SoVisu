@@ -611,7 +611,7 @@ def collect_researchers_data2(self, struct, idx):
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
         sommeDocs += len(docs)
-        doc_progress_recorder.set_progress(k, len(docs), " document traités " + searcher["labHalId"])
+        doc_progress_recorder.set_progress(k, len(docs), " document traités " + searcher["halId_s"])
             # Insert documents collection
         if len(docs)>1:
                 for num, doc in enumerate(docs):
@@ -716,7 +716,7 @@ def collect_researchers_data2(self, struct, idx):
                 es,
                 docs,
                 request_timeout=50,
-                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
+                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
                 # -researchers" + searcher["ldapId"] + "-documents
             )
         doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " document traités " + searcher['ldapId'])
