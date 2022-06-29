@@ -367,29 +367,29 @@ def collect_researchers_data(self, struct):
                     except:
                         print('publicationDate_tdate error ?')
 
-                    if check_existing_docs:
-                        doc_param = esActions.scope_p("_id", doc["_id"])
-
-                        if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
-                            print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
-                            break
-                        res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
-                            "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
-
-                        if len(res['hits']['hits']) > 0:
-                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                            if "validated" in res['hits']['hits'][0]['_source']:
-                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                            if force_doc_validated:
-                                doc['validated'] = True
-
-                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
-
-                        else:
-                            doc["validated"] = True
+                    # if check_existing_docs:
+                    #     doc_param = esActions.scope_p("_id", doc["_id"])
+                    #
+                    #     if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
+                    #         print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
+                    #         break
+                    #     res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                    #         "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
+                    #
+                    #     if len(res['hits']['hits']) > 0:
+                    #         if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                    #             doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                    #         if "validated" in res['hits']['hits'][0]['_source']:
+                    #             doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                    #         if force_doc_validated:
+                    #             doc['validated'] = True
+                    #
+                    #         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                    #             doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                    #                                    'MDS': res['hits']['hits'][0]['_source']['MDS']})
+                    #
+                    #     else:
+                    #         doc["validated"] = True
 
                 time.sleep(1)
             else:
@@ -412,7 +412,7 @@ def collect_researchers_data(self, struct):
 
 @shared_task(bind=True)
 def collect_laboratories_data(self):
-    print("uuuuuuuu")
+
     # Init laboratories
     laboratories_list = []
     progress_recorder = ProgressRecorder(self)
@@ -602,7 +602,7 @@ def collect_researchers_data2(self, struct, idx):
     sommeDocs = 0
     for searcher in researchers_list:
         #progress_recorder.set_progress(j, count, " chercheurs traités ")
-        print ("hooo", searcher .keys(), researchers_list, idxCher)
+        # print ("hooo", searcher .keys(), researchers_list, idxCher)
         #if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
             #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             # Collect publications
@@ -610,13 +610,14 @@ def collect_researchers_data2(self, struct, idx):
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
+
+        doc_progress_recorder.set_progress(k, sommeDocs, " document traités " + searcher["halId_s"])
         sommeDocs += len(docs)
-        doc_progress_recorder.set_progress(k, len(docs), " document traités " + searcher["halId_s"])
             # Insert documents collection
         if len(docs)>1:
                 for num, doc in enumerate(docs):
                     k += 1
-                    doc_progress_recorder.set_progress(num, len(docs), " document traités " + searcher['halId_s'])
+                    doc_progress_recorder.set_progress(num, sommeDocs, " document traités " + searcher['halId_s'])
                     doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
                     if "fr_abstract_s" in doc.keys():
