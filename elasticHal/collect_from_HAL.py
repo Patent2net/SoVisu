@@ -33,7 +33,7 @@ else:
 # Global variables
 structIdlist = None
 
-check_existing_docs = True  # if True, check all the existing data in ES index to compare with those gathered to keep part of totality of data persistence
+check_existing_docs = False  # if True, check all the existing data in ES index to compare with those gathered to keep part of totality of data persistence
 
 force_doc_validated = False  # if True, overwrite the doc['validated'] status to True for all the docs existing in ES (work only if Check_existing_docs = True)
 force_doc_authorship = False  # if True, overwrite the doc["authorship"] status for all the docs existing in ES (work only if Check_existing_docs = True)
@@ -367,29 +367,29 @@ def collect_researchers_data(self, struct):
                     except:
                         print('publicationDate_tdate error ?')
 
-                    # if check_existing_docs:
-                    #     doc_param = esActions.scope_p("_id", doc["_id"])
-                    #
-                    #     if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
-                    #         print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
-                    #         break
-                    #     res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
-                    #         "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
-                    #
-                    #     if len(res['hits']['hits']) > 0:
-                    #         if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                    #             doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                    #         if "validated" in res['hits']['hits'][0]['_source']:
-                    #             doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                    #         if force_doc_validated:
-                    #             doc['validated'] = True
-                    #
-                    #         if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                    #             doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                    #                                    'MDS': res['hits']['hits'][0]['_source']['MDS']})
-                    #
-                    #     else:
-                    #         doc["validated"] = True
+                    if check_existing_docs:
+                        doc_param = esActions.scope_p("_id", doc["_id"])
+
+                        if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
+                            print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
+                            break
+                        res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                            "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
+
+                        if len(res['hits']['hits']) > 0:
+                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                            if "validated" in res['hits']['hits'][0]['_source']:
+                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                            if force_doc_validated:
+                                doc['validated'] = True
+
+                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
+
+                        else:
+                            doc["validated"] = True
 
                 time.sleep(1)
             else:
@@ -691,6 +691,7 @@ def collect_researchers_data2(self, struct, idx):
                         if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
                             print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
                             break
+
                         res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
                             "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
 
