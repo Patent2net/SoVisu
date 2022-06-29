@@ -47,7 +47,6 @@
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
-	<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script><!-- from : https://api.altmetric.com/embeds.html -->
     <link rel="stylesheet" type="text/css" href="{% static "styles/main.css" %}">
 
 </head>
@@ -82,7 +81,7 @@
                     {%  endif %}
                 </div>
 
-                {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Terminologie" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" and title != "Vérification des données" %}
+                {% if halId_s != 'nullNone' and title != "Expertise" and title != "Aide" and title != "Index des chercheurs" and title != "Terminologie" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" and title != "Vérification des données" %}
                     <div class="flex items-center mr-6" id="parentDaterange">
 
 
