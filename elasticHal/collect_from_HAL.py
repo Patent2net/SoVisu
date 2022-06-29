@@ -589,49 +589,19 @@ def collect_researchers_data2(self, struct, idx):
     if count > 0:
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
         res = es.search(index=idx, body=scope_param, size=count, request_timeout=50)
+
         es_researchers = res['hits']['hits']
         i=0
         for searcher in es_researchers:
 
             researchers_list.append(searcher['_source'])
 
-    # if csv_open:
-    #     with open('data/researchers.csv', encoding='utf-8') as csv_file:
-    #         csv_reader = list(csv.DictReader(csv_file, delimiter=','))
-    #         csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] != '']  # Only keep researchers with known 'halId_s'
-    #         if researchers_list:
-    #             print("\u00A0 \u21D2 checking researchers.csv list: ")
-    #             for searcher in csv_reader:
-    #                 if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
-    #                     print(f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
-    #                 else:
-    #                     print(f'\u00A0 \u21D2 adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
-    #                     researchers_list.append(searcher)
-    #         else:
-    #             print("\u00A0 \u21D2 researchers_list is empty, adding csv content to values")
-    #             researchers_list = csv_reader
-    #
-    # if djangodb_open:
-    #     django_researchers = Researcher.objects.all().values()
-    #     django_researchers = [researcher for researcher in django_researchers if researcher['halId_s'] != '' and researcher.pop('id')]  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
-    #     if researchers_list:
-    #         print("checking DjangoDb laboratory list:")
-    #         for searcher in django_researchers:
-    #             if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
-    #                 print(f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
-    #             else:
-    #                 print(f'\u00A0 \u21D2 adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
-    #                 researchers_list.append(searcher)
-    #     else:
-    #         print("\u00A0 \u21D2 researchers_list is empty, adding DjangoDb content to values")
-    #         researchers_list = django_researchers
-
     print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
     sommeDocs = 0
     for searcher in researchers_list:
         #progress_recorder.set_progress(j, count, " chercheurs traités ")
-
+        print ("hooo", searcher .keys())
         #if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
             #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             # Collect publications

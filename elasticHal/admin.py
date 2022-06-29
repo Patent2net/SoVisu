@@ -205,16 +205,17 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
             # chercheurs = request.POST.get('Chercheurs')
             #  laboratoires =
             #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
-
-            if "chercheurs" in form. fields .keys():
-                chercheurs = True
-            else:
-                chercheurs = False
-            if "collectionLabo" in form.fields .keys():
-                collectionLabo = True
-            else:
-                collectionLabo = False
-            collection = form ["f_index"] .as_text()
+            if form .is_valid():
+                if "chercheurs" in form. fields .keys():
+                    chercheurs = True
+                else:
+                    chercheurs = False
+                if "collectionLabo" in form.fields .keys():
+                    collectionLabo = True
+                else:
+                    collectionLabo = False
+                collection = form .cleaned_data ["f_index"]
+                print('uuuu ', collection)
             laboratoire = collection . split("-")[1]
             structure = collection .split("-")[0]
             # chercheurs = True
