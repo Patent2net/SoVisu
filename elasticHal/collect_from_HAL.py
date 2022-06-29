@@ -725,8 +725,13 @@ def collect_researchers_data2(self, struct, idx):
         #else:
             # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
+    if len(researchers_list) >0:
+        doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités " + searcher['ldapId'])
 
-    doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités " + searcher['ldapId'])
+    else:
+        doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités ")
+        print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
+        print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
     #progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
     return "fini !"
 
