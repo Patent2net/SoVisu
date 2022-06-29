@@ -113,5 +113,5 @@ def return_entities(txt, lang):
     if lang == "en":
         nlp_ = nlp_en(txt)
         entities_en = [token.text for token in nlp_.ents if not token .text.isdigit() and not token .text in nlp_fr .Defaults.stop_words]
-        print("taille du texte " + str(len(txt)))
+        # print("taille du texte " + str(len(txt)))
         return entities_en
