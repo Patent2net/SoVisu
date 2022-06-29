@@ -646,7 +646,7 @@ def collect_researchers_data2(self, struct, idx):
         sommeDocs += len(docs)
             # Insert documents collection
         if len(docs)>1:
-                for num, doc in enumerate(docs):
+            for num, doc in enumerate(docs):
                     k += 1
                     doc_progress_recorder.set_progress(num, sommeDocs, " document traités " + searcher['halId_s'])
                     doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
@@ -745,24 +745,29 @@ def collect_researchers_data2(self, struct, idx):
 
                         else:
                             doc["validated"] = True
-
-                time.sleep(1)
+                    # En attendant de trouver une solution pivot / transfo d'index
+                    #C'est pas du tout beau !
+                    # exemple de ce qu'il ne faut pas faire
+                    for cle, val in searcher .items():
+                        doc [cle] = val
+                    time.sleep(1)
         else:
-                print ("pas de docs", searcher['halId_s'])
-        docs .append(searcher)
-        res = helpers.bulk(
-                es,
-                docs,
-                request_timeout=50,
-                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
-                # -researchers" + searcher["ldapId"] + "-documents
-            )
-        doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " document traités " + searcher['ldapId'])
+                print ("pas de docs : " +searcher['halId_s'])
+        if len(docs)>0:
+
+            res = helpers.bulk(
+                    es,
+                    docs,
+                    request_timeout=50,
+                    index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
+                    # -researchers" + searcher["ldapId"] + "-documents
+                )
+            doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " document traités " + searcher['ldapId'])
         #else:
             # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
     if len(researchers_list) >0:
-        doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités " + searcher['ldapId'])
+        doc_progress_recorder.set_progress(len(docs), sommeDocs, " document traités " + searcher['ldapId'])
 
     else:
         doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités ")
