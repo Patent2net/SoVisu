@@ -119,7 +119,7 @@ def collect_laboratories_data2(self, labo):
         if len(lab['halStructId']) > 0:
             docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
 
-            docs = doi_enrichissement.docs_enrichissement_doi(docs)
+
             # docs = keyword_enrichissement.keyword_from_teeft(docs)
             # docs = keyword_enrichissement.return_entities(docs)
 
@@ -130,6 +130,7 @@ def collect_laboratories_data2(self, labo):
                     print(f"- sub processing : {str(doc['docid'])}")
                     # Enrichssements des documents récoltés
                     doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                    doc = doi_enrichissement.docs_enrichissement_doi(doc)
                     lstResum = [cle for cle in doc.keys() if "abstract" in cle]
                     for cle in lstResum:
                         if isinstance(doc[cle], list):
@@ -596,8 +597,8 @@ def collect_researchers_data2(self, struct, idx):
         for searcher in es_researchers:
 
             researchers_list.append(searcher['_source'])
-
-    print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
+            #print (searcher['_source'])
+    #print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
     sommeDocs = 0
     for searcher in researchers_list:
@@ -606,6 +607,36 @@ def collect_researchers_data2(self, struct, idx):
         #if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
             #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             # Collect publications
+
+        # {'structSirene': '198307662',
+        # 'ldapId': 'watelain', '
+        # name': 'WATELAIN Eric', 'type': 'Personnel',
+        # 'function': 'Enseignant Chercheur Titulaire',
+        # 'mail': 'eric.watelain@univ-tln.fr',
+        # 'lab': 'IAPS', 'supannAffectation': 'IAPS',
+        # 'supannEntiteAffectationPrincipale': 'UFR Staps',
+        # 'halId_s': 'eric-watelain', 'labHalId': '558924',
+        # 'idRef': '093548974', 'structDomain': 'univ-tln.fr',
+        # 'firstName': 'Eric', 'lastName': 'WATELAIN', '
+        # aurehalId': '70316', 'validated': True,
+        # 'concepts': {'id': 'Concepts',
+        # 'children': [{'id': 'scco', 'children':
+        # [{'id': 'scco.neur', 'label_en': 'Neuroscience', 'label_fr': 'Neurosciences', 'state': 'invalidated'}],
+        # 'label_en': 'Cognitive science', 'label_fr': 'Sciences cognitives', 'state': 'invalidated'},
+        # {'id': 'spi', 'children': [{'id': 'spi.auto', 'label_en': 'Automatic', 'label_fr': 'Automatique / Robotique',
+        # 'state': 'invalidated'},
+        # {'id': 'spi.meca', 'children': [{'id': 'spi.meca.biom', 'label_en': 'Biomechanics', 'label_fr': 'Biomécanique',
+        # 'state': 'invalidated'}], 'label_en': 'Mechanics', 'label_fr': 'Mécanique', 'state': 'invalidated'},
+        # {'id': 'spi.signal', 'label_en': 'Signal and Image processing', 'label_fr': "Traitement du signal et de l'image",
+        # 'state': 'invalidated'}], 'label_en': 'Engineering Sciences', 'label_fr': "Sciences de l'ingénieur", 'state': 'invalidated'},
+        # {'id': 'phys', 'children': [{'id': 'phys.meca', 'children': [{'id': 'phys.meca.biom', 'label_en': 'Biomechanics',
+        # 'label_fr': 'Biomécanique', 'state': 'invalidated'}], 'label_en': 'Mechanics', 'label_fr': 'Mécanique', 'state': 'invalidated'}],
+        # 'label_en': 'Physics', 'label_fr': 'Physique', 'state': 'invalidated'}, {'id': 'sdv',
+        # 'children': [{'id': 'sdv.neu', 'children':
+        # [{'id': 'sdv.neu.sc', 'label_en': 'Cognitive Sciences', 'label_fr': 'Sciences cognitives', 'state': 'invalidated'}],
+        # 'label_en': 'Neurons and Cognition', 'label_fr': 'Neurosciences', 'state': 'invalidated'}, {'id': 'sdv.mhep', 'children':
+        # [{'id': 'sdv.mhep.geg', 'label_en': 'Geriatry and gerontology', 'label_fr': 'Gériatrie et gérontologie', 'state': 'invalidated'},
+        # {'id': 'sdv.mhep.phy', 'label_en': 'Tissues and Organs', 'label_fr': 'Physiologie', 'state': 'invalidated'}], 'label_en': 'Human health and pathology', 'label_fr': 'Médecine humaine et pathologie', 'state': 'invalidated'}], 'label_en': 'Life Sciences', 'label_fr': 'Sciences du Vivant', 'state': 'invalidated'}, {'id': 'info', 'children': [{'id': 'info.info-ai', 'label_en': 'Artificial Intelligence', 'label_fr': 'Intelligence artificielle', 'state': 'invalidated'}], 'label_en': 'Computer Science', 'label_fr': 'Informatique', 'state': 'invalidated'}, {'id': 'shs.edu', 'label_en': 'Education', 'label_fr': 'Education', 'state': 'invalidated'}, {'id': 'sde', 'label_en': 'Environmental Sciences', 'label_fr': "Sciences de l'environnement", 'state': 'invalidated'}]}, 'guidingKeywords': ['Activité physique adaptée ', ' locomotion ', ' biomécanique ', ' fauteuil roulant manuel '], 'Created': '2022-06-29T11:53:17.569225', 'orcId': '0000-0001-6837-623X', 'guidingDomains': ['sdv.mhep.phy'], 'researchDescription': '', 'axis': 'IAPS'}
 
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
@@ -718,7 +749,7 @@ def collect_researchers_data2(self, struct, idx):
                 time.sleep(1)
         else:
                 print ("pas de docs", searcher['halId_s'])
-
+        docs .append(searcher)
         res = helpers.bulk(
                 es,
                 docs,
