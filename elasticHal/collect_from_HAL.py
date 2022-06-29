@@ -670,7 +670,12 @@ def collect_researchers_data2(self, struct, idx):
 
                     doc["records"] = []
                     doc["MDS"] = utils.calculate_mds(doc)
+                    #####
+                    # indexation sur index spécial
+                    ####
 
+
+                    #### Fin index spécial
                     try:
                         should_be_open = utils.should_be_open(doc)
                         if should_be_open == 1:
