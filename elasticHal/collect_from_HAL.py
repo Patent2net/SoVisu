@@ -585,10 +585,11 @@ def collect_researchers_data2(self, struct, idx):
     # Init researchers
     researchers_list = []
     labos, dico_acronym = init_labo()
-    count = es.count(index=idx, body=scope_param, request_timeout=50)['count']
+    idxCher = idx .replace("laboratories", "researchers*")
+    count = es.count(index=idxCher, body=scope_param, request_timeout=50)['count']
     if count > 0:
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
-        res = es.search(index=idx, body=scope_param, size=count, request_timeout=50)
+        res = es.search(index=idxCher, body=scope_param, size=count, request_timeout=50)
 
         es_researchers = res['hits']['hits']
         i=0
@@ -601,7 +602,7 @@ def collect_researchers_data2(self, struct, idx):
     sommeDocs = 0
     for searcher in researchers_list:
         #progress_recorder.set_progress(j, count, " chercheurs traités ")
-        print ("hooo", searcher .keys())
+        print ("hooo", searcher .keys(), researchers_list, idxCher)
         #if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
             #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             # Collect publications
