@@ -32,7 +32,7 @@ def docs_enrichissement_doi(doc):
             doc["times_cited"] = citations["times_cited"]
 
         url = "https://api.unpaywall.org/v2/"+doc["doiId_s"]+"?email=SOVisuHAL@univ-tln.fr"
-        req = requests.get(url, timeout=50)  # envoie une requete sur l'API Unpaywall pour récupére des information
+        req = requests.get(url, timeout=50)  # envoie une requête sur l'API Unpaywall pour récupérer des informations
         data = req.json()
 
         if req.status_code == 200:
