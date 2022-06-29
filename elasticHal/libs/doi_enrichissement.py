@@ -22,7 +22,7 @@ def docs_enrichissement_doi(doc):
     # Cette Fonction permet de retourner la date de mise en open access de l'ensemble des documents contenu dans doc en fonction de leur DOI
     # La fonction test la validiter du DOI si le DOI n'est pas valide initialise le DOI vide, si le Doi existe teste la date de mise en open
     # acces du document sinon initialise la date de mise en open access vide
-    print("début docs_enrichissement_doi_date")
+    # print("début docs_enrichissement_doi_date")
     #for index, doc in enumerate(docs):
     if "doiId_s" in doc.keys():  # Si Le Doi est renseigner dans le document pris en parametre
 
