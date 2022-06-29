@@ -119,7 +119,7 @@ def collect_laboratories_data2(self, labo):
         if len(lab['halStructId']) > 0:
             docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
 
-            # docs = doi_enrichissement.docs_enrichissement_doi(docs)
+            docs = doi_enrichissement.docs_enrichissement_doi(docs)
             # docs = keyword_enrichissement.keyword_from_teeft(docs)
             # docs = keyword_enrichissement.return_entities(docs)
 
