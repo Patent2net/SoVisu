@@ -931,7 +931,11 @@
             for (let i in table.rows) {
                 try {
                     let row = table.rows[i]
-                    let curr_rsr = getObjectByValue(references, "docid", parseInt(row.cells[5].textContent));
+                    console.log(row.cells[5].textContent);
+                    console.log(references);
+                    console.log(getObjectByValue(references, "docid", 3690997));
+                    let curr_rsr = getObjectByValue(references, "docid", row.cells[5].textContent);
+                    console.log(curr_rsr)
                     if (curr_rsr[0].authorship) {
                         let curr_val = getObjectByValue(curr_rsr[0].authorship, "halId_s", document.querySelector(".halId_s").textContent);
                         row.cells[3].querySelector('#authorship').value = curr_val[0].authorship;

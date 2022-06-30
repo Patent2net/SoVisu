@@ -154,17 +154,31 @@ def collecte_docs(chercheur):  # self,
 
     init = False  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
-    docs = location_docs.generate_countrys_fields(docs)
-    docs = doi_enrichissement.docs_enrichissement_doi(docs)
-    docs = keyword_enrichissement.keyword_from_teeft(docs)
-    docs = keyword_enrichissement.return_entities(docs)
 
     es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
     for num, doc in enumerate(docs):
+
+
         #     progress_recorder.set_progress(num, len(docs))
+        doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+        doc = doi_enrichissement.docs_enrichissement_doi(doc)
+        if "fr_abstract_s" in doc.keys():
+            if isinstance(doc["fr_abstract_s"], list):
+                doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
+            if len(doc["fr_abstract_s"]) > 100:
+                doc["fr_entites"] = keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
+                doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
+        if "en_abstract_s" in doc.keys():
+            if isinstance(doc["en_abstract_s"], list):
+                doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
+            if len(doc["en_abstract_s"]) > 100:
+                doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
+                doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
+
+
         doc["_id"] = doc['docid']
         doc["validated"] = True
 
@@ -189,8 +203,11 @@ def collecte_docs(chercheur):  # self,
                     authhalid_s_filled.append("")
 
         authors_count = len(authhalid_s_filled)
+        print(authors_count)
         i = 0
+        print(authhalid_s_filled)
         for auth in authhalid_s_filled:
+            print(auth)
             i += 1
             if i == 1 and auth != "":
                 doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})

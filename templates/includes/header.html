@@ -222,6 +222,8 @@
 
             </div>
 
+            {% if halId_s != 'nullNone' and title != "Expertise" and title != "Aide" and title != "Index des chercheurs" and title != "Terminologie" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" and title != "Vérification des données" %}
+
             <script>
                 var getUrlParameter = function getUrlParameter(sParam) {
                     var sPageURL = window.location.search.substring(1),
@@ -237,6 +239,7 @@
                         }
                     }
                 };
+
 
                 function updateFilters(start, end, lang) {
                     if (getUrlParameter('filter') != undefined) {
@@ -280,5 +283,7 @@
 
 
             </script>
+
+            {% endif %}
 
 {%  endif %}
