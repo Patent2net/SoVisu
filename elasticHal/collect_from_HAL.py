@@ -5,7 +5,7 @@ import time
 from elasticsearch import helpers
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import hal, utils, archivesOuvertes, location_docs, doi_enrichissement ,keyword_enrichissement
+from elasticHal.libs import hal, utils, archivesOuvertes, location_docs, doi_enrichissement, keyword_enrichissement
 
 # Celery
 from celery import shared_task
@@ -23,6 +23,7 @@ if __name__ == '__main__':
         print("init django DB access (standalone mode)")
         import os
         import django
+
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
         django.setup()  # allow to use the elastichal.models under independantly from Django
 
@@ -52,25 +53,26 @@ scope_param = esActions.scope_all()
 def get_structid_list():
     global structIdlist
     structIdlist = []
-    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"], request_timeout=50)
+    res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"],
+                    request_timeout=50)
     print(res)
     structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
     print("\u00A0 \u21D2 ", structIdlist)
     return structIdlist
 
+
 @shared_task(bind=True)
 def collect_laboratories_data2(self, labo):
-
     # Init laboratories
     laboratories_list = []
-    #progress_recorder = ProgressRecorder(self)
+    # progress_recorder = ProgressRecorder(self)
     doc_progress_recorder = ProgressRecorder(self)
     # init es_laboratories
     count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
-    #progress_recorder.set_progress(0, count, " labo traités ")
+    # progress_recorder.set_progress(0, count, " labo traités ")
     if count > 0:
         # grosse feint, on ne récupère que le labo coché
-        #print("\u00A0 \u21D2", count, "laboratories found in ES, checking es_laboratories list")
+        # print("\u00A0 \u21D2", count, "laboratories found in ES, checking es_laboratories list")
         res = es.search(index="*-laboratories", body=scope_param, size=count, request_timeout=50)
         es_laboratories = res['hits']['hits']
         for lab in es_laboratories:
@@ -85,9 +87,11 @@ def collect_laboratories_data2(self, labo):
 
                 for lab in csv_reader:
                     if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                        print(f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
+                        print(
+                            f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
                     else:
-                        print(f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
+                        print(
+                            f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
                         laboratories_list.append(lab)
             else:
                 print("\u00A0 \u21D2 laboratories_list is empty, adding csv content to values")
@@ -100,7 +104,8 @@ def collect_laboratories_data2(self, labo):
             print("\u00A0 \u21D2 checking DjangoDb laboratory list:")
             for lab in djangolab:
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                    print(f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
+                    print(
+                        f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
                 else:
                     print(f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
                     laboratories_list.append(lab)
@@ -113,28 +118,27 @@ def collect_laboratories_data2(self, labo):
     nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
-        #progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
-        nblab +=1
+        # progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
+        nblab += 1
         # Collect publications
         if len(lab['halStructId']) > 0:
             docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
-
 
             # docs = keyword_enrichissement.keyword_from_teeft(docs)
             # docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
-            if len(docs)>1:
+            if len(docs) > 1:
                 for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
+                    doc_progress_recorder.set_progress(num, len(docs), "Collection " + lab['acronym'] + " en cours")
                     print(f"- sub processing : {str(doc['docid'])}")
                     # Enrichssements des documents récoltés
-                    doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                    doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
                     lstResum = [cle for cle in doc.keys() if "abstract" in cle]
                     for cle in lstResum:
                         if isinstance(doc[cle], list):
-                            doc [cle] =  ' ' .join( doc [cle] )
+                            doc[cle] = ' '.join(doc[cle])
                         else:
                             pass
                     doc["_id"] = doc['docid']
@@ -199,8 +203,9 @@ def collect_laboratories_data2(self, labo):
                                 index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
                             es.indices.create(
                                 index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
-                        res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                                        body=doc_param, request_timeout=50)
+                        res = es.search(
+                            index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                            body=doc_param, request_timeout=50)
 
                         if len(res['hits']['hits']) > 0:
                             if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
@@ -221,18 +226,20 @@ def collect_laboratories_data2(self, labo):
                 es,
                 docs,
                 index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                request_timeout = 50
+                request_timeout=50
             )
-            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
-        #progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
+            doc_progress_recorder.set_progress(len(docs), len(docs),
+                                               lab['acronym'] + " " + str(len(docs)) + " documents")
+        # progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
+
 
 @shared_task(bind=True)
 def collect_researchers_data(self, struct):
     # initialisation liste labos supposée plus fiables que données issues Ldap.
-    progress_recorder= ProgressRecorder(self)
-    doc_progress_recorder= ProgressRecorder(self)
+    progress_recorder = ProgressRecorder(self)
+    doc_progress_recorder = ProgressRecorder(self)
     labos, dico_acronym = init_labo()
     print(f"\u00A0 \u21D2 labos values ={labos}")
     print(f"\u00A0 \u21D2 dicoAcronym values ={dico_acronym}")
@@ -244,22 +251,24 @@ def collect_researchers_data(self, struct):
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
         res = es.search(index=struct + "*-researchers", body=scope_param, size=count, request_timeout=50)
         es_researchers = res['hits']['hits']
-        i=0
+        i = 0
         for searcher in es_researchers:
-
             researchers_list.append(searcher['_source'])
 
     if csv_open:
         with open('data/researchers.csv', encoding='utf-8') as csv_file:
             csv_reader = list(csv.DictReader(csv_file, delimiter=','))
-            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] != '']  # Only keep researchers with known 'halId_s'
+            csv_reader = [searcher for searcher in csv_reader if
+                          searcher['halId_s'] != '']  # Only keep researchers with known 'halId_s'
             if researchers_list:
                 print("\u00A0 \u21D2 checking researchers.csv list: ")
                 for searcher in csv_reader:
                     if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
-                        print(f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
+                        print(
+                            f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
                     else:
-                        print(f'\u00A0 \u21D2 adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
+                        print(
+                            f'\u00A0 \u21D2 adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
                         researchers_list.append(searcher)
             else:
                 print("\u00A0 \u21D2 researchers_list is empty, adding csv content to values")
@@ -267,12 +276,15 @@ def collect_researchers_data(self, struct):
 
     if djangodb_open:
         django_researchers = Researcher.objects.all().values()
-        django_researchers = [researcher for researcher in django_researchers if researcher['halId_s'] != '' and researcher.pop('id')]  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
+        django_researchers = [researcher for researcher in django_researchers if
+                              researcher['halId_s'] != '' and researcher.pop(
+                                  'id')]  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
         if researchers_list:
             print("checking DjangoDb laboratory list:")
             for searcher in django_researchers:
                 if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
-                    print(f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
+                    print(
+                        f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
                 else:
                     print(f'\u00A0 \u21D2 adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
                     researchers_list.append(searcher)
@@ -287,7 +299,7 @@ def collect_researchers_data(self, struct):
         progress_recorder.set_progress(j, count, " chercheurs traités ")
 
         if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
-            #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
+            # print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             if searcher["labHalId"] not in labos:
                 searcher["labHalId"] = "non-labo"
             # Collect publications
@@ -297,7 +309,7 @@ def collect_researchers_data(self, struct):
             # Enrichssements des documents récoltés
 
             # Insert documents collection
-            if len(docs)>1:
+            if len(docs) > 1:
                 for num, doc in enumerate(docs):
                     k += 1
                     doc_progress_recorder.set_progress(num, len(docs), " document traités " + searcher['halId_s'])
@@ -305,16 +317,18 @@ def collect_researchers_data(self, struct):
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
                     if "fr_abstract_s" in doc.keys():
                         if isinstance(doc["fr_abstract_s"], list):
-                            doc["fr_abstract_s"] = "/n" .join(doc["fr_abstract_s"])
+                            doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
                         if len(doc["fr_abstract_s"]) > 100:
-                            doc["fr_entites"]= keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
-                            doc["fr_teeft_keywords"]= keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
+                            doc["fr_entites"] = keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
+                            doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"],
+                                                                                                 'fr')
                     if "en_abstract_s" in doc.keys():
                         if isinstance(doc["en_abstract_s"], list):
-                            doc["en_abstract_s"] = "/n" .join(doc["en_abstract_s"])
+                            doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
                         if len(doc["en_abstract_s"]) > 100:
-                            doc["en_entites"]= keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
-                            doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
+                            doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
+                            doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"],
+                                                                                                 'en')
                     doc["_id"] = doc['docid']
                     doc["validated"] = True
 
@@ -371,11 +385,16 @@ def collect_researchers_data(self, struct):
                     if check_existing_docs:
                         doc_param = esActions.scope_p("_id", doc["_id"])
 
-                        if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
+                        if not es.indices.exists(
+                                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" +
+                                      searcher[
+                                          "ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
                             print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
                             break
-                        res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
-                            "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
+                        res = es.search(
+                            index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                                "ldapId"] + "-documents", body=doc_param,
+                            request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
 
                         if len(res['hits']['hits']) > 0:
                             if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
@@ -394,26 +413,27 @@ def collect_researchers_data(self, struct):
 
                 time.sleep(1)
             else:
-                print ("pas de docs", searcher['halId_s'])
+                print("pas de docs", searcher['halId_s'])
             res = helpers.bulk(
                 es,
                 docs,
                 request_timeout=50,
-                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
+                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                    "ldapId"] + "-documents",
                 # -researchers" + searcher["ldapId"] + "-documents
             )
-            doc_progress_recorder.set_progress(k, len(docs), " document traités "+ searcher["labHalId"])
+            doc_progress_recorder.set_progress(k, len(docs), " document traités " + searcher["labHalId"])
         else:
-            print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
+            print(
+                f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
 
     doc_progress_recorder.set_progress(len(docs), len(docs), " document traités " + searcher['ldapId'])
-    progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
+    progress_recorder.set_progress(count, count, " chercheurs traités " + searcher['ldapId'])
     return "finished"
 
 
 @shared_task(bind=True)
 def collect_laboratories_data(self):
-
     # Init laboratories
     laboratories_list = []
     progress_recorder = ProgressRecorder(self)
@@ -436,9 +456,11 @@ def collect_laboratories_data(self):
 
                 for lab in csv_reader:
                     if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                        print(f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
+                        print(
+                            f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
                     else:
-                        print(f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
+                        print(
+                            f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
                         laboratories_list.append(lab)
             else:
                 print("\u00A0 \u21D2 laboratories_list is empty, adding csv content to values")
@@ -451,7 +473,8 @@ def collect_laboratories_data(self):
             print("\u00A0 \u21D2 checking DjangoDb laboratory list:")
             for lab in djangolab:
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                    print(f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
+                    print(
+                        f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
                 else:
                     print(f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
                     laboratories_list.append(lab)
@@ -464,8 +487,8 @@ def collect_laboratories_data(self):
     nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
-        progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
-        nblab +=1
+        progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo en cours")
+        nblab += 1
         # Collect publications
         if len(lab['halStructId']) > 0:
             docs = hal.find_publications(lab['halStructId'], 'labStructId_i')
@@ -475,16 +498,16 @@ def collect_laboratories_data(self):
             # docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
-            if len(docs)>1:
+            if len(docs) > 1:
                 for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
+                    doc_progress_recorder.set_progress(num, len(docs), "Collection " + lab['acronym'] + " en cours")
                     print(f"- sub processing : {str(doc['docid'])}")
                     # Enrichssements des documents récoltés
-                    doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                    doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     lstResum = [cle for cle in doc.keys() if "abstract" in cle]
                     for cle in lstResum:
                         if isinstance(doc[cle], list):
-                            doc [cle] =  ' ' .join( doc [cle] )
+                            doc[cle] = ' '.join(doc[cle])
                         else:
                             pass
                     doc["_id"] = doc['docid']
@@ -549,8 +572,9 @@ def collect_laboratories_data(self):
                                 index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
                             es.indices.create(
                                 index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
-                        res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                                        body=doc_param, request_timeout=50)
+                        res = es.search(
+                            index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                            body=doc_param, request_timeout=50)
 
                         if len(res['hits']['hits']) > 0:
                             if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
@@ -571,42 +595,44 @@ def collect_laboratories_data(self):
                 es,
                 docs,
                 index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                request_timeout = 50
+                request_timeout=50
             )
-            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
+            doc_progress_recorder.set_progress(len(docs), len(docs),
+                                               lab['acronym'] + " " + str(len(docs)) + " documents")
         progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
+
+
 @shared_task(bind=True)
 def collect_researchers_data2(self, struct, idx):
     # initialisation liste labos supposée plus fiables que données issues Ldap.
-    #progress_recorder= ProgressRecorder(self)
-    doc_progress_recorder= ProgressRecorder(self)
+    # progress_recorder= ProgressRecorder(self)
+    doc_progress_recorder = ProgressRecorder(self)
 
     # Init researchers
     researchers_list = []
     labos, dico_acronym = init_labo()
-    idxCher = idx .replace("laboratories", "researchers*")
+    idxCher = idx.replace("laboratories", "researchers*")
     count = es.count(index=idxCher, body=scope_param, request_timeout=50)['count']
     if count > 0:
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
         res = es.search(index=idxCher, body=scope_param, size=count, request_timeout=50)
 
         es_researchers = res['hits']['hits']
-        i=0
+        i = 0
         for searcher in es_researchers:
-
             researchers_list.append(searcher['_source'])
-            #print (searcher['_source'])
-    #print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
+            # print (searcher['_source'])
+    # print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
     sommeDocs = 0
     for searcher in researchers_list:
-        #progress_recorder.set_progress(j, count, " chercheurs traités ")
+        # progress_recorder.set_progress(j, count, " chercheurs traités ")
         # print ("hooo", searcher .keys(), researchers_list, idxCher)
-        #if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
-            #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
-            # Collect publications
+        # if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
+        # print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
+        # Collect publications
 
         # {'structSirene': '198307662',
         # 'ldapId': 'watelain', '
@@ -640,141 +666,145 @@ def collect_researchers_data2(self, struct, idx):
 
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
-            # Enrichssements des documents récoltés
+        # Enrichssements des documents récoltés
 
         doc_progress_recorder.set_progress(k, sommeDocs, " document traités " + searcher["halId_s"])
         sommeDocs += len(docs)
-            # Insert documents collection
-        if len(docs)>1:
+        # Insert documents collection
+        if len(docs) > 1:
             for num, doc in enumerate(docs):
-                    k += 1
-                    doc_progress_recorder.set_progress(num, sommeDocs, " document traités " + searcher['halId_s'])
-                    doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
-                    doc = doi_enrichissement.docs_enrichissement_doi(doc)
-                    if "fr_abstract_s" in doc.keys():
-                        if isinstance(doc["fr_abstract_s"], list):
-                            doc["fr_abstract_s"] = "/n" .join(doc["fr_abstract_s"])
-                        if len(doc["fr_abstract_s"]) > 100:
-                            doc["fr_entites"]= keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
-                            doc["fr_teeft_keywords"]= keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
-                    if "en_abstract_s" in doc.keys():
-                        if isinstance(doc["en_abstract_s"], list):
-                            doc["en_abstract_s"] = "/n" .join(doc["en_abstract_s"])
-                        if len(doc["en_abstract_s"]) > 100:
-                            doc["en_entites"]= keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
-                            doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
-                    doc["_id"] = doc['docid']
-                    doc["validated"] = True
+                k += 1
+                doc_progress_recorder.set_progress(num, sommeDocs, " document traités " + searcher['halId_s'])
+                doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                doc = doi_enrichissement.docs_enrichissement_doi(doc)
+                if "fr_abstract_s" in doc.keys():
+                    if isinstance(doc["fr_abstract_s"], list):
+                        doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
+                    if len(doc["fr_abstract_s"]) > 100:
+                        doc["fr_entites"] = keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
+                        doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
+                if "en_abstract_s" in doc.keys():
+                    if isinstance(doc["en_abstract_s"], list):
+                        doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
+                    if len(doc["en_abstract_s"]) > 100:
+                        doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
+                        doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
+                doc["_id"] = doc['docid']
+                doc["validated"] = True
 
-                    doc["harvested_from"] = "researcher"
+                doc["harvested_from"] = "researcher"
 
-                    doc["harvested_from_ids"] = []
-                    doc["harvested_from_label"] = []
-                    try:
-                        doc["harvested_from_label"].append(dico_acronym[searcher["labHalId"]])
-                    except:
-                        doc["harvested_from_label"].append("non-labo")
+                doc["harvested_from_ids"] = []
+                doc["harvested_from_label"] = []
+                try:
+                    doc["harvested_from_label"].append(dico_acronym[searcher["labHalId"]])
+                except:
+                    doc["harvested_from_label"].append("non-labo")
 
-                    doc["authorship"] = []
+                doc["authorship"] = []
 
-                    if "authIdHal_s" in doc:
-                        authors_count = len(doc["authIdHal_s"])
-                        i = 0
-                        for auth in doc["authIdHal_s"]:
-                            i += 1
-                            if i == 1:
-                                doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
-                            elif i == authors_count:
-                                doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
-                    if "Created" not in doc:
-                        doc['Created'] = datetime.datetime.now().isoformat()
+                if "authIdHal_s" in doc:
+                    authors_count = len(doc["authIdHal_s"])
+                    i = 0
+                    for auth in doc["authIdHal_s"]:
+                        i += 1
+                        if i == 1:
+                            doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
+                        elif i == authors_count:
+                            doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
+                if "Created" not in doc:
+                    doc['Created'] = datetime.datetime.now().isoformat()
 
-                    doc["harvested_from_ids"].append(searcher['halId_s'])
-                    # historique d'appartenance du docId
-                    # pour attribuer les bons docs aux chercheurs
-                    harvet_history.append({'docid': doc['docid'], 'from': searcher['halId_s']})
+                doc["harvested_from_ids"].append(searcher['halId_s'])
+                # historique d'appartenance du docId
+                # pour attribuer les bons docs aux chercheurs
+                harvet_history.append({'docid': doc['docid'], 'from': searcher['halId_s']})
 
-                    for h in harvet_history:
-                        if h['docid'] == doc['docid']:
-                            if h['from'] not in doc["harvested_from_ids"]:
-                                doc["harvested_from_ids"].append(h['from'])
+                for h in harvet_history:
+                    if h['docid'] == doc['docid']:
+                        if h['from'] not in doc["harvested_from_ids"]:
+                            doc["harvested_from_ids"].append(h['from'])
 
-                    doc["records"] = []
-                    doc["MDS"] = utils.calculate_mds(doc)
-                    #####
-                    # indexation sur index spécial
-                    ####
+                doc["records"] = []
+                doc["MDS"] = utils.calculate_mds(doc)
+                #####
+                # indexation sur index spécial
+                ####
 
+                #### Fin index spécial
+                try:
+                    should_be_open = utils.should_be_open(doc)
+                    if should_be_open == 1:
+                        doc["should_be_open"] = True
+                    if should_be_open == -1:
+                        doc["should_be_open"] = False
 
-                    #### Fin index spécial
-                    try:
-                        should_be_open = utils.should_be_open(doc)
-                        if should_be_open == 1:
-                            doc["should_be_open"] = True
-                        if should_be_open == -1:
-                            doc["should_be_open"] = False
+                    if should_be_open == 1 or should_be_open == 2:
+                        doc['isOaExtra'] = True
+                    elif should_be_open == -1:
+                        doc['isOaExtra'] = False
+                except:
+                    print('publicationDate_tdate error ?')
 
-                        if should_be_open == 1 or should_be_open == 2:
-                            doc['isOaExtra'] = True
-                        elif should_be_open == -1:
-                            doc['isOaExtra'] = False
-                    except:
-                        print('publicationDate_tdate error ?')
+                if check_existing_docs:
+                    doc_param = esActions.scope_p("_id", doc["_id"])
 
-                    if check_existing_docs:
-                        doc_param = esActions.scope_p("_id", doc["_id"])
+                    if not es.indices.exists(
+                            index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                                "ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
+                        print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
+                        break
 
-                        if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
-                            print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
-                            break
+                    res = es.search(
+                        index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                            "ldapId"] + "-documents", body=doc_param,
+                        request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
 
-                        res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
-                            "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
+                    if len(res['hits']['hits']) > 0:
+                        if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                            doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                        if "validated" in res['hits']['hits'][0]['_source']:
+                            doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                        if force_doc_validated:
+                            doc['validated'] = True
 
-                        if len(res['hits']['hits']) > 0:
-                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                            if "validated" in res['hits']['hits'][0]['_source']:
-                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                            if force_doc_validated:
-                                doc['validated'] = True
+                        if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                            doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                   'MDS': res['hits']['hits'][0]['_source']['MDS']})
 
-                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
-
-                        else:
-                            doc["validated"] = True
-                    # En attendant de trouver une solution pivot / transfo d'index
-                    #C'est pas du tout beau !
-                    # exemple de ce qu'il ne faut pas faire
-                    for cle, val in searcher .items():
-                        doc [cle] = val
-                    time.sleep(1)
+                    else:
+                        doc["validated"] = True
+                # En attendant de trouver une solution pivot / transfo d'index
+                # C'est pas du tout beau !
+                # exemple de ce qu'il ne faut pas faire
+                for cle, val in searcher.items():
+                    doc[cle] = val
+                time.sleep(1)
         else:
-                print ("pas de docs : " +searcher['halId_s'])
-        if len(docs)>0:
-
+            print("pas de docs : " + searcher['halId_s'])
+        if len(docs) > 0:
             res = helpers.bulk(
-                    es,
-                    docs,
-                    request_timeout=50,
-                    index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
-                    # -researchers" + searcher["ldapId"] + "-documents
-                )
-            doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " document traités " + searcher['ldapId'])
-        #else:
-            # impossible d'être là
+                es,
+                docs,
+                request_timeout=50,
+                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                    "ldapId"] + "-documents"
+                # -researchers" + searcher["ldapId"] + "-documents
+            )
+            doc_progress_recorder.set_progress(len(docs) - 1, sommeDocs, " document traités " + searcher['ldapId'])
+        # else:
+        # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
-    if len(researchers_list) >0:
+    if len(researchers_list) > 0:
         doc_progress_recorder.set_progress(len(docs), sommeDocs, " document traités " + searcher['ldapId'])
 
     else:
         doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités ")
         print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
-    #progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
+    # progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
     return "fini !"
+
 
 def init_labo():
     # initialisation liste labos supposée plus fiables que données issues Ldap.

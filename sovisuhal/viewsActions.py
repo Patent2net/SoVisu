@@ -16,6 +16,9 @@ from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
 import pandas as pd
 from io import BytesIO as B_io
 
+from elasticHal import collect_from_HAL
+
+
 try:
     from decouple import config
     from ldap3 import Server, Connection, ALL
@@ -607,7 +610,10 @@ def force_update_references(request):
             entity = res['hits']['hits'][0]['_source']
         except:
             return redirect('unknown')
+
         collecte_docs(entity)
+        # bricolage pour réparer temporairement
+        # collect_from_HAL.collect_researcher(entity, check_existing_docs=True)
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation=1')
