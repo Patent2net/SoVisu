@@ -612,8 +612,6 @@ def force_update_references(request):
             return redirect('unknown')
 
         collecte_docs(entity)
-        # bricolage pour réparer temporairement
-        # collect_from_HAL.collect_researcher(entity, check_existing_docs=True)
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation=1')
