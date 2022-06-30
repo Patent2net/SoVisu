@@ -80,3 +80,4 @@ def docs_enrichissement_doi(doc):
     """
     #print("fin docs_enrichissement_doi_date")
     return doc
+
