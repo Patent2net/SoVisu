@@ -6,53 +6,18 @@ from django.shortcuts import render
 from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
 from django import forms
-
-from .insert_entities import create_index
+from .views import get_index_list
+from .insert_entities import get_structid_list, create_index
 from .collect_from_HAL import collect_data, init_labo, collect_laboratories_data2, collect_researchers_data2
+
+from .forms import PopulateLab, ExportToElasticForm, CsvImportForm
 
 admin.site.site_header = "Administration de SoVisu"
 
-
 # Celery
 from celery import shared_task
-
 # Celery-progress
 from celery_progress.backend import ProgressRecorder
-
-class CsvImportForm(forms.Form):
-    csv_upload = forms.FileField()
-
-
-class ExportToElasticForm(forms.Form):
-    Structures = forms.BooleanField(initial=True, required=False)
-    Laboratoires = forms.BooleanField(initial=True, required=False)
-    Chercheurs = forms.BooleanField(initial=True, required=False)
-
-
-class PopulateLab(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        if 'val' in kwargs:
-            val = kwargs.pop('val')
-
-        super(PopulateLab, self).__init__(*args, **kwargs)
-
-    # Set choices to an empty list as it is a required argument.
-    labos, dico_acronym = init_labo()
-    structur = "198*-" # on doit pouvoir faire un init_struct
-    indexes = [] # ("198*-" + labos [ind] + "*-laboratories", dico_acronym  [ind]) ))
-
-    for labId in dico_acronym .keys():
-            idx = structur + labId + "-laboratories"
-
-            indexes.append((idx, dico_acronym [labId] ))
-    indexes = tuple(indexes)
-    f_index = forms.ChoiceField(widget=forms.RadioSelect, label='Laboratoire', choices=indexes)
-    collectionLabo = forms.BooleanField(initial=False, required=False)
-    chercheurs = forms.BooleanField(initial=True, required=False)
-
-    #f_search = forms.CharField(label='Peuplement entités', max_length=100, widget=forms.TextInput(
-     #   attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
 class ExportCsv:
@@ -77,9 +42,6 @@ class ExportCsv:
 
 
 # Models are under that line+
-
-
-
 class StructureAdmin(admin.ModelAdmin, ExportCsv):
     list_display = ('structSirene', 'acronym', 'label')
     actions = ["export_as_csv"]
@@ -233,18 +195,17 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
                     task_id2 = None
 
             elif chercheurs:
-                result2 = collect_researchers_data2 .delay(struct = structure, idx = collection )
+                result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
                 task_id2 = result2.task_id
                 task_id1 = None
 
             else:
-                pass # pas sûr
+                pass  # pas sûr
 
             return render(request, "admin/elasticHal/export_to_elasticLabs.html",
                           context={'form': form, 'task_id2': task_id2})
         form = PopulateLab()
-        data = {'form': form
-        }
+        data = {'form': form}
         return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
 
 
@@ -373,9 +334,6 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
 
 
             #return render(request, "admin/elasticHal/export_to_elastic.html", data)
-
-
-
 
 # Register your models here.
 admin.site.register(Structure, StructureAdmin)
