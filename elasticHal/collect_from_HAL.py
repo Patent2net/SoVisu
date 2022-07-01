@@ -362,7 +362,7 @@ def collect_researchers_data(self, struct):
             else:
                 print ("pas de docs", searcher['halId_s'])
             for indi in range (int(len(docs) / 100)):
-                boutdeDoc = doc [indi*100, indi*100+100]
+                boutdeDoc = docs [indi*100, indi*100+100]
 
                 res = helpers.bulk(
                     es,
@@ -520,13 +520,15 @@ def collect_laboratories_data(self):
                         else:
                             doc["validated"] = True
             time.sleep(1)
-
-            res = helpers.bulk(
-                es,
-                docs,
-                index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                request_timeout = 50
-            )
+            for indi in range (int(len(docs) / 100)):
+                boutdeDoc = docs [indi*100, indi*100+100]
+                res = helpers.bulk(
+                    es,
+                    docs,
+                    index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                    request_timeout = 100
+                )
+                time.sleep(1)
             doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
         progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
@@ -715,14 +717,16 @@ def collect_researchers_data2(self, struct, idx):
         else:
                 print ("pas de docs : " +searcher['halId_s'])
         if len(docs)>0:
-
-            res = helpers.bulk(
-                    es,
-                    docs,
-                    request_timeout=50,
-                    index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
-                    # -researchers" + searcher["ldapId"] + "-documents
-                )
+            for indi in range (int(len(docs) / 100)):
+                boutdeDoc = docs [indi*100, indi*100+100]
+                res = helpers.bulk(
+                        es,
+                        docs,
+                        request_timeout=50,
+                        index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
+                        # -researchers" + searcher["ldapId"] + "-documents
+                    )
+                time.sleep(1)
             doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " document traités " + searcher['ldapId'])
         #else:
             # impossible d'être là
