@@ -1,4 +1,3 @@
-import csv
 import datetime
 import json
 import sys
@@ -33,7 +32,6 @@ else:
 structIdlist = []  # is dependant of get_structid_list()
 Labolist = []
 
-csv_open = None  # If csv_open = True script will use .csv stocked in elasticHal > data to generate index for ES. Default Value is True when used as a script and False when called by SoVisu.(check the code at the bottom of the file)
 djangodb_open = None  # If djangodb_open = True script will use django Db to generate index for ES. Default Value is False vhen used as a script and True when called by SoVisu. (check the code at the bottom of the file)
 
 init = True
@@ -46,7 +44,6 @@ es = esActions.es_connector()
 
 
 def get_structid_list():
-    print("\u00A0 \u21D2 csv_open value is : ", csv_open)
     print("\u00A0 \u21D2 djangodb_open value is : ", djangodb_open)
     global structIdlist
 
@@ -57,20 +54,6 @@ def get_structid_list():
         print("\u00A0 \u21D2 ", count, " structures found in ES")
         res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
         structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
-
-    # get structId for structures in csv and compare with structIdlist
-    if csv_open:
-        with open('data/structures.csv', encoding='utf-8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=',')
-            for csv_row in csv_reader:
-                if " " in csv_row["structSirene"]:
-                    print("\u00A0 \u21D2 StructSirerene missing for ", csv_row["acronym"])
-                else:
-                    if csv_row["structSirene"] not in structIdlist:
-                        structIdlist.append(csv_row["structSirene"])
-                        print(f"\u00A0 \u21D2 Rajout de la structure  {csv_row['acronym']} (structSirene: {csv_row['structSirene']}) dans structIdlist")
-                    else:
-                        print(f"\u00A0 \u21D2 {csv_row['acronym']} is already listed (structSirene: {csv_row['structSirene']})")
 
     # get structId for structures in django db and compare with structIdlist
     if djangodb_open:
@@ -108,14 +91,6 @@ def get_labo_list():
             print(row)
             sys.exit(1)
 
-    if csv_open:
-        with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=';')
-            for row in csv_reader:
-                temp_laboratories(row)
-
-    print(f"\u00A0 \u21D2 Labhalid listed: {Labolist}")
-    print(f"\u00A0 \u21D2 structid listed: {structIdlist}")
     if djangodb_open:
         for row in Laboratory.objects.all().values():
             row.pop('id')
@@ -124,14 +99,8 @@ def get_labo_list():
 
 def create_structures_index(pg):
     # Process structures
-    if csv_open:
-        with open('data/structures.csv', encoding='utf-8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=',')
-            for row in csv_reader:
-                # Insert structure data
-                es.index(index=row["structSirene"] + "-structures", id=row['structSirene'], body=json.dumps(row))
 
-    elif djangodb_open:
+    if djangodb_open:
         percentage = 0.0
         for row in Structure.objects.all().values():
             row.pop('id')  # delete unique id added by django DB from the dict
@@ -140,10 +109,10 @@ def create_structures_index(pg):
             progress_description = "processing structure"
             percentage += 33 / len(Structure.objects.all().values())
             pg.set_progress(int(percentage), 100, description=progress_description)
-
     else:
         print("No source enabled to add structure. Please check the parameters")
-    pg.set_progress(33, 100, description= "processing structure finished")
+    pg.set_progress(33, 100, description="processing structure finished")
+
 
 def create_researchers_index(pg):
     # Process researchers
@@ -161,23 +130,6 @@ def create_researchers_index(pg):
             cleaned_es_researchers.append(row)
     progress_description = "processing " + str(len(cleaned_es_researchers)) + " researchers"
     pg.set_progress(int(percentage), 100, description=progress_description)
-    if csv_open:
-        with open('data/researchers.csv', encoding='utf-8') as csv_file:
-            csv_reader = list(csv.DictReader(csv_file, delimiter=','))
-            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] != '']  # Only keep researchers with known 'halId_s'
-            if cleaned_es_researchers:
-                print("\u00A0 \u21D2 checking csv researcher list:")
-                for csv_row in csv_reader:
-                    if any(dictlist['halId_s'] == csv_row['halId_s'] for dictlist in cleaned_es_researchers):  # Si l'aurehalid de la ligne du csv (=chercheur) est présente dans les données récupérées d'ES : on ignore. Sinon on rajoute le chercheur à la liste.
-                        print(f"\u00A0 \u21D2 {csv_row['halId_s']} is already in cleaned_es_researchers")
-
-                    else:
-                        print("\u00A0 \u21D2 adding " + csv_row["halId_s"] + " to cleaned_es_researchers")
-                        cleaned_es_researchers.append(csv_row)
-
-            else:
-                print("\u00A0 \u21D2 cleaned_es_researchers is empty, adding csv content to values")
-                cleaned_es_researchers = csv_reader
 
     if djangodb_open:
         django_researchers = Researcher.objects.all().values()
@@ -394,23 +346,6 @@ def create_laboratories_index(pg):
             row = row['_source']
             cleaned_es_laboratories.append(row)
 
-    if csv_open:
-        with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-            csv_reader = list(csv.DictReader(csv_file, delimiter=';'))
-            if cleaned_es_laboratories:
-                print("\u00A0 \u21D2 checking csv researcher list:")
-                for csv_row in csv_reader:
-                    if any(dictlist['halStructId'] == csv_row['halStructId'] for dictlist in cleaned_es_laboratories):
-                        print("\u00A0 \u21D2 ", csv_row["acronym"] + " is already in cleaned_es_laboratories")
-
-                    else:
-                        print("\u00A0 \u21D2 adding " + csv_row["acronym"] + " to cleaned_es_laboratories")
-                        cleaned_es_laboratories.append(csv_row)
-
-            else:
-                print("\u00A0 \u21D2 cleaned_es_laboratories is empty, adding csv content to values")
-                cleaned_es_laboratories = csv_reader
-
     if djangodb_open:
         if cleaned_es_laboratories:
             print("\u00A0 \u21D2 checking DjangoDb laboratory list:")
@@ -561,10 +496,9 @@ def temp_laboratories(row):
             Labolist.append(connait_lab)
 
 @shared_task(bind=True)
-def create_index(self, structure, researcher, laboratories, csv_enabler=True, django_enabler=None):
-    global csv_open, djangodb_open
+def create_index(self, structure, researcher, laboratories, django_enabler=None):
+    global djangodb_open
     progress_recorder = ProgressRecorder(self)
-    csv_open = csv_enabler
     djangodb_open = django_enabler
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('Begin Index creation')
@@ -617,6 +551,3 @@ def create_index(self, structure, researcher, laboratories, csv_enabler=True, dj
     percentage = 100
     progress_recorder.set_progress(int(percentage), 100, description=progress_description)
     return "finished"
-
-if __name__ == '__main__':
-    create_index(structure='on', researcher='on', laboratories='on')
