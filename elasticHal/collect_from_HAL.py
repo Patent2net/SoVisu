@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 import datetime
-import csv
 import time
 from elasticsearch import helpers
 # Custom libs
@@ -38,7 +37,6 @@ check_existing_docs = False  # if True, check all the existing data in ES index 
 force_doc_validated = False  # if True, overwrite the doc['validated'] status to True for all the docs existing in ES (work only if Check_existing_docs = True)
 force_doc_authorship = False  # if True, overwrite the doc["authorship"] status for all the docs existing in ES (work only if Check_existing_docs = True)
 
-csv_open = None  # If csv_open = True script will use .csv stocked in elasticHal > data to generate index for ES. Default Value is True when used as a script and False when called by SoVisu.(check the code at the bottom of the file)
 djangodb_open = None  # If djangodb_open = True script will use django Db to generate index for ES. Default Value is False vhen used as a script and True when called by SoVisu. (check the code at the bottom of the file)
 
 harvet_history = []
@@ -76,22 +74,6 @@ def collect_laboratories_data2(self, labo):
         for lab in es_laboratories:
             if labo == lab['_source']['halStructId']:
                 laboratories_list.append(lab['_source'])
-
-    if csv_open:
-        with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-            csv_reader = list(csv.DictReader(csv_file, delimiter=';'))
-            if laboratories_list:
-                print("\u00A0 \u21D2 checking laboratories.csv list: ")
-
-                for lab in csv_reader:
-                    if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                        print(f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
-                    else:
-                        print(f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
-                        laboratories_list.append(lab)
-            else:
-                print("\u00A0 \u21D2 laboratories_list is empty, adding csv content to values")
-                laboratories_list = csv_reader
 
     if djangodb_open:
         djangolab = Laboratory.objects.all().values()
@@ -221,9 +203,9 @@ def collect_laboratories_data2(self, labo):
                 es,
                 docs,
                 index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                request_timeout = 50
+                request_timeout=50
             )
-            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
+            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym'] + " " + str(len(docs)) + " documents")
         #progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
@@ -248,22 +230,6 @@ def collect_researchers_data(self, struct):
         for searcher in es_researchers:
 
             researchers_list.append(searcher['_source'])
-
-    if csv_open:
-        with open('data/researchers.csv', encoding='utf-8') as csv_file:
-            csv_reader = list(csv.DictReader(csv_file, delimiter=','))
-            csv_reader = [searcher for searcher in csv_reader if searcher['halId_s'] != '']  # Only keep researchers with known 'halId_s'
-            if researchers_list:
-                print("\u00A0 \u21D2 checking researchers.csv list: ")
-                for searcher in csv_reader:
-                    if any(dictlist['halId_s'] == searcher['halId_s'] for dictlist in researchers_list):
-                        print(f'\u00A0 \u21D2 {searcher["name"]} (ldapId: {searcher["ldapId"]}) is already in researchers_list')
-                    else:
-                        print(f'\u00A0 \u21D2 adding {searcher["name"]} (ldapId: {searcher["ldapId"]}) to researchers_list')
-                        researchers_list.append(searcher)
-            else:
-                print("\u00A0 \u21D2 researchers_list is empty, adding csv content to values")
-                researchers_list = csv_reader
 
     if djangodb_open:
         django_researchers = Researcher.objects.all().values()
@@ -431,22 +397,6 @@ def collect_laboratories_data(self):
         es_laboratories = res['hits']['hits']
         for lab in es_laboratories:
             laboratories_list.append(lab['_source'])
-
-    if csv_open:
-        with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-            csv_reader = list(csv.DictReader(csv_file, delimiter=';'))
-            if laboratories_list:
-                print("\u00A0 \u21D2 checking laboratories.csv list: ")
-
-                for lab in csv_reader:
-                    if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in laboratories_list):
-                        print(f'\u00A0 \u21D2 {lab["acronym"]} (struct: {lab["structSirene"]}) is already in laboratories_list')
-                    else:
-                        print(f'\u00A0 \u21D2 adding {lab["acronym"]} (struct: {lab["structSirene"]}) to laboratories_list')
-                        laboratories_list.append(lab)
-            else:
-                print("\u00A0 \u21D2 laboratories_list is empty, adding csv content to values")
-                laboratories_list = csv_reader
 
     if djangodb_open:
         djangolab = Laboratory.objects.all().values()
@@ -810,20 +760,6 @@ def init_labo():
             if lab['acronym'] not in dico_acronym.values():
                 dico_acronym[lab['halStructId']] = lab['acronym']
 
-    if csv_open:
-        with open('data/laboratories.csv', encoding='utf-8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=';')
-            for lab in csv_reader:
-                lab["halStructId"] = lab["halStructId"].strip()
-                if " " in lab["halStructId"]:
-                    connait_lab = "non-labo"
-                else:
-                    connait_lab = lab["halStructId"]
-                    labos.append(connait_lab)
-
-                if lab['acronym'] not in dico_acronym.values():
-                    dico_acronym[lab['halStructId']] = lab['acronym']
-
     if djangodb_open:
         djangolab = Laboratory.objects.all().values()
         [lab.pop('id') for lab in djangolab]
@@ -841,10 +777,9 @@ def init_labo():
     return labos, dico_acronym
 
 
-def collect_data(laboratories=False, researcher=False, csv_enabler=True, django_enabler=None):
-    global csv_open, djangodb_open
+def collect_data(laboratories=False, researcher=False, django_enabler=None):
+    global djangodb_open
 
-    csv_open = csv_enabler
     djangodb_open = django_enabler
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('Begin index completion')
@@ -873,6 +808,3 @@ def collect_data(laboratories=False, researcher=False, csv_enabler=True, django_
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('Index completion finished')
     return tache1, tache2
-
-if __name__ == '__main__':
-    collect_data(laboratories='on', researcher='on')
