@@ -99,8 +99,8 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
             chercheurs = request.POST.get('Chercheurs')
             print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
-            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
-            collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
+            collect_data(laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
 
         form = ExportToElasticForm()
         data = {"form": form}
@@ -181,7 +181,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
             laboratoire = collection . split("-")[1]
             structure = collection .split("-")[0]
             # chercheurs = True
-            # create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+            # create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
             if collectionLabo:
                 if chercheurs:
                     result1 = collect_laboratories_data2 .delay(laboratoire)
@@ -283,11 +283,11 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                 laboratoires = form.cleaned_data['Laboratoires']
                 chercheurs = form.cleaned_data['Chercheurs']
                 print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
-                result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
                 task_id1 = result1.task_id
 
                 #print(f'Celery Task ID: {task_id1}')
-                result2 = collect_data(laboratories=laboratoires, researcher=chercheurs, csv_enabler=None, django_enabler=True)
+                result2 = collect_data(laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
                 if result2[0] is not None:
                     task_id2 = result2[0].task_id
                 else:
