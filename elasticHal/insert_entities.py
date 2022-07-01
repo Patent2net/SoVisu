@@ -196,6 +196,9 @@ def create_researchers_index(pg):
     cpt=0
     docmap = {
             "properties": {
+                "docid": {
+                    "type": "long"
+                },
                 "en_abstract_s": {
                     "type": "text",  # formerly "string"
                     "fields": {
@@ -488,6 +491,9 @@ def create_laboratories_index(pg):
             print(f"creating document directory for: {row['acronym']}(struct: {row['structSirene']})")
             docmap = {
                     "properties": {
+                        "docid": {
+                            "type": "long"
+                        },
                         "en_abstract_s": {
                             "type": "text",  # formerly "string"
                             "fields": {
