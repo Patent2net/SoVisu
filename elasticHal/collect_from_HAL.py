@@ -395,13 +395,17 @@ def collect_researchers_data(self, struct):
                 time.sleep(1)
             else:
                 print ("pas de docs", searcher['halId_s'])
-            res = helpers.bulk(
-                es,
-                docs,
-                request_timeout=50,
-                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
-                # -researchers" + searcher["ldapId"] + "-documents
-            )
+            for indi in range (int(len(docs) / 100)):
+                boutdeDoc = doc [indi*100, indi*100+100]
+
+                res = helpers.bulk(
+                    es,
+                    boutdeDoc,
+                    request_timeout=100,
+                    index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
+                    # -researchers" + searcher["ldapId"] + "-documents
+                )
+                time .sleep(1)
             doc_progress_recorder.set_progress(k, len(docs), " document traités "+ searcher["labHalId"])
         else:
             print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
@@ -736,6 +740,15 @@ def collect_researchers_data2(self, struct, idx):
                                 doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
                             if "validated" in res['hits']['hits'][0]['_source']:
                                 doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                                if doc['validated'] and (doc["authorship"] == "firstAuthor" or doc["authorship"] == "lastAuthor" or doc["authorship"] == "correspondingAuthor") :
+                                    for cle, val in searcher.items():
+                                        doc[cle] = val
+                                else:
+                                    for cle, val in searcher.items():
+                                        if cle in doc .keys():
+                                            doc.pop(cle)
+
+
                             if force_doc_validated:
                                 doc['validated'] = True
 
@@ -748,9 +761,7 @@ def collect_researchers_data2(self, struct, idx):
                     # En attendant de trouver une solution pivot / transfo d'index
                     #C'est pas du tout beau !
                     # exemple de ce qu'il ne faut pas faire
-                    for cle, val in searcher .items():
-                        doc [cle] = val
-                    time.sleep(1)
+
         else:
                 print ("pas de docs : " +searcher['halId_s'])
         if len(docs)>0:
