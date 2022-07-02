@@ -82,7 +82,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
                     domain=fields[3],
 
                 )
-                print(created)
+                #print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -97,7 +97,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
             structure = request.POST.get('Structures')
             laboratoires = request.POST.get('Laboratoires')
             chercheurs = request.POST.get('Chercheurs')
-            print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+            #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
 
             create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
             collect_data(laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
@@ -149,7 +149,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
                     rsnr=fields[4],
                     idRef=fields[5],
                 )
-                print(created)
+                #print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -177,7 +177,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
                 else:
                     collectionLabo = False
                 collection = form .cleaned_data ["f_index"]
-                print('uuuu ', collection)
+                #print('uuuu ', collection)
             laboratoire = collection . split("-")[1]
             structure = collection .split("-")[0]
             # chercheurs = True
@@ -263,7 +263,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     aurehalId=fields[15],
 
                 )
-                print(created)
+                #print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -282,7 +282,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                 structure = form.cleaned_data['Structures']
                 laboratoires = form.cleaned_data['Laboratoires']
                 chercheurs = form.cleaned_data['Chercheurs']
-                print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+                #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
                 result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
                 task_id1 = result1.task_id
 
@@ -298,20 +298,25 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     task_id3 = None
 
                 #
-                print(f'Celery Task ID2: {task_id2}')
-                print(f'Celery Task ID3: {task_id3}')
+                #print(f'Celery Task ID2: {task_id2}')
+                #print(f'Celery Task ID3: {task_id3}')
                 if (task_id3 is not None and task_id2 is not None and task_id1 is not None):
-                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2, 'task_id3': task_id3})
+                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form,
+                                                                                               'task_id1': task_id1,
+                                                                                               'task_id2': task_id2,
+                                                                                               'task_id3': task_id3})
                 if (task_id2 is not None and task_id1 is not None):
                     return render(request, "admin/elasticHal/export_to_elastic.html",
                                   context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
                 if (task_id3 is not None and task_id2 is not None):
                     return render(request, "admin/elasticHal/export_to_elastic.html",
-                                  context={'form': form, 'task_id2': task_id2,
+                                  context={'form': form,
+                                           'task_id2': task_id2,
                                            'task_id3': task_id3})
                 if (task_id3 is not None and task_id1 is not None):
                     return render(request, "admin/elasticHal/export_to_elastic.html",
-                                  context={'form': form, 'task_id1': task_id1,
+                                  context={'form': form,
+                                           'task_id1': task_id1,
                                            'task_id3': task_id3})
 
                 if task_id1 is not None:
