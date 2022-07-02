@@ -108,8 +108,8 @@ def collect_laboratories_data2(self, labo):
             # Insert documents collection
             if len(docs)>1:
                 for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
-                    print(f"- sub processing : {str(doc['docid'])}")
+                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours. docid : " +str(doc['docid']))
+                    #print(f"- sub processing : {str(doc['docid'])}")
                     # Enrichssements des documents récoltés
                     doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
@@ -437,8 +437,8 @@ def collect_laboratories_data(self):
             # Insert documents collection
             if len(docs)>1:
                 for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours")
-                    print(f"- sub processing : {str(doc['docid'])}")
+                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours. Docid: " + str(doc['docid']))
+                    # print(f"- sub processing : {str(doc['docid'])}")
                     # Enrichssements des documents récoltés
                     doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     lstResum = [cle for cle in doc.keys() if "abstract" in cle]
