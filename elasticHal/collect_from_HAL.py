@@ -617,11 +617,12 @@ def collect_researchers_data2(self, struct, idx):
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
-        print ("2e " + type (docs))
+        # print ("2e " + str(type (docs)))
         doc_progress_recorder.set_progress(k, sommeDocs, " documents traités " + searcher["halId_s"])
-        sommeDocs = len(docs)
+
             # Insert documents collection
         if isinstance(docs, list):
+            sommeDocs = len(docs)
             if len(docs)>1:
                 for num, doc in enumerate(docs):
                         k += 1
@@ -739,7 +740,7 @@ def collect_researchers_data2(self, struct, idx):
                         # exemple de ce qu'il ne faut pas faire
 
         else:
-            doc_progress_recorder.set_progress(0, 0, " pas de docs " + searcher['ldapId'])
+            doc_progress_recorder.set_progress(0, 0, " pas de docs " + searcher['halId_s'])
             print ("pas de docs : " +searcher['halId_s'])
         if isinstance(docs, list):
             if len(docs)>0:
@@ -753,16 +754,17 @@ def collect_researchers_data2(self, struct, idx):
                             # -researchers" + searcher["ldapId"] + "-documents
                         )
                     time.sleep(1)
-                doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " documents traités " + searcher['ldapId'])
+                doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " documents traités " + searcher['halId_s'])
         else:
-            doc_progress_recorder.set_progress(0, 0, " Pas de docs (pb hal ?) " + searcher['ldapId'])
+            doc_progress_recorder.set_progress(0, 0, " Pas de docs (pb hal ?) " + searcher['halId_s'])
             # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
     if len(researchers_list) >0:
         if isinstance(docs, list):
-            doc_progress_recorder.set_progress(len(docs), sommeDocs, " documents traités " + searcher['ldapId'])
+            doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités " + searcher['lab'])
         else:
-            doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['ldapId'])
+            pass
+            # doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['halId_s'])
     else:
         doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités ")
         print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')

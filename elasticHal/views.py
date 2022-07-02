@@ -11,10 +11,10 @@ def get_index_list():
     result = es.search(index="*-laboratories", body=scope_param, size=count,
                        filter_path=["hits.hits._index, hits.hits._source.acronym"])
     result = result['hits']['hits']
-    print(f"result = {result}")
+    #print(f"result = {result}")
     indexes = []
     for lab in result:
         indexes.append((lab["_index"], lab["_source"]["acronym"]))
     indexes = tuple(indexes)
-    print(f"indexes2 content {indexes}")
+    #print(f"indexes2 content {indexes}")
     return indexes
