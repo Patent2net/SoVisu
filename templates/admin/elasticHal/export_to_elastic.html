@@ -87,22 +87,22 @@
 {% if task_id1 or task_id2 or task_id3%}
 <script type="text/javascript">
 	function processProgress1(progressBarElement, progressBarMessageElement, progress) {
-            console.log("progress1", progress);
+            //console.log("progress1", progress);
 			progressBarElement.style.width = progress.percent + "%";
-			var description = progress.current + " " + progress.description || "En attente du démarrage1...";
+			var description = "<p>" + progress.current + " " + progress.description || "En attente du démarrage1..." + "</p>" ;
 			progressBarMessageElement.innerHTML = description;
 		}
 
 	function processProgress2(progressBarElement, progressBarMessageElement, progress) {
-            console.log("progress2", progress);
+            //console.log("progress2", progress);
 			progressBarElement.style.width = progress.percent + "%";
 			var description2 = progress.current + " " + progress.description  || "En attente du démarrage2...";
-			progressBarMessageElement.innerHTML = description2 ;
+			//progressBarMessageElement.innerHTML = description2 ;
             progressBarMessageElement.innerText = description2 ;
 
 		}
 	function processProgress3(progressBarElement, progressBarMessageElement, progress) {
-            console.log("progress3", progress);
+            //console.log("progress3", progress);
 			progressBarElement.style.width = progress.percent + "%";
             //progressBarElement.innerHTML = Array(parseInt(progress.percent)).join("😊");
 			var description3 = progress.current + " " + progress.description  || "En attente du démarrage3...";
