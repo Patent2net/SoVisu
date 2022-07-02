@@ -19,7 +19,7 @@ Default Value: "django_init = False"
 django_init = None
 if __name__ == '__main__':
     if django_init:
-        print("init django DB access (standalone mode)")
+        #print("init django DB access (standalone mode)")
         import os
         import django
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
@@ -51,9 +51,9 @@ def get_structid_list():
     global structIdlist
     structIdlist = []
     res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"], request_timeout=50)
-    print(res)
+    #print(res)
     structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
-    print("\u00A0 \u21D2 ", structIdlist)
+    #print("\u00A0 \u21D2 ", structIdlist)
     return structIdlist
 
 @shared_task(bind=True)
@@ -94,7 +94,7 @@ def collect_laboratories_data2(self, labo):
     # Process laboratories
     nblab = 0
     for lab in laboratories_list:
-        print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
+        # print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
         #progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
         nblab +=1
         # Collect publications
@@ -106,108 +106,113 @@ def collect_laboratories_data2(self, labo):
             # docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
-            if len(docs)>1:
-                for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours. docid : " +str(doc['docid']))
-                    #print(f"- sub processing : {str(doc['docid'])}")
-                    # Enrichssements des documents récoltés
-                    doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
-                    doc = doi_enrichissement.docs_enrichissement_doi(doc)
-                    lstResum = [cle for cle in doc.keys() if "abstract" in cle]
-                    for cle in lstResum:
-                        if isinstance(doc[cle], list):
-                            doc [cle] =  ' ' .join( doc [cle] )
-                        else:
-                            pass
-                    doc["_id"] = doc['docid']
-                    doc["validated"] = True
-                    doc["harvested_from"] = "lab"
-                    doc["harvested_from_ids"] = []
+            if isinstance(docs, list):
+                if len(docs)>1:
+                    for num, doc in enumerate(docs):
+                        doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours. docid : " +str(doc['docid']))
+                        #print(f"- sub processing : {str(doc['docid'])}")
+                        # Enrichssements des documents récoltés
+                        doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                        doc = doi_enrichissement.docs_enrichissement_doi(doc)
+                        lstResum = [cle for cle in doc.keys() if "abstract" in cle]
+                        for cle in lstResum:
+                            if isinstance(doc[cle], list):
+                                doc [cle] =  ' ' .join( doc [cle] )
+                            else:
+                                pass
+                        doc["_id"] = doc['docid']
+                        doc["validated"] = True
+                        doc["harvested_from"] = "lab"
+                        doc["harvested_from_ids"] = []
 
-                    doc["harvested_from_ids"].append(lab['halStructId'])
-                    doc["harvested_from_label"] = []
-                    doc["harvested_from_label"].append(lab['acronym'])
-                    if "Created" not in doc:
-                        doc['Created'] = datetime.datetime.now().isoformat()
+                        doc["harvested_from_ids"].append(lab['halStructId'])
+                        doc["harvested_from_label"] = []
+                        doc["harvested_from_label"].append(lab['acronym'])
+                        if "Created" not in doc:
+                            doc['Created'] = datetime.datetime.now().isoformat()
 
-                    doc["authorship"] = []
+                        doc["authorship"] = []
 
-                    authid_s_filled = []
-                    if "authId_i" in doc:
-                        for auth in doc["authId_i"]:
-                            try:
-                                aurehal = archivesOuvertes.get_halid_s(auth)
-                                authid_s_filled.append(aurehal)
-                            except:
-                                authid_s_filled.append("")
+                        authid_s_filled = []
+                        if "authId_i" in doc:
+                            for auth in doc["authId_i"]:
+                                try:
+                                    aurehal = archivesOuvertes.get_halid_s(auth)
+                                    authid_s_filled.append(aurehal)
+                                except:
+                                    authid_s_filled.append("")
 
-                    authors_count = len(authid_s_filled)
-                    i = 0
-                    for auth in authid_s_filled:
-                        i += 1
-                        if i == 1 and auth != "":
-                            doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
-                        elif i == authors_count and auth != "":
-                            doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
+                        authors_count = len(authid_s_filled)
+                        i = 0
+                        for auth in authid_s_filled:
+                            i += 1
+                            if i == 1 and auth != "":
+                                doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
+                            elif i == authors_count and auth != "":
+                                doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
 
-                    harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
+                        harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
 
-                    for h in harvet_history:
-                        if h['docid'] == doc['docid']:
-                            doc["harvested_from_ids"].append(h['from'])
+                        for h in harvet_history:
+                            if h['docid'] == doc['docid']:
+                                doc["harvested_from_ids"].append(h['from'])
 
-                    doc["MDS"] = utils.calculate_mds(doc)
-                    doc["records"] = []
+                        doc["MDS"] = utils.calculate_mds(doc)
+                        doc["records"] = []
 
-                    try:
-                        should_be_open = utils.should_be_open(doc)
-                        if should_be_open == 1:
-                            doc["should_be_open"] = True
-                        if should_be_open == -1:
-                            doc["should_be_open"] = False
+                        try:
+                            should_be_open = utils.should_be_open(doc)
+                            if should_be_open == 1:
+                                doc["should_be_open"] = True
+                            if should_be_open == -1:
+                                doc["should_be_open"] = False
 
-                        if should_be_open == 1 or should_be_open == 2:
-                            doc['isOaExtra'] = True
-                        elif should_be_open == -1:
-                            doc['isOaExtra'] = False
-                    except:
-                        print('publicationDate_tdate error ?')
+                            if should_be_open == 1 or should_be_open == 2:
+                                doc['isOaExtra'] = True
+                            elif should_be_open == -1:
+                                doc['isOaExtra'] = False
+                        except:
+                            print('publicationDate_tdate error ?')
 
-                    if check_existing_docs:
+                        if check_existing_docs:
 
-                        doc_param = esActions.scope_p("_id", doc["_id"])
+                            doc_param = esActions.scope_p("_id", doc["_id"])
 
-                        if not es.indices.exists(
-                                index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
-                            es.indices.create(
-                                index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
-                        res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                                        body=doc_param, request_timeout=50)
+                            if not es.indices.exists(
+                                    index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
+                                es.indices.create(
+                                    index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
+                            res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                                            body=doc_param, request_timeout=50)
 
-                        if len(res['hits']['hits']) > 0:
-                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                            if "validated" in res['hits']['hits'][0]['_source']:
-                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                            if force_doc_validated:
-                                doc['validated'] = True
+                            if len(res['hits']['hits']) > 0:
+                                if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                                    doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                                if "validated" in res['hits']['hits'][0]['_source']:
+                                    doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                                if force_doc_validated:
+                                    doc['validated'] = True
 
-                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
-                        else:
-                            doc["validated"] = True
-            time.sleep(1)
+                                if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                                    doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                           'MDS': res['hits']['hits'][0]['_source']['MDS']})
+                            else:
+                                doc["validated"] = True
 
-            for indi in range(int(len(docs) / 50)):
-                boutdeDoc = docs[indi * 50:indi * 50 + 50]
-                res = helpers.bulk(
-                    es,
-                    boutdeDoc,
-                    index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                    request_timeout=100
-                )
-            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym'] + " " + str(len(docs)) + " documents")
+
+                for indi in range(int(len(docs) / 50)):
+                    boutdeDoc = docs[indi * 50:indi * 50 + 50]
+                    res = helpers.bulk(
+                        es,
+                        boutdeDoc,
+                        index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                        request_timeout=100
+                    )
+                    time.sleep(1)
+                doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym'] + " " + str(len(docs)) + " documents")
+            else:
+                doc_progress_recorder.set_progress(len(docs), len(docs),
+                                                   lab['acronym'] + " " + str(len(docs)) + " Pas de documents")
         #progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
@@ -248,28 +253,33 @@ def collect_researchers_data(self, struct):
             print("\u00A0 \u21D2 researchers_list is empty, adding DjangoDb content to values")
             researchers_list = django_researchers
 
-    print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
+    # print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
-    j = 0
+    j = 1
     for searcher in researchers_list:
         progress_recorder.set_progress(j, count, " chercheurs traités ")
-
+        j = j+1
         if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
             #print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
             if searcher["labHalId"] not in labos:
                 searcher["labHalId"] = "non-labo"
             # Collect publications
-            j += 1
-            k = 0
+
+
             docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
 
             # Insert documents collection
             if isinstance(docs, list):
+
                 if len(docs)>1:
                     for num, doc in enumerate(docs):
-                        k += 1
-                        doc_progress_recorder.set_progress(num, len(docs), " document traités " + searcher['halId_s'])
+
+                        if num > 1:
+                            doc_progress_recorder.set_progress(num, len(docs),
+                                                               " documents traités pour idhal :" + searcher['halId_s'])
+                        else:
+                            doc_progress_recorder.set_progress(num, len(docs), " documents traités pour idhal : " + searcher['halId_s'])
                         doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                         doc = doi_enrichissement.docs_enrichissement_doi(doc)
                         if "fr_abstract_s" in doc.keys():
@@ -363,7 +373,7 @@ def collect_researchers_data(self, struct):
 
                             else:
                                 doc["validated"] = True
-                for indi in range(int(len(docs) / 50)):
+                    for indi in range(int(len(docs) / 50)):
                         boutdeDoc = docs[indi * 50:indi * 50 + 50]
                         res = helpers.bulk(
                             es,
@@ -376,13 +386,14 @@ def collect_researchers_data(self, struct):
                         time.sleep(1)
 
             else:
-                print ("pas de docs", searcher['halId_s'])
+                doc_progress_recorder.set_progress(0, 0, " pas de docs " + searcher['halId_s'])
+                #print ("pas de docs", searcher['halId_s'])
 
-            doc_progress_recorder.set_progress(k, len(docs), " document traités "+ searcher["labHalId"])
+            #doc_progress_recorder.set_progress(k, len(docs), " document traités "+ searcher["labHalId"])
         else:
             print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
 
-    doc_progress_recorder.set_progress(len(docs), len(docs), " document traités " + searcher['ldapId'])
+    doc_progress_recorder.set_progress(100, 100, " fin traitements. ")
     progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
     return "finished"
 
@@ -424,7 +435,7 @@ def collect_laboratories_data(self):
     nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
-        progress_recorder.set_progress( nblab, count,  " labo " +lab['acronym'] + +" en cours")
+        progress_recorder.set_progress( nblab, count,  " labo " + str(lab['acronym']) +" en cours")
         nblab +=1
         # Collect publications
         if len(lab['halStructId']) > 0:
@@ -435,107 +446,110 @@ def collect_laboratories_data(self):
             # docs = keyword_enrichissement.return_entities(docs)
 
             # Insert documents collection
-            if len(docs)>1:
-                for num, doc in enumerate(docs):
-                    doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours. Docid: " + str(doc['docid']))
-                    # print(f"- sub processing : {str(doc['docid'])}")
-                    # Enrichssements des documents récoltés
-                    doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
-                    lstResum = [cle for cle in doc.keys() if "abstract" in cle]
-                    for cle in lstResum:
-                        if isinstance(doc[cle], list):
-                            doc [cle] =  ' ' .join( doc [cle] )
-                        else:
-                            pass
-                    doc["_id"] = doc['docid']
-                    doc["validated"] = True
-                    doc["harvested_from"] = "lab"
-                    doc["harvested_from_ids"] = []
+            if isinstance(docs, list):
+                if len(docs)>1:
+                    for num, doc in enumerate(docs):
+                        doc_progress_recorder.set_progress(num, len(docs), "Collection "+ lab['acronym'] + " en cours. Docid: " + str(doc['docid']))
+                        # print(f"- sub processing : {str(doc['docid'])}")
+                        # Enrichssements des documents récoltés
+                        doc ["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                        lstResum = [cle for cle in doc.keys() if "abstract" in cle]
+                        for cle in lstResum:
+                            if isinstance(doc[cle], list):
+                                doc [cle] =  ' ' .join( doc [cle] )
+                            else:
+                                pass
+                        doc["_id"] = doc['docid']
+                        doc["validated"] = True
+                        doc["harvested_from"] = "lab"
+                        doc["harvested_from_ids"] = []
 
-                    doc["harvested_from_ids"].append(lab['halStructId'])
-                    doc["harvested_from_label"] = []
-                    doc["harvested_from_label"].append(lab['acronym'])
-                    if "Created" not in doc:
-                        doc['Created'] = datetime.datetime.now().isoformat()
+                        doc["harvested_from_ids"].append(lab['halStructId'])
+                        doc["harvested_from_label"] = []
+                        doc["harvested_from_label"].append(lab['acronym'])
+                        if "Created" not in doc:
+                            doc['Created'] = datetime.datetime.now().isoformat()
 
-                    doc["authorship"] = []
+                        doc["authorship"] = []
 
-                    authid_s_filled = []
-                    if "authId_i" in doc:
-                        for auth in doc["authId_i"]:
-                            try:
-                                aurehal = archivesOuvertes.get_halid_s(auth)
-                                authid_s_filled.append(aurehal)
-                            except:
-                                authid_s_filled.append("")
+                        authid_s_filled = []
+                        if "authId_i" in doc:
+                            for auth in doc["authId_i"]:
+                                try:
+                                    aurehal = archivesOuvertes.get_halid_s(auth)
+                                    authid_s_filled.append(aurehal)
+                                except:
+                                    authid_s_filled.append("")
 
-                    authors_count = len(authid_s_filled)
-                    i = 0
-                    for auth in authid_s_filled:
-                        i += 1
-                        if i == 1 and auth != "":
-                            doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
-                        elif i == authors_count and auth != "":
-                            doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
+                        authors_count = len(authid_s_filled)
+                        i = 0
+                        for auth in authid_s_filled:
+                            i += 1
+                            if i == 1 and auth != "":
+                                doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
+                            elif i == authors_count and auth != "":
+                                doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
 
-                    harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
+                        harvet_history.append({'docid': doc['docid'], 'from': lab['halStructId']})
 
-                    for h in harvet_history:
-                        if h['docid'] == doc['docid']:
-                            doc["harvested_from_ids"].append(h['from'])
+                        for h in harvet_history:
+                            if h['docid'] == doc['docid']:
+                                doc["harvested_from_ids"].append(h['from'])
 
-                    doc["MDS"] = utils.calculate_mds(doc)
-                    doc["records"] = []
+                        doc["MDS"] = utils.calculate_mds(doc)
+                        doc["records"] = []
 
-                    try:
-                        should_be_open = utils.should_be_open(doc)
-                        if should_be_open == 1:
-                            doc["should_be_open"] = True
-                        if should_be_open == -1:
-                            doc["should_be_open"] = False
+                        try:
+                            should_be_open = utils.should_be_open(doc)
+                            if should_be_open == 1:
+                                doc["should_be_open"] = True
+                            if should_be_open == -1:
+                                doc["should_be_open"] = False
 
-                        if should_be_open == 1 or should_be_open == 2:
-                            doc['isOaExtra'] = True
-                        elif should_be_open == -1:
-                            doc['isOaExtra'] = False
-                    except:
-                        print('publicationDate_tdate error ?')
+                            if should_be_open == 1 or should_be_open == 2:
+                                doc['isOaExtra'] = True
+                            elif should_be_open == -1:
+                                doc['isOaExtra'] = False
+                        except:
+                            print('publicationDate_tdate error ?')
 
-                    if check_existing_docs:
+                        if check_existing_docs:
 
-                        doc_param = esActions.scope_p("_id", doc["_id"])
+                            doc_param = esActions.scope_p("_id", doc["_id"])
 
-                        if not es.indices.exists(
-                                index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
-                            es.indices.create(
-                                index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
-                        res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                                        body=doc_param, request_timeout=50)
+                            if not es.indices.exists(
+                                    index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents"):
+                                es.indices.create(
+                                    index=lab['structSirene'] + "-" + lab["halStructId"] + "-laboratories-documents")
+                            res = es.search(index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                                            body=doc_param, request_timeout=50)
 
-                        if len(res['hits']['hits']) > 0:
-                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                            if "validated" in res['hits']['hits'][0]['_source']:
-                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                            if force_doc_validated:
-                                doc['validated'] = True
+                            if len(res['hits']['hits']) > 0:
+                                if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                                    doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                                if "validated" in res['hits']['hits'][0]['_source']:
+                                    doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                                if force_doc_validated:
+                                    doc['validated'] = True
 
-                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
-                        else:
-                            doc["validated"] = True
-            time.sleep(1)
-            for indi in range (int(len(docs) / 50)):
-                boutdeDoc = docs[indi * 50:indi * 50 + 50]
-                res = helpers.bulk(
-                    es,
-                    boutdeDoc,
-                    index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                    request_timeout = 100
-                )
-                time.sleep(1)
-            doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
+                                if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                                    doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                           'MDS': res['hits']['hits'][0]['_source']['MDS']})
+                            else:
+                                doc["validated"] = True
+
+                for indi in range (int(len(docs) / 50)):
+                    boutdeDoc = docs[indi * 50:indi * 50 + 50]
+                    res = helpers.bulk(
+                        es,
+                        boutdeDoc,
+                        index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                        request_timeout = 100
+                    )
+                    time.sleep(1)
+                doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
+            else:
+                doc_progress_recorder.set_progress(0, 0, " pas de docs " +  lab["halStructId"])
         progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
@@ -603,148 +617,154 @@ def collect_researchers_data2(self, struct, idx):
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
-
-        doc_progress_recorder.set_progress(k, sommeDocs, " document traités " + searcher["halId_s"])
+        print ("2e " + type (docs))
+        doc_progress_recorder.set_progress(k, sommeDocs, " documents traités " + searcher["halId_s"])
         sommeDocs = len(docs)
             # Insert documents collection
-        if len(docs)>1:
-            for num, doc in enumerate(docs):
-                    k += 1
-                    doc_progress_recorder.set_progress(num, sommeDocs, " document traités " + searcher['halId_s'])
-                    doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
-                    doc = doi_enrichissement.docs_enrichissement_doi(doc)
-                    if "fr_abstract_s" in doc.keys():
-                        if isinstance(doc["fr_abstract_s"], list):
-                            doc["fr_abstract_s"] = "/n" .join(doc["fr_abstract_s"])
-                        if len(doc["fr_abstract_s"]) > 100:
-                            doc["fr_entites"]= keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
-                            doc["fr_teeft_keywords"]= keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
-                    if "en_abstract_s" in doc.keys():
-                        if isinstance(doc["en_abstract_s"], list):
-                            doc["en_abstract_s"] = "/n" .join(doc["en_abstract_s"])
-                        if len(doc["en_abstract_s"]) > 100:
-                            doc["en_entites"]= keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
-                            doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
-                    doc["_id"] = doc['docid']
-                    doc["validated"] = True
+        if isinstance(docs, list):
+            if len(docs)>1:
+                for num, doc in enumerate(docs):
+                        k += 1
+                        doc_progress_recorder.set_progress(num, sommeDocs, " documents traités " + searcher['halId_s'])
+                        doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                        doc = doi_enrichissement.docs_enrichissement_doi(doc)
+                        if "fr_abstract_s" in doc.keys():
+                            if isinstance(doc["fr_abstract_s"], list):
+                                doc["fr_abstract_s"] = "/n" .join(doc["fr_abstract_s"])
+                            if len(doc["fr_abstract_s"]) > 100:
+                                doc["fr_entites"]= keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
+                                doc["fr_teeft_keywords"]= keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
+                        if "en_abstract_s" in doc.keys():
+                            if isinstance(doc["en_abstract_s"], list):
+                                doc["en_abstract_s"] = "/n" .join(doc["en_abstract_s"])
+                            if len(doc["en_abstract_s"]) > 100:
+                                doc["en_entites"]= keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
+                                doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
+                        doc["_id"] = doc['docid']
+                        doc["validated"] = True
 
-                    doc["harvested_from"] = "researcher"
+                        doc["harvested_from"] = "researcher"
 
-                    doc["harvested_from_ids"] = []
-                    doc["harvested_from_label"] = []
-                    try:
-                        doc["harvested_from_label"].append(dico_acronym[searcher["labHalId"]])
-                    except:
-                        doc["harvested_from_label"].append("non-labo")
+                        doc["harvested_from_ids"] = []
+                        doc["harvested_from_label"] = []
+                        try:
+                            doc["harvested_from_label"].append(dico_acronym[searcher["labHalId"]])
+                        except:
+                            doc["harvested_from_label"].append("non-labo")
 
-                    doc["authorship"] = []
+                        doc["authorship"] = []
 
-                    if "authIdHal_s" in doc:
-                        authors_count = len(doc["authIdHal_s"])
-                        i = 0
-                        for auth in doc["authIdHal_s"]:
-                            i += 1
-                            if i == 1:
-                                doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
-                            elif i == authors_count:
-                                doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
-                    if "Created" not in doc:
-                        doc['Created'] = datetime.datetime.now().isoformat()
+                        if "authIdHal_s" in doc:
+                            authors_count = len(doc["authIdHal_s"])
+                            i = 0
+                            for auth in doc["authIdHal_s"]:
+                                i += 1
+                                if i == 1:
+                                    doc["authorship"].append({"authorship": "firstAuthor", "halId_s": auth})
+                                elif i == authors_count:
+                                    doc["authorship"].append({"authorship": "lastAuthor", "halId_s": auth})
+                        if "Created" not in doc:
+                            doc['Created'] = datetime.datetime.now().isoformat()
 
-                    doc["harvested_from_ids"].append(searcher['halId_s'])
-                    # historique d'appartenance du docId
-                    # pour attribuer les bons docs aux chercheurs
-                    harvet_history.append({'docid': doc['docid'], 'from': searcher['halId_s']})
+                        doc["harvested_from_ids"].append(searcher['halId_s'])
+                        # historique d'appartenance du docId
+                        # pour attribuer les bons docs aux chercheurs
+                        harvet_history.append({'docid': doc['docid'], 'from': searcher['halId_s']})
 
-                    for h in harvet_history:
-                        if h['docid'] == doc['docid']:
-                            if h['from'] not in doc["harvested_from_ids"]:
-                                doc["harvested_from_ids"].append(h['from'])
+                        for h in harvet_history:
+                            if h['docid'] == doc['docid']:
+                                if h['from'] not in doc["harvested_from_ids"]:
+                                    doc["harvested_from_ids"].append(h['from'])
 
-                    doc["records"] = []
-                    doc["MDS"] = utils.calculate_mds(doc)
-                    #####
-                    # indexation sur index spécial
-                    ####
-
-
-                    #### Fin index spécial
-                    try:
-                        should_be_open = utils.should_be_open(doc)
-                        if should_be_open == 1:
-                            doc["should_be_open"] = True
-                        if should_be_open == -1:
-                            doc["should_be_open"] = False
-
-                        if should_be_open == 1 or should_be_open == 2:
-                            doc['isOaExtra'] = True
-                        elif should_be_open == -1:
-                            doc['isOaExtra'] = False
-                    except:
-                        print('publicationDate_tdate error ?')
-
-                    if check_existing_docs:
-                        doc_param = esActions.scope_p("_id", doc["_id"])
-
-                        if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
-                            print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
-                            res = dict()
-                            res ["hits"]=dict()
-                            res ["hits"]["hits"] =[]
-                        else:
-
-                            res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
-                            "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
-
-                        if len(res['hits']['hits']) > 0:
-                            if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
-                                doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
-                            if "validated" in res['hits']['hits'][0]['_source']:
-                                doc['validated'] = res['hits']['hits'][0]['_source']['validated']
-                                if doc['validated'] and (doc["authorship"] == "firstAuthor" or doc["authorship"] == "lastAuthor" or doc["authorship"] == "correspondingAuthor") :
-                                    for cle, val in searcher.items():
-                                        doc[cle] = val
-                                else:
-                                    for cle, val in searcher.items():
-                                        if cle in doc .keys():
-                                            doc.pop(cle)
+                        doc["records"] = []
+                        doc["MDS"] = utils.calculate_mds(doc)
+                        #####
+                        # indexation sur index spécial
+                        ####
 
 
-                                if force_doc_validated: # çà va pas RAZ si le cherche invalide ? On devrait enlever non ?
-                                    doc['validated'] = True
+                        #### Fin index spécial
+                        try:
+                            should_be_open = utils.should_be_open(doc)
+                            if should_be_open == 1:
+                                doc["should_be_open"] = True
+                            if should_be_open == -1:
+                                doc["should_be_open"] = False
 
-                                if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                                    doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                           'MDS': res['hits']['hits'][0]['_source']['MDS']})
+                            if should_be_open == 1 or should_be_open == 2:
+                                doc['isOaExtra'] = True
+                            elif should_be_open == -1:
+                                doc['isOaExtra'] = False
+                        except:
+                            print('publicationDate_tdate error ?')
 
-                        else:
-                            doc["validated"] = True
-                    # En attendant de trouver une solution pivot / transfo d'index
-                    #C'est pas du tout beau !
-                    # exemple de ce qu'il ne faut pas faire
+                        if check_existing_docs:
+                            doc_param = esActions.scope_p("_id", doc["_id"])
+
+                            if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
+                                print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
+                                res = dict()
+                                res ["hits"]=dict()
+                                res ["hits"]["hits"] =[]
+                            else:
+
+                                res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                                "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
+
+                            if len(res['hits']['hits']) > 0:
+                                if "authorship" in res['hits']['hits'][0]['_source'] and not force_doc_authorship:
+                                    doc["authorship"] = res['hits']['hits'][0]['_source']['authorship']
+                                if "validated" in res['hits']['hits'][0]['_source']:
+                                    doc['validated'] = res['hits']['hits'][0]['_source']['validated']
+                                    if doc['validated'] and (doc["authorship"] == "firstAuthor" or doc["authorship"] == "lastAuthor" or doc["authorship"] == "correspondingAuthor") :
+                                        for cle, val in searcher.items():
+                                            doc[cle] = val
+                                    else:
+                                        for cle, val in searcher.items():
+                                            if cle in doc .keys():
+                                                doc.pop(cle)
+
+
+                                    if force_doc_validated: # çà va pas RAZ si le cherche invalide ? On devrait enlever non ?
+                                        doc['validated'] = True
+
+                                    if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                                        doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                               'MDS': res['hits']['hits'][0]['_source']['MDS']})
+
+                            else:
+                                doc["validated"] = True
+                        # En attendant de trouver une solution pivot / transfo d'index
+                        #C'est pas du tout beau !
+                        # exemple de ce qu'il ne faut pas faire
 
         else:
-                print ("pas de docs : " +searcher['halId_s'])
-        if len(docs)>0:
-            for indi in range (int(len(docs) / 50)):
-                boutdeDoc = docs [indi*50:indi*50+50]
-                res = helpers.bulk(
-                        es,
-                        boutdeDoc,
-                        request_timeout=100,
-                        index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
-                        # -researchers" + searcher["ldapId"] + "-documents
-                    )
-                time.sleep(1)
-            doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " document traités " + searcher['ldapId'])
-        #else:
+            doc_progress_recorder.set_progress(0, 0, " pas de docs " + searcher['ldapId'])
+            print ("pas de docs : " +searcher['halId_s'])
+        if isinstance(docs, list):
+            if len(docs)>0:
+                for indi in range (int(len(docs) / 50)):
+                    boutdeDoc = docs [indi*50:indi*50+50]
+                    res = helpers.bulk(
+                            es,
+                            boutdeDoc,
+                            request_timeout=100,
+                            index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
+                            # -researchers" + searcher["ldapId"] + "-documents
+                        )
+                    time.sleep(1)
+                doc_progress_recorder.set_progress(len(docs)-1, sommeDocs, " documents traités " + searcher['ldapId'])
+        else:
+            doc_progress_recorder.set_progress(0, 0, " Pas de docs (pb hal ?) " + searcher['ldapId'])
             # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
     if len(researchers_list) >0:
-        doc_progress_recorder.set_progress(len(docs), sommeDocs, " document traités " + searcher['ldapId'])
-
+        if isinstance(docs, list):
+            doc_progress_recorder.set_progress(len(docs), sommeDocs, " documents traités " + searcher['ldapId'])
+        else:
+            doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['ldapId'])
     else:
-        doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " document traités ")
+        doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités ")
         print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
     #progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
