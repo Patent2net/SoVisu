@@ -199,13 +199,13 @@ def collect_laboratories_data2(self, labo):
                             doc["validated"] = True
             time.sleep(1)
 
-            for indi in range(int(len(docs) / 100)):
-                boutdeDoc = docs[indi * 100:indi * 100 + 100]
+            for indi in range(int(len(docs) / 50)):
+                boutdeDoc = docs[indi * 50:indi * 50 + 50]
                 res = helpers.bulk(
                     es,
                     boutdeDoc,
                     index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                    request_timeout=50
+                    request_timeout=100
                 )
             doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym'] + " " + str(len(docs)) + " documents")
         #progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
@@ -342,8 +342,11 @@ def collect_researchers_data(self, struct):
 
                             if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
                                 print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
-                                break
-                            res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                                res = dict()
+                                res["hits"] = dict()
+                                res["hits"]["hits"] = []
+                            else:
+                                res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
                                 "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
 
                             if len(res['hits']['hits']) > 0:
@@ -352,7 +355,7 @@ def collect_researchers_data(self, struct):
                                 if "validated" in res['hits']['hits'][0]['_source']:
                                     doc['validated'] = res['hits']['hits'][0]['_source']['validated']
                                 if force_doc_validated:
-                                    doc['validated'] = True
+                                    doc['validated'] = True # çà va pas RAZ si le cherche invalide ? On devrait enlever non ?
 
                                 if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
                                     doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
@@ -360,8 +363,8 @@ def collect_researchers_data(self, struct):
 
                             else:
                                 doc["validated"] = True
-                for indi in range(int(len(docs) / 100)):
-                        boutdeDoc = docs[indi * 100:indi * 100 + 100]
+                for indi in range(int(len(docs) / 50)):
+                        boutdeDoc = docs[indi * 50:indi * 50 + 50]
                         res = helpers.bulk(
                             es,
                             boutdeDoc,
@@ -421,7 +424,7 @@ def collect_laboratories_data(self):
     nblab = 0
     for lab in laboratories_list:
         print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
-        progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
+        progress_recorder.set_progress( nblab, count,  " labo " +lab['acronym'] + +" en cours")
         nblab +=1
         # Collect publications
         if len(lab['halStructId']) > 0:
@@ -523,8 +526,8 @@ def collect_laboratories_data(self):
                         else:
                             doc["validated"] = True
             time.sleep(1)
-            for indi in range (int(len(docs) / 100)):
-                boutdeDoc = docs[indi * 100:indi * 100 + 100]
+            for indi in range (int(len(docs) / 50)):
+                boutdeDoc = docs[indi * 50:indi * 50 + 50]
                 res = helpers.bulk(
                     es,
                     boutdeDoc,
@@ -602,7 +605,7 @@ def collect_researchers_data2(self, struct, idx):
             # Enrichssements des documents récoltés
 
         doc_progress_recorder.set_progress(k, sommeDocs, " document traités " + searcher["halId_s"])
-        sommeDocs += len(docs)
+        sommeDocs = len(docs)
             # Insert documents collection
         if len(docs)>1:
             for num, doc in enumerate(docs):
@@ -685,9 +688,12 @@ def collect_researchers_data2(self, struct, idx):
 
                         if not es.indices.exists(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"):  # -researchers" + searcher["ldapId"] + "-documents
                             print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
-                            break
+                            res = dict()
+                            res ["hits"]=dict()
+                            res ["hits"]["hits"] =[]
+                        else:
 
-                        res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
+                            res = es.search(index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher[
                             "ldapId"] + "-documents", body=doc_param, request_timeout=50)  # -researchers" + searcher["ldapId"] + "-documents
 
                         if len(res['hits']['hits']) > 0:
@@ -704,12 +710,12 @@ def collect_researchers_data2(self, struct, idx):
                                             doc.pop(cle)
 
 
-                            if force_doc_validated:
-                                doc['validated'] = True
+                                if force_doc_validated: # çà va pas RAZ si le cherche invalide ? On devrait enlever non ?
+                                    doc['validated'] = True
 
-                            if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
-                                doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
-                                                       'MDS': res['hits']['hits'][0]['_source']['MDS']})
+                                if res['hits']['hits'][0]['_source']['modifiedDate_tdate'] != doc['modifiedDate_tdate']:
+                                    doc["records"].append({'beforeModifiedDate_tdate': doc['modifiedDate_tdate'],
+                                                           'MDS': res['hits']['hits'][0]['_source']['MDS']})
 
                         else:
                             doc["validated"] = True
@@ -720,12 +726,12 @@ def collect_researchers_data2(self, struct, idx):
         else:
                 print ("pas de docs : " +searcher['halId_s'])
         if len(docs)>0:
-            for indi in range (int(len(docs) / 100)):
-                boutdeDoc = docs [indi*100:indi*100+100]
+            for indi in range (int(len(docs) / 50)):
+                boutdeDoc = docs [indi*50:indi*50+50]
                 res = helpers.bulk(
                         es,
                         boutdeDoc,
-                        request_timeout=50,
+                        request_timeout=100,
                         index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents"
                         # -researchers" + searcher["ldapId"] + "-documents
                     )
