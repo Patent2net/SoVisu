@@ -395,7 +395,7 @@ def collect_laboratories_data(self):
     count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
     progress_recorder.set_progress(0, count, " labo traités ")
     if count > 0:
-        print("\u00A0 \u21D2", count, "laboratories found in ES, checking es_laboratories list")
+        print("\u00A0 \u21D2", count, " laboratories found in ES, checking es_laboratories list")
         res = es.search(index="*-laboratories", body=scope_param, size=count, request_timeout=50)
         es_laboratories = res['hits']['hits']
         for lab in es_laboratories:
@@ -414,7 +414,7 @@ def collect_laboratories_data(self):
                     laboratories_list.append(lab)
         else:
             print("\u00A0 \u21D2 laboratories_list is empty, adding DjangoDb content to values")
-            laboratories_list = djangolab
+            laboratories_list = djangolab # il est pas vide celui là ? à cause de [lab.pop('id') for lab in djangolab] #curieuse écriture au passage
 
     # print(f'laboratories_list values = {laboratories_list}')
     # Process laboratories
@@ -795,7 +795,7 @@ def collect_data(laboratories=False, researcher=False, django_enabler=None):
     print('processing get_structid_list')
     structIdlist = get_structid_list()
 
-    print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+    print("\u2022 ", structIdlist, ' ', time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if laboratories:
         print('collecting laboratories data')
         tache1 = collect_laboratories_data.delay()
