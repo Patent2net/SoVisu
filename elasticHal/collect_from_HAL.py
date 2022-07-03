@@ -122,7 +122,6 @@ def collect_laboratories_data2(self, labo):
                                 pass
                         doc["_id"] = doc['docid']
                         doc["validated"] = True
-
                         doc["harvested_from"] = "lab"
                         doc["harvested_from_ids"] = []
 
