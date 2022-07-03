@@ -3,6 +3,21 @@ import re
 import dateutil.parser
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from PyPDF2 import PdfFileReader, PdfFileWriter
+import io
+
+
+def remove_page(pdf_file, pages):
+    infile = PdfFileReader(io.BytesIO(pdf_file.content))
+    output = PdfFileWriter()
+    for i in range(infile.getNumPages()):
+        if i not in pages:
+            p = infile.getPage(i)
+            output.addPage(p)
+
+    response_bytes_stream = io.BytesIO()
+    output.write(response_bytes_stream)
+    return response_bytes_stream.getvalue()
 
 
 def should_be_open(doc):
