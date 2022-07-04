@@ -10,23 +10,8 @@ from elasticHal.libs import archivesOuvertes, utils
 from celery import shared_task
 # Celery-progress
 from celery_progress.backend import ProgressRecorder
-"""
-django_init allow to run the script by using the Database integrated in django(SQLite) without passing by SoVisu.
-Turn django_init value at "True" only if you intend to use the script as standalone and want to use the Database by turning djangodb_open value at "True".
-Default Value: "django_init = False"
-"""
-django_init = False
-if __name__ == '__main__':
-    if django_init:
-        #print("init django DB access (standalone mode)")
-        import os
-        import django
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
-        django.setup()  # allow to use the elastichal.models under independantly from Django
 
-        from elasticHal.models import Structure, Laboratory, Researcher
-else:
-    from elasticHal.models import Structure, Laboratory, Researcher
+from elasticHal.models import Structure, Laboratory, Researcher
 
 # Global variables declaration
 structIdlist = []  # is dependant of get_structid_list()
