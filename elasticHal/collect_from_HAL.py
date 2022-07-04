@@ -200,15 +200,15 @@ def collect_laboratories_data2(self, labo):
                                 doc["validated"] = True
 
 
-                for indi in range(int(len(docs) / 50)):
-                    boutdeDoc = docs[indi * 50:indi * 50 + 50]
-                    res = helpers.bulk(
-                        es,
-                        boutdeDoc,
-                        index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
-                        request_timeout=100
-                    )
-                    time.sleep(1)
+                    for indi in range(int(len(docs) / 50)+1):
+                        boutdeDoc = docs[indi * 50:indi * 50 + 50]
+                        res = helpers.bulk(
+                            es,
+                            boutdeDoc,
+                            index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
+                            request_timeout=100
+                        )
+                        time.sleep(1)
                 doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym'] + " " + str(len(docs)) + " documents")
             else:
                 doc_progress_recorder.set_progress(len(docs), len(docs),
@@ -373,7 +373,7 @@ def collect_researchers_data(self, struct):
 
                             else:
                                 doc["validated"] = True
-                    for indi in range(int(len(docs) / 50)):
+                    for indi in range(int(len(docs) / 50)+1):
                         boutdeDoc = docs[indi * 50:indi * 50 + 50]
                         res = helpers.bulk(
                             es,
@@ -538,7 +538,7 @@ def collect_laboratories_data(self):
                             else:
                                 doc["validated"] = True
 
-                for indi in range (int(len(docs) / 50)):
+                for indi in range (int(len(docs) / 50)+1):
                     boutdeDoc = docs[indi * 50:indi * 50 + 50]
                     res = helpers.bulk(
                         es,
@@ -618,15 +618,15 @@ def collect_researchers_data2(self, struct, idx):
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
             # Enrichssements des documents récoltés
         # print ("2e " + str(type (docs)))
-        doc_progress_recorder.set_progress(k, sommeDocs, " documents traités " + searcher["halId_s"])
+        doc_progress_recorder.set_progress(k, len(docs), " documents traités " + searcher["halId_s"])
 
             # Insert documents collection
         if isinstance(docs, list):
-            sommeDocs = len(docs)
+            sommeDocs += len(docs)
             if len(docs)>1:
                 for num, doc in enumerate(docs):
                         k += 1
-                        doc_progress_recorder.set_progress(num, sommeDocs, " documents traités " + searcher['halId_s'])
+                        doc_progress_recorder.set_progress(num, len(docs), " documents traités " + searcher['halId_s'])
                         doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                         doc = doi_enrichissement.docs_enrichissement_doi(doc)
                         if "fr_abstract_s" in doc.keys():
@@ -744,8 +744,8 @@ def collect_researchers_data2(self, struct, idx):
             print ("pas de docs : " +searcher['halId_s'])
         if isinstance(docs, list):
             if len(docs)>0:
-                for indi in range (int(len(docs) / 50)):
-                    boutdeDoc = docs [indi*50:indi*50+50]
+                for indi in range (int(len(docs) / 50)+1):
+                    boutdeDoc = docs [indi*50:(indi*50)+50]
                     res = helpers.bulk(
                             es,
                             boutdeDoc,
@@ -761,15 +761,15 @@ def collect_researchers_data2(self, struct, idx):
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
     if len(researchers_list) >0:
         if isinstance(docs, list):
-            doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités " + searcher['lab'])
+            doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités " + str(searcher))
         else:
             pass
             # doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['halId_s'])
     else:
-        doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités ")
+        #doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités")
         print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
-    #progress_recorder.set_progress(count, count, " chercheurs traités "+searcher['ldapId'])
+    doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités  au total")
     return "fini !"
 
 def init_labo():
