@@ -563,7 +563,7 @@ def collect_researchers_data2(self, struct, idx):
     # Init researchers
     researchers_list = []
     labos, dico_acronym = init_labo()
-    idxCher = idx .replace("laboratories", "researchers*")
+    idxCher = idx .replace("laboratories", "researchers")
     count = es.count(index=idxCher, body=scope_param, request_timeout=50)['count']
     if count > 0:
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
