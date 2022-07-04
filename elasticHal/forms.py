@@ -9,17 +9,12 @@ class CsvImportForm(forms.Form):
 class PopulateLab(forms.Form):
 
     def __init__(self, *args, **kwargs):
-        if 'val' in kwargs:
-            val = kwargs.pop('val')
-
+        indexes = get_index_list()
         super(PopulateLab, self).__init__(*args, **kwargs)
-    indexes = get_index_list()
-    f_index = forms.ChoiceField(widget=forms.RadioSelect, label='Laboratoire', choices=indexes)
-    collectionLabo = forms.BooleanField(initial=False, required=False)
-    chercheurs = forms.BooleanField(initial=False, required=False)
 
-    #f_search = forms.CharField(label='Peuplement entités', max_length=100, widget=forms.TextInput(
-    #   attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
+        self.fields['f_index'] = forms.ChoiceField(widget=forms.RadioSelect, label='Laboratoire', choices=indexes)  # self.fields[''] permet de rendre dynamique les champs du formulaire
+        self.fields['collectionLabo'] = forms.BooleanField(initial=False, required=False)
+        self.fields['chercheurs'] = forms.BooleanField(initial=False, required=False)
 
 
 class ExportToElasticForm(forms.Form):
