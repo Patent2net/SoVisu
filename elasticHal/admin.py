@@ -168,11 +168,11 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
             #  laboratoires =
             #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
             if form .is_valid():
-                if "chercheurs" in form. fields .keys():
+                if "chercheurs" in request .POST .keys():
                     chercheurs = True
                 else:
                     chercheurs = False
-                if "collectionLabo" in form.fields .keys():
+                if "collectionLabo" in request .POST .keys():
                     collectionLabo = True
                 else:
                     collectionLabo = False
@@ -182,8 +182,8 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
             structure = collection .split("-")[0]
             # chercheurs = True
             # create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
-            if collectionLabo:
-                if chercheurs:
+            if collectionLabo == True:
+                if chercheurs == True:
                     result1 = collect_laboratories_data2 .delay(laboratoire)
                     task_id1 = result1.task_id
                     result2 = collect_researchers_data2.delay(struct=structure, idx=collection)
@@ -194,7 +194,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
                     task_id1 = result1.task_id
                     task_id2 = None
 
-            elif chercheurs:
+            elif chercheurs == True:
                 result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
                 task_id2 = result2.task_id
                 task_id1 = None
