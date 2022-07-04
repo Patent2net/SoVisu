@@ -5,10 +5,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import path, reverse
 from .models import Structure, Laboratory, Researcher
-from django import forms
-from .views import get_index_list
-from .insert_entities import get_structid_list, create_index
-from .collect_from_HAL import collect_data, init_labo, collect_laboratories_data2, collect_researchers_data2
+from .insert_entities import create_index
+from .collect_from_HAL import collect_data, collect_laboratories_data2, collect_researchers_data2
 
 from .forms import PopulateLab, ExportToElasticForm, CsvImportForm
 
