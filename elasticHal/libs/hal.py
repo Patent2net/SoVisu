@@ -3,6 +3,19 @@ import grobid_tei_xml
 import io
 from elasticHal.libs import utils
 
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+retry_strategy = Retry(
+    total=3,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["HEAD", "GET", "DELETE", "PUT", "OPTIONS"]
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
 
 def find_publications(idhal, field, increment=0):
     articles = []
@@ -29,7 +42,7 @@ def find_publications(idhal, field, increment=0):
             'structCountry_s,' \
             'structCountry_t'
 
-    req = requests.get(
+    req = http.get(
         'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(
             increment))
 
@@ -74,7 +87,7 @@ def find_publications(idhal, field, increment=0):
 
 
 def get_content(hal_url):
-    pdf_file = requests.get(hal_url)
+    pdf_file = http.get(hal_url)
     pdf_file.raise_for_status()
 
     grobid_resp = requests.post(
