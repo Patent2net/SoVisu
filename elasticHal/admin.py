@@ -204,7 +204,9 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
             return render(request, "admin/elasticHal/export_to_elasticLabs.html",
                           context={'form': form, 'task_id2': task_id2})
-        form = PopulateLab()
+        else:
+            form = PopulateLab()
+
         data = {'form': form}
         return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
 
@@ -270,8 +272,6 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         form = CsvImportForm()
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
-
-
 
     @staticmethod
     def export_to_elastic(request):
