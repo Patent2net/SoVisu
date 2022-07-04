@@ -1,8 +1,7 @@
 # from django.shortcuts import render
 from sovisuhal.libs import esActions
+
 es = esActions.es_connector()
-# Create your views here.
-# Set choices to an empty list as it is a required argument.
 
 
 def get_index_list():
