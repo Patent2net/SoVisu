@@ -1,11 +1,14 @@
 import requests
+import grobid_tei_xml
+import io
+from elasticHal.libs import utils
+
 
 def find_publications(idhal, field, increment=0):
-
     articles = []
     flags = 'docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,' \
             'publicationDate_tdate,submittedDate_tdate,modifiedDate_tdate,producedDate_tdate,' \
-            'fileMain_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,' \
+            'fileMain_s,fileType_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,' \
             'version_i,journalDate_s,journalTitle_s,journalPublisher_s,funding_s,' \
             'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s,' \
             'bookTitle_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,' \
@@ -26,7 +29,9 @@ def find_publications(idhal, field, increment=0):
             'structCountry_s,' \
             'structCountry_t'
 
-    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(increment))
+    req = requests.get(
+        'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(
+            increment))
 
     if req.status_code == 200:
         data = req.json()
@@ -66,3 +71,23 @@ def find_publications(idhal, field, increment=0):
     else:
         print('Error : can not reach HAL API endpoint')
         return articles
+
+
+def get_content(hal_url):
+    pdf_file = requests.get(hal_url)
+    pdf_file.raise_for_status()
+
+    grobid_resp = requests.post(
+        "https://cloud.science-miner.com/grobid/api/processFulltextDocument",
+        files={
+            'input': utils.remove_page(pdf_file, [0]),  # remove first page (HAL header)
+            'consolidate_Citations': 0,
+            'includeRawCitations': 1,
+        },
+        timeout=60.0,
+    )
+    grobid_resp.raise_for_status()
+
+    doc = grobid_tei_xml.parse_document_xml(grobid_resp.text)
+
+    return doc.body
