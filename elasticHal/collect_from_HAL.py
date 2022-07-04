@@ -387,7 +387,7 @@ def collect_researchers_data(self, struct):
                         time.sleep(1)
 
             else:
-                doc_progress_recorder.set_progress(0, 0, " pas de docs " + searcher['halId_s'])
+                doc_progress_recorder.set_progress(0, 0, " pas de docs 1" + searcher['halId_s'])
                 #print ("pas de docs", searcher['halId_s'])
 
             #doc_progress_recorder.set_progress(k, len(docs), " document traités "+ searcher["labHalId"])
@@ -550,7 +550,7 @@ def collect_laboratories_data(self):
                     time.sleep(1)
                 doc_progress_recorder.set_progress(len(docs), len(docs), lab['acronym']+ " " + str(len(docs)) + " documents")
             else:
-                doc_progress_recorder.set_progress(0, 0, " pas de docs " +  lab["halStructId"])
+                doc_progress_recorder.set_progress(0, 0, " pas de docs 2" +  lab["halStructId"])
         progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
     return "finished"
@@ -563,7 +563,7 @@ def collect_researchers_data2(self, struct, idx):
     # Init researchers
     researchers_list = []
     labos, dico_acronym = init_labo()
-    idxCher = idx .replace("laboratories", "researchers*")
+    idxCher = idx .replace("laboratories", "researchers")
     count = es.count(index=idxCher, body=scope_param, request_timeout=50)['count']
     if count > 0:
         print("\u00A0 \u21D2 ", count, " researchers found in ES, checking es_researchers list")
@@ -624,7 +624,7 @@ def collect_researchers_data2(self, struct, idx):
 
             # Insert documents collection
         if isinstance(docs, list):
-            doc_progress_recorder.set_progress(k, len(docs), " documents traités " + searcher["halId_s"])
+            #doc_progress_recorder.set_progress(k, len(docs), " documents traités " + searcher["halId_s"])
             sommeDocs += len(docs)
             if len(docs)>1:
                 for num, doc in enumerate(docs):
@@ -738,13 +738,11 @@ def collect_researchers_data2(self, struct, idx):
 
                             else:
                                 doc["validated"] = True
-                        # En attendant de trouver une solution pivot / transfo d'index
-                        #C'est pas du tout beau !
-                        # exemple de ce qu'il ne faut pas faire
+
 
         else:
-            doc_progress_recorder.set_progress(0, 0, " pas de docs " + searcher['halId_s'])
-            print ("pas de docs : " +searcher['halId_s'])
+            doc_progress_recorder.set_progress(0, 0, " pas de docs 3" + searcher['halId_s'])
+            print ("pas de docs 4 : " +searcher['halId_s'])
         if isinstance(docs, list):
             if len(docs)>0:
                 for indi in range (int(len(docs) // 50)+1):
