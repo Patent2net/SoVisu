@@ -724,6 +724,11 @@ def wordcloud(request):
     else:
         struct = -1
 
+    if 'lang' in request.GET:
+        lang = str(request.GET["lang"])
+    else:
+        lang = "all"
+
     if 'ldapid' in request.GET:
         ldapid = request.GET['ldapid']
     else:
@@ -802,6 +807,7 @@ def wordcloud(request):
                    'filterRsr': filtrechercheur,
                    'filterLab': filtrelab,
                    'url': url,
+                   'lang':lang,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 

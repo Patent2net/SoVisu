@@ -20,15 +20,47 @@
 
         <!-- Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#  -->
 
-        {% if type == "lab" %}
-        <div class="w-full h-full">
-            <iframe src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%"></iframe>
-        </div>                                          4ec4e950-8716-11eb-b61e-8702cc892037
-        {%  else %}
-                    <div class="w-full h-full">
-            <iframe src="{{ url }}/app/dashboards#/view/84aeeba0-bf7f-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
-        </div>                                          eb38ebe0-d050-11ec-9593-851110e50703?
+        {% if lang == "all" %}
+            {% if type == "lab" %}
+                <div class="w-full h-full">
+
+                    <iframe src="{{ url }}/app/dashboards#/view/d4df0830-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%"></iframe>
+
+                </div>
+            {%  else %}
+                <div class="w-full h-full">
+                    <iframe src="{{ url }}/app/dashboards#/view/8c338430-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+                </div>
+            {%  endif %}
+
+        {% elif lang == "FR" %}
+            {% if type == "lab" %}
+                <div class="w-full h-full">
+                    <iframe src="{{ url }}/app/dashboards#/view/db8a8f80-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%"></iframe>
+                </div>
+
+            {%  else %}
+                <div class="w-full h-full">
+
+                    <iframe src="{{ url }}/app/dashboards#/view/934e9630-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+
+                </div>
+
+            {%  endif %}
+        {% elif lang == "EN" %}
+            {% if type == "lab" %}
+                <div class="w-full h-full">
+                    <iframe src="{{ url }}/app/dashboards#/view/c0feaf00-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%"></iframe>
+                </div>
+            {%  else %}
+                  <div class="w-full h-full">
+                        <iframe src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+                  </div>
+            {%  endif %}
+
         {%  endif %}
+
+
 
     </div>
 </div>
