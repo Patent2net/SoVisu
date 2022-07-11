@@ -204,11 +204,12 @@ def create_researchers_index(pg):
 
             row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empéchant une erreur venant de SPARQL
             try:
+                row['aurehalId'] = row['aurehalId'] .replace(' --> En erreur, contactez-nous','').strip()
                 archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(int(row['aurehalId']))
             except:
                 archives_ouvertes_data=dict()
                 archives_ouvertes_data['concepts'] =[]
-                row['aurehalId'] = row['aurehalId'] +" --> En erreur, contactez-nous"
+                row['aurehalId'] = str(row['aurehalId']) +" --> En erreur, contactez-nous"
                 print("aille archives_ouvertes_data, ", row['aurehalId'])
             time.sleep(1)
 

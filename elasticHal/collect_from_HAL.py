@@ -270,14 +270,26 @@ def collect_researchers_data(self, struct):
                             if isinstance(doc["fr_abstract_s"], list):
                                 doc["fr_abstract_s"] = "/n" .join(doc["fr_abstract_s"])
                             if len(doc["fr_abstract_s"]) > 100:
-                                doc["fr_entites"]= keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
-                                doc["fr_teeft_keywords"]= keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
+                                try:
+                                    doc["fr_entites"]= keyword_enrichissement.return_entities(doc["fr_abstract_s"], 'fr')
+                                except:
+                                    doc["fr_entites"] = []
+                                try:
+                                    doc["fr_teeft_keywords"]= keyword_enrichissement.keyword_from_teeft(doc["fr_abstract_s"], 'fr')
+                                except:
+                                    doc["fr_teeft_keywords"] = []
                         if "en_abstract_s" in doc.keys():
                             if isinstance(doc["en_abstract_s"], list):
                                 doc["en_abstract_s"] = "/n" .join(doc["en_abstract_s"])
                             if len(doc["en_abstract_s"]) > 100:
-                                doc["en_entites"]= keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
-                                doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
+                                try:
+                                    doc["en_entites"]= keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
+                                except:
+                                    doc["en_entites"] = []
+                                try:
+                                    doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
+                                except:
+                                    doc["en_teeft_keywords"] = []
                         doc["_id"] = doc['docid']
                         doc["validated"] = True
 
@@ -367,7 +379,8 @@ def collect_researchers_data(self, struct):
                                 "ldapId"] + "-documents",
                             # -researchers" + searcher["ldapId"] + "-documents
                         )
-                        print (str(len(boutdeDoc)) + "indexés")
+                        print (str(len(boutdeDoc)) + " indexés "+ searcher[
+                                "ldapId"] )
                         time.sleep(1)
 
             else:
