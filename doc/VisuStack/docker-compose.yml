@@ -36,13 +36,16 @@ services:
       - metricbeatvolum:/usr/share/metricbeat/data
       - ./metricbeat/modules.d/elasticsearch.yml:/usr/share/metricbeat/modules.d/elasticsearch.yml
     environment:
-      - ELASTICSEARCH_HOST=elastichal
+      - ELASTICSEARCH_HOST=elastichal1
       - KIBANA_HOST=kibanahal
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=MonMdp
     # disable strict permission checks
     command: ["--strict.perms=false"] #, "-system.hostfs=/hostfs"]
-    
+    links:
+      - elastichal1
+      - elastichal2
+      - kibanahal
 
   elastichal1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
@@ -53,8 +56,8 @@ services:
       - "9300:9300"
     environment:
       - node.name=elastichal1
-      - node.master=true
-      - node.data=true
+      - node.roles=master
+      #- node.data=true
       - cluster.name=sovisucluster
       #- cluster.name=sovisucluster
       - discovery.seed_hosts=elastichal2:9301
@@ -62,6 +65,11 @@ services:
       - "path.repo=/usr/share/elasticsearch/backup"
       - cluster.routing.allocation.enable=all
       - bootstrap.memory_lock=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - http.max_content_length=10MB
       #- "discovery.type=single-node"
       - xpack.security.enabled=false
       - ELASTIC_USERNAME=elastic
@@ -90,14 +98,19 @@ services:
       - "9301:9301"
     environment:
       - node.name=elastichal2
-      - node.master=true
-      - node.data=true
+      - node.roles=master
+      #- node.data=true
       - cluster.name=sovisucluster
       - discovery.seed_hosts=elastichal1:9300
       #- discovery.seed_providers=elastichal1:9300
       - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - bootstrap.memory_lock=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - http.max_content_length=10MB
       #- "discovery.type=single-node"
       - xpack.security.enabled=false
       - ELASTIC_USERNAME=elastic
@@ -119,7 +132,6 @@ services:
     volumes:
       - es-data2:/usr/share/elasticsearch/data
       - es-backup1:/usr/share/elasticsearch/backup
-
 
   kibanahal:
     image: docker.elastic.co/kibana/kibana:7.16.2
@@ -150,34 +162,34 @@ volumes:
      driver_opts:
         o: bind
         type: none
-        device: "/d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/data1"
+        device: "./volume/data1" # /d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack
 
   es-backup1:
      driver: local
      driver_opts:
         o: bind
         type: none
-        device: "/d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/backup1"
+        device: "./volume/backup1"
 
   es-data2:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "/d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/data2"
+      device: "./volume/data2"
 
   modules:
      driver: local
      driver_opts:
         o: bind
         type: none
-        device: ./metricbeat/modules.d/elasticsearch.yml
+        device: "./metricbeat/modules.d/elasticsearch.yml"
   metricbeatvolum:
      driver: local
      driver_opts:
         o: bind
         type: none
-        device: /d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack/volume/MB-data
+        device: "./volume/MB-data"
 
 networks:
   elk:

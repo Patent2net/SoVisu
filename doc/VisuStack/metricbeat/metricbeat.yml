@@ -14,14 +14,14 @@ monitoring.enabled: true
 setup.ilm.enabled: false
 
 output.elasticsearch:
-  hosts: ['http://elastichal:9200']
+  hosts: ['http://elastichal1:9200']
   protocol: "http"
   username: "elastic"
   password: "MonMdp"
  # ssl.certificate_authorities: ["/usr/share/metricbeat/certs/ca/ca.crt"]
 
 setup.kibana:
-  host: "http://kibana:5601"
+  host: "http://kibanahal:5601"
   username: "elastic"
   password: "MonMdp"
   protocol: "http"

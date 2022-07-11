@@ -8,3 +8,5 @@ doc/OpenSearch/data/
 doc/stackELK/backup/
 doc/VisuStack/volume/
 doc/stackELK/volume/
+.run/Celery.run.xml
+.run/SoVisu.run.xml
