@@ -208,6 +208,7 @@ def create_researchers_index(pg):
             except:
                 archives_ouvertes_data=dict()
                 archives_ouvertes_data['concepts'] =[]
+                row['aurehalId'] = row['aurehalId'] +" --> En erreur, contactez-nous"
                 print("aille archives_ouvertes_data, ", row['aurehalId'])
             time.sleep(1)
 
