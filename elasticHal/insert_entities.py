@@ -206,6 +206,8 @@ def create_researchers_index(pg):
             try:
                 archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(int(row['aurehalId']))
             except:
+                archives_ouvertes_data=dict()
+                archives_ouvertes_data['concepts'] =[]
                 print("aille archives_ouvertes_data, ", row['aurehalId'])
             time.sleep(1)
 
