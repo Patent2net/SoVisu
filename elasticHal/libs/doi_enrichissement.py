@@ -1,12 +1,26 @@
 import requests
-from elasticHal.libs import dimensions
 
+
+from elasticHal.libs import dimensions
+from requests.packages.urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+
+retry_strategy = Retry(
+    total=3,
+    backoff_factor=2,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["HEAD", "GET", "DELETE", "PUT", "OPTIONS"]
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
 
 def check_doi(doi):
     # Cette fonctionpermet de tester un DOI au travers d'une requete . Renvoie si False si le DOI est invalie renvoi True si le DOI  exist
     url = 'https://doi.org/' + doi
     try:
-        res = requests.get(url, timeout=50)
+        res = http.get(url, timeout=50)
 
         if str(res) == "<Response [200]>":
 
@@ -25,14 +39,12 @@ def docs_enrichissement_doi(doc):
     # print("début docs_enrichissement_doi_date")
     #for index, doc in enumerate(docs):
     if "doiId_s" in doc.keys():  # Si Le Doi est renseigner dans le document pris en parametre
-
         citations = dimensions.getCitations(doc["doiId_s"])
         if citations:
             doc["field_citation_ratio"] = citations["field_citation_ratio"]
             doc["times_cited"] = citations["times_cited"]
-
         url = "https://api.unpaywall.org/v2/"+doc["doiId_s"]+"?email=SOVisuHAL@univ-tln.fr"
-        req = requests.get(url, timeout=50)  # envoie une requête sur l'API Unpaywall pour récupérer des informations
+        req = http.get(url, timeout=50)  # envoie une requête sur l'API Unpaywall pour récupérer des informations
         data = req.json()
 
         if req.status_code == 200:
@@ -50,12 +62,7 @@ def docs_enrichissement_doi(doc):
                     doc['is_oa'] = 'closed access'
 
         else:
-            url = 'https://doi.org/' + doc["doiId_s"]
-            req = requests.get(url, timeout=50)
-            if req.status_code == 200:
-                pass
-            else:
-                doc["doiId_sPasCorrect"] = True
+            doc["doiId_sPasCorrect"] = check_doi(doc["doiId_s"])
 
         if 'publisher' not in data:
             doc["oa_host_type"] = 'open archive'
