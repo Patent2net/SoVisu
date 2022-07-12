@@ -114,6 +114,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
+            path('update_elastic/', self.update_elastic),
             path('export-elastic/', self.export_to_elastic),
         ]
         return new_urls + urls
@@ -157,6 +158,22 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
     @staticmethod
     def export_to_elastic(request):
+
+        if request.method == "POST":
+            structure = request.POST.get('Structures')
+            laboratoires = request.POST.get('Laboratoires')
+            chercheurs = request.POST.get('Chercheurs')
+            #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+
+            create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
+            collect_data(laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
+
+        form = ExportToElasticForm()
+        data = {"form": form}
+        return render(request, "admin/elasticHal/export_to_elastic.html", data)
+
+    @staticmethod
+    def update_elastic(request):
 
         if request.method == "POST":
             form = PopulateLab(request.POST)
