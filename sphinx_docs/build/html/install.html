@@ -197,13 +197,14 @@
 <li><p>sovisuhal, qui permet de retranscrire les données récupérées au sein d’une interface permettant aux chercheurs et laboratoires de gérer leur rayonnement numérique.</p></li>
 </ul>
 <p>Les données récupérées sont stockées sur un Moteur de recherche <a class="reference external" href="https://www.elastic.co/fr/elasticsearch/">Elasticsearch</a>, couplé à l’interface utilisateur <a class="reference external" href="https://www.elastic.co/fr/kibana/">Kibana</a> qui est utilisée pour créer les tableaux de bord proposés aux utilisateurs.</p>
-<section id="mise-en-route">
-<h2>Mise en route<a class="headerlink" href="#mise-en-route" title="Lien permanent vers cette rubrique">#</a></h2>
+<section id="prerequis">
+<h2>Prérequis<a class="headerlink" href="#prerequis" title="Lien permanent vers cette rubrique">#</a></h2>
 <p>Afin d’initialiser le projet, il est nécessaire de disposer d’une machine équipée de Python (version 3.9=~), de Docker, ainsi que de Git.</p>
 <p>Il n’est pas nécessaire de créer des index pour Elasticsearch, ces derniers sont créés par elasticHal lors de la collecte.</p>
 <p>Le code de SoVisu est accessible sur <a class="reference external" href="https://github.com/Patent2net/SoVisu">https://github.com/Patent2net/SoVisu</a> .</p>
+</section>
 <section id="configuration-de-l-environnement">
-<h3>Configuration de l’environnement<a class="headerlink" href="#configuration-de-l-environnement" title="Lien permanent vers cette rubrique">#</a></h3>
+<h2>Configuration de l’environnement<a class="headerlink" href="#configuration-de-l-environnement" title="Lien permanent vers cette rubrique">#</a></h2>
 <ol class="arabic simple">
 <li><p>Clonez le répertoire</p></li>
 </ol>
@@ -225,7 +226,7 @@
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Avertissement</p>
-<p>Cette commande peut prendre du temps à s’exécuter, car elle télécharge les images Docker manquantes afin d’installer Kibana et ElasticSearch.</p>
+<p>Cette commande peut prendre du temps à s’exécuter, car elle télécharge les images Docker de Kibana, ElasticSearch et Redis qui sont nécessaires au fonctionnement du projet.</p>
 </div>
 <ol class="arabic simple" start="5">
 <li><p>Initialisez les migrations de SoVisu:</p></li>
@@ -239,9 +240,20 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>python manage.py add_institution <span class="s2">&quot;nom de l&#39;institution&quot;</span> https://cas.exemple.fr
 </pre></div>
 </div>
+<ol class="arabic simple" start="7">
+<li><p>Créez un profil administrateur:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>python manage.py createsuperuser
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Astuce</p>
+<p>il vous sera demandé de rentrer un identifiant, une adresse mail et un mot de passe.
+Bien que l’identifiant et le mot de passe soient obligatoires, le champ adresse mail est optionnel.</p>
+</div>
 </section>
-<section id="verification-de-l-installation">
-<h3>Vérification de l’installation<a class="headerlink" href="#verification-de-l-installation" title="Lien permanent vers cette rubrique">#</a></h3>
+<section id="mise-en-route">
+<h2>Mise en route<a class="headerlink" href="#mise-en-route" title="Lien permanent vers cette rubrique">#</a></h2>
 <ol class="arabic simple">
 <li><p>Lancez SoVisu:</p></li>
 </ol>
@@ -250,10 +262,10 @@
 </div>
 <ol class="arabic simple" start="2">
 <li><p>Visitez l’adresse suivante: <a class="reference external" href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a></p></li>
+<li><p>Sur l’affichage de la page d’authentification, cliquez sur administrateur</p></li>
+<li><p>Renseignez les identifiants administrateur créés précédemment.</p></li>
+<li><p>Dans l’interface d’administration,</p></li>
 </ol>
-<p>3. Si la fenêtre affichée correspond à l’image ci-dessous, l’installation est effectuée.
-[Rajouter image login Sovisu]</p>
-</section>
 </section>
 <section id="mise-en-production">
 <h2>Mise en production<a class="headerlink" href="#mise-en-production" title="Lien permanent vers cette rubrique">#</a></h2>
@@ -311,11 +323,9 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#mise-en-route">Mise en route</a><ul>
+<li><a class="reference internal" href="#prerequis">Prérequis</a></li>
 <li><a class="reference internal" href="#configuration-de-l-environnement">Configuration de l’environnement</a></li>
-<li><a class="reference internal" href="#verification-de-l-installation">Vérification de l’installation</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#mise-en-route">Mise en route</a></li>
 <li><a class="reference internal" href="#mise-en-production">Mise en production</a></li>
 </ul>
 </li>
