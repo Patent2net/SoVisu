@@ -3,9 +3,11 @@ import json
 import sys
 import time
 
+
+
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import archivesOuvertes, utils
+from elasticHal.libs import archivesOuvertes, utils ,StructAcronym
 # Celery
 from celery import shared_task
 # Celery-progress
@@ -26,6 +28,7 @@ init = True
 es = esActions.es_connector()
 
 # #print("__name__ value is : ", __name__)
+
 
 
 def get_structid_list():
@@ -467,11 +470,13 @@ def create_laboratories_index(pg):
                                    doc_type='_doc',
                                    body=docmap,
                                    include_type_name = True
+
             )
         percentage += (33.0/len(cleaned_es_laboratories))
         progress_description = row ["acronym"] + " updated"
         pg.set_progress(int(percentage), 100, description=progress_description)
     pg.set_progress(100, 100, description="finished")
+    StructAcronym.return_struct()
     return "finished"
 
 def temp_laboratories(row):
