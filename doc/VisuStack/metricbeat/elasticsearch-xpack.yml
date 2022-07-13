@@ -1,0 +1,13 @@
+- module: elasticsearch
+    xpack.enabled: true
+    period: 10s
+    hosts: ["http://elastichal1:9200", "http://elastichal2:9200"]
+    scope: cluster
+    username: "david"
+    password: "MonMdp"
+    #ssl.enabled: true
+    #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+    #ssl.certificate: "/etc/pki/client/cert.pem"
+    #ssl.key: "/etc/pki/client/cert.key"
+    #ssl.verification_mode: "full"
+

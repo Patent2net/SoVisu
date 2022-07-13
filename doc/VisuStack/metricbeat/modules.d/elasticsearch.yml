@@ -8,8 +8,8 @@
     - shard
     #- ml_job
   period: 10s
-  hosts: ["http://elastichal:9200"]
-  username: "elastic"
+  hosts: ["http://elastichal1:9200", "http://elastichal2:9200"]
+  username: "david"
   password: "MonMdp"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
