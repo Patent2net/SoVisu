@@ -21,7 +21,7 @@ services:
 
 
   metricbeat:
-    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-7.16.2}
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-8.3.2}
     # https://github.com/docker/swarmkit/issues/1951
     hostname: "metricbeathal"
     user: root
@@ -34,11 +34,11 @@ services:
       #- /var/run/docker.sock:/var/run/docker.sock
       - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
       - metricbeatvolum:/usr/share/metricbeat/data
-      - ./metricbeat/modules.d/elasticsearch.yml:/usr/share/metricbeat/modules.d/elasticsearch.yml
+      - ./metricbeat/modules.d/:/usr/share/metricbeat/modules.d/
     environment:
       - ELASTICSEARCH_HOST=elastichal1
       - KIBANA_HOST=kibanahal
-      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_USERNAME=david
       - ELASTICSEARCH_PASSWORD=MonMdp
     # disable strict permission checks
     command: ["--strict.perms=false"] #, "-system.hostfs=/hostfs"]
@@ -48,7 +48,7 @@ services:
       - kibanahal
 
   elastichal1:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.5
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
     container_name: elastichal1
 
     ports:
@@ -56,7 +56,7 @@ services:
       - "9300:9300"
     environment:
       - node.name=elastichal1
-      - node.roles=master,data
+      - node.roles=master,data,remote_cluster_client
       #- node.data=true
       - cluster.name=sovisucluster
       #- cluster.name=sovisucluster
@@ -72,7 +72,7 @@ services:
       - http.max_content_length=10MB
       #- "discovery.type=single-node"
       - xpack.security.enabled=false
-      - ELASTIC_USERNAME=elastic
+      - ELASTIC_USERNAME=david
       - ELASTIC_PASSWORD=MonMdp
       - "ES_JAVA_OPTS=-Xms2G -Xmx2g"
     ulimits:
@@ -90,7 +90,7 @@ services:
       - es-backup1:/usr/share/elasticsearch/backup
 
   elastichal2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.5
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
     container_name: elastichal2
 
     ports:
@@ -98,7 +98,7 @@ services:
       - "9301:9301"
     environment:
       - node.name=elastichal2
-      - node.roles=master,data
+      - node.roles=master,data,remote_cluster_client
       #- node.data=true
       - cluster.name=sovisucluster
       - discovery.seed_hosts=elastichal1:9300
@@ -113,7 +113,7 @@ services:
       - http.max_content_length=10MB
       #- "discovery.type=single-node"
       - xpack.security.enabled=false
-      - ELASTIC_USERNAME=elastic
+      - ELASTIC_USERNAME=david
       - ELASTIC_PASSWORD=MonMdp
       - "ES_JAVA_OPTS=-Xms2G -Xmx2g"
     depends_on:
@@ -134,7 +134,7 @@ services:
       - es-backup1:/usr/share/elasticsearch/backup
 
   kibanahal:
-    image: docker.elastic.co/kibana/kibana:7.17.5
+    image: docker.elastic.co/kibana/kibana:8.3.2
     container_name: kibanahal
 
     ports:
@@ -148,10 +148,10 @@ services:
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     environment:
-      KIBANA_USERNAME: kibana_system
+      KIBANA_USERNAME: david_system
       KIBANA_PASSWORD: MonMdp
       ELASTICSEARCH_PASSWORD: MonMdp
-      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_USERNAME: david
       #ELASTICSEARCH_HOST_PORT: "http://elastichal:9200"
     networks:
       - elk

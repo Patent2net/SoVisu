@@ -14,15 +14,15 @@ monitoring.enabled: true
 setup.ilm.enabled: false
 
 output.elasticsearch:
-  hosts: ['http://elastichal1:9200']
+  hosts: ["elastichal1:9200","elastichal2:9200"]
   protocol: "http"
-  username: "elastic"
+  username: "david"
   password: "MonMdp"
  # ssl.certificate_authorities: ["/usr/share/metricbeat/certs/ca/ca.crt"]
 
 setup.kibana:
   host: "http://kibanahal:5601"
-  username: "elastic"
+  username: "david"
   password: "MonMdp"
   protocol: "http"
   ssl.enabled: false
@@ -32,7 +32,7 @@ setup.kibana:
 logging.to_files: false
 #output.console:
   # Boolean flag to enable or disable the output module.
- # enabled: true
+ #enabled: true
   
 
 xpack.monitoring.enabled: false
