@@ -38,7 +38,7 @@ def docs_enrichissement_doi(doc):
     # acces du document sinon initialise la date de mise en open access vide
     # print("début docs_enrichissement_doi_date")
     #for index, doc in enumerate(docs):
-    if "doiId_s" in doc.keys():  # Si Le Doi est renseigner dans le document pris en parametre
+    if "doiId_s" in doc.keys():  # Si Le Doi est renseigné dans le document pris en paramètre
         citations = dimensions.getCitations(doc["doiId_s"])
         if citations:
             doc["field_citation_ratio"] = citations["field_citation_ratio"]
