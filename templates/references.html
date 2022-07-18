@@ -25,15 +25,15 @@
                     <a class="pl-0  px-2 pb-1
                         {% if filter == "uncomplete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=uncomplete"
-                    >Références à compléter</a>
+                    >Notices à compléter</a>
                     <a class="pr-0 px-2 pb-1
                         {% if filter == "complete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=complete"
-                    >Références complètes</a>
+                    >Notices complètes</a>
                 <a class="px-2 pb-1
                         {% if filter == -1 or filter == "all" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=all"
-                    >Toutes les références</a>
+                    >Toutes les notices</a>
                 </h1>
 
 
