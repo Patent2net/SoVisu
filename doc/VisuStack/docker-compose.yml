@@ -60,7 +60,7 @@ services:
       #- node.data=true
       - cluster.name=sovisucluster
       #- cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal2:9301
+      - discovery.seed_hosts=elastichal2:9300
       - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - cluster.routing.allocation.enable=all
@@ -94,8 +94,8 @@ services:
     container_name: elastichal2
 
     ports:
-      - "9201:9201"
-      - "9301:9301"
+      - "9201:9200"
+      - "9301:9300"
     environment:
       - node.name=elastichal2
       - node.roles=master,data,remote_cluster_client
@@ -156,7 +156,7 @@ services:
     networks:
       - elk
      
-volumes:
+
   es-data1:
      driver: local
      driver_opts:
