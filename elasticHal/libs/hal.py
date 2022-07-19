@@ -17,6 +17,7 @@ http = requests.Session()
 http.mount("https://", adapter)
 http.mount("http://", adapter)
 
+
 def find_publications(idhal, field, increment=0):
     articles = []
     flags = 'docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,' \

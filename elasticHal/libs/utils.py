@@ -128,7 +128,7 @@ def append_to_tree(scope, rsr, tree, state):
     rsr_id = rsr['ldapId']
 
     sid = scope['id'].split('.')
-    #print(f"\u00A0 \u21D2 \u00A0{scope}")
+    # print(f"\u00A0 \u21D2 \u00A0{scope}")
 
     scope_data = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
                   'children': [],

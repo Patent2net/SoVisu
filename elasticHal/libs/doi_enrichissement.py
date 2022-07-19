@@ -16,8 +16,9 @@ http = requests.Session()
 http.mount("https://", adapter)
 http.mount("http://", adapter)
 
+
 def check_doi(doi):
-    # Cette fonctionpermet de tester un DOI au travers d'une requete . Renvoie si False si le DOI est invalie renvoi True si le DOI  exist
+    # Cette fonction permet de tester un DOI au travers d'une requête. Renvoie si False si le DOI est invalide renvoi True si le DOI exist
     url = 'https://doi.org/' + doi
     try:
         res = http.get(url, timeout=50)
@@ -33,11 +34,8 @@ def check_doi(doi):
 
 
 def docs_enrichissement_doi(doc):
-    # Cette Fonction permet de retourner la date de mise en open access de l'ensemble des documents contenu dans doc en fonction de leur DOI
-    # La fonction test la validiter du DOI si le DOI n'est pas valide initialise le DOI vide, si le Doi existe teste la date de mise en open
-    # acces du document sinon initialise la date de mise en open access vide
-    # print("début docs_enrichissement_doi_date")
-    #for index, doc in enumerate(docs):
+
+    # for index, doc in enumerate(docs):
     if "doiId_s" in doc.keys():  # Si Le Doi est renseigné dans le document pris en paramètre
         citations = dimensions.getCitations(doc["doiId_s"])
         if citations:
@@ -48,7 +46,8 @@ def docs_enrichissement_doi(doc):
         data = req.json()
 
         if req.status_code == 200:
-            if "oa_status" in data.keys(): doc["oa_status"] = data['oa_status']
+            if "oa_status" in data.keys():
+                doc["oa_status"] = data['oa_status']
             if "is_oa" in data.keys():
                 if data['is_oa'] == True:  # Test si le doi est en open access sur l'api Unpaywall
                     doc['is_oa'] = 'open access'
@@ -57,7 +56,7 @@ def docs_enrichissement_doi(doc):
                     elif data["first_oa_location"]["updated"] != None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
-                        pass # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type
+                        pass  # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type
                 else:
                     doc['is_oa'] = 'closed access'
 
@@ -79,12 +78,5 @@ def docs_enrichissement_doi(doc):
         else:
             doc["oa_host_type"] = 'N/A'
 
-    # initialisation des champs vide pour eviter les porblémes de mapping
-    """
-    for key in ["oa_status","is_oa","date_depot_oa","oa_host_type"]:
-        if key not in  doc.keys():
-            doc[key]=""
-    """
-    #print("fin docs_enrichissement_doi_date")
     return doc
 

@@ -807,7 +807,7 @@ def wordcloud(request):
                    'filterRsr': filtrechercheur,
                    'filterLab': filtrelab,
                    'url': url,
-                   'lang':lang,
+                   'lang': lang,
                    'startDate': start_date,
                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 

@@ -233,7 +233,7 @@ def get_concepts_and_keywords(aurehalid):
     sujets, domaines = extrait_sujets_domaines(data)
     domains = []
 
-    #print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
+    # print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
     try:
         tree = ''
         for dom in domaines:

@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
 from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
-from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs ,doi_enrichissement , keyword_enrichissement
+from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs, doi_enrichissement, keyword_enrichissement
 from elasticsearch import helpers
 import json
 import datetime
@@ -161,8 +161,6 @@ def collecte_docs(chercheur):  # self,
     # Insert documents collection
     for num, doc in enumerate(docs):
 
-
-        #     progress_recorder.set_progress(num, len(docs))
         doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
         doc = doi_enrichissement.docs_enrichissement_doi(doc)
         if "fr_abstract_s" in doc.keys():
@@ -177,7 +175,6 @@ def collecte_docs(chercheur):  # self,
             if len(doc["en_abstract_s"]) > 100:
                 doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"], 'en')
                 doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(doc["en_abstract_s"], 'en')
-
 
         doc["_id"] = doc['docid']
         doc["validated"] = True
@@ -227,14 +224,6 @@ def collecte_docs(chercheur):  # self,
 
         doc["records"] = []
 
-
-        """
-        if 'doiId_s' in doc:
-            tmp_unpaywall = unpaywall.get_oa(doc['doiId_s'])
-            if 'is_oa' in tmp_unpaywall: doc['is_oa'] = tmp_unpaywall['is_oa']
-            if 'oa_status' in tmp_unpaywall: doc['oa_status'] = tmp_unpaywall['oa_status']
-            if 'oa_host_type' in tmp_unpaywall: doc['oa_host_type'] = tmp_unpaywall['oa_host_type']
-        """
 
         doc["MDS"] = utils.calculate_mds(doc)
 
