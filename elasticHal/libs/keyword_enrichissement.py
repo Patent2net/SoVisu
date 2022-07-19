@@ -2,10 +2,8 @@ from spacy.lang.fr.stop_words import STOP_WORDS
 import spacy
 import requests
 
-global nlp_fr
 nlp_fr = spacy.load("fr_core_news_md")  # chargement du modèle dans Spacy
 
-global nlp_en
 nlp_en = spacy.load("en_core_web_md")
 
 
