@@ -1,7 +1,8 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
 from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
-from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs, doi_enrichissement, keyword_enrichissement
+from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs, doi_enrichissement, \
+    keyword_enrichissement
 from elasticsearch import helpers
 import json
 import datetime
@@ -20,7 +21,6 @@ except:
 
     mode = "Dev"
     structId = "198307662"  # UTLN
-
 
 # from celery import shared_task
 # from celery_progress.backend import ProgressRecorder
@@ -224,7 +224,6 @@ def collecte_docs(chercheur):  # self,
 
         doc["records"] = []
 
-
         doc["MDS"] = utils.calculate_mds(doc)
 
         try:
@@ -246,7 +245,9 @@ def collecte_docs(chercheur):  # self,
             field = "_id"
             doc_param = esActions.scope_p(field, doc["_id"])
 
-            if not es.indices.exists(index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur["ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
+            if not es.indices.exists(
+                    index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur[
+                        "ldapId"] + "-documents"):  # -researchers" + row["ldapId"] + "-documents
                 print("exception ", chercheur["labHalId"], chercheur["ldapId"])
 
             res = es.search(
@@ -266,10 +267,11 @@ def collecte_docs(chercheur):  # self,
             else:
                 doc["validated"] = True
 
-    res = helpers.bulk(
+    helpers.bulk(
         es,
         docs,
-        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur["ldapId"] + "-documents"
+        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers-" + chercheur[
+            "ldapId"] + "-documents"
         # -researchers" + row["ldapId"] + "-documents
     )
 
@@ -277,7 +279,6 @@ def collecte_docs(chercheur):  # self,
 
 
 def get_aurehal(idhal):
-
     print(idhal)
 
     sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")

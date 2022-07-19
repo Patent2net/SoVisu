@@ -74,12 +74,8 @@ def get_label(label, lang):
 
 
 def get_article(halid_s):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre halId_s l'id d'un article et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
-    # example: get_article(702215) => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': []}}
-    # end
-    """returns  Liste des métadonnées d'un document in sparlq dataarchive format"""
+
+    #  Retourne la Liste des métadonnées d'un document in sparlq dataarchive format
     sparql.setQuery("""select ?p ?o 
 where {
  <https://data.archives-ouvertes.fr/document/%s> ?p ?o
@@ -89,11 +85,7 @@ where {
 
 
 def recup_individu(authidhal_s):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre authIdHal_s d'un cherhcheur et retourne sous forme de dictionnaire donnee_individu qui regroupe l'ensemble des données concernant le chercheur
-    # example : recup_individu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
-    # end
+
     sparql.setQuery("""
 select ?p ?o
 where  {
@@ -139,8 +131,6 @@ def extrait_sujets_domaines(data):
               truc['p']['value'] == "http://xmlns.com/foaf/0.1/interest"]
     # récupération des langues
 
-    # alaric : soit on considère que les mots qui n'ont pas de langue renseignée sont en anglais (j'ai constaté ça pour chl)
-    # soit on les drop ?
     for top in topics:
         if 'xml:lang' not in top['o']:
             top['o']['xml:lang'] = 'en'
