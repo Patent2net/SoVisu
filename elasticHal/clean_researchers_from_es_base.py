@@ -21,8 +21,8 @@ scope_param = {
             "match_all": {}
         }
     }
-count = es.count(index="*-researchers", body=scope_param)['count']  # je crois que ça récuppere le nombre de laboratoire
-res = es.search(index="*-researchers", body=scope_param, size=count)  # je crois que ça lance la requete avec la taille attendus
+count = es.count(index="*-researchers", body=scope_param)['count']
+res = es.search(index="*-researchers", body=scope_param, size=count)
 
 
 researchers = res['hits']['hits']  # pour chaque laboratoire

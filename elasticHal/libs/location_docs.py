@@ -42,7 +42,7 @@ def generate_countrys_fields(doc):
 
     if len(country_list_upper) == 0:
         country_list_upper = [""]
-    #print(" fin de génération des champs country")
+    # print(" fin de génération des champs country")
     return country_list_upper
 
 

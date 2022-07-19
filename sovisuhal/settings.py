@@ -214,7 +214,7 @@ MANAGERS = (
     ('BU', 'dreymond@univ-tln.fr'),  # changer l'adresse
     ('BU_1', '')
 )
-# Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés. Dans le cas ou un seul admin est présent pour le système, merci de laisser le 2e profil sans adresse mail renseignée.
+# Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés. Dans le cas où un seul admin est présent pour le système, merci de laisser le 2e profil sans adresse mail renseignée.
 
 # Celery Settings
 BROKER_URL = 'redis://localhost:6379'

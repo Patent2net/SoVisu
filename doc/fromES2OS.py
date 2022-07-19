@@ -69,8 +69,8 @@ def scope_p(scope_field, scope_value):
 
 es = es_connector()
 
-# memo des pbs.
-# choix fait de se poser sur le ldapid
+# Memo des pbs.
+# Choix fait de se poser sur le ldapid
 # si deux meme ldapid dans des index chercheurs différents alors
 # memo du plus recent created seulement
 scope_param = scope_all()

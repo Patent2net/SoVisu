@@ -189,7 +189,7 @@ def collect_laboratories_data2(self, labo):
 
                     for indi in range(int(len(docs) // 50) + 1):
                         boutdeDoc = docs[indi * 50:indi * 50 + 50]
-                        res = helpers.bulk(
+                        helpers.bulk(
                             es,
                             boutdeDoc,
                             index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
@@ -389,7 +389,7 @@ def collect_researchers_data(self, struct):
                                 doc["validated"] = True
                     for indi in range(int(len(docs) // 50) + 1):
                         boutdeDoc = docs[indi * 50:indi * 50 + 50]
-                        res = helpers.bulk(
+                        helpers.bulk(
                             es,
                             boutdeDoc,
                             request_timeout=100,
@@ -445,9 +445,8 @@ def collect_laboratories_data(self):
                     laboratories_list.append(lab)
         else:
             print("\u00A0 \u21D2 laboratories_list is empty, adding DjangoDb content to values")
-            laboratories_list = djangolab  # il est pas vide celui là ? à cause de [lab.pop('id') for lab in djangolab] #curieuse écriture au passage
+            laboratories_list = djangolab
 
-    # print(f'laboratories_list values = {laboratories_list}')
     # Process laboratories
     nblab = 0
     for lab in laboratories_list:
@@ -560,7 +559,7 @@ def collect_laboratories_data(self):
 
                 for indi in range(int(len(docs) // 50) + 1):
                     boutdeDoc = docs[indi * 50:indi * 50 + 50]
-                    res = helpers.bulk(
+                    helpers.bulk(
                         es,
                         boutdeDoc,
                         index=lab["structSirene"] + "-" + lab["halStructId"] + "-laboratories-documents",
@@ -578,8 +577,7 @@ def collect_laboratories_data(self):
 
 @shared_task(bind=True)
 def collect_researchers_data2(self, struct, idx):
-    # initialisation liste labos supposée plus fiables que données issues Ldap.
-    # progress_recorder= ProgressRecorder(self)
+
     doc_progress_recorder = ProgressRecorder(self)
 
     # Init researchers
@@ -774,7 +772,7 @@ def collect_researchers_data2(self, struct, idx):
             if len(docs) > 0:
                 for indi in range(int(len(docs) // 50) + 1):
                     boutdeDoc = docs[indi * 50:(indi * 50) + 50]
-                    res = helpers.bulk(
+                    helpers.bulk(
                         es,
                         boutdeDoc,
                         request_timeout=100,

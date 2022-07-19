@@ -14,7 +14,7 @@ def keyword_from_teeft(txt, lang):
         # 'Content-Type': 'application/json',
     }
 
-    # initialisations des variables pour stocker les requetes  json
+    # initialisations des variables pour stocker les requêtes json
     json_data_fr = list()
     json_data_en = list()
 
@@ -37,7 +37,6 @@ def keyword_from_teeft(txt, lang):
 
     if lang == "en":
         data_en = []
-        # Pour chaque document ayant un résumer en français anglais
         json_data_en.append({
             'id': 0,
             'value': txt
@@ -55,9 +54,6 @@ def keyword_from_teeft(txt, lang):
 
 
 def return_entities(txt, lang):
-    # Cette fonction renvois les entité nommée des abstract d'un document
-    # Actuellement la fonction gére le français et l'anglais
-    #
 
     entities_fr, entities_en = [], []
     # for index, doc in enumerate(docs):
