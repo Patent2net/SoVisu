@@ -1,5 +1,7 @@
 from elasticsearch import Elasticsearch
 from datetime import datetime
+
+
 # Custom libs
 # from sovisuhal.libs import esActions
 # from elasticHal.libs import archivesOuvertes, utils
@@ -10,7 +12,7 @@ from datetime import datetime
 def es_connector(mode=True):
     if mode == "Prod":
 
-        #secret = config('ELASTIC_PASSWORD')
+        # secret = config('ELASTIC_PASSWORD')
         # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
         es = Elasticsearch('localhost',
                            http_auth=('elastic', secret),
@@ -57,21 +59,22 @@ res = es.search(index="*-researchers", body=scope_param, size=count)
 chercheurs = res['hits']['hits']
 
 ldapList = [cher['_source']['ldapId'] for cher in chercheurs]
-doublons = [cher for cher in chercheurs if ldapList .count(cher['_source']['ldapId']) > 1]
+doublons = [cher for cher in chercheurs if ldapList.count(cher['_source']['ldapId']) > 1]
 cpt = 0
 Vus, lstRetenus = [], []
 for ind, doudou in enumerate(doublons):
-    if "Created" in doudou['_source'] .keys():
+    if "Created" in doudou['_source'].keys():
         dateCrea = doudou['_source']["Created"]
         if doudou['_source']['ldapId'] not in Vus:
-            Vus .append(doudou['_source']['ldapId'])
+            Vus.append(doudou['_source']['ldapId'])
             retenu = doudou
-            if ind < len(doublons)-1:
-                Autres = [doub for doub in doublons[ind+1:] if doub['_source']['ldapId'] == doudou ['_source']['ldapId']]
+            if ind < len(doublons) - 1:
+                Autres = [doub for doub in doublons[ind + 1:] if
+                          doub['_source']['ldapId'] == doudou['_source']['ldapId']]
                 for dub in Autres:
-                    if dub ['_source']["Created"] > dateCrea:
+                    if dub['_source']["Created"] > dateCrea:
                         retenu = dub
-            lstRetenus .append(retenu)
+            lstRetenus.append(retenu)
 
         else:
             pass
@@ -86,16 +89,16 @@ deDoub = [cher['_source']['ldapId'] for cher in lstRetenus]
 
 for cher in doublons:
     if cher not in lstRetenus:
-        print("à supprimer ", cher ['_index'], cher ['_id'] )
-        es.delete(index= cher ['_index'], id = cher ['_id'] )
-        print ("supression de son index documents", cher['_index'] + "-" + cher ['_id']+ "-documents")
+        print("à supprimer ", cher['_index'], cher['_id'])
+        es.delete(index=cher['_index'], id=cher['_id'])
+        print("supression de son index documents", cher['_index'] + "-" + cher['_id'] + "-documents")
         try:
-            es.indices.delete(index= cher['_index'] + "-" + cher ['_id']+ "-documents")
+            es.indices.delete(index=cher['_index'] + "-" + cher['_id'] + "-documents")
         except:
-            print ("ok, pas besoin")
+            print("ok, pas besoin")
 
-        #es.indices.delete(index=cher ['_source'])
-        #es.indices.delete(index=cher['_source'] + "-documents")
+        # es.indices.delete(index=cher ['_source'])
+        # es.indices.delete(index=cher['_source'] + "-documents")
 
 # Pour vérifier que ce sont les bons
 # for cher in lstRetenus:

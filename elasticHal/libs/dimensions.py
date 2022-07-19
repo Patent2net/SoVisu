@@ -13,6 +13,7 @@ http = requests.Session()
 http.mount("https://", adapter)
 http.mount("http://", adapter)
 
+
 def getCitations(doi):
     response = http.get("https://metrics-api.dimensions.ai/doi/" + doi)
     if response.status_code == 200:

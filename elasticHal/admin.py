@@ -10,12 +10,12 @@ from .collect_from_HAL import collect_data, collect_laboratories_data2, collect_
 
 from .forms import PopulateLab, ExportToElasticForm, CsvImportForm
 
-admin.site.site_header = "Administration de SoVisu"
-
 # Celery
 from celery import shared_task
 # Celery-progress
 from celery_progress.backend import ProgressRecorder
+
+admin.site.site_header = "Administration de SoVisu"
 
 
 class ExportCsv:
@@ -32,7 +32,7 @@ class ExportCsv:
 
         writer.writerow(field_names)
         for obj in queryset:
-            row = writer.writerow([getattr(obj, field) for field in field_names])
+            writer.writerow([getattr(obj, field) for field in field_names])
 
         return response
 
@@ -49,11 +49,10 @@ class ElasticActions:
                 structure = form.cleaned_data['Structures']
                 laboratoires = form.cleaned_data['Laboratoires']
                 chercheurs = form.cleaned_data['Chercheurs']
-                #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+
                 result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
                 task_id1 = result1.task_id
 
-                #print(f'Celery Task ID: {task_id1}')
                 result2 = collect_data(laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
                 if result2[0] is not None:
                     task_id2 = result2[0].task_id
@@ -64,9 +63,6 @@ class ElasticActions:
                 else:
                     task_id3 = None
 
-                #
-                #print(f'Celery Task ID2: {task_id2}')
-                #print(f'Celery Task ID3: {task_id3}')
                 if (task_id3 is not None and task_id2 is not None and task_id1 is not None):
                     return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form,
                                                                                                'task_id1': task_id1,
@@ -102,10 +98,6 @@ class ElasticActions:
             form = ExportToElasticForm()
             # Return
             return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})
-        #form = ExportToElasticForm()
-
-
-            #return render(request, "admin/elasticHal/export_to_elastic.html", data)
 
     @staticmethod
     def update_elastic(request):
@@ -116,7 +108,7 @@ class ElasticActions:
             # laboratoires = request.POST.get('Laboratoires')
             # chercheurs = request.POST.get('Chercheurs')
             #  laboratoires =
-            #print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
+            # print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
             if form .is_valid():
                 if "chercheurs" in request .POST .keys():
                     chercheurs = True
@@ -126,12 +118,11 @@ class ElasticActions:
                     collectionLabo = True
                 else:
                     collectionLabo = False
-                collection = form .cleaned_data ["f_index"]
-                #print('uuuu ', collection)
+                collection = form .cleaned_data["f_index"]
+                # print('uuuu ', collection)
             laboratoire = collection . split("-")[1]
             structure = collection .split("-")[0]
-            # chercheurs = True
-            # create_index(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
+
             if collectionLabo == True:
                 if chercheurs == True:
                     result1 = collect_laboratories_data2 .delay(laboratoire)
@@ -175,7 +166,6 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         ]
         return new_urls + urls
 
-
     @staticmethod
     def upload_csv(request):
 
@@ -197,14 +187,14 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
 
             for line in csv_data:
                 fields = line.split(",")
-                created = Structure.objects.update_or_create(
+                Structure.objects.update_or_create(
                     structSirene=fields[0],
                     label=fields[1],
                     acronym=fields[2],
                     domain=fields[3],
 
                 )
-                #print(created)
+                # print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -248,7 +238,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
             for x in csv_data:
                 fields = x.split(";")  # sépare les lignes en champs
-                created = Laboratory.objects.update_or_create(
+                Laboratory.objects.update_or_create(
                     structSirene=fields[0],
                     acronym=fields[1],
                     label=fields[2],
@@ -256,7 +246,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
                     rsnr=fields[4],
                     idRef=fields[5],
                 )
-                #print(created)
+                # print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
@@ -301,7 +291,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
 
             for x in csv_data:
                 fields = x.split(",")
-                created = Researcher.objects.update_or_create(
+                Researcher.objects.update_or_create(
                     structSirene=fields[0],
                     ldapId=fields[1],
                     name=fields[2],
@@ -320,7 +310,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     aurehalId=fields[15],
 
                 )
-                #print(created)
+                # print(created)
             url = reverse('admin:index')
             return HttpResponseRedirect(url)
 
