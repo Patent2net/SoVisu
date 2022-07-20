@@ -18,6 +18,9 @@ def cycle(liste):
 
 
 def get_halid_s(aurehal_id):
+    """
+
+    """
     # start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre la valeur aurehal_id et retourne la valeur authIdHal_s associée
@@ -189,8 +192,8 @@ def explain_domains(dom_uri):
 
 
 def extrait_mots_cles(dat):
-    """ inputs from get_article(halid)
-    halid est un article
+    """
+
     """
     # extraction des résultats
 
@@ -209,11 +212,11 @@ def extrait_mots_cles(dat):
 
 
 def get_concepts_and_keywords(aurehalid):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concepts et données abordées par le chercheur
-    # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
-    # end
+    """
+    Récupère les concepts et mots-clés d'un auteur à partir de son aurehalid
+    :param aurehalid:
+    :return:
+    """
 
     keywords = []
 

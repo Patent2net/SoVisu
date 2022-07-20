@@ -29,6 +29,10 @@ es = esActions.es_connector()
 
 
 def get_structid_list():
+    """
+    Get the list of structure id from Elasticsearch and/or from Django DB to store in a global variable
+    :return:
+    """
     global structIdlist
 
     # get structId for already existing structures in ES
@@ -48,6 +52,10 @@ def get_structid_list():
 
 
 def get_labo_list():
+    """
+    Get the list of laboratories id from Elasticsearch and/or from Django DB to store in a global variable
+    :return:
+    """
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     global Labolist
 
@@ -80,6 +88,11 @@ def get_labo_list():
 
 
 def create_structures_index(pg):
+    """
+    Create the index for structures in Elasticsearch
+    :param pg:
+    :return:
+    """
     # Process structures
 
     if djangodb_open:
@@ -96,6 +109,11 @@ def create_structures_index(pg):
 
 
 def create_researchers_index(pg):
+    """
+    Create the index for researchers in Elasticsearch
+    :param pg:
+    :return:
+    """
     # Process researchers
     scope_param = esActions.scope_all()
     percentage = 66.0
@@ -311,6 +329,11 @@ def create_researchers_index(pg):
 
 
 def create_laboratories_index(pg):
+    """
+    Create laboratories index for laboratories in ElasticSearch
+    :param pg:
+    :return:
+    """
     # Process laboratories
     scope_param = esActions.scope_all()
     percentage = 33
@@ -481,6 +504,15 @@ def temp_laboratories(row):
 
 @shared_task(bind=True)
 def create_index(self, structure, researcher, laboratories, django_enabler=None):
+    """
+    Create index for all the selected objects(structure, researcher, laboratories)
+    :param self:
+    :param structure:
+    :param researcher:
+    :param laboratories:
+    :param django_enabler:
+    :return:
+    """
     global djangodb_open
     progress_recorder = ProgressRecorder(self)
     djangodb_open = django_enabler
