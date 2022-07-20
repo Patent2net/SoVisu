@@ -15,6 +15,11 @@ http.mount("http://", adapter)
 
 
 def getCitations(doi):
+    """
+    Récupération des citations d'un article
+    :param doi: DOI de l'article
+    :return: liste des citations
+    """
     response = http.get("https://metrics-api.dimensions.ai/doi/" + doi)
     if response.status_code == 200:
         response = response.json()
