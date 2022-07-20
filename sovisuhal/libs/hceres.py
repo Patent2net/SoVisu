@@ -6,6 +6,9 @@ es = esActions.es_connector()
 
 
 def common_data(list1, list2):
+    """
+    Returns the common data between two lists
+    """
     result = False
 
     # traverse in the 1st list
@@ -23,7 +26,12 @@ def common_data(list1, list2):
 
 
 def sort_references(articles, halstructid):
-
+    """
+    Sort the references in the article
+    :param articles: list of articles
+    :param halstructid: halstructid of the article
+    :return: list of references
+    """
     # sort by lab
     utln_rsr = []
     amu_rsr = []

@@ -1,4 +1,8 @@
 def concepts():
+    """
+    This function returns a list of concepts.
+    :return: list of concepts
+    """
     return {"id": "Concepts", "children": [{"id": "chim", "label_en": "Chemical Sciences", "label_fr": "Chimie",
                                             "children": [{"id": "chim.anal", "label_en": "Analytical chemistry",
                                                           "label_fr": "Chimie analytique", "children": []},

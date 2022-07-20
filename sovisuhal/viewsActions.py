@@ -38,6 +38,11 @@ es = esActions.es_connector()
 
 @login_required
 def admin_access_login(request):
+    """
+    Login page for app access
+    param request
+    return HttpResponse
+    """
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
@@ -70,6 +75,11 @@ def admin_access_login(request):
 
 
 def create_credentials(request):
+    """
+    Create credentials for a researcher
+    param request
+    return HttpResponse
+    """
     ldapid = request.GET['ldapid']
     idref = request.POST.get('f_IdRef')
     idhal = request.POST.get('f_halId_s')
@@ -112,6 +122,11 @@ def create_credentials(request):
 # Redirects
 
 def validate_references(request):
+    """
+    Validation des références HAL
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -199,6 +214,11 @@ def validate_references(request):
 
 
 def validate_guiding_domains(request):
+    """
+    Validation des domaines de guidance
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -251,6 +271,11 @@ def validate_guiding_domains(request):
 
 
 def validate_expertise(request):
+    """
+    Validation des domaines d'expertise
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -348,6 +373,11 @@ def validate_expertise(request):
 
 
 def validate_credentials(request):
+    """
+    Validation des identifiants
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -407,6 +437,11 @@ def validate_credentials(request):
 
 
 def validate_guiding_keywords(request):
+    """
+    Validation des mots clés de guidance
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -459,6 +494,11 @@ def validate_guiding_keywords(request):
 
 
 def validate_research_description(request):
+    """
+    Validation de la description de recherche
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -524,6 +564,11 @@ def validate_research_description(request):
 
 
 def refresh_aurehal_id(request):
+    """
+    Refresh de l'id aurehal
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -573,6 +618,11 @@ def refresh_aurehal_id(request):
 
 
 def force_update_references(request):
+    """
+    Force la mise à jour des références
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -618,6 +668,11 @@ def force_update_references(request):
 
 
 def update_members(request):
+    """
+    Update members
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -668,6 +723,11 @@ def update_members(request):
 
 
 def update_authorship(request):
+    """
+    Update authorship
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -778,6 +838,11 @@ def update_authorship(request):
 
 
 def export_hceres_xls(request):
+    """
+    Export HCERES to XLS
+    param request
+    return HttpResponse
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -896,6 +961,11 @@ def export_hceres_xls(request):
 
 
 def idhal_checkout(idhal):
+    """
+    Checkout a HAL structure from IDHAL
+    :param idhal:
+    :return:
+    """
     # idhal = "luc-quoniam" valeur test
     html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
     response = urlopen(html)
@@ -912,6 +982,10 @@ def idhal_checkout(idhal):
 
 
 def vizualisation_url():
+    """
+    Get the url of the vizualisation page
+    :return:
+    """
     print("mode: ")
     print(mode)
     if mode == "dev":

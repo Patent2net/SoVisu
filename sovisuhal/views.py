@@ -18,6 +18,11 @@ es = esActions.es_connector()
 
 # /Pages
 def unknown(request):
+    """
+    Page d'erreur si l'url est inconnue
+    :param request:
+    :return:
+    """
     return render(request, '404.html')
 
 
@@ -43,6 +48,11 @@ def create(request):
 
 
 def check(request):
+    """
+    Page de vérification des données
+    :param request:
+    :return:
+    """
     if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
         return redirect('unknown')
 
@@ -348,6 +358,11 @@ def check(request):
 
 
 def dashboard(request):
+    """
+    Dashboard view
+    :param request:
+    :return:
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -455,6 +470,11 @@ def dashboard(request):
 
 
 def references(request):
+    """
+    References view
+    :param request:
+    :return:
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -571,6 +591,11 @@ def references(request):
 
 @xframe_options_exempt
 def terminology(request):
+    """
+    Terminology view
+    :param request:
+    :return:
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -718,6 +743,11 @@ def terminology(request):
 
 
 def wordcloud(request):
+    """
+    Wordcloud view
+    n:param request:
+    n:return:
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -813,6 +843,11 @@ def wordcloud(request):
 
 
 def impact_international(request):
+    """
+    Impact international view
+    n:param request:
+    n:return:
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = str(request.GET['struct'])
@@ -898,6 +933,11 @@ def impact_international(request):
 
 
 def tools(request):
+    """
+    Tools view
+    n:param request:
+    n:return:
+    """
     start_time = datetime.now()
     # Get parameters
     if 'struct' in request.GET:
@@ -1041,6 +1081,11 @@ def tools(request):
 
 
 def index(request):
+    """
+    Index page
+    n :param request:
+    n:return:
+    """
     start = time.time()
     # Get parameters
     indexcat = request.GET['indexcat']
@@ -1081,7 +1126,11 @@ def index(request):
 
 
 def search(request):  # Revoir la fonction
-
+    """
+    Search page
+    n :param request:
+    n:return:
+    """
     date_param = {
         "aggs": {
             "min_date": {"min": {"field": "submittedDate_tdate"}},
@@ -1149,6 +1198,11 @@ def search(request):  # Revoir la fonction
 
 
 def presentation(request):
+    """
+    Presentation page
+    n :param request:
+    n:return:
+    """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
@@ -1156,6 +1210,11 @@ def presentation(request):
 
 
 def ressources(request):
+    """
+    Ressources page
+    n :param request:
+    n:return:
+    """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
@@ -1163,6 +1222,11 @@ def ressources(request):
 
 
 def faq(request):
+    """
+    FAQ page
+    n :param request:
+    n:return:
+    """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
@@ -1170,6 +1234,11 @@ def faq(request):
 
 
 def useful_links(request):
+    """
+    Useful links page
+    n :param request:
+    n:return:
+    """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
@@ -1179,12 +1248,18 @@ def useful_links(request):
 # /fonctions d'initialisation des pages
 
 def default_checker(request, basereverse, default_data=None):
+    """
+    Check if the user is connected or not
+    n :param request:
+    n:param basereverse:
+    n:param default_data:
+    n:return:
+    """
     # utiliser cette fonction pour call log_checker
-    """
-        default_data ='' #use only if that parameter is needed
-        basereverse = ''
-        return default_checker(request, basereverse)
-    """
+    # default_data ='' #use only if that parameter is needed
+    # basereverse = ''
+    # return default_checker(request, basereverse)
+
     p_id = request.user.get_username()  # check si l'utilisateur est log
     p_id = p_id.replace(viewsActions.patternCas, '').lower()
 
@@ -1219,10 +1294,13 @@ def default_checker(request, basereverse, default_data=None):
 
 
 def regular_get_parameters(request):
+    """
+    Get parameters
+    n :param request:
+    n:return:
+    """
     # utiliser cette fonction pour call regular_get_parameters
-    """
-    struct, i_type, p_id, ldapid = regular_get_parameters(request)
-    """
+    # struct, i_type, p_id, ldapid = regular_get_parameters(request)
 
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -1248,10 +1326,15 @@ def regular_get_parameters(request):
 
 
 def get_scope_data(i_type, p_id):
+    """
+    Get scope data
+    n :param i_type:
+    n:param p_id:
+    n:return:
+    """
     # utiliser cette fonction pour call get_scope_data
-    """
-    key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
-    """
+    # key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
     if i_type == "rsr":
         field = "_id"
         key = 'halId_s'
@@ -1275,10 +1358,15 @@ def get_scope_data(i_type, p_id):
 
 
 def get_date(request, start_date):
+    """
+    Get date
+    n :param request:
+    n:param start_date:
+    n:return:
+    """
     # utiliser cette fonction pour call get_scope_data
-    """
-    date_from, date_to = get_date(request, start_date)
-    """
+    # date_from, date_to = get_date(request, start_date)
+
     if 'from' in request.GET:
         date_from = request.GET['from']
     else:
