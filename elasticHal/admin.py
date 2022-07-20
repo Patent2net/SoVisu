@@ -20,7 +20,12 @@ admin.site.site_header = "Administration de SoVisu"
 
 class ExportCsv:
     def export_as_csv(self, request, queryset):
-
+        """
+        Export the selected objects as a CSV file.
+        :param request:
+        :param queryset:
+        :return:
+        """
         meta = self.model._meta
         field_names = [field.name for field in meta.fields]
 
@@ -40,8 +45,16 @@ class ExportCsv:
 
 
 class ElasticActions:
+    """
+    Actions for the Elasticsearch index.
+    """
     @staticmethod
     def export_to_elastic(request):
+        """
+        Initiate creation of the index and the collect on HAL of the corresponding data in Elasticsearch, based on the known structure of the django database.
+        :param request:
+        :return:
+        """
 
         if request.method == "POST":
             form = ExportToElasticForm(request.POST)
@@ -101,7 +114,11 @@ class ElasticActions:
 
     @staticmethod
     def update_elastic(request):
-
+        """
+        Update datas in the designated index in Elasticsearch.
+        :param request:
+        :return:
+        """
         if request.method == "POST":
             form = PopulateLab(request.POST)
             # structure = request.POST.get('Structures')
@@ -154,10 +171,20 @@ class ElasticActions:
 
 # Models are under that line+
 class StructureAdmin(admin.ModelAdmin, ExportCsv):
+    """
+    Structure Admin
+    :param admin.ModelAdmin:
+    :param :ExportCsv:
+    :return:
+    """
     list_display = ('structSirene', 'acronym', 'label')
     actions = ["export_as_csv"]
 
     def get_urls(self):
+        """
+        Get urls
+        :return:
+        """
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
@@ -168,7 +195,11 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
 
     @staticmethod
     def upload_csv(request):
-
+        """
+        Upload csv file in Django database
+        :param request:
+        :return:
+        """
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
 
@@ -209,6 +240,9 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
     actions = ["export_as_csv"]
 
     def get_urls(self):
+        """
+        Get urls
+        """
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
@@ -219,7 +253,11 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
     @staticmethod
     def upload_csv(request):
-
+        """
+        Upload csv file in Django database
+        :param request:
+        :return:
+        """
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
 
@@ -262,6 +300,9 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
     actions = ["export_as_csv"]
 
     def get_urls(self):
+        """
+        Get urls
+        """
         urls = super().get_urls()
         new_urls = [
             path('upload-csv/', self.upload_csv),
@@ -272,7 +313,11 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
 
     @staticmethod
     def upload_csv(request):
-
+        """
+        Upload csv file in Django database
+        :param request:
+        :return:
+        """
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
 

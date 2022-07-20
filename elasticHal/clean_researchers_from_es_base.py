@@ -3,12 +3,12 @@ from datetime import datetime
 import time
 
 
-#############################################################################################
-# Ce script permet de supprimer les doublons de chercheurs. Le script récupère dans un premier
-# Temps l'ensemble des chercheurs, pour chaque chercheur, il vérifie s'il existe en double au
-# travers de son halId. Une fois les doublons repérés, les index *-researchers et -*documents
-# sont supprimés
-#############################################################################################
+"""
+Ce script permet de supprimer les doublons de chercheurs. Le script récupère dans un premier
+Temps l'ensemble des chercheurs, pour chaque chercheur, il vérifie s'il existe en double au
+travers de son halId. Une fois les doublons repérés, les index *-researchers et -*documents
+sont supprimés
+"""
 
 print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
 print("process start")
