@@ -45,7 +45,7 @@ def find_publications(idhal, field, increment=0):
 
     req = http.get(
         'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(
-            increment))
+            increment)&sort=docid%20asc)
 
     if req.status_code == 200:
         data = req.json()
