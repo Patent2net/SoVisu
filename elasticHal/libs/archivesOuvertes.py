@@ -25,29 +25,6 @@ def get_halid_s(aurehal_id):
     return authidhal_s
 
 
-def get_extid(authidhal_s):
-    """
-    Récupération du aurehal_id associé au authidhal_s
-    :param authidhal_s:
-    :return: aurehal_id
-    """
-    # Start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aurehal_id associée
-    # example : authIdHal_s(vanessa-richard)=>826859
-    # end
-    sparql.setQuery("""
-    select ?p ?o
-    where  {
-    <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-    }""" % authidhal_s)
-    results = sparql.query().convert()
-    extids = [truc for truc in results['results']['bindings'] if
-              truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
-    aurehalid = int(extids[0]['o']['value'].rsplit('/', 1)[1])
-    return aurehalid
-
-
 def get_label(label, lang):
     """
     Récupére le nom complet d'un label en fonction de la langue associée
@@ -68,20 +45,6 @@ def get_label(label, lang):
              truc['o']['xml:lang'] == lang]
     label_complet = label[0]
     return label_complet
-
-
-def get_article(halid_s):
-    """
-    Retourne la Liste des métadonnées d'un document dans SPARQL en format dataarchives
-    :param halid_s:
-    :return:
-    """
-    sparql.setQuery("""select ?p ?o 
-where {
- <https://data.archives-ouvertes.fr/document/%s> ?p ?o
-} """ % halid_s)
-    metadone_article = sparql.query().convert()
-    return metadone_article
 
 
 def recup_individu(authidhal_s):
