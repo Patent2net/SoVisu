@@ -6,26 +6,13 @@ sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
 
 
-def cycle(liste):
-    tempo = []
-    if len(liste) < 1:
-        return None
-    else:
-        taille = len(liste) - 1
-        for indice in range(taille):
-            tempo.append((liste[indice], liste[indice + 1]))
-        return tempo
-
-
 def get_halid_s(aurehal_id):
     """
-
+    Récupération du aurehal_id associé au authidhal_s dans HAL
+    :param aurehal_id:
+    :return:
     """
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur aurehal_id et retourne la valeur authIdHal_s associée
-    # example: aurehal_id(826859)=>vanessa-richard
-    # end
+
     sparql.setQuery("""
     select ?p ?o
     where  {
@@ -39,6 +26,11 @@ def get_halid_s(aurehal_id):
 
 
 def get_extid(authidhal_s):
+    """
+    Récupération du aurehal_id associé au authidhal_s
+    :param authidhal_s:
+    :return:
+    """
     # Start
     # auteur :Joseph
     # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aurehal_id associée
@@ -57,11 +49,13 @@ def get_extid(authidhal_s):
 
 
 def get_label(label, lang):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur label et lang et retourne le nom complet du label en fonction de la langue associée
-    # example: get_label("phys","en") => Physics
-    # end
+    """
+    Récupére le nom complet d'un label en fonction de la langue associée
+    :param label:
+    :param lang:
+    :return:
+    """
+
     sparql.setQuery("""
         select ?p ?o
         where  {
@@ -77,8 +71,11 @@ def get_label(label, lang):
 
 
 def get_article(halid_s):
-
-    #  Retourne la Liste des métadonnées d'un document in sparlq dataarchive format
+    """
+    Retourne la Liste des métadonnées d'un document dans SPARQL en format dataarchives
+    :param halid_s:
+    :return:
+    """
     sparql.setQuery("""select ?p ?o 
 where {
  <https://data.archives-ouvertes.fr/document/%s> ?p ?o
@@ -88,7 +85,11 @@ where {
 
 
 def recup_individu(authidhal_s):
-
+    """
+    recupération des données d'un individu à partir de son authidhal_s
+    :param authidhal_s:
+    :return:
+    """
     sparql.setQuery("""
 select ?p ?o
 where  {
@@ -100,6 +101,11 @@ where  {
 
 
 def explore_broader(uri):
+    """
+    explore the broader concept of a concept
+    :param uri:
+    :return:
+    """
 
     sparql.setQuery("""
     select ?p ?o
@@ -124,8 +130,11 @@ def explore_broader(uri):
 
 
 def extrait_sujets_domaines(data):
-    """ inputs from recup_individu(halidint)
-    halidint est un individu
+    """
+    TODO: à vérifier
+    à partir des données de l'article, extrait les sujets et domaines
+    :param data:
+    :return:
     """
     # extraction des résultats
     topics = [truc for truc in data['results']['bindings'] if
@@ -151,6 +160,11 @@ def extrait_sujets_domaines(data):
 
 
 def explain_domains(dom_uri):
+    """
+    Recherche le domaine parent d'un domaine dom_uri
+    :param dom_uri:
+    :return:
+    """
     sparql.setQuery("""
     prefix foaf: <http://xmlns.com/foaf/0.1/>
     prefix skos: <http://www.w3.org/2004/02/skos/core>
@@ -189,26 +203,6 @@ def explain_domains(dom_uri):
         return tempo_clone
     else:
         return [labels]
-
-
-def extrait_mots_cles(dat):
-    """
-
-    """
-    # extraction des résultats
-
-    topics = [truc for truc in dat['results']['bindings'] if
-              truc['p']['value'] == "http://purl.org/dc/elements/1.1/subject"]
-    # sujets = [truc ['o']['value'] for truc in dat['results']['bindings'] if truc ['p']['value'] == "http://xmlns.com/foaf/0.1/interest"]
-    # récupération des langues
-    langues = list(set([top['o']['xml:lang'] for top in topics]))
-    # filtres par langues
-    dico_top = dict()
-
-    for lang in langues:
-        dico_top[lang] = [top['o']['value'] for top in topics if top['o']['xml:lang'] == lang]
-
-    return dico_top
 
 
 def get_concepts_and_keywords(aurehalid):
