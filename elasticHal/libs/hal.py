@@ -19,6 +19,13 @@ http.mount("http://", adapter)
 
 
 def find_publications(idhal, field, increment=0):
+    """
+    Cherche les publications d'un auteur dans HAL à partir de son IDHAL
+    :param idhal: IDHAL de l'auteur
+    :param field: champ de recherche
+    :param increment: nombre de publications à ignorer
+    :return: liste des publications
+    """
     articles = []
     flags = 'docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,' \
             'publicationDate_tdate,submittedDate_tdate,modifiedDate_tdate,producedDate_tdate,' \
@@ -88,6 +95,11 @@ def find_publications(idhal, field, increment=0):
 
 
 def get_content(hal_url):
+    """
+    Récupère le contenu d'un article HAL à partir de son URL
+    :param hal_url: URL de l'article
+    :return: contenu de l'article
+    """
     pdf_file = http.get(hal_url)
     pdf_file.raise_for_status()
 

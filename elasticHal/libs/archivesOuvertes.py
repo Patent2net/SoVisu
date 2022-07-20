@@ -8,9 +8,9 @@ sparql.setReturnFormat(JSON)
 
 def get_halid_s(aurehal_id):
     """
-    Récupération du aurehal_id associé au authidhal_s dans HAL
+    Récupération du authidhal_s associé au aurehal_id dans HAL
     :param aurehal_id:
-    :return:
+    :return: authidhal_s
     """
 
     sparql.setQuery("""
@@ -29,7 +29,7 @@ def get_extid(authidhal_s):
     """
     Récupération du aurehal_id associé au authidhal_s
     :param authidhal_s:
-    :return:
+    :return: aurehal_id
     """
     # Start
     # auteur :Joseph
