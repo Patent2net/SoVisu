@@ -5,6 +5,13 @@ struct = "198307662"  # mesure temporaire, valable tant que seuls les chercheurs
 
 
 class CreateCredentials(forms.Form):
+    """
+    Formulaire de création de compte
+    \n\n
+    :param forms.Form:
+    \n\n
+    :return:
+    """
     # Set choices to an empty list as it is a required argument.
     # f_more = forms.CharField()
 
@@ -38,7 +45,13 @@ class CreateCredentials(forms.Form):
 
 
 class ValidCredentials(forms.Form):
-
+    """
+    Formulaire de validation de compte
+    \n\n
+    :param forms.Form:
+    \n\n
+    :return:
+    """
     def __init__(self, *args, **kwargs):
         halid_s = kwargs.pop('halId_s')
         idref = kwargs.pop('idRef')
@@ -75,6 +88,13 @@ class ValidCredentials(forms.Form):
 
 
 class ValidLabCredentials(forms.Form):
+    """
+    Formulaire de validation de compte
+    \n\n
+    :param forms.Form:
+    \n\n
+    :return:
+    """
     def __init__(self, *args, **kwargs):
         halstructid = kwargs.pop('halStructId')
         rsnr = kwargs.pop('rsnr')
@@ -98,6 +118,13 @@ class ValidLabCredentials(forms.Form):
 
 
 class SetGuidingKeywords(forms.Form):
+    """
+    Formulaire de validation de mot clé de guidance
+    \n\n
+    :param forms.Form:
+    \n\n
+    :return:
+    """
     def __init__(self, *args, **kwargs):
         guiding_keywords = kwargs.pop('guidingKeywords')
 
@@ -117,6 +144,13 @@ class SetGuidingKeywords(forms.Form):
 
 
 class SetResearchDescription(forms.Form):
+    """
+    Formulaire de validation de description de recherche
+    \n\n
+    :param forms.Form:
+    \n\n
+    :return:
+    """
     def __init__(self, *args, **kwargs):
         research_summary = kwargs.pop('research_summary')
         research_projects_in_progress = kwargs.pop('research_projectsInProgress')
@@ -134,6 +168,13 @@ class SetResearchDescription(forms.Form):
 
 
 class Search(forms.Form):
+    """
+    Formulaire de recherche
+    \n\n
+    :param forms.Form:
+    \n\n
+    :return:
+    """
 
     def __init__(self, *args, **kwargs):
         if 'val' in kwargs:
