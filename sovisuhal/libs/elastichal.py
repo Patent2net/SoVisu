@@ -1,7 +1,7 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
 from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
-from elasticHal.libs import utils, hal, unpaywall, archivesOuvertes, location_docs, doi_enrichissement, \
+from elasticHal.libs import utils, hal, archivesOuvertes, location_docs, doi_enrichissement, \
     keyword_enrichissement
 from elasticsearch import helpers
 import json
