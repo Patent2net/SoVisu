@@ -1,9 +1,8 @@
-SoVisu
+Développement
 ======
 
 .. toctree::
    :maxdepth: 4
 
    elasticHal
-   manage
    sovisuhal

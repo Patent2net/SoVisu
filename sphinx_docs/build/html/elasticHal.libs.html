@@ -1,0 +1,497 @@
+<!doctype html>
+<html class="no-js" lang="fr">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="elasticHal.migrations package" href="elasticHal.migrations.html" /><link rel="prev" title="elasticHal package" href="elasticHal.html" />
+
+    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+        <title>elasticHal.libs package - Documentation SoVisu 0.0.1</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Documentation SoVisu 0.0.1</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Documentation SoVisu 0.0.1</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Recherche name="q" aria-label="Recherche">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">Développement</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="elasticHal.html">elasticHal package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">elasticHal.libs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.migrations.html">elasticHal.migrations package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html">sovisuhal package</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="elastichal-libs-package">
+<h1>elasticHal.libs package<a class="headerlink" href="#elastichal-libs-package" title="Lien permanent vers cette rubrique">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Lien permanent vers cette rubrique">#</a></h2>
+</section>
+<section id="module-elasticHal.libs.archivesOuvertes">
+<span id="elastichal-libs-archivesouvertes-module"></span><h2>elasticHal.libs.archivesOuvertes module<a class="headerlink" href="#module-elasticHal.libs.archivesOuvertes" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.explain_domains">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">explain_domains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dom_uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.explain_domains" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Recherche le domaine parent d’un domaine dom_uri
+:param dom_uri:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.explore_broader">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">explore_broader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.explore_broader" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>explore the broader concept of a concept
+:param uri:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.extrait_sujets_domaines">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">extrait_sujets_domaines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.extrait_sujets_domaines" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>TODO: à vérifier
+à partir des données de l’article, extrait les sujets et domaines
+:param data:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.get_concepts_and_keywords">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">get_concepts_and_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aurehalid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.get_concepts_and_keywords" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Récupère les concepts et mots-clés d’un auteur à partir de son aurehalid
+:param aurehalid:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.get_halid_s">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">get_halid_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aurehal_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.get_halid_s" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Récupération du authidhal_s associé au aurehal_id dans HAL
+:param aurehal_id:
+:return: authidhal_s</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.get_label">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">get_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.get_label" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Récupére le nom complet d’un label en fonction de la langue associée
+:param label:
+:param lang:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.archivesOuvertes.recup_individu">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.archivesOuvertes.</span></span><span class="sig-name descname"><span class="pre">recup_individu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">authidhal_s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.archivesOuvertes.recup_individu" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>recupération des données d’un individu à partir de son authidhal_s
+:param authidhal_s:
+:return:</p>
+</dd></dl>
+
+</section>
+<section id="module-elasticHal.libs.dimensions">
+<span id="elastichal-libs-dimensions-module"></span><h2>elasticHal.libs.dimensions module<a class="headerlink" href="#module-elasticHal.libs.dimensions" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.dimensions.getCitations">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.dimensions.</span></span><span class="sig-name descname"><span class="pre">getCitations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doi</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.dimensions.getCitations" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Récupération des citations d’un article
+:param doi: DOI de l’article
+:return: liste des citations</p>
+</dd></dl>
+
+</section>
+<section id="module-elasticHal.libs.doi_enrichissement">
+<span id="elastichal-libs-doi-enrichissement-module"></span><h2>elasticHal.libs.doi_enrichissement module<a class="headerlink" href="#module-elasticHal.libs.doi_enrichissement" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.doi_enrichissement.check_doi">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.doi_enrichissement.</span></span><span class="sig-name descname"><span class="pre">check_doi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doi</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.doi_enrichissement.check_doi" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Vérifie si le doi existe
+:param doi: DOI à vérifier
+:return: True si le doi existe, False sinon</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.doi_enrichissement.docs_enrichissement_doi">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.doi_enrichissement.</span></span><span class="sig-name descname"><span class="pre">docs_enrichissement_doi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.doi_enrichissement.docs_enrichissement_doi" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Enrichissement des documents avec les informations provenant du DOI
+:param doc: Document à enrichir
+:return: Document enrichi</p>
+</dd></dl>
+
+</section>
+<section id="module-elasticHal.libs.hal">
+<span id="elastichal-libs-hal-module"></span><h2>elasticHal.libs.hal module<a class="headerlink" href="#module-elasticHal.libs.hal" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.hal.find_publications">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.hal.</span></span><span class="sig-name descname"><span class="pre">find_publications</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idhal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.hal.find_publications" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Cherche les publications d’un auteur dans HAL à partir de son IDHAL
+:param idhal: IDHAL de l’auteur
+:param field: champ de recherche
+:param increment: nombre de publications à ignorer
+:return: liste des publications</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.hal.get_content">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.hal.</span></span><span class="sig-name descname"><span class="pre">get_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hal_url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.hal.get_content" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Récupère le contenu d’un article HAL à partir de son URL
+:param hal_url: URL de l’article
+:return: contenu de l’article</p>
+</dd></dl>
+
+</section>
+<section id="module-elasticHal.libs.keyword_enrichissement">
+<span id="elastichal-libs-keyword-enrichissement-module"></span><h2>elasticHal.libs.keyword_enrichissement module<a class="headerlink" href="#module-elasticHal.libs.keyword_enrichissement" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.keyword_enrichissement.keyword_from_teeft">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.keyword_enrichissement.</span></span><span class="sig-name descname"><span class="pre">keyword_from_teeft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.keyword_enrichissement.keyword_from_teeft" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Enrichissement des mots clés avec les entités trouvées dans les résumés à partir de TEEFT
+:param txt: résumé du document
+:param lang: langue du document
+:return: liste des mots clés enrichis</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.keyword_enrichissement.return_entities">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.keyword_enrichissement.</span></span><span class="sig-name descname"><span class="pre">return_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.keyword_enrichissement.return_entities" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Enrichissement des documents avec les entités trouvées dans les résumés à partir de la terminologie de loterre
+:param txt: résumé du document
+:param lang: langue du document
+:return: liste des entités enrichies</p>
+</dd></dl>
+
+</section>
+<section id="module-elasticHal.libs.location_docs">
+<span id="elastichal-libs-location-docs-module"></span><h2>elasticHal.libs.location_docs module<a class="headerlink" href="#module-elasticHal.libs.location_docs" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.location_docs.generate_countrys_fields">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.location_docs.</span></span><span class="sig-name descname"><span class="pre">generate_countrys_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.location_docs.generate_countrys_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Enrichi les données avec les champs « deptStructCountry_s », « labStructCountry_s », « structCountry_s », « structCountry_t », »rgrpInstStructCountry_s », « rgrpLabStructCountry_s » en se basant sur les données du document
+:param doc: document à enrichir
+:return: document enrichi</p>
+</dd></dl>
+
+</section>
+<section id="elastichal-libs-scanr-module">
+<h2>elasticHal.libs.scanR module<a class="headerlink" href="#elastichal-libs-scanr-module" title="Lien permanent vers cette rubrique">#</a></h2>
+</section>
+<section id="elastichal-libs-sherpa-module">
+<h2>elasticHal.libs.sherpa module<a class="headerlink" href="#elastichal-libs-sherpa-module" title="Lien permanent vers cette rubrique">#</a></h2>
+</section>
+<section id="elastichal-libs-unpaywall-module">
+<h2>elasticHal.libs.unpaywall module<a class="headerlink" href="#elastichal-libs-unpaywall-module" title="Lien permanent vers cette rubrique">#</a></h2>
+</section>
+<section id="module-elasticHal.libs.utils">
+<span id="elastichal-libs-utils-module"></span><h2>elasticHal.libs.utils module<a class="headerlink" href="#module-elasticHal.libs.utils" title="Lien permanent vers cette rubrique">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.utils.append_to_tree">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.utils.</span></span><span class="sig-name descname"><span class="pre">append_to_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rsr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.utils.append_to_tree" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Rajoute un domaine d’expertise à un arbre d’expertise</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.utils.calculate_mds">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.utils.</span></span><span class="sig-name descname"><span class="pre">calculate_mds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.utils.calculate_mds" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Attribue un score à la qualité de description d’une notice.
+:param doc: La notice
+:return: Le score</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.utils.filter_concepts">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.utils.</span></span><span class="sig-name descname"><span class="pre">filter_concepts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concepts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validated_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.utils.filter_concepts" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Filtre les concepts qui ne sont pas dans la liste des concepts validés
+:param concepts: liste des concepts
+:param validated_ids: liste des ids des concepts validés
+:return: liste des concepts validés</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.utils.remove_page">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.utils.</span></span><span class="sig-name descname"><span class="pre">remove_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pages</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.utils.remove_page" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Supprime des pages d’un pdf
+:param pdf_file: Le pdf
+:param pages: La liste des pages à supprimer
+:return: Le pdf sans les pages supprimées</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elasticHal.libs.utils.should_be_open">
+<span class="sig-prename descclassname"><span class="pre">elasticHal.libs.utils.</span></span><span class="sig-name descname"><span class="pre">should_be_open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.libs.utils.should_be_open" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Détermine si une notice devrait être ouverte
+:param doc: La notice
+:return: -1 si la notice ne devrait pas être ouverte, 0 si la notice devrait être ouverte, 1 si la notice devrait être ouverte, 2 si la notice est déjà ouverte</p>
+</dd></dl>
+
+</section>
+<section id="module-elasticHal.libs">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-elasticHal.libs" title="Lien permanent vers cette rubrique">#</a></h2>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="elasticHal.migrations.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">elasticHal.migrations package</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="elasticHal.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">elasticHal package</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, David Reymond, Alaric Tabariès, Esteban Bara, Clara Galliano
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contenu
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">elasticHal.libs package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.archivesOuvertes">elasticHal.libs.archivesOuvertes module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.dimensions">elasticHal.libs.dimensions module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.doi_enrichissement">elasticHal.libs.doi_enrichissement module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.hal">elasticHal.libs.hal module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.keyword_enrichissement">elasticHal.libs.keyword_enrichissement module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.location_docs">elasticHal.libs.location_docs module</a></li>
+<li><a class="reference internal" href="#elastichal-libs-scanr-module">elasticHal.libs.scanR module</a></li>
+<li><a class="reference internal" href="#elastichal-libs-sherpa-module">elasticHal.libs.sherpa module</a></li>
+<li><a class="reference internal" href="#elastichal-libs-unpaywall-module">elasticHal.libs.unpaywall module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs.utils">elasticHal.libs.utils module</a></li>
+<li><a class="reference internal" href="#module-elasticHal.libs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/translations.js"></script>
+    </body>
+</html>
