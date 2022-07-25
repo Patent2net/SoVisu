@@ -19,9 +19,7 @@ http.mount("http://", adapter)
 
 def check_doi(doi):
     """
-    Vérifie si le doi existe
-    :param doi: DOI à vérifier
-    :return: True si le doi existe, False sinon
+    Vérifie si le doi renseigné existe dans la base de données de doi.org
     """
     # Cette fonction permet de tester un DOI au travers d'une requête. Renvoie si False si le DOI est invalide renvoi True si le DOI exist
     url = 'https://doi.org/' + doi
@@ -41,8 +39,6 @@ def check_doi(doi):
 def docs_enrichissement_doi(doc):
     """
     Enrichissement des documents avec les informations provenant du DOI
-    :param doc: Document à enrichir
-    :return: Document enrichi
     """
     # for index, doc in enumerate(docs):
     if "doiId_s" in doc.keys():  # Si Le Doi est renseigné dans le document pris en paramètre

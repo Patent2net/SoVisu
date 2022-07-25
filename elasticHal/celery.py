@@ -20,8 +20,6 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     """
-    This task will print the task id and the name of the task.
-    :param self:
-    :return:
+    Permet de tester la connexion à celery
     """
     print(f'Request: {self.request!r}')

@@ -33,13 +33,6 @@ import requests
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
-    :param ldapid:
-    :param labo_accro:
-    :param labhalid:
-    :param idhal:
-    :param idref:
-    :param orcid:
-    :return:
     """
     es = esActions.es_connector()
     #   progress_recorder = ProgressRecorder(self)
@@ -162,10 +155,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
 # @shared_task(bind=True)
 def collecte_docs(chercheur):  # self,
     """
-    collecte des documents d'un chercheur
-    \n\n
-    :param chercheur:
-    :return:
+    collecte les documents d'un chercheur
     """
     init = False  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
@@ -296,8 +286,6 @@ def collecte_docs(chercheur):  # self,
 def get_aurehal(idhal):
     """
     Vérifie si l'Idhal renseigné existe dans la base de données de HAL
-    :param idhal:
-    :return:
     """
     print(idhal)
 

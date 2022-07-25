@@ -30,8 +30,7 @@ es = esActions.es_connector()
 
 def get_structid_list():
     """
-    Get the list of structure id from Elasticsearch and/or from Django DB to store in a global variable
-    :return:
+    Récupère la liste des structures dans Elasticsearch et / ou Django DB afin de les stocker dans une variable globale
     """
     global structIdlist
 
@@ -53,8 +52,7 @@ def get_structid_list():
 
 def get_labo_list():
     """
-    Get the list of laboratories id from Elasticsearch and/or from Django DB to store in a global variable
-    :return:
+    Récupère la liste des laboratoires dans Elasticsearch et / ou Django DB afin de les stocker dans une variable globale
     """
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     global Labolist
@@ -89,9 +87,7 @@ def get_labo_list():
 
 def create_structures_index(pg):
     """
-    Create the index for structures in Elasticsearch
-    :param pg:
-    :return:
+    Crée les index de structures dans Elasticsearch
     """
     # Process structures
 
@@ -110,9 +106,7 @@ def create_structures_index(pg):
 
 def create_researchers_index(pg):
     """
-    Create the index for researchers in Elasticsearch
-    :param pg:
-    :return:
+    Crée les index de chercheurs dans Elasticsearch
     """
     # Process researchers
     scope_param = esActions.scope_all()
@@ -330,9 +324,7 @@ def create_researchers_index(pg):
 
 def create_laboratories_index(pg):
     """
-    Create laboratories index for laboratories in ElasticSearch
-    :param pg:
-    :return:
+    Créé les index pour les laboratoires
     """
     # Process laboratories
     scope_param = esActions.scope_all()
@@ -491,6 +483,9 @@ def create_laboratories_index(pg):
 
 
 def temp_laboratories(row):
+    """
+    Nettoie les données provenant de Django avant de les comparer à celles d'Elastic pour insérer les données manquantes.
+    """
     global Labolist
     row["validated"] = False
     row["halStructId"] = row["halStructId"].strip()
@@ -505,13 +500,7 @@ def temp_laboratories(row):
 @shared_task(bind=True)
 def create_index(self, structure, researcher, laboratories, django_enabler=None):
     """
-    Create index for all the selected objects(structure, researcher, laboratories)
-    :param self:
-    :param structure:
-    :param researcher:
-    :param laboratories:
-    :param django_enabler:
-    :return:
+    Initialise la création d'un index pour les catégories sélectionnées (structure, researcher, laboratories)
     """
     global djangodb_open
     progress_recorder = ProgressRecorder(self)

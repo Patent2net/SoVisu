@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="elasticHal package" href="elasticHal.html" /><link rel="prev" title="Installation" href="install.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Application ElasticHal" href="elasticHal.html" /><link rel="prev" title="Installation" href="install.html" />
 
     <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
         <title>Développement - Documentation SoVisu 0.0.1</title>
@@ -158,12 +158,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Développement</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="elasticHal.html">elasticHal package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="elasticHal.libs.html">elasticHal.libs package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="elasticHal.migrations.html">elasticHal.migrations package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="elasticHal.html">Application ElasticHal</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.libs.html">Paquet elasticHal.libs</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html">sovisuhal package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="sovisuhal.html">Application SoVisuhal</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html">Paquet sovisuhal.libs</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -203,62 +205,40 @@
 <h1>Développement<a class="headerlink" href="#developpement" title="Lien permanent vers cette rubrique">#</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="elasticHal.html">elasticHal package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="elasticHal.libs.html">elasticHal.libs package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.archivesOuvertes">elasticHal.libs.archivesOuvertes module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.dimensions">elasticHal.libs.dimensions module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.doi_enrichissement">elasticHal.libs.doi_enrichissement module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.hal">elasticHal.libs.hal module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.keyword_enrichissement">elasticHal.libs.keyword_enrichissement module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.location_docs">elasticHal.libs.location_docs module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#elastichal-libs-scanr-module">elasticHal.libs.scanR module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#elastichal-libs-sherpa-module">elasticHal.libs.sherpa module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#elastichal-libs-unpaywall-module">elasticHal.libs.unpaywall module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs.utils">elasticHal.libs.utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#module-elasticHal.libs">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="elasticHal.migrations.html">elasticHal.migrations package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0001_initial">elasticHal.migrations.0001_initial module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0002_auto_20220418_1750">elasticHal.migrations.0002_auto_20220418_1750 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0003_elastichal_name">elasticHal.migrations.0003_elastichal_name module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0004_auto_20220418_1814">elasticHal.migrations.0004_auto_20220418_1814 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0005_auto_20220418_1815">elasticHal.migrations.0005_auto_20220418_1815 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0006_auto_20220418_1821">elasticHal.migrations.0006_auto_20220418_1821 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0007_auto_20220418_1822">elasticHal.migrations.0007_auto_20220418_1822 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0008_auto_20220419_1130">elasticHal.migrations.0008_auto_20220419_1130 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations.0009_auto_20220419_1420">elasticHal.migrations.0009_auto_20220419_1420 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.migrations.html#module-elasticHal.migrations">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elasticHal.html">Application ElasticHal</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#sous-paquets">Sous-paquets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.libs.html">Paquet elasticHal.libs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html#modules">Modules</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.admin">elasticHal.admin module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.apps">elasticHal.apps module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.clean_researchers_from_es_base">elasticHal.clean_researchers_from_es_base module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.collect_from_HAL">elasticHal.collect_from_HAL module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.insert_entities">elasticHal.insert_entities module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.models">elasticHal.models module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.tests">elasticHal.tests module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal.views">elasticHal.views module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#module-elasticHal">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elasticHal.html#modules">Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.admin">elasticHal.admin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.apps">elasticHal.apps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.clean_researchers_from_es_base">elasticHal.clean_researchers_from_es_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.collect_from_HAL">elasticHal.collect_from_HAL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.insert_entities">elasticHal.insert_entities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.models">elasticHal.models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#module-elasticHal.views">elasticHal.views</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sovisuhal.html">sovisuhal package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.asgi">sovisuhal.asgi module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.forms">sovisuhal.forms module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.settings">sovisuhal.settings module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#sovisuhal-test-module">sovisuhal.test module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.urls">sovisuhal.urls module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.views">sovisuhal.views module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.viewsActions">sovisuhal.viewsActions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.wsgi">sovisuhal.wsgi module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#module-sovisuhal">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sovisuhal.html">Application SoVisuhal</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#sous-paquets">Sous-paquets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html">Paquet sovisuhal.libs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sovisuhal.libs.html#modules">Modules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html#modules">Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.forms">sovisuhal.forms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.views">sovisuhal.views</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.viewsActions">sovisuhal.viewsActions</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -275,7 +255,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">elasticHal package</div>
+                <div class="title">Application ElasticHal</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>

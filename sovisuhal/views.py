@@ -19,14 +19,15 @@ es = esActions.es_connector()
 # /Pages
 def unknown(request):
     """
-    Page d'erreur si l'url est inconnue
-    :param request:
-    :return:
+    Gestion de l'affichage de la page d'erreur si l'url est inconnue
     """
     return render(request, '404.html')
 
 
 def create(request):
+    """
+    Gestion de la page affichant le formulaire de création d'un nouveau profil à un utilisateur non reconnu
+    """
     ldapid = request.GET['ldapid']  # ldapid
     id_halerror = False
     if 'iDhalerror' in request.GET:
@@ -49,9 +50,7 @@ def create(request):
 
 def check(request):
     """
-    Page de vérification des données
-    :param request:
-    :return:
+    Gestion de la page gérant l'affichage des données utilisateur ainsi que la vérification des données récupérées sur HAL afin d'affiner les résultats affichés par SoVisu
     """
     if request.user.is_authenticated and (request.user.get_username() == 'visiteur' or request.user.get_username() == 'guestUtln'):
         return redirect('unknown')
@@ -359,9 +358,7 @@ def check(request):
 
 def dashboard(request):
     """
-    Dashboard view
-    :param request:
-    :return:
+    Gestion de la page affichant les tableaux de bord sous Kibana
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -471,9 +468,7 @@ def dashboard(request):
 
 def references(request):
     """
-    References view
-    :param request:
-    :return:
+    Gestion de la page affichant les références du profil sélectionné
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -592,9 +587,7 @@ def references(request):
 @xframe_options_exempt
 def terminology(request):
     """
-    Terminology view
-    :param request:
-    :return:
+    Gestion de la page affichant les domaines d'expertise du profil sélectionné
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -744,9 +737,7 @@ def terminology(request):
 
 def wordcloud(request):
     """
-    Wordcloud view
-    n:param request:
-    n:return:
+    Gestion de la page affichant sous forme de wordcloud les mots clés représentant le domaine de recherche du profil sélectionné (sous Kibana)
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -844,9 +835,7 @@ def wordcloud(request):
 
 def impact_international(request):
     """
-    Impact international view
-    n:param request:
-    n:return:
+    Gestion de la page affichant l'impact international d'un profil sélectionné
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -934,9 +923,7 @@ def impact_international(request):
 
 def tools(request):
     """
-    Tools view
-    n:param request:
-    n:return:
+    Gestion de la page "Outils", proposant des fonctionnalités pour les profils laboratoires. (Export HCERES, Cohésion des données)
     """
     start_time = datetime.now()
     # Get parameters
@@ -1082,9 +1069,7 @@ def tools(request):
 
 def index(request):
     """
-    Index page
-    n :param request:
-    n:return:
+    Gestion des pages d'indexation des profils chercheurs et laboratoires
     """
     start = time.time()
     # Get parameters
@@ -1127,9 +1112,7 @@ def index(request):
 
 def search(request):  # Revoir la fonction
     """
-    Search page
-    n :param request:
-    n:return:
+    Gestion de la page de recherche à partir de mots clés
     """
     date_param = {
         "aggs": {
@@ -1199,9 +1182,7 @@ def search(request):  # Revoir la fonction
 
 def presentation(request):
     """
-    Presentation page
-    n :param request:
-    n:return:
+    Gestion de la page de présentation du projet
     """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1211,9 +1192,7 @@ def presentation(request):
 
 def ressources(request):
     """
-    Ressources page
-    n :param request:
-    n:return:
+    Gestion de la page des ressouces à destination des chercheurs
     """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1223,9 +1202,7 @@ def ressources(request):
 
 def faq(request):
     """
-    FAQ page
-    n :param request:
-    n:return:
+    Gestion de la page des questions fréquentes
     """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1236,8 +1213,6 @@ def faq(request):
 def useful_links(request):
     """
     Useful links page
-    n :param request:
-    n:return:
     """
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1249,11 +1224,7 @@ def useful_links(request):
 
 def default_checker(request, basereverse, default_data=None):
     """
-    Check if the user is connected or not
-    n :param request:
-    n:param basereverse:
-    n:param default_data:
-    n:return:
+    Vérifie si l'utilisateur est reconnu ou non avant de lui donner l'accès à certaines pages.
     """
     # utiliser cette fonction pour call log_checker
     # default_data ='' #use only if that parameter is needed
@@ -1295,9 +1266,7 @@ def default_checker(request, basereverse, default_data=None):
 
 def regular_get_parameters(request):
     """
-    Get parameters
-    n :param request:
-    n:return:
+    Récupère les paramètres de la requête url
     """
     # utiliser cette fonction pour call regular_get_parameters
     # struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1327,10 +1296,7 @@ def regular_get_parameters(request):
 
 def get_scope_data(i_type, p_id):
     """
-    Get scope data
-    n :param i_type:
-    n:param p_id:
-    n:return:
+    Retourne des valeurs de variable en fonction du profil (chercheur,labo)
     """
     # utiliser cette fonction pour call get_scope_data
     # key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
@@ -1359,10 +1325,7 @@ def get_scope_data(i_type, p_id):
 
 def get_date(request, start_date):
     """
-    Get date
-    n :param request:
-    n:param start_date:
-    n:return:
+    Retourne la date passée dans la requête url, sinon renseigne des dates par défaut.
     """
     # utiliser cette fonction pour call get_scope_data
     # date_from, date_to = get_date(request, start_date)

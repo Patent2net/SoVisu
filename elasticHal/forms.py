@@ -4,7 +4,7 @@ from .views import get_index_list
 
 class CsvImportForm(forms.Form):
     """
-    Form to import a csv file into the Django database
+    Formulaire d'import de fichier CSV pour l'indexation dans Django
     :return:
     """
     csv_upload = forms.FileField()
@@ -12,7 +12,7 @@ class CsvImportForm(forms.Form):
 
 class PopulateLab(forms.Form):
     """
-    Form to populate a lab index or/and researchers index with documents
+    Formulaire pour initialiser la population d'un index laboratoire ou chercheur dans Elasticsearch
     :return:
     """
     def __init__(self, *args, **kwargs):
@@ -26,8 +26,7 @@ class PopulateLab(forms.Form):
 
 class ExportToElasticForm(forms.Form):
     """
-    Form to export a Structure/lab/researchers index from Django DB to elasticsearch
-    :return:
+    Formulaire pour créer les index dans Elasticsearch à partir des données de Django et rechercher les documents dans l'API HAL
     """
     Structures = forms.BooleanField(initial=True, required=False)
     Laboratoires = forms.BooleanField(initial=True, required=False)

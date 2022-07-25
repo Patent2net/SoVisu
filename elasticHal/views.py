@@ -6,8 +6,7 @@ es = esActions.es_connector()
 
 def get_index_list():
     """
-    Get list of laboratories indices from Elasticsearch
-    :return: list of indices
+    Récupère la liste des index laboratoires dans elasticsearch
     """
     indexes = ()
     scope_param = esActions.scope_all()

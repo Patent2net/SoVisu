@@ -1,93 +1,85 @@
-elasticHal.libs package
+Paquet elasticHal.libs
 =======================
 
-Submodules
+Modules
 ----------
 
-elasticHal.libs.archivesOuvertes module
----------------------------------------
+elasticHal.libs.archivesOuvertes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.archivesOuvertes
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.dimensions module
----------------------------------
+elasticHal.libs.dimensions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.dimensions
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.doi\_enrichissement module
-------------------------------------------
+elasticHal.libs.doi\_enrichissement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.doi_enrichissement
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.hal module
---------------------------
+elasticHal.libs.hal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.hal
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.keyword\_enrichissement module
-----------------------------------------------
+elasticHal.libs.keyword\_enrichissement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.keyword_enrichissement
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.location\_docs module
--------------------------------------
+elasticHal.libs.location\_docs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.location_docs
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.scanR module
-----------------------------
-
+elasticHal.libs.scanR
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: elasticHal.libs.scanR
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.sherpa module
------------------------------
+elasticHal.libs.sherpa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.sherpa
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.unpaywall module
---------------------------------
+elasticHal.libs.unpaywall
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.unpaywall
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.utils module
-----------------------------
+elasticHal.libs.utils
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.utils
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: elasticHal.libs
-   :members:
-   :undoc-members:
-   :show-inheritance:

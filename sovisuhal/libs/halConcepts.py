@@ -1,7 +1,6 @@
 def concepts():
     """
-    This function returns a list of concepts.
-    :return: list of concepts
+    Retourne la liste des concepts pouvant être par la suite assignés à un chercheur
     """
     return {"id": "Concepts", "children": [{"id": "chim", "label_en": "Chemical Sciences", "label_fr": "Chimie",
                                             "children": [{"id": "chim.anal", "label_en": "Analytical chemistry",

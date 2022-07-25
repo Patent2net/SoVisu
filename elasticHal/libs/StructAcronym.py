@@ -40,8 +40,6 @@ def return_struct():
 def return_struct_from_index(index):
     """
     Enrichi les index laboratoires en entrée avec le champ structAcronym à partir des index de structures
-    :param index: index du laboratoire
-    return: contenu de l'index laboratoire enrichi
     """
     # Cette fonction enregistre le struct Acronym d'un laboratoire en fonctions d'un index
     es = esActions.es_connector()
