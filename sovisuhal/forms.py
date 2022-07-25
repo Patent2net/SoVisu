@@ -6,9 +6,8 @@ struct = "198307662"  # mesure temporaire, valable tant que seuls les chercheurs
 
 class CreateCredentials(forms.Form):
     """
-    Formulaire de création de compte
-    \n\n
-    :param forms.Form:
+    Formulaire de création de compte.
+    Créé un profil utilisateur à partir des données saisies.
     \n\n
     :return:
     """
@@ -47,8 +46,6 @@ class CreateCredentials(forms.Form):
 class ValidCredentials(forms.Form):
     """
     Formulaire de validation de compte
-    \n\n
-    :param forms.Form:
     \n\n
     :return:
     """
@@ -91,8 +88,6 @@ class ValidLabCredentials(forms.Form):
     """
     Formulaire de validation de compte
     \n\n
-    :param forms.Form:
-    \n\n
     :return:
     """
     def __init__(self, *args, **kwargs):
@@ -121,8 +116,6 @@ class SetGuidingKeywords(forms.Form):
     """
     Formulaire de validation de mot clé de guidance
     \n\n
-    :param forms.Form:
-    \n\n
     :return:
     """
     def __init__(self, *args, **kwargs):
@@ -147,8 +140,6 @@ class SetResearchDescription(forms.Form):
     """
     Formulaire de validation de description de recherche
     \n\n
-    :param forms.Form:
-    \n\n
     :return:
     """
     def __init__(self, *args, **kwargs):
@@ -170,8 +161,6 @@ class SetResearchDescription(forms.Form):
 class Search(forms.Form):
     """
     Formulaire de recherche
-    \n\n
-    :param forms.Form:
     \n\n
     :return:
     """

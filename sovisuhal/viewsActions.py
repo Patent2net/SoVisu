@@ -39,9 +39,7 @@ es = esActions.es_connector()
 @login_required
 def admin_access_login(request):
     """
-    Login page for app access
-    param request
-    return HttpResponse
+    Fonction gérant les accès à SoVisu
     """
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
@@ -76,9 +74,7 @@ def admin_access_login(request):
 
 def create_credentials(request):
     """
-    Create credentials for a researcher
-    param request
-    return HttpResponse
+    Fonction gérant la création du nouveau profil d'un chercheur à partir des données renseignées dans le formulaire CreateCredentials
     """
     ldapid = request.GET['ldapid']
     idref = request.POST.get('f_IdRef')
@@ -124,8 +120,6 @@ def create_credentials(request):
 def validate_references(request):
     """
     Validation des références HAL
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -216,8 +210,6 @@ def validate_references(request):
 def validate_guiding_domains(request):
     """
     Validation des domaines de guidance
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -273,8 +265,6 @@ def validate_guiding_domains(request):
 def validate_expertise(request):
     """
     Validation des domaines d'expertise
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -375,8 +365,6 @@ def validate_expertise(request):
 def validate_credentials(request):
     """
     Validation des identifiants
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -439,8 +427,6 @@ def validate_credentials(request):
 def validate_guiding_keywords(request):
     """
     Validation des mots clés de guidance
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -496,8 +482,6 @@ def validate_guiding_keywords(request):
 def validate_research_description(request):
     """
     Validation de la description de recherche
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -565,9 +549,7 @@ def validate_research_description(request):
 
 def refresh_aurehal_id(request):
     """
-    Refresh de l'id aurehal
-    param request
-    return HttpResponse
+    Mise à jour de l'id aurehal
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -620,8 +602,6 @@ def refresh_aurehal_id(request):
 def force_update_references(request):
     """
     Force la mise à jour des références
-    param request
-    return HttpResponse
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -669,9 +649,7 @@ def force_update_references(request):
 
 def update_members(request):
     """
-    Update members
-    param request
-    return HttpResponse
+    Permet la mise à jour du profil utilisateur
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -724,9 +702,7 @@ def update_members(request):
 
 def update_authorship(request):
     """
-    Update authorship
-    param request
-    return HttpResponse
+    Met à jour l'autorat des documents d'un utlisateur après vérification de ce dernier
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -839,9 +815,7 @@ def update_authorship(request):
 
 def export_hceres_xls(request):
     """
-    Export HCERES to XLS
-    param request
-    return HttpResponse
+    Export des données de l'HCERES d'un laboratoire sous fichier Excel (XLS)
     """
     # Get parameters
     if 'struct' in request.GET:
@@ -962,9 +936,7 @@ def export_hceres_xls(request):
 
 def idhal_checkout(idhal):
     """
-    Checkout a HAL structure from IDHAL
-    :param idhal:
-    :return:
+    Vérifie si le halId renseigné existe
     """
     # idhal = "luc-quoniam" valeur test
     html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
@@ -983,8 +955,7 @@ def idhal_checkout(idhal):
 
 def vizualisation_url():
     """
-    Get the url of the vizualisation page
-    :return:
+    Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
     """
     print("mode: ")
     print(mode)

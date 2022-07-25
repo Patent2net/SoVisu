@@ -10,9 +10,6 @@ nlp_en = spacy.load("en_core_web_md")
 def keyword_from_teeft(txt, lang):
     """
     Enrichissement des mots clés avec les entités trouvées dans les résumés à partir de TEEFT
-    :param txt: résumé du document
-    :param lang: langue du document
-    :return: liste des mots clés enrichis
     """
     headers = {
         'accept': 'application/json',
@@ -62,9 +59,6 @@ def keyword_from_teeft(txt, lang):
 def return_entities(txt, lang):
     """
     Enrichissement des documents avec les entités trouvées dans les résumés à partir de la terminologie de loterre
-    :param txt: résumé du document
-    :param lang: langue du document
-    :return: liste des entités enrichies
     """
     entities_fr, entities_en = [], []
     # for index, doc in enumerate(docs):

@@ -4,8 +4,6 @@ import requests
 def generate_countrys_fields(doc):
     """
     Enrichi les données avec les champs "deptStructCountry_s", "labStructCountry_s", "structCountry_s", "structCountry_t","rgrpInstStructCountry_s", "rgrpLabStructCountry_s" en se basant sur les données du document
-    :param doc: document à enrichir
-    :return: document enrichi
     """
     facet_fields_list = ["deptStructCountry_s", "labStructCountry_s", "structCountry_s", "structCountry_t",
                          "rgrpInstStructCountry_s", "rgrpLabStructCountry_s", ]

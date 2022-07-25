@@ -1,86 +1,70 @@
-elasticHal package
+Application ElasticHal
 ==================
 
-Subpackages
+Sous-paquets
 -----------
 
 .. toctree::
    :maxdepth: 4
 
    elasticHal.libs
-   elasticHal.migrations
 
-Submodules
+Modules
 ----------
 
-elasticHal.admin module
------------------------
+elasticHal.admin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.admin
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.apps module
-----------------------
+elasticHal.apps
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.apps
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.clean\_researchers\_from\_es\_base module
-----------------------------------------------------
+elasticHal.clean\_researchers\_from\_es\_base
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.clean_researchers_from_es_base
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.collect\_from\_HAL module
-------------------------------------
+elasticHal.collect\_from\_HAL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.collect_from_HAL
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.insert\_entities module
-----------------------------------
+elasticHal.insert\_entities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.insert_entities
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.models module
-------------------------
+elasticHal.models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.models
    :members:
    :undoc-members:
    :show-inheritance:
 
-elasticHal.tests module
------------------------
-
-.. automodule:: elasticHal.tests
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-elasticHal.views module
------------------------
+elasticHal.views
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.views
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: elasticHal
-   :members:
-   :undoc-members:
-   :show-inheritance:

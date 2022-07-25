@@ -1,77 +1,39 @@
-sovisuhal package
+Application SoVisuhal
 =================
 
-Submodules
+Sous-paquets
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   sovisuhal.libs
+
+Modules
 ----------
 
-sovisuhal.asgi module
----------------------
-
-.. automodule:: sovisuhal.asgi
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-sovisuhal.forms module
-----------------------
+sovisuhal.forms
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: sovisuhal.forms
    :members:
    :undoc-members:
    :show-inheritance:
 
-sovisuhal.settings module
--------------------------
 
-.. automodule:: sovisuhal.settings
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-sovisuhal.test module
----------------------
-
-.. automodule:: sovisuhal.test
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-sovisuhal.urls module
----------------------
-
-.. automodule:: sovisuhal.urls
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-sovisuhal.views module
-----------------------
+sovisuhal.views
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: sovisuhal.views
    :members:
    :undoc-members:
    :show-inheritance:
 
-sovisuhal.viewsActions module
------------------------------
+sovisuhal.viewsActions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: sovisuhal.viewsActions
    :members:
    :undoc-members:
    :show-inheritance:
 
-sovisuhal.wsgi module
----------------------
-
-.. automodule:: sovisuhal.wsgi
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: sovisuhal
-   :members:
-   :undoc-members:
-   :show-inheritance:

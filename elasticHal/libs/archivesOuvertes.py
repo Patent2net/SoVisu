@@ -8,9 +8,7 @@ sparql.setReturnFormat(JSON)
 
 def get_halid_s(aurehal_id):
     """
-    Récupération du authidhal_s associé au aurehal_id dans HAL
-    :param aurehal_id:
-    :return: authidhal_s
+    Récupération du authidhal_s associé au aurehal_id depuis HAL
     """
 
     sparql.setQuery("""
@@ -28,9 +26,6 @@ def get_halid_s(aurehal_id):
 def get_label(label, lang):
     """
     Récupére le nom complet d'un label en fonction de la langue associée
-    :param label:
-    :param lang:
-    :return:
     """
 
     sparql.setQuery("""
@@ -50,8 +45,6 @@ def get_label(label, lang):
 def recup_individu(authidhal_s):
     """
     recupération des données d'un individu à partir de son authidhal_s
-    :param authidhal_s:
-    :return:
     """
     sparql.setQuery("""
 select ?p ?o
@@ -65,9 +58,7 @@ where  {
 
 def explore_broader(uri):
     """
-    explore the broader concept of a concept
-    :param uri:
-    :return:
+    Recherche le domaine parent d'un domaine donné
     """
 
     sparql.setQuery("""
@@ -94,10 +85,7 @@ def explore_broader(uri):
 
 def extrait_sujets_domaines(data):
     """
-    TODO: à vérifier
-    à partir des données de l'article, extrait les sujets et domaines
-    :param data:
-    :return:
+    À partir des données d'un l'article, extrait les sujets et domaines
     """
     # extraction des résultats
     topics = [truc for truc in data['results']['bindings'] if
@@ -125,8 +113,6 @@ def extrait_sujets_domaines(data):
 def explain_domains(dom_uri):
     """
     Recherche le domaine parent d'un domaine dom_uri
-    :param dom_uri:
-    :return:
     """
     sparql.setQuery("""
     prefix foaf: <http://xmlns.com/foaf/0.1/>
@@ -171,8 +157,6 @@ def explain_domains(dom_uri):
 def get_concepts_and_keywords(aurehalid):
     """
     Récupère les concepts et mots-clés d'un auteur à partir de son aurehalid
-    :param aurehalid:
-    :return:
     """
 
     keywords = []

@@ -33,8 +33,7 @@ scope_param = esActions.scope_all()
 
 def get_structid_list():
     """
-    Get the list of structId from ES
-    :return: list of structId
+    Récupère la liste des structSirene des structures recensées dans ElasticSearch
     """
     global structIdlist
     structIdlist = []
@@ -49,10 +48,7 @@ def get_structid_list():
 @shared_task(bind=True)
 def collect_laboratories_data2(self, labo):
     """
-    Collect laboratories data from HAL and save it in ES
-    :param self:
-    :param labo:
-    :return:
+    Collecte les données de laboratoires depuis HAL et les enregistre dans ElasticSearch
     """
     # Init laboratories
     laboratories_list = []
@@ -220,9 +216,6 @@ def collect_laboratories_data2(self, labo):
 def collect_researchers_data(self, struct):
     """
     Collecte des données des chercheurs sur HAL et les enregistre dans ElasticSearch
-    :param self:
-    :param struct:
-    :return:
     """
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     progress_recorder = ProgressRecorder(self)
@@ -434,9 +427,7 @@ def collect_researchers_data(self, struct):
 @shared_task(bind=True)
 def collect_laboratories_data(self):
     """
-    Collect data from laboratories and store it in ElasticSearch
-    :param self:
-    :return:
+    Collecte les données des laboratoires dans HAL et les indexe dans ElasticSearch
     """
     # Init laboratories
     laboratories_list = []
@@ -600,10 +591,6 @@ def collect_laboratories_data(self):
 def collect_researchers_data2(self, struct, idx):
     """
     Collecte les données des chercheurs appartenant à un laboratoire et crée les index pour les chercheurs s'ils n'existent pas dans elasticsearch.
-    :param self:
-    :param struct:
-    :param idx:
-    :return:
     """
     doc_progress_recorder = ProgressRecorder(self)
 
@@ -831,7 +818,6 @@ def collect_researchers_data2(self, struct, idx):
 def init_labo():
     """
     Initialise les données de l'index
-    :return:
     """
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     labos = []
@@ -875,10 +861,6 @@ def init_labo():
 def collect_data(laboratories=False, researcher=False, django_enabler=None):
     """
     Collecte les données de HAL et les indexe dans ElasticSearch
-    :param laboratories: booléen, si True, collecte les données des laboratoires
-    :param researcher: booléen, si True, collecte les données des chercheurs
-    :param django_enabler: booléen, si True, collecte les données en se basant sur les données dans Django DB
-    :return:
     """
     global djangodb_open
 

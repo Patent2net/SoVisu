@@ -21,10 +21,7 @@ admin.site.site_header = "Administration de SoVisu"
 class ExportCsv:
     def export_as_csv(self, request, queryset):
         """
-        Export the selected objects as a CSV file.
-        :param request:
-        :param queryset:
-        :return:
+        Exporte les données sélectionnées dans un fichier CSV
         """
         meta = self.model._meta
         field_names = [field.name for field in meta.fields]
@@ -46,14 +43,12 @@ class ExportCsv:
 
 class ElasticActions:
     """
-    Actions for the Elasticsearch index.
+    Actions pour l'index Elasticsearch
     """
     @staticmethod
     def export_to_elastic(request):
         """
-        Initiate creation of the index and the collect on HAL of the corresponding data in Elasticsearch, based on the known structure of the django database.
-        :param request:
-        :return:
+        Initialise la création des index Elasticsearch et collecte les données correspondantes via l'API HAL
         """
 
         if request.method == "POST":
@@ -115,9 +110,7 @@ class ElasticActions:
     @staticmethod
     def update_elastic(request):
         """
-        Update datas in the designated index in Elasticsearch.
-        :param request:
-        :return:
+        Met à jour les données dans les index Elasticsearch sélectionnées
         """
         if request.method == "POST":
             form = PopulateLab(request.POST)
@@ -169,21 +162,17 @@ class ElasticActions:
         return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
 
 
-# Models are under that line+
+# Models are under that line
 class StructureAdmin(admin.ModelAdmin, ExportCsv):
     """
-    Structure Admin
-    :param admin.ModelAdmin:
-    :param :ExportCsv:
-    :return:
+    Modèle de l'administration des structures
     """
     list_display = ('structSirene', 'acronym', 'label')
     actions = ["export_as_csv"]
 
     def get_urls(self):
         """
-        Get urls
-        :return:
+        Initialise les urls du modèle StructureAdmin
         """
         urls = super().get_urls()
         new_urls = [
@@ -196,9 +185,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
     @staticmethod
     def upload_csv(request):
         """
-        Upload csv file in Django database
-        :param request:
-        :return:
+        Permet de charger un fichier CSV dans la base de données du modèle Structure
         """
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
@@ -235,13 +222,16 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
 
 
 class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
+    """
+    Modèle de l'administration des laboratoires
+    """
     list_display = ('acronym', 'label', 'halStructId', 'idRef', 'structSirene')
     list_filter = ('structSirene',)
     actions = ["export_as_csv"]
 
     def get_urls(self):
         """
-        Get urls
+        Initialise les urls du modèle LaboratoryAdmin
         """
         urls = super().get_urls()
         new_urls = [
@@ -254,9 +244,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
     @staticmethod
     def upload_csv(request):
         """
-        Upload csv file in Django database
-        :param request:
-        :return:
+        Permet de charger un fichier CSV dans la base de données du modèle Laboratory
         """
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
@@ -294,6 +282,9 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
 
 class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
+    """
+    Modèle de l'administration des chercheurs
+    """
     list_display = ('ldapId', 'name', 'function', 'lab')
     list_filter = ('structSirene', 'lab', 'function',)
     search_fields = ('name',)
@@ -301,7 +292,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
 
     def get_urls(self):
         """
-        Get urls
+        Initialise les urls du modèle ResearcherAdmin
         """
         urls = super().get_urls()
         new_urls = [
@@ -314,9 +305,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
     @staticmethod
     def upload_csv(request):
         """
-        Upload csv file in Django database
-        :param request:
-        :return:
+        Permet de charger un fichier CSV dans la base de données du modèle Researcher
         """
         if request.method == "POST":
             csv_file = request.FILES["csv_upload"]
