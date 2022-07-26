@@ -38,6 +38,9 @@ es = esActions.es_connector()
 
 @login_required
 def admin_access_login(request):
+    """
+    Fonction gérant les accès à SoVisu
+    """
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
@@ -70,6 +73,9 @@ def admin_access_login(request):
 
 
 def create_credentials(request):
+    """
+    Fonction gérant la création du nouveau profil d'un chercheur à partir des données renseignées dans le formulaire CreateCredentials
+    """
     ldapid = request.GET['ldapid']
     idref = request.POST.get('f_IdRef')
     idhal = request.POST.get('f_halId_s')
@@ -112,6 +118,9 @@ def create_credentials(request):
 # Redirects
 
 def validate_references(request):
+    """
+    Validation des références HAL
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -199,6 +208,9 @@ def validate_references(request):
 
 
 def validate_guiding_domains(request):
+    """
+    Validation des domaines de guidance
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -251,6 +263,9 @@ def validate_guiding_domains(request):
 
 
 def validate_expertise(request):
+    """
+    Validation des domaines d'expertise
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -348,6 +363,9 @@ def validate_expertise(request):
 
 
 def validate_credentials(request):
+    """
+    Validation des identifiants
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -407,6 +425,9 @@ def validate_credentials(request):
 
 
 def validate_guiding_keywords(request):
+    """
+    Validation des mots clés de guidance
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -459,6 +480,9 @@ def validate_guiding_keywords(request):
 
 
 def validate_research_description(request):
+    """
+    Validation de la description de recherche
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -524,6 +548,9 @@ def validate_research_description(request):
 
 
 def refresh_aurehal_id(request):
+    """
+    Mise à jour de l'id aurehal
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -573,6 +600,9 @@ def refresh_aurehal_id(request):
 
 
 def force_update_references(request):
+    """
+    Force la mise à jour des références
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -618,6 +648,9 @@ def force_update_references(request):
 
 
 def update_members(request):
+    """
+    Permet la mise à jour du profil utilisateur
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -668,6 +701,9 @@ def update_members(request):
 
 
 def update_authorship(request):
+    """
+    Met à jour l'autorat des documents d'un utlisateur après vérification de ce dernier
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -778,6 +814,9 @@ def update_authorship(request):
 
 
 def export_hceres_xls(request):
+    """
+    Export des données de l'HCERES d'un laboratoire sous fichier Excel (XLS)
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -896,6 +935,9 @@ def export_hceres_xls(request):
 
 
 def idhal_checkout(idhal):
+    """
+    Vérifie si le halId renseigné existe
+    """
     # idhal = "luc-quoniam" valeur test
     html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
     response = urlopen(html)
@@ -912,6 +954,9 @@ def idhal_checkout(idhal):
 
 
 def vizualisation_url():
+    """
+    Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
+    """
     print("mode: ")
     print(mode)
     if mode == "dev":

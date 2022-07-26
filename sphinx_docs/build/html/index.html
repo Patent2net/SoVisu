@@ -2,7 +2,7 @@
 <html class="no-js" lang="fr">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Installation" href="install.html" />
 
     <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -154,8 +154,21 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul>
+  <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Développement</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="elasticHal.html">Application ElasticHal</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.libs.html">Paquet elasticHal.libs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="sovisuhal.html">Application SoVisuhal</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html">Paquet sovisuhal.libs</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -183,7 +196,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -193,32 +206,69 @@
 <h1>SoVisu<a class="headerlink" href="#sovisu" title="Lien permanent vers cette rubrique">#</a></h1>
 <p>SoVisu est un dispositif créé et pensé pour accompagner la communauté d’un établissement à la Science Ouverte(SO) en lui fournissant les instruments guides de son pilotage, tout en permettant de cartographier l’expertise des chercheurs.
 Ce dispositif prend source sur HAL pour s’inscrire dans l’écosystème de la SO côté usager en donnant la possibilité aux chercheurs de qualifier/vérifier et compléter leurs données de production, leurs domaines, leurs mot-clés « experts ».</p>
-<p>Pour un chercheur SoVisu accompagne la vérification et recensement des Id (idRef, OrcId, idHal), validation des données issues de scanr, récupération et intégration ou pas de sa production issue de Hal à son profil chercheur.
+<p>Pour un chercheur SoVisu accompagne la vérification et recensement des Id (idRef, OrcId, idHal), validation des données issues de scanr, récupération et intégration ou pas de sa production issue d’Hal à son profil chercheur.
 SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques et interactives à partir des travaux (indicateurs bibliométriques interactifs).</p>
 <p>Pour un laboratoire, ou groupe de, côté gouvernance les mêmes principes et fonctions par agrégations, extractions de la production au format HCERES (4 premiers volets avec calculs réalisés : interrogation unpaywal, appartenance d’un doctorant dans les co-publiants notamment).</p>
 <dl class="simple">
-<dt>SoVisu est une application web Python/Django se basant sur les données disponible sur HAL (<a class="reference external" href="https://hal.archives-ouvertes.fr">https://hal.archives-ouvertes.fr</a>) et constitué de deux app distinctes:</dt><dd><ul class="simple">
+<dt>SoVisu est une application web Python/Django se basant sur les données disponibles sur HAL (<a class="reference external" href="https://hal.archives-ouvertes.fr">https://hal.archives-ouvertes.fr</a>) et constitué de deux app distinctes :</dt><dd><ul class="simple">
 <li><p><strong>elasticHal</strong> : une app chargé de récupérer les données des laboratoires et chercheurs sur HAL afin de les incorporer à une base de données Elastic</p></li>
 <li><p><strong>sovisuhal</strong> : une app chargé d’afficher les données aux utilisateurs et se basant sur un environnement Django et les données récupérées puis stockées dans Elastic par elasticHal</p></li>
 </ul>
 </dd>
 </dl>
 <div class="toctree-wrapper compound">
-</div>
-<section id="documentation-sovisu">
-<h2>Documentation SoVisu<a class="headerlink" href="#documentation-sovisu" title="Lien permanent vers cette rubrique">#</a></h2>
-<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html#prerequis">Prérequis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#configuration-de-l-environnement">Configuration de l’environnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#mise-en-route">Mise en route</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#mise-en-route">Mise en route</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#initialisation-des-processus-dans-la-partie-admin">Initialisation des processus dans la partie Admin</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="install.html#specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement">Spécificités de la mise en route de SoVisu pour le développement</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#initialisation-des-visualisations-dans-kibana">Initialisation des visualisations dans Kibana</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#mise-en-production">Mise en production</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Développement</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="elasticHal.html">Application ElasticHal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#sous-paquets">Sous-paquets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.libs.html">Paquet elasticHal.libs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.html#modules">Modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.admin">elasticHal.admin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.apps">elasticHal.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.clean_researchers_from_es_base">elasticHal.clean_researchers_from_es_base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.collect_from_HAL">elasticHal.collect_from_HAL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.insert_entities">elasticHal.insert_entities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.models">elasticHal.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.views">elasticHal.views</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sovisuhal.html">Application SoVisuhal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.html#sous-paquets">Sous-paquets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sovisuhal.libs.html">Paquet sovisuhal.libs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.html#modules">Modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.forms">sovisuhal.forms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.views">sovisuhal.views</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sovisuhal.html#module-sovisuhal.viewsActions">sovisuhal.viewsActions</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </div>
-</section>
 </section>
 
         </article>
@@ -256,27 +306,8 @@ SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques 
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            Contenu
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">SoVisu</a><ul>
-<li><a class="reference internal" href="#documentation-sovisu">Documentation SoVisu</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

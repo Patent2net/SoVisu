@@ -5,6 +5,9 @@ es = esActions.es_connector()
 
 
 def get_index_list():
+    """
+    Récupère la liste des index laboratoires dans elasticsearch
+    """
     indexes = ()
     scope_param = esActions.scope_all()
     count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']

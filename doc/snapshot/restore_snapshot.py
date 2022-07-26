@@ -20,7 +20,6 @@ print(es.snapshot.restore(repository=path, snapshot=name_test, body=restore_inde
 print(f"Opening all the indices. state: {es.indices.open(index='_all')}")  # indices can be not reopened, security to avoid kibana crash
 
 
-
 """
 # use to delete all snapshots and cleanup the repository
 if snapshot_name:

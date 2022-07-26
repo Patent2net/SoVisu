@@ -6,7 +6,7 @@ Le docker-compose met en œuvre :
 ### Services indispensables
 - Elasticsearch (port 9200). Composant d'indexation. Mode Cluster dans cette version.
 - Kibana (port 5601). Gestion des index, gestions de tableaux de bord
-Non fait : nginx; grafa et cerebro
+Non fait : nginx ; grafa et cerebro
 - Nginx en reverse proxy https sur les différents ports via un chemin dédié (/kibana ; /cerebro et /grafana)
 
 ### Services de monitoring

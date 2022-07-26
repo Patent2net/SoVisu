@@ -3,11 +3,9 @@ import json
 import sys
 import time
 
-
-
 # Custom libs
 from sovisuhal.libs import esActions
-from elasticHal.libs import archivesOuvertes, utils ,StructAcronym
+from elasticHal.libs import archivesOuvertes, utils, StructAcronym
 # Celery
 from celery import shared_task
 # Celery-progress
@@ -23,23 +21,23 @@ djangodb_open = None  # If djangodb_open = True script will use django Db to gen
 
 init = True
 
-
 # Connect to DB
 es = esActions.es_connector()
+
 
 # #print("__name__ value is : ", __name__)
 
 
-
 def get_structid_list():
-    #print("\u00A0 \u21D2 djangodb_open value is : ", djangodb_open)
+    """
+    Récupère la liste des structures dans Elasticsearch et / ou Django DB afin de les stocker dans une variable globale
+    """
     global structIdlist
 
     # get structId for already existing structures in ES
     scope_param = esActions.scope_all()
     count = es.count(index="*-structures", body=scope_param)['count']
     if count > 0:
-        #print("\u00A0 \u21D2 ", count, " structures found in ES")
         res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"])
         structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
 
@@ -48,12 +46,14 @@ def get_structid_list():
         for structure in Structure.objects.all():
             if structure.structSirene not in structIdlist:
                 structIdlist.append(structure.structSirene)
-                #print("\u00A0 \u21D2 Rajout de la structure ", structure.acronym, " (", structure.structSirene, ") dans structIdlist")
             else:
                 print("\u00A0 \u21D2 ", structure.acronym, " is already listed")
 
 
 def get_labo_list():
+    """
+    Récupère la liste des laboratoires dans Elasticsearch et / ou Django DB afin de les stocker dans une variable globale
+    """
     # initialisation liste labos supposée plus fiables que données issues Ldap.
     global Labolist
 
@@ -86,13 +86,15 @@ def get_labo_list():
 
 
 def create_structures_index(pg):
+    """
+    Crée les index de structures dans Elasticsearch
+    """
     # Process structures
 
     if djangodb_open:
         percentage = 0.0
         for row in Structure.objects.all().values():
             row.pop('id')  # delete unique id added by django DB from the dict
-            #print(row)
             es.index(index=row["structSirene"] + "-structures", id=row['structSirene'], body=json.dumps(row))
             progress_description = "processing structure"
             percentage += 33 / len(Structure.objects.all().values())
@@ -103,6 +105,9 @@ def create_structures_index(pg):
 
 
 def create_researchers_index(pg):
+    """
+    Crée les index de chercheurs dans Elasticsearch
+    """
     # Process researchers
     scope_param = esActions.scope_all()
     percentage = 66.0
@@ -121,73 +126,71 @@ def create_researchers_index(pg):
 
     if djangodb_open:
         django_researchers = Researcher.objects.all().values()
-        django_researchers = list([researcher for researcher in django_researchers if researcher['halId_s'] != '' and researcher.pop('id')])  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
+        django_researchers = list([researcher for researcher in django_researchers if
+                                   researcher['halId_s'] != '' and researcher.pop(
+                                       'id')])  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
         if cleaned_es_researchers:
             for researcher in django_researchers:
-                #print(researcher)
                 if any(dictlist['halId_s'] == researcher["halId_s"] for dictlist in cleaned_es_researchers):
                     print("\u00A0 \u21D2 ", researcher["halId_s"] + " is already in cleaned_es_researchers")
                 else:
-                    #print("\u00A0 \u21D2 adding " + researcher["halId_s"] + " to cleaned_es_researchers")
                     cleaned_es_researchers.append(researcher)
         else:
-            #print("\u00A0 \u21D2 cleaned_es_researchers is empty, adding djangoDb content to values")
             cleaned_es_researchers = django_researchers
-    cpt=0
+    cpt = 0
     docmap = {
-            "properties": {
-                # "docid": {
-                #     "type": "long"
-                # },
-                "en_abstract_s": {
-                    "type": "text",  # formerly "string"
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 1000
-                        }}
-                },
-                "fr_abstract_s": {
-                    "type": "text",  # formerly "string"
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 1000
-                        }}
-                },
-                "it_abstract_s": {
-                    "type": "text",  # formerly "string"
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 1000
-                        }}
-                },
-                "es_abstract_s": {
-                    "type": "text",  # formerly "string"
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 1000
-                        }}
-                },
-                "pt_abstract_s": {
-                    "type": "text",  # formerly "string"
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 1000
-                        }}
-                }
+        "properties": {
+            # "docid": {
+            #     "type": "long"
+            # },
+            "en_abstract_s": {
+                "type": "text",  # formerly "string"
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 1000
+                    }}
+            },
+            "fr_abstract_s": {
+                "type": "text",  # formerly "string"
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 1000
+                    }}
+            },
+            "it_abstract_s": {
+                "type": "text",  # formerly "string"
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 1000
+                    }}
+            },
+            "es_abstract_s": {
+                "type": "text",  # formerly "string"
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 1000
+                    }}
+            },
+            "pt_abstract_s": {
+                "type": "text",  # formerly "string"
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 1000
+                    }}
             }
         }
+    }
 
     for row in cleaned_es_researchers:
-        cpt+=1
-        percentage =  66 +  33 *(cpt /len(cleaned_es_researchers))
+        cpt += 1
+        percentage = 66 + 33 * (cpt / len(cleaned_es_researchers))
         pg.set_progress(int(percentage), 100, description=progress_description)
         if row["structSirene"] in structIdlist:
-            #print('\u00A0 \u21D2 Processing : ' + row['halId_s'])
             row["labHalId"] = row["labHalId"].strip()
             if 'validated' in row.keys():
                 if not row["validated"]:
@@ -198,21 +201,20 @@ def create_researchers_index(pg):
             if row['labHalId'] not in Labolist:
                 old_lab = row['labHalId']
                 row['labHalId'] = "non-labo"
-                #print('labo changé --> ', old_lab, ' en ', row['labHalId'], ' pour ', row["ldapId"])
                 connait_lab = "non-labo"
 
             else:
                 connait_lab = row["labHalId"]
                 old_lab = row['labHalId']
 
-            row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empéchant une erreur venant de SPARQL
+            row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empêchant une erreur venant de SPARQL
             try:
-                row['aurehalId'] = row['aurehalId'] .replace(' --> En erreur, contactez-nous','').strip()
+                row['aurehalId'] = row['aurehalId'].replace(' --> En erreur, contactez-nous', '').strip()
                 archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(int(row['aurehalId']))
             except:
-                archives_ouvertes_data=dict()
-                archives_ouvertes_data['concepts'] =[]
-                row['aurehalId'] = str(row['aurehalId']) +" --> En erreur, contactez-nous"
+                archives_ouvertes_data = dict()
+                archives_ouvertes_data['concepts'] = []
+                row['aurehalId'] = str(row['aurehalId']) + " --> En erreur, contactez-nous"
                 print("aille archives_ouvertes_data, ", row['aurehalId'])
             time.sleep(1)
 
@@ -230,7 +232,6 @@ def create_researchers_index(pg):
 
             if "axis" not in row:
                 row["axis"] = row['lab']
-                #print("affectations automatique d'un axis : " + row["axis"])
 
             validated_ids = []
             if 'concepts' in row:  # si le champ existe : mise à jour des concepts existant avec persistance des données validées, sinon création des concepts.
@@ -250,35 +251,34 @@ def create_researchers_index(pg):
 
             # Insert researcher data
             if init:
-                #print("\u00A0 \u21D2 Process researcher init path")
 
                 es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                          body=json.dumps(row))
             else:
-                # #print("row : ", row)
 
-                #print("index : ", row['structSirene'] + "-" + connait_lab + "-researchers")
                 if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers"):
                     es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers")
                     es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                         "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents
                     es.indices.put_mapping(
                         index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
-                        "ldapId"] + "-documents",
+                            "ldapId"] + "-documents",
                         doc_type='_doc',
                         body=docmap,
                         include_type_name=True
                     )
                     es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                              body=json.dumps(row))
-                elif not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
-                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
+                elif not es.indices.exists(
+                        index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
+                    es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
+                        "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                     es.indices.put_mapping(
                         index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
                         doc_type='_doc',
                         body=docmap,
-                        include_type_name = True
-                        )
+                        include_type_name=True
+                    )
                 else:
                     try:
                         docu = dict()  # from https://stackoverflow.com/questions/57564374/elasticsearch-update-gives-unknown-field-error
@@ -286,22 +286,24 @@ def create_researchers_index(pg):
                         es.update(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                                   body=json.dumps(docu))
                     except:
-                        #print("changement d'index : ", connait_lab)
-                        #print(row)
                         try:
-                            es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'], body=json.dumps(row))
+                            es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
+                                     body=json.dumps(row))
                         except:
                             print("boum 2 ???", connait_lab, row['ldapId'])
                 if connait_lab != old_lab:
                     print(" détruire l'entrée ", row['structSirene'] + "-" + old_lab + "-researchers/" + row['ldapId'])
 
-            if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
-                es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")
-                es.indices.put_mapping(index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
-                                       doc_type='_doc',
-                                       body=docmap,
-                                       include_type_name = True
-                                       )
+            if not es.indices.exists(
+                    index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents"):
+                es.indices.create(
+                    index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")
+                es.indices.put_mapping(
+                    index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
+                    doc_type='_doc',
+                    body=docmap,
+                    include_type_name=True
+                    )
 
             if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-laboratories"):
                 es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories")
@@ -310,7 +312,7 @@ def create_researchers_index(pg):
                 es.indices.put_mapping(index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents",
                                        doc_type='_doc',
                                        body=docmap,
-                                       include_type_name = True
+                                       include_type_name=True
                                        )
             percentage += (33.0 / len(cleaned_es_researchers))
             progress_description = row["ldapId"] + " updated"
@@ -321,6 +323,9 @@ def create_researchers_index(pg):
 
 
 def create_laboratories_index(pg):
+    """
+    Créé les index pour les laboratoires
+    """
     # Process laboratories
     scope_param = esActions.scope_all()
     percentage = 33
@@ -341,18 +346,15 @@ def create_laboratories_index(pg):
 
     if djangodb_open:
         if cleaned_es_laboratories:
-            #print("\u00A0 \u21D2 checking DjangoDb laboratory list:")
             for lab in Laboratory.objects.all().values():
                 lab.pop('id')
                 if any(dictlist['halStructId'] == lab['halStructId'] for dictlist in cleaned_es_laboratories):
                     print(lab["acronym"] + " is already in cleaned_es_laboratories")
 
                 else:
-                    #print("\u00A0 \u21D2 adding " + lab["acronym"] + " to cleaned_es_laboratories")
                     cleaned_es_laboratories.append(lab)
 
         else:
-            #print("\u00A0 \u21D2 cleaned_es_laboratories is empty, adding djangoDb content to values")
             for lab in Laboratory.objects.all().values():
                 lab.pop('id')
                 cleaned_es_laboratories.append(lab)
@@ -367,7 +369,8 @@ def create_laboratories_index(pg):
         if not es.indices.exists(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers"):
             es.indices.create(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers")
 
-        es.indices.refresh(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers")  # force le refresh des indices(index) de elasticsearch
+        es.indices.refresh(index=row['structSirene'] + "-" + row[
+            "halStructId"] + "-researchers")  # force le refresh des indices(index) de elasticsearch
         res = es.search(index=row['structSirene'] + "-" + row["halStructId"] + "-researchers", body=rsr_param)
 
         # Build laboratory skills
@@ -416,70 +419,73 @@ def create_laboratories_index(pg):
 
         # create laboratory document repertory
         if not es.indices.exists(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents"):
-            #print(f"creating document directory for: {row['acronym']}(struct: {row['structSirene']})")
             docmap = {
-                    "properties": {
-                        # "docid": {
-                        #     "type": "long"
-                        # },
-                        "en_abstract_s": {
-                            "type": "text",  # formerly "string"
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 1000
-                                }}
-                        },
-                        "fr_abstract_s": {
-                            "type": "text",  # formerly "string"
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 1000
-                                }}
-                        },
-                        "it_abstract_s": {
-                            "type": "text",  # formerly "string"
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 1000
-                                }}
-                        },
-                        "es_abstract_s": {
-                            "type": "text",  # formerly "string"
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 1000
-                                }}
-                        },
-                        "pt_abstract_s": {
-                            "type": "text",  # formerly "string"
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 1000
-                                }}
-                        }
+                "properties": {
+                    # "docid": {
+                    #     "type": "long"
+                    # },
+                    "en_abstract_s": {
+                        "type": "text",  # formerly "string"
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 1000
+                            }}
+                    },
+                    "fr_abstract_s": {
+                        "type": "text",  # formerly "string"
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 1000
+                            }}
+                    },
+                    "it_abstract_s": {
+                        "type": "text",  # formerly "string"
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 1000
+                            }}
+                    },
+                    "es_abstract_s": {
+                        "type": "text",  # formerly "string"
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 1000
+                            }}
+                    },
+                    "pt_abstract_s": {
+                        "type": "text",  # formerly "string"
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 1000
+                            }}
                     }
                 }
+            }
 
             es.indices.create(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
             es.indices.put_mapping(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents",
                                    doc_type='_doc',
                                    body=docmap,
-                                   include_type_name = True
+                                   include_type_name=True
 
-            )
-        percentage += (33.0/len(cleaned_es_laboratories))
-        progress_description = row ["acronym"] + " updated"
+                                   )
+        percentage += (33.0 / len(cleaned_es_laboratories))
+        progress_description = row["acronym"] + " updated"
         pg.set_progress(int(percentage), 100, description=progress_description)
     pg.set_progress(100, 100, description="finished")
     StructAcronym.return_struct()
     return "finished"
 
+
 def temp_laboratories(row):
+    """
+    Nettoie les données provenant de Django avant de les comparer à celles d'Elastic pour insérer les données manquantes.
+    """
     global Labolist
     row["validated"] = False
     row["halStructId"] = row["halStructId"].strip()
@@ -490,57 +496,46 @@ def temp_laboratories(row):
         if connait_lab not in Labolist:
             Labolist.append(connait_lab)
 
+
 @shared_task(bind=True)
 def create_index(self, structure, researcher, laboratories, django_enabler=None):
+    """
+    Initialise la création d'un index pour les catégories sélectionnées (structure, researcher, laboratories)
+    """
     global djangodb_open
     progress_recorder = ProgressRecorder(self)
     djangodb_open = django_enabler
-    #print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    #print('Begin Index creation')
-    #print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    #print('processing get_structid_list')
     get_structid_list()
-    #print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    #print('processing get_labo_list')
     get_labo_list()
     percentage = 0
-    #print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     if structure:
-        progress_description ='processing create_structures_index'
+        progress_description = 'processing create_structures_index'
         percentage = 33
         progress_recorder.set_progress(int(percentage), 100, description=progress_description)
         create_structures_index(progress_recorder)
     else:
-        progress_recorder.set_progress(int(percentage), 100, description='structure is disabled, skipping to next process')
-        #print('structure is disabled, skipping to next process')
-
-    #print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+        progress_recorder.set_progress(int(percentage), 100,
+                                       description='structure is disabled, skipping to next process')
 
     if laboratories:
 
-
-        progress_description ='processing create_laboratories_index'
+        progress_description = 'processing create_laboratories_index'
         create_laboratories_index(progress_recorder)
         percentage = 66
         progress_recorder.set_progress(int(percentage), 100, description=progress_description)
     else:
-        progress_recorder.set_progress(int(percentage), 100, description='laboratories is disabled, skipping to next process')
-        #print('laboratories is disabled, skipping to next process')
-
-    #print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
-    ##print('Index creation finished')
+        progress_recorder.set_progress(int(percentage), 100,
+                                       description='laboratories is disabled, skipping to next process')
 
     if researcher:
 
-        progress_description ='processing create_researchers_index'
+        progress_description = 'processing create_researchers_index'
         create_researchers_index(progress_recorder)
         percentage = 99
         progress_recorder.set_progress(int(percentage), 100, description=progress_description)
     else:
-        progress_recorder.set_progress(int(percentage), 100, description='researcher is disabled, skipping to next process')
-        ##print('researcher is disabled, skipping to next process')
-
-    #print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+        progress_recorder.set_progress(int(percentage), 100,
+                                       description='researcher is disabled, skipping to next process')
 
     progress_description = 'Index creation finished'
     percentage = 100

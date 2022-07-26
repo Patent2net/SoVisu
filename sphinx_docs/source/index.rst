@@ -5,14 +5,11 @@
 
 .. include:: ../../README.md
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
-Documentation SoVisu
---------
 
 .. toctree::
+   :maxdepth: 4
+   :caption: Contenu:
 
    install
+   user_guide
+   modules
