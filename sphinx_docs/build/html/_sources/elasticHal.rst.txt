@@ -1,8 +1,8 @@
 Application ElasticHal
-==================
+========================
 
 Sous-paquets
------------
+--------------
 
 .. toctree::
    :maxdepth: 4

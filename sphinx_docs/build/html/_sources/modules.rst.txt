@@ -1,5 +1,5 @@
 Développement
-======
+==================
 
 .. toctree::
    :maxdepth: 4

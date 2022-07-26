@@ -11,4 +11,5 @@
    :caption: Contenu:
 
    install
+   user_guide
    modules
