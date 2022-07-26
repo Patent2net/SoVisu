@@ -271,6 +271,8 @@ Bien que l’identifiant et le mot de passe soient obligatoires, le champ adress
 <p>Avant toute mise en route de SoVisu, vérifiez que l’instance elastic avec lequel le projet interagit est active.
 Si ce n’est pas le cas, SoVisu renverra un message d’erreur au lieu de s’initialiser normalement.</p>
 </div>
+<section id="initialisation-des-processus-dans-la-partie-admin">
+<h3>Initialisation des processus dans la partie Admin<a class="headerlink" href="#initialisation-des-processus-dans-la-partie-admin" title="Lien permanent vers cette rubrique">#</a></h3>
 <ol class="arabic simple">
 <li><p>Lancez SoVisu:</p></li>
 </ol>
@@ -472,9 +474,35 @@ La récupération des données dans Elasticsearch est longue, et peut prendre du
 celle ci se base sur les données des modèles présent dans Django mais également les éléments déjà importés dans Elasticsearch.
 Pour cela, il suffit de sélectionner la partie qui doit être mise à jour pour lancer un processus allégé.</p>
 </div>
-<ol class="arabic simple" start="9">
-<li><p>Une fois le processus terminé, vous pouvez retourner sur l’acceuil</p></li>
+<section id="specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement">
+<h4>Spécificités de la mise en route de SoVisu pour le développement<a class="headerlink" href="#specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement" title="Lien permanent vers cette rubrique">#</a></h4>
+<p>Dans le cas d’une installation de SoVisu sur une machine de développement n’ayant pas accès à l’authentification par CAS, il est nécessaire de définir un profil utilisateur afin d’accéder à l’application.
+Dans le cas d’un profil chercheur, celui ci est identifié par SoVisu grâce à son identifiant ldapId. Le nom d’utilisateur est le même que l’identifiant ldapId.</p>
+<p>Il est cependant possible de définir un profil utilisateur nommé « adminlab », reconnu par SoVisu comme un administrateur du laboratoire et ayant donc accès complet à l’application.</p>
+<ol class="arabic simple">
+<li><p>Dans l’interface d’administration de SoVisu, cliquez sur « Utilisateurs » dans « Authentification et autorisations ».</p></li>
+<li><p>Cliquez sur « Ajouter utilisateur ».</p></li>
+<li><p>Créez un utilisateur ayant pour nom d’utilisateur « adminlab », le mot de passe est libre de choix.</p></li>
+<li><p>Cliquez sur « Enregistrer ».</p></li>
 </ol>
+</section>
+</section>
+<section id="initialisation-des-visualisations-dans-kibana">
+<h3>Initialisation des visualisations dans Kibana<a class="headerlink" href="#initialisation-des-visualisations-dans-kibana" title="Lien permanent vers cette rubrique">#</a></h3>
+<p>Dans Kibana, il est possible de créer des visualisations à partir des données présentes dans Elasticsearch.
+Par défaut SoVisu propose des visualisations qui sont disponibles dans les dossiers du projet:
+SoVisu/doc/Dashboards/</p>
+<p>Afin de les rendre disponible il est nécessaire de les importer dans l’instance Kibana dont dépend votre installation.</p>
+<ol class="arabic simple">
+<li><p>Dans Kibana, ouvrez le menu.</p></li>
+<li><p>Dans la section Management, cliquez sur « Stack Management »</p></li>
+<li><p>Sur la nouvelle page affichée, allez dans « Saved Objects »(dans la section Kibana).</p></li>
+<li><p>Cliquez sur « Import » et importez les fichiers disponibles dans le dossier SoVisu/doc/Dashboards/, en sélectionnant  les options « check for existing objects » et « automatically overwrite conflicts ».</p></li>
+<li><p>Cliquez sur « import ».</p></li>
+<li><p>Kibana vous signale l’ensemble des objets modifiés; Cliquez sur « Done »</p></li>
+<li><p>répétez les points 4 à 6 pour l’ensemble des fichiers dans le dossier.</p></li>
+</ol>
+</section>
 </section>
 <section id="mise-en-production">
 <h2>Mise en production<a class="headerlink" href="#mise-en-production" title="Lien permanent vers cette rubrique">#</a></h2>
@@ -545,7 +573,14 @@ Pour cela, il suffit de sélectionner la partie qui doit être mise à jour pour
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#prerequis">Prérequis</a></li>
 <li><a class="reference internal" href="#configuration-de-l-environnement">Configuration de l’environnement</a></li>
-<li><a class="reference internal" href="#mise-en-route">Mise en route</a></li>
+<li><a class="reference internal" href="#mise-en-route">Mise en route</a><ul>
+<li><a class="reference internal" href="#initialisation-des-processus-dans-la-partie-admin">Initialisation des processus dans la partie Admin</a><ul>
+<li><a class="reference internal" href="#specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement">Spécificités de la mise en route de SoVisu pour le développement</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#initialisation-des-visualisations-dans-kibana">Initialisation des visualisations dans Kibana</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#mise-en-production">Mise en production</a></li>
 </ul>
 </li>
