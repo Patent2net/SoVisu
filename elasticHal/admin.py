@@ -4,7 +4,10 @@ from django.contrib import admin, messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import path, reverse
+
 from .models import Structure, Laboratory, Researcher
+from django.contrib.auth.models import User, Group
+
 from .insert_entities import create_index
 from .collect_from_HAL import collect_data, collect_laboratories_data2, collect_researchers_data2
 
@@ -188,7 +191,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         Permet de charger un fichier CSV dans la base de données du modèle Structure
         """
         if request.method == "POST":
-            csv_file = request.FILES["csv_upload"]
+            csv_file = request.FILES["importer_un_fichier"]
 
             if not csv_file.name.endswith('.csv'):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
@@ -247,7 +250,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         Permet de charger un fichier CSV dans la base de données du modèle Laboratory
         """
         if request.method == "POST":
-            csv_file = request.FILES["csv_upload"]
+            csv_file = request.FILES["importer_un_fichier"]
 
             if not csv_file.name.endswith('.csv'):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
@@ -308,7 +311,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         Permet de charger un fichier CSV dans la base de données du modèle Researcher
         """
         if request.method == "POST":
-            csv_file = request.FILES["csv_upload"]
+            csv_file = request.FILES["importer_un_fichier"]
 
             if not csv_file.name.endswith('.csv'):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
@@ -351,6 +354,10 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         form = CsvImportForm()
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
+
+# Unregister the default admin site
+# admin.site.unregister(User)
+# admin.site.unregister(Group)
 
 
 # Register your models here.
