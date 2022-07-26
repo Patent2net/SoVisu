@@ -15,6 +15,9 @@ except:
 
 # Use that base code in other files to use es_connector function: es = esActions.es_connector()
 def es_connector(mode=mode):
+    """
+    Assure la connexion de SoVisu à l'instance ElasticSearch
+    """
     if mode == "Prod":
 
         secret = config('ELASTIC_PASSWORD')
@@ -23,7 +26,6 @@ def es_connector(mode=mode):
                            http_auth=('elastic', secret),
                            scheme="http",
                            port=9200)
-                           # ssl_context=context,
 
     else:
         es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
@@ -35,6 +37,9 @@ def es_connector(mode=mode):
 
 # Use that base code in other files to use scope_all function: variable_name = esActions.scope_all()
 def scope_all():
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne tous les documents
+    """
     scope = {
         "query": {
             "match_all": {}
@@ -45,6 +50,9 @@ def scope_all():
 
 # Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
 def scope_p(scope_field, scope_value):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction d'un filtre
+    """
     scope = {
         "query": {
             "match": {
@@ -57,6 +65,9 @@ def scope_p(scope_field, scope_value):
 
 # Use that base code in other files to use date_all function: variable_name = esActions.date_all()
 def date_all():
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne tous les documents, triés par date de publication
+    """
     start_date_param = {
         "size": 1,
         "sort": [
@@ -72,6 +83,9 @@ def date_all():
 
 # Use that base code in other files to use date_p function: variable_name = esActions.date_p(scope_field, scope_value)
 def date_p(scope_field, scope_value):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction d'un filtre, triés par date de publication
+    """
     start_date_param = {
         "size": 1,
         "sort": [
@@ -88,6 +102,9 @@ def date_p(scope_field, scope_value):
 # entity[key], validate, date_range_type, dateFrom, dateTo)
 
 def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from, scope_date_to):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction de différents filtres, dans une période donnée
+    """
     ref_param = {
         "query": {
             "bool": {
@@ -122,6 +139,9 @@ def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, 
 
 def ref_p_filter(p_filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
                  scope_date_to):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction de différents filtres, dans une période donnée et d'un filtre p_filter("uncomplete","complete", "all").
+    """
     if p_filter == "uncomplete":
         ref_param = {
             "query": {
@@ -228,6 +248,9 @@ def ref_p_filter(p_filter, scope_bool_type, scope_field, scope_value, validate, 
 
 
 def confirm_p(scope_field, scope_value, validate):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction d'un filtre, qui ont leur champ validated à une certaine valeur.
+    """
     has_to_confirm_param = {
         "query": {
             "bool": {

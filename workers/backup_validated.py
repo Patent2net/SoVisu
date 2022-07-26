@@ -19,3 +19,4 @@ for doc in docs["hits"]["hits"][0:5]:
 
 with open('data/dump.json', 'w') as outfile:
     json.dump(dump, outfile)
+

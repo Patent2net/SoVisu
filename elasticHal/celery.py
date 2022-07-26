@@ -19,4 +19,7 @@ app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
+    """
+    Permet de tester la connexion à celery
+    """
     print(f'Request: {self.request!r}')

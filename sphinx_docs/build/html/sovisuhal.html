@@ -1,0 +1,740 @@
+<!doctype html>
+<html class="no-js" lang="fr">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Paquet sovisuhal.libs" href="sovisuhal.libs.html" /><link rel="prev" title="Paquet elasticHal.libs" href="elasticHal.libs.html" />
+
+    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+        <title>Application SoVisuhal - Documentation SoVisu 0.0.1</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Documentation SoVisu 0.0.1</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Documentation SoVisu 0.0.1</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Recherche name="q" aria-label="Recherche">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">Développement</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="elasticHal.html">Application ElasticHal</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="elasticHal.libs.html">Paquet elasticHal.libs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">Application SoVisuhal</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html">Paquet sovisuhal.libs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="application-sovisuhal">
+<h1>Application SoVisuhal<a class="headerlink" href="#application-sovisuhal" title="Lien permanent vers cette rubrique">#</a></h1>
+<section id="sous-paquets">
+<h2>Sous-paquets<a class="headerlink" href="#sous-paquets" title="Lien permanent vers cette rubrique">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sovisuhal.libs.html">Paquet sovisuhal.libs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sovisuhal.libs.html#modules">Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html#module-sovisuhal.libs.elastichal">sovisuhal.libs.elastichal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html#module-sovisuhal.libs.esActions">sovisuhal.libs.esActions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html#module-sovisuhal.libs.halConcepts">sovisuhal.libs.halConcepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sovisuhal.libs.html#module-sovisuhal.libs.hceres">sovisuhal.libs.hceres</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Lien permanent vers cette rubrique">#</a></h2>
+<section id="module-sovisuhal.forms">
+<span id="sovisuhal-forms"></span><h3>sovisuhal.forms<a class="headerlink" href="#module-sovisuhal.forms" title="Lien permanent vers cette rubrique">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sovisuhal.forms.</span></span><span class="sig-name descname"><span class="pre">CreateCredentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_id='id_%s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_class=&lt;class</span> <span class="pre">'django.forms.utils.ErrorList'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_suffix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty_permitted=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_order=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_required_attribute=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.forms.CreateCredentials" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></p>
+<p>Formulaire de création de compte.
+Créé un profil utilisateur à partir des données saisies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Renvoie</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_IdRef':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_halId_s':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_labo':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_orcId':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_role':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.base_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.count">
+<span class="sig-name descname"><span class="pre">count</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.count" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_IdRef':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_halId_s':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_labo':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_orcId':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_role':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.declared_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.entities">
+<span class="sig-name descname"><span class="pre">entities</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[{'_index':</span> <span class="pre">'198307662-527028-laboratories',</span> <span class="pre">'_id':</span> <span class="pre">'527028',</span> <span class="pre">'_score':</span> <span class="pre">1.0,</span> <span class="pre">'_source':</span> <span class="pre">{'structSirene':</span> <span class="pre">'198307662',</span> <span class="pre">'acronym':</span> <span class="pre">'IMSIC',</span> <span class="pre">'label':</span> <span class="pre">&quot;Institut</span> <span class="pre">mediterranéen</span> <span class="pre">des</span> <span class="pre">sciences</span> <span class="pre">de</span> <span class="pre">l'information</span> <span class="pre">et</span> <span class="pre">de</span> <span class="pre">la</span> <span class="pre">communication&quot;,</span> <span class="pre">'halStructId':</span> <span class="pre">'527028',</span> <span class="pre">'rsnr':</span> <span class="pre">'527028',</span> <span class="pre">'idRef':</span> <span class="pre">'233736085',</span> <span class="pre">'guidingKeywords':</span> <span class="pre">[],</span> <span class="pre">'Created':</span> <span class="pre">'2022-07-12T11:28:18.213487',</span> <span class="pre">'concepts':</span> <span class="pre">{'id':</span> <span class="pre">'Concepts',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'info',</span> <span class="pre">'label_fr':</span> <span class="pre">'Informatique',</span> <span class="pre">'label_en':</span> <span class="pre">'Computer</span> <span class="pre">Science',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'info.info-tt',</span> <span class="pre">'label_fr':</span> <span class="pre">'Traitement</span> <span class="pre">du</span> <span class="pre">texte</span> <span class="pre">et</span> <span class="pre">du</span> <span class="pre">document',</span> <span class="pre">'label_en':</span> <span class="pre">'Document</span> <span class="pre">and</span> <span class="pre">Text</span> <span class="pre">Processing',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-mo',</span> <span class="pre">'label_fr':</span> <span class="pre">'Modélisation</span> <span class="pre">et</span> <span class="pre">simulation',</span> <span class="pre">'label_en':</span> <span class="pre">'Modeling</span> <span class="pre">and</span> <span class="pre">Simulation',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ne',</span> <span class="pre">'label_fr':</span> <span class="pre">'Réseau</span> <span class="pre">de</span> <span class="pre">neurones',</span> <span class="pre">'label_en':</span> <span class="pre">'Neural</span> <span class="pre">and</span> <span class="pre">Evolutionary</span> <span class="pre">Computing',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-wb',</span> <span class="pre">'label_fr':</span> <span class="pre">'Web',</span> <span class="pre">'label_en':</span> <span class="pre">'Web',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ai',</span> <span class="pre">'label_fr':</span> <span class="pre">'Intelligence</span> <span class="pre">artificielle',</span> <span class="pre">'label_en':</span> <span class="pre">'Artificial</span> <span class="pre">Intelligence',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.eiah',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Environnements</span> <span class="pre">Informatiques</span> <span class="pre">pour</span> <span class="pre">l'Apprentissage</span> <span class="pre">Humain&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Technology</span> <span class="pre">for</span> <span class="pre">Human</span> <span class="pre">Learning',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-dl',</span> <span class="pre">'label_fr':</span> <span class="pre">'Bibliothèque</span> <span class="pre">électronique',</span> <span class="pre">'label_en':</span> <span class="pre">'Digital</span> <span class="pre">Libraries',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ir',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Recherche</span> <span class="pre">d'information&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Information</span> <span class="pre">Retrieval',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ts',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Traitement</span> <span class="pre">du</span> <span class="pre">signal</span> <span class="pre">et</span> <span class="pre">de</span> <span class="pre">l'image&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Signal</span> <span class="pre">and</span> <span class="pre">Image</span> <span class="pre">Processing',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'shs',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Sciences</span> <span class="pre">de</span> <span class="pre">l'Homme</span> <span class="pre">et</span> <span class="pre">Société&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Humanities</span> <span class="pre">and</span> <span class="pre">Social</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'shs.gestion',</span> <span class="pre">'label_fr':</span> <span class="pre">'Gestion</span> <span class="pre">et</span> <span class="pre">management',</span> <span class="pre">'label_en':</span> <span class="pre">'Business</span> <span class="pre">administration',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'shs.psy',</span> <span class="pre">'label_fr':</span> <span class="pre">'Psychologie',</span> <span class="pre">'label_en':</span> <span class="pre">'Psychology',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'shs.stat',</span> <span class="pre">'label_fr':</span> <span class="pre">'Méthodes</span> <span class="pre">et</span> <span class="pre">statistiques',</span> <span class="pre">'label_en':</span> <span class="pre">'Methods</span> <span class="pre">and</span> <span class="pre">statistics',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'sdv',</span> <span class="pre">'label_fr':</span> <span class="pre">'Sciences</span> <span class="pre">du</span> <span class="pre">Vivant',</span> <span class="pre">'label_en':</span> <span class="pre">'Life</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sdv.tox',</span> <span class="pre">'label_fr':</span> <span class="pre">'Toxicologie',</span> <span class="pre">'label_en':</span> <span class="pre">'Toxicology',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sdv.tox.eco',</span> <span class="pre">'label_fr':</span> <span class="pre">'Ecotoxicologie',</span> <span class="pre">'label_en':</span> <span class="pre">'Ecotoxicology',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'sdv.neu',</span> <span class="pre">'label_fr':</span> <span class="pre">'Neurosciences',</span> <span class="pre">'label_en':</span> <span class="pre">'Neurons</span> <span class="pre">and</span> <span class="pre">Cognition',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sdv.neu.sc',</span> <span class="pre">'label_fr':</span> <span class="pre">'Sciences</span> <span class="pre">cognitives',</span> <span class="pre">'label_en':</span> <span class="pre">'Cognitive</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'qfin',</span> <span class="pre">'label_fr':</span> <span class="pre">'Économie</span> <span class="pre">et</span> <span class="pre">finance</span> <span class="pre">quantitative',</span> <span class="pre">'label_en':</span> <span class="pre">'Quantitative</span> <span class="pre">Finance',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'qfin.st',</span> <span class="pre">'label_fr':</span> <span class="pre">'Econométrie</span> <span class="pre">de</span> <span class="pre">la</span> <span class="pre">finance',</span> <span class="pre">'label_en':</span> <span class="pre">'Statistical</span> <span class="pre">Finance',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'spi',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Sciences</span> <span class="pre">de</span> <span class="pre">l'ingénieur&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Engineering</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'spi.auto',</span> <span class="pre">'label_fr':</span> <span class="pre">'Automatique</span> <span class="pre">/</span> <span class="pre">Robotique',</span> <span class="pre">'label_en':</span> <span class="pre">'Automatic',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'sde',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Sciences</span> <span class="pre">de</span> <span class="pre">l'environnement&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Environmental</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sde.es',</span> <span class="pre">'label_fr':</span> <span class="pre">'Environnement</span> <span class="pre">et</span> <span class="pre">Société',</span> <span class="pre">'label_en':</span> <span class="pre">'Environmental</span> <span class="pre">and</span> <span class="pre">Society',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}]},</span> <span class="pre">'structAcronym':</span> <span class="pre">'UTLN'}}]</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.entities" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.es">
+<span class="sig-name descname"><span class="pre">es</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Elasticsearch([{'host':</span> <span class="pre">'localhost',</span> <span class="pre">'port':</span> <span class="pre">9200}])&gt;</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.es" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.labos">
+<span class="sig-name descname"><span class="pre">labos</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('',</span> <span class="pre">''),</span> <span class="pre">(('527028',</span> <span class="pre">'IMSIC'),</span> <span class="pre">&quot;Institut</span> <span class="pre">mediterranéen</span> <span class="pre">des</span> <span class="pre">sciences</span> <span class="pre">de</span> <span class="pre">l'information</span> <span class="pre">et</span> <span class="pre">de</span> <span class="pre">la</span> <span class="pre">communication&quot;)]</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.labos" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.media" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.res">
+<span class="sig-name descname"><span class="pre">res</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'_shards':</span> <span class="pre">{'failed':</span> <span class="pre">0,</span> <span class="pre">'skipped':</span> <span class="pre">0,</span> <span class="pre">'successful':</span> <span class="pre">1,</span> <span class="pre">'total':</span> <span class="pre">1},</span> <span class="pre">'hits':</span> <span class="pre">{'hits':</span> <span class="pre">[{'_index':</span> <span class="pre">'198307662-527028-laboratories',</span> <span class="pre">'_id':</span> <span class="pre">'527028',</span> <span class="pre">'_score':</span> <span class="pre">1.0,</span> <span class="pre">'_source':</span> <span class="pre">{'structSirene':</span> <span class="pre">'198307662',</span> <span class="pre">'acronym':</span> <span class="pre">'IMSIC',</span> <span class="pre">'label':</span> <span class="pre">&quot;Institut</span> <span class="pre">mediterranéen</span> <span class="pre">des</span> <span class="pre">sciences</span> <span class="pre">de</span> <span class="pre">l'information</span> <span class="pre">et</span> <span class="pre">de</span> <span class="pre">la</span> <span class="pre">communication&quot;,</span> <span class="pre">'halStructId':</span> <span class="pre">'527028',</span> <span class="pre">'rsnr':</span> <span class="pre">'527028',</span> <span class="pre">'idRef':</span> <span class="pre">'233736085',</span> <span class="pre">'guidingKeywords':</span> <span class="pre">[],</span> <span class="pre">'Created':</span> <span class="pre">'2022-07-12T11:28:18.213487',</span> <span class="pre">'concepts':</span> <span class="pre">{'id':</span> <span class="pre">'Concepts',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'info',</span> <span class="pre">'label_fr':</span> <span class="pre">'Informatique',</span> <span class="pre">'label_en':</span> <span class="pre">'Computer</span> <span class="pre">Science',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'info.info-tt',</span> <span class="pre">'label_fr':</span> <span class="pre">'Traitement</span> <span class="pre">du</span> <span class="pre">texte</span> <span class="pre">et</span> <span class="pre">du</span> <span class="pre">document',</span> <span class="pre">'label_en':</span> <span class="pre">'Document</span> <span class="pre">and</span> <span class="pre">Text</span> <span class="pre">Processing',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-mo',</span> <span class="pre">'label_fr':</span> <span class="pre">'Modélisation</span> <span class="pre">et</span> <span class="pre">simulation',</span> <span class="pre">'label_en':</span> <span class="pre">'Modeling</span> <span class="pre">and</span> <span class="pre">Simulation',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ne',</span> <span class="pre">'label_fr':</span> <span class="pre">'Réseau</span> <span class="pre">de</span> <span class="pre">neurones',</span> <span class="pre">'label_en':</span> <span class="pre">'Neural</span> <span class="pre">and</span> <span class="pre">Evolutionary</span> <span class="pre">Computing',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-wb',</span> <span class="pre">'label_fr':</span> <span class="pre">'Web',</span> <span class="pre">'label_en':</span> <span class="pre">'Web',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ai',</span> <span class="pre">'label_fr':</span> <span class="pre">'Intelligence</span> <span class="pre">artificielle',</span> <span class="pre">'label_en':</span> <span class="pre">'Artificial</span> <span class="pre">Intelligence',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.eiah',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Environnements</span> <span class="pre">Informatiques</span> <span class="pre">pour</span> <span class="pre">l'Apprentissage</span> <span class="pre">Humain&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Technology</span> <span class="pre">for</span> <span class="pre">Human</span> <span class="pre">Learning',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-dl',</span> <span class="pre">'label_fr':</span> <span class="pre">'Bibliothèque</span> <span class="pre">électronique',</span> <span class="pre">'label_en':</span> <span class="pre">'Digital</span> <span class="pre">Libraries',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ir',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Recherche</span> <span class="pre">d'information&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Information</span> <span class="pre">Retrieval',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'info.info-ts',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Traitement</span> <span class="pre">du</span> <span class="pre">signal</span> <span class="pre">et</span> <span class="pre">de</span> <span class="pre">l'image&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Signal</span> <span class="pre">and</span> <span class="pre">Image</span> <span class="pre">Processing',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'shs',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Sciences</span> <span class="pre">de</span> <span class="pre">l'Homme</span> <span class="pre">et</span> <span class="pre">Société&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Humanities</span> <span class="pre">and</span> <span class="pre">Social</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'shs.gestion',</span> <span class="pre">'label_fr':</span> <span class="pre">'Gestion</span> <span class="pre">et</span> <span class="pre">management',</span> <span class="pre">'label_en':</span> <span class="pre">'Business</span> <span class="pre">administration',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'shs.psy',</span> <span class="pre">'label_fr':</span> <span class="pre">'Psychologie',</span> <span class="pre">'label_en':</span> <span class="pre">'Psychology',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'shs.stat',</span> <span class="pre">'label_fr':</span> <span class="pre">'Méthodes</span> <span class="pre">et</span> <span class="pre">statistiques',</span> <span class="pre">'label_en':</span> <span class="pre">'Methods</span> <span class="pre">and</span> <span class="pre">statistics',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'sdv',</span> <span class="pre">'label_fr':</span> <span class="pre">'Sciences</span> <span class="pre">du</span> <span class="pre">Vivant',</span> <span class="pre">'label_en':</span> <span class="pre">'Life</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sdv.tox',</span> <span class="pre">'label_fr':</span> <span class="pre">'Toxicologie',</span> <span class="pre">'label_en':</span> <span class="pre">'Toxicology',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sdv.tox.eco',</span> <span class="pre">'label_fr':</span> <span class="pre">'Ecotoxicologie',</span> <span class="pre">'label_en':</span> <span class="pre">'Ecotoxicology',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'sdv.neu',</span> <span class="pre">'label_fr':</span> <span class="pre">'Neurosciences',</span> <span class="pre">'label_en':</span> <span class="pre">'Neurons</span> <span class="pre">and</span> <span class="pre">Cognition',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sdv.neu.sc',</span> <span class="pre">'label_fr':</span> <span class="pre">'Sciences</span> <span class="pre">cognitives',</span> <span class="pre">'label_en':</span> <span class="pre">'Cognitive</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'qfin',</span> <span class="pre">'label_fr':</span> <span class="pre">'Économie</span> <span class="pre">et</span> <span class="pre">finance</span> <span class="pre">quantitative',</span> <span class="pre">'label_en':</span> <span class="pre">'Quantitative</span> <span class="pre">Finance',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'qfin.st',</span> <span class="pre">'label_fr':</span> <span class="pre">'Econométrie</span> <span class="pre">de</span> <span class="pre">la</span> <span class="pre">finance',</span> <span class="pre">'label_en':</span> <span class="pre">'Statistical</span> <span class="pre">Finance',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'spi',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Sciences</span> <span class="pre">de</span> <span class="pre">l'ingénieur&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Engineering</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'spi.auto',</span> <span class="pre">'label_fr':</span> <span class="pre">'Automatique</span> <span class="pre">/</span> <span class="pre">Robotique',</span> <span class="pre">'label_en':</span> <span class="pre">'Automatic',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]},</span> <span class="pre">{'id':</span> <span class="pre">'sde',</span> <span class="pre">'label_fr':</span> <span class="pre">&quot;Sciences</span> <span class="pre">de</span> <span class="pre">l'environnement&quot;,</span> <span class="pre">'label_en':</span> <span class="pre">'Environmental</span> <span class="pre">Sciences',</span> <span class="pre">'children':</span> <span class="pre">[{'id':</span> <span class="pre">'sde.es',</span> <span class="pre">'label_fr':</span> <span class="pre">'Environnement</span> <span class="pre">et</span> <span class="pre">Société',</span> <span class="pre">'label_en':</span> <span class="pre">'Environmental</span> <span class="pre">and</span> <span class="pre">Society',</span> <span class="pre">'children':</span> <span class="pre">[],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}],</span> <span class="pre">'researchers':</span> <span class="pre">[{'ldapId':</span> <span class="pre">'dreymond',</span> <span class="pre">'firstName':</span> <span class="pre">'David',</span> <span class="pre">'lastName':</span> <span class="pre">'REYMOND',</span> <span class="pre">'state':</span> <span class="pre">'invalidated'}]}]},</span> <span class="pre">'structAcronym':</span> <span class="pre">'UTLN'}}],</span> <span class="pre">'max_score':</span> <span class="pre">1.0,</span> <span class="pre">'total':</span> <span class="pre">{'relation':</span> <span class="pre">'eq',</span> <span class="pre">'value':</span> <span class="pre">1}},</span> <span class="pre">'timed_out':</span> <span class="pre">False,</span> <span class="pre">'took':</span> <span class="pre">0}</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.res" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('chercheur',</span> <span class="pre">'chercheur'),</span> <span class="pre">('adminlab',</span> <span class="pre">'responsable</span> <span class="pre">ou</span> <span class="pre">directeur</span> <span class="pre">de</span> <span class="pre">laboratoire'),</span> <span class="pre">('doctorant',</span> <span class="pre">'doctorant'),</span> <span class="pre">('visiteur',</span> <span class="pre">'visiteur')]</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.roles" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.CreateCredentials.scope_param">
+<span class="sig-name descname"><span class="pre">scope_param</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'query':</span> <span class="pre">{'match_all':</span> <span class="pre">{}}}</span></em><a class="headerlink" href="#sovisuhal.forms.CreateCredentials.scope_param" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sovisuhal.forms.Search">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sovisuhal.forms.</span></span><span class="sig-name descname"><span class="pre">Search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.forms.Search" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></p>
+<p>Formulaire de recherche</p>
+<dl class="field-list simple">
+<dt class="field-odd">Renvoie</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.Search.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_index':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_search':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.Search.base_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.Search.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_index':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_search':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.Search.declared_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.Search.indexes">
+<span class="sig-name descname"><span class="pre">indexes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('*-researchers-*-doc*',</span> <span class="pre">'références'),</span> <span class="pre">('*-researchers',</span> <span class="pre">'chercheurs'),</span> <span class="pre">('*-laboratories',</span> <span class="pre">'laboratoires'))</span></em><a class="headerlink" href="#sovisuhal.forms.Search.indexes" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sovisuhal.forms.Search.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#sovisuhal.forms.Search.media" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetGuidingKeywords">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sovisuhal.forms.</span></span><span class="sig-name descname"><span class="pre">SetGuidingKeywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.forms.SetGuidingKeywords" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></p>
+<p>Formulaire de validation de mot clé de guidance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Renvoie</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetGuidingKeywords.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_guidingKeywords':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.SetGuidingKeywords.base_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetGuidingKeywords.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_guidingKeywords':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.SetGuidingKeywords.declared_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetGuidingKeywords.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#sovisuhal.forms.SetGuidingKeywords.media" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetResearchDescription">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sovisuhal.forms.</span></span><span class="sig-name descname"><span class="pre">SetResearchDescription</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.forms.SetResearchDescription" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></p>
+<p>Formulaire de validation de description de recherche</p>
+<dl class="field-list simple">
+<dt class="field-odd">Renvoie</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetResearchDescription.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_research_projectsAndFundings':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_research_projectsInProgress':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_research_summary':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.SetResearchDescription.base_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetResearchDescription.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_research_projectsAndFundings':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_research_projectsInProgress':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_research_summary':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.SetResearchDescription.declared_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sovisuhal.forms.SetResearchDescription.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#sovisuhal.forms.SetResearchDescription.media" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidCredentials">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sovisuhal.forms.</span></span><span class="sig-name descname"><span class="pre">ValidCredentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.forms.ValidCredentials" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></p>
+<p>Formulaire de validation de compte</p>
+<dl class="field-list simple">
+<dt class="field-odd">Renvoie</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidCredentials.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_IdRef':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_halId_s':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_more':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_orcId':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_status':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.ValidCredentials.base_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidCredentials.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_IdRef':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_halId_s':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_more':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_orcId':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_status':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.ValidCredentials.declared_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidCredentials.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#sovisuhal.forms.ValidCredentials.media" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidCredentials.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('0',</span> <span class="pre">'Non</span> <span class="pre">renseigné'),</span> <span class="pre">('Enseignant</span> <span class="pre">Contractuel',</span> <span class="pre">'Enseignant</span> <span class="pre">Vacataire'),</span> <span class="pre">('Enseignant</span> <span class="pre">Titulaire',</span> <span class="pre">'Enseignant</span> <span class="pre">Titulaire'),</span> <span class="pre">('Enseignant</span> <span class="pre">Contractuel',</span> <span class="pre">'Enseignant</span> <span class="pre">Contractuel'),</span> <span class="pre">('Personnel</span> <span class="pre">Administratif</span> <span class="pre">ou</span> <span class="pre">Technique</span> <span class="pre">Contractuel',</span> <span class="pre">'Personnel</span> <span class="pre">Administratif</span> <span class="pre">ou</span> <span class="pre">Technique</span> <span class="pre">Contractuel'),</span> <span class="pre">('Enseignant</span> <span class="pre">Chercheur</span> <span class="pre">Titulaire',</span> <span class="pre">'Enseignant</span> <span class="pre">Chercheur</span> <span class="pre">Titulaire'),</span> <span class="pre">('Doctorant',</span> <span class="pre">'Doctorant'),</span> <span class="pre">('Emérite',</span> <span class="pre">'Emérite'),</span> <span class="pre">('Personnel</span> <span class="pre">Hébergé',</span> <span class="pre">'Personnel</span> <span class="pre">Hébergé'))</span></em><a class="headerlink" href="#sovisuhal.forms.ValidCredentials.status" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidLabCredentials">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sovisuhal.forms.</span></span><span class="sig-name descname"><span class="pre">ValidLabCredentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.forms.ValidLabCredentials" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></p>
+<p>Formulaire de validation de compte</p>
+<dl class="field-list simple">
+<dt class="field-odd">Renvoie</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidLabCredentials.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_IdRef':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_halStructId':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_rsnr':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.ValidLabCredentials.base_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidLabCredentials.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'f_IdRef':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_halStructId':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'f_rsnr':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#sovisuhal.forms.ValidLabCredentials.declared_fields" title="Lien permanent vers cette définition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sovisuhal.forms.ValidLabCredentials.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#sovisuhal.forms.ValidLabCredentials.media" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sovisuhal.views">
+<span id="sovisuhal-views"></span><h3>sovisuhal.views<a class="headerlink" href="#module-sovisuhal.views" title="Lien permanent vers cette rubrique">#</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.check">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.check" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page gérant l’affichage des données utilisateur ainsi que la vérification des données récupérées sur HAL afin d’affiner les résultats affichés par SoVisu</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.create">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.create" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page affichant le formulaire de création d’un nouveau profil à un utilisateur non reconnu</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.dashboard">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">dashboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.dashboard" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page affichant les tableaux de bord sous Kibana</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.default_checker">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">default_checker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basereverse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.default_checker" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Vérifie si l’utilisateur est reconnu ou non avant de lui donner l’accès à certaines pages.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.faq">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">faq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.faq" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page des questions fréquentes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.get_date">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">get_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.get_date" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Retourne la date passée dans la requête url, sinon renseigne des dates par défaut.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.get_scope_data">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">get_scope_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.get_scope_data" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Retourne des valeurs de variable en fonction du profil (chercheur,labo)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.impact_international">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">impact_international</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.impact_international" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page affichant l’impact international d’un profil sélectionné</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.index">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.index" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion des pages d’indexation des profils chercheurs et laboratoires</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.presentation">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">presentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.presentation" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page de présentation du projet</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.references">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.references" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page affichant les références du profil sélectionné</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.regular_get_parameters">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">regular_get_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.regular_get_parameters" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Récupère les paramètres de la requête url</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.ressources">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">ressources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.ressources" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page des ressouces à destination des chercheurs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.search">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.search" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page de recherche à partir de mots clés</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.terminology">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">terminology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.terminology" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page affichant les domaines d’expertise du profil sélectionné</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.tools">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">tools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.tools" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page « Outils », proposant des fonctionnalités pour les profils laboratoires. (Export HCERES, Cohésion des données)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.unknown">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">unknown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.unknown" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de l’affichage de la page d’erreur si l’url est inconnue</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.useful_links">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">useful_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.useful_links" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Useful links page</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.views.wordcloud">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.views.</span></span><span class="sig-name descname"><span class="pre">wordcloud</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.views.wordcloud" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Gestion de la page affichant sous forme de wordcloud les mots clés représentant le domaine de recherche du profil sélectionné (sous Kibana)</p>
+</dd></dl>
+
+</section>
+<section id="module-sovisuhal.viewsActions">
+<span id="sovisuhal-viewsactions"></span><h3>sovisuhal.viewsActions<a class="headerlink" href="#module-sovisuhal.viewsActions" title="Lien permanent vers cette rubrique">#</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.admin_access_login">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">admin_access_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.admin_access_login" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Fonction gérant les accès à SoVisu</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.create_credentials">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">create_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.create_credentials" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Fonction gérant la création du nouveau profil d’un chercheur à partir des données renseignées dans le formulaire CreateCredentials</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.export_hceres_xls">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">export_hceres_xls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.export_hceres_xls" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Export des données de l’HCERES d’un laboratoire sous fichier Excel (XLS)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.force_update_references">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">force_update_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.force_update_references" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Force la mise à jour des références</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.idhal_checkout">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">idhal_checkout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idhal</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.idhal_checkout" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Vérifie si le halId renseigné existe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.refresh_aurehal_id">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">refresh_aurehal_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.refresh_aurehal_id" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Mise à jour de l’id aurehal</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.update_authorship">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">update_authorship</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.update_authorship" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Met à jour l’autorat des documents d’un utlisateur après vérification de ce dernier</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.update_members">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">update_members</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.update_members" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Permet la mise à jour du profil utilisateur</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.validate_credentials">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">validate_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.validate_credentials" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Validation des identifiants</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.validate_expertise">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">validate_expertise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.validate_expertise" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Validation des domaines d’expertise</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.validate_guiding_domains">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">validate_guiding_domains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.validate_guiding_domains" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Validation des domaines de guidance</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.validate_guiding_keywords">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">validate_guiding_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.validate_guiding_keywords" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Validation des mots clés de guidance</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.validate_references">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">validate_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.validate_references" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Validation des références HAL</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.validate_research_description">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">validate_research_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.validate_research_description" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Validation de la description de recherche</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sovisuhal.viewsActions.vizualisation_url">
+<span class="sig-prename descclassname"><span class="pre">sovisuhal.viewsActions.</span></span><span class="sig-name descname"><span class="pre">vizualisation_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sovisuhal.viewsActions.vizualisation_url" title="Lien permanent vers cette définition">#</a></dt>
+<dd><p>Permet d’ajuster l’affichage des visualisations Kibana entre la version Dev et la version Prod</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="sovisuhal.libs.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Paquet sovisuhal.libs</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="elasticHal.libs.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Paquet elasticHal.libs</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, David Reymond, Alaric Tabariès, Esteban Bara, Clara Galliano
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contenu
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Application SoVisuhal</a><ul>
+<li><a class="reference internal" href="#sous-paquets">Sous-paquets</a></li>
+<li><a class="reference internal" href="#modules">Modules</a><ul>
+<li><a class="reference internal" href="#module-sovisuhal.forms">sovisuhal.forms</a></li>
+<li><a class="reference internal" href="#module-sovisuhal.views">sovisuhal.views</a></li>
+<li><a class="reference internal" href="#module-sovisuhal.viewsActions">sovisuhal.viewsActions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/translations.js"></script>
+    </body>
+</html>

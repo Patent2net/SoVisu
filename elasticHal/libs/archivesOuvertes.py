@@ -6,23 +6,11 @@ sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
 
 
-def cycle(liste):
-    tempo = []
-    if len(liste) < 1:
-        return None
-    else:
-        taille = len(liste) - 1
-        for indice in range(taille):
-            tempo.append((liste[indice], liste[indice + 1]))
-        return tempo
-
-
 def get_halid_s(aurehal_id):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur aurehal_id et retourne la valeur authIdHal_s associée
-    # example: aurehal_id(826859)=>vanessa-richard
-    # end
+    """
+    Récupération du authidhal_s associé au aurehal_id depuis HAL
+    """
+
     sparql.setQuery("""
     select ?p ?o
     where  {
@@ -35,30 +23,11 @@ def get_halid_s(aurehal_id):
     return authidhal_s
 
 
-def get_extid(authidhal_s):
-    # Start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur authidhal_s et retourne la valeur aurehal_id associée
-    # example : authIdHal_s(vanessa-richard)=>826859
-    # end
-    sparql.setQuery("""
-    select ?p ?o
-    where  {
-    <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-    }""" % authidhal_s)
-    results = sparql.query().convert()
-    extids = [truc for truc in results['results']['bindings'] if
-              truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
-    aurehalid = int(extids[0]['o']['value'].rsplit('/', 1)[1])
-    return aurehalid
-
-
 def get_label(label, lang):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre la valeur label et lang et retourne le nom complet du label en fonction de la langue associée
-    # example: get_label("phys","en") => Physics
-    # end
+    """
+    Récupére le nom complet d'un label en fonction de la langue associée
+    """
+
     sparql.setQuery("""
         select ?p ?o
         where  {
@@ -73,27 +42,10 @@ def get_label(label, lang):
     return label_complet
 
 
-def get_article(halid_s):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre halId_s l'id d'un article et retourne sous forme de dictionnaire metadone_article qui regroupe l'ensemble des metadoné de l'article
-    # example: get_article(702215) => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': []}}
-    # end
-    """returns  Liste des métadonnées d'un document in sparlq dataarchive format"""
-    sparql.setQuery("""select ?p ?o 
-where {
- <https://data.archives-ouvertes.fr/document/%s> ?p ?o
-} """ % halid_s)
-    metadone_article = sparql.query().convert()
-    return metadone_article
-
-
 def recup_individu(authidhal_s):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre authIdHal_s d'un cherhcheur et retourne sous forme de dictionnaire donnee_individu qui regroupe l'ensemble des données concernant le chercheur
-    # example : recup_individu("vanessa-richard") => {'head': {'link': [], 'vars': ['p', 'o']}, 'results': {'distinct': False, 'ordered': True, 'bindings': [{'p': {'type': 'uri', 'value': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} ....
-    # end
+    """
+    recupération des données d'un individu à partir de son authidhal_s
+    """
     sparql.setQuery("""
 select ?p ?o
 where  {
@@ -105,6 +57,9 @@ where  {
 
 
 def explore_broader(uri):
+    """
+    Recherche le domaine parent d'un domaine donné
+    """
 
     sparql.setQuery("""
     select ?p ?o
@@ -129,8 +84,8 @@ def explore_broader(uri):
 
 
 def extrait_sujets_domaines(data):
-    """ inputs from recup_individu(halidint)
-    halidint est un individu
+    """
+    À partir des données d'un l'article, extrait les sujets et domaines
     """
     # extraction des résultats
     topics = [truc for truc in data['results']['bindings'] if
@@ -139,8 +94,6 @@ def extrait_sujets_domaines(data):
               truc['p']['value'] == "http://xmlns.com/foaf/0.1/interest"]
     # récupération des langues
 
-    # alaric : soit on considère que les mots qui n'ont pas de langue renseignée sont en anglais (j'ai constaté ça pour chl)
-    # soit on les drop ?
     for top in topics:
         if 'xml:lang' not in top['o']:
             top['o']['xml:lang'] = 'en'
@@ -158,6 +111,9 @@ def extrait_sujets_domaines(data):
 
 
 def explain_domains(dom_uri):
+    """
+    Recherche le domaine parent d'un domaine dom_uri
+    """
     sparql.setQuery("""
     prefix foaf: <http://xmlns.com/foaf/0.1/>
     prefix skos: <http://www.w3.org/2004/02/skos/core>
@@ -198,32 +154,10 @@ def explain_domains(dom_uri):
         return [labels]
 
 
-def extrait_mots_cles(dat):
-    """ inputs from get_article(halid)
-    halid est un article
-    """
-    # extraction des résultats
-
-    topics = [truc for truc in dat['results']['bindings'] if
-              truc['p']['value'] == "http://purl.org/dc/elements/1.1/subject"]
-    # sujets = [truc ['o']['value'] for truc in dat['results']['bindings'] if truc ['p']['value'] == "http://xmlns.com/foaf/0.1/interest"]
-    # récupération des langues
-    langues = list(set([top['o']['xml:lang'] for top in topics]))
-    # filtres par langues
-    dico_top = dict()
-
-    for lang in langues:
-        dico_top[lang] = [top['o']['value'] for top in topics if top['o']['xml:lang'] == lang]
-
-    return dico_top
-
-
 def get_concepts_and_keywords(aurehalid):
-    # start
-    # auteur :Joseph
-    # commentaire : Cette fonction prend en paramètre aurehal_id d'un chercheur et retourne sous forme de dictionnaire ConceptsAndKeywords qui regroupe l'ensemble des concepts et données abordées par le chercheur
-    # example : get_concepts_and_keywords(702215) => {'fr': ['Toxines', 'Génétique des populations', 'Écologie microbienne', 'Cyanobactéries']}
-    # end
+    """
+    Récupère les concepts et mots-clés d'un auteur à partir de son aurehalid
+    """
 
     keywords = []
 
@@ -233,7 +167,7 @@ def get_concepts_and_keywords(aurehalid):
     sujets, domaines = extrait_sujets_domaines(data)
     domains = []
 
-    #print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
+    # print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
     try:
         tree = ''
         for dom in domaines:

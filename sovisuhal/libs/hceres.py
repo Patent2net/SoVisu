@@ -6,6 +6,9 @@ es = esActions.es_connector()
 
 
 def common_data(list1, list2):
+    """
+    Renvoie la liste des éléments communs entre deux listes
+    """
     result = False
 
     # traverse in the 1st list
@@ -23,7 +26,9 @@ def common_data(list1, list2):
 
 
 def sort_references(articles, halstructid):
-
+    """
+    Classe les références récupérées dans un ordre défini pour le HCERES
+    """
     # sort by lab
     utln_rsr = []
     amu_rsr = []
@@ -54,8 +59,6 @@ def sort_references(articles, halstructid):
         if "authIdHal_s" in article:
             for authIdHal_s in article["authIdHal_s"]:
 
-                field = "halId_s"
-                doc_param = esActions.scope_p(field, authIdHal_s)
                 doc_param = {
                     "query": {
                         "bool": {
@@ -98,14 +101,11 @@ def sort_references(articles, halstructid):
 
         if "authorship" in article:
             for authorship in article["authorship"]:
-                field = "halId_s"
                 # authFullName_s qui est en fait halId_s mais pas toujours
                 try:
-                    doc_param = esActions.scope_p(field, authorship["authFullName_s"])
                     halid_s = authorship["authFullName_s"]
 
                 except:
-                    doc_param = esActions.scope_p(field, authorship['halId_s'])
                     halid_s = authorship["halId_s"]
 
                 doc_param = {

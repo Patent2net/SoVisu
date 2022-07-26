@@ -1,9 +1,10 @@
 from sovisuhal.libs import esActions
 
 
-
 def return_struct():
-
+    """
+    Enrichi le champ structAcronym de tous les laboratoires à partir des index de structures
+    """
     es = esActions.es_connector()
 
     scope_param = esActions.scope_all()
@@ -12,7 +13,6 @@ def return_struct():
     if StructCount > 0:
         Struct = es.search(index="*-structures", body=scope_param, size=StructCount)
         Struct = Struct["hits"]["hits"]
-
 
     count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)['count']
     if count > 0:
@@ -32,13 +32,16 @@ def return_struct():
                     else:
                         print("Warning: pas de structSirene")
                         print(labo['_index'])
-                        es.update(index=labo['_index'], refresh='wait_for', id=labo['_source']['halStructId'],body={"doc": {"structAcronym": "Warning"}})
+                        es.update(index=labo['_index'], refresh='wait_for', id=labo['_source']['halStructId'], body={"doc": {"structAcronym": "Warning"}})
             else:
                 print(f"le champ structAcronym existe dans {labo['_index']}")
 
 
 def return_struct_from_index(index):
-    #Cette fonction enregistre le struct Acronym d'un laboratoire en fonctions d'un index
+    """
+    Enrichi les index laboratoires en entrée avec le champ structAcronym à partir des index de structures
+    """
+    # Cette fonction enregistre le struct Acronym d'un laboratoire en fonctions d'un index
     es = esActions.es_connector()
 
     scope_param = esActions.scope_all()
@@ -47,8 +50,6 @@ def return_struct_from_index(index):
     if StructCount > 0:
         Struct = es.search(index="*-structures", body=scope_param, size=StructCount)
         Struct = Struct["hits"]["hits"]
-
-
 
     count = es.count(index=index, body=scope_param, request_timeout=50)['count']
     if count > 0:
@@ -67,7 +68,7 @@ def return_struct_from_index(index):
                 else:
                     print("Warning: pas de structSirene")
                     print(labo['_index'])
-                    es.update(index=labo['_index'], refresh='wait_for', id=labo['_source']['halStructId'],body={"doc": {"structAcronym": "Warning"}})
+                    es.update(index=labo['_index'], refresh='wait_for', id=labo['_source']['halStructId'], body={"doc": {"structAcronym": "Warning"}})
         else:
             print(f"le champ structAcronym existe dans {labo['_index']}")
             return labo['_source']['structAcronym']
