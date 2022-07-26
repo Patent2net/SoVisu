@@ -5,15 +5,13 @@ from .views import get_index_list
 class CsvImportForm(forms.Form):
     """
     Formulaire d'import de fichier CSV pour l'indexation dans Django
-    :return:
     """
-    csv_upload = forms.FileField()
+    importer_un_fichier = forms.FileField()
 
 
 class PopulateLab(forms.Form):
     """
     Formulaire pour initialiser la population d'un index laboratoire ou chercheur dans Elasticsearch
-    :return:
     """
     def __init__(self, *args, **kwargs):
         indexes = get_index_list()

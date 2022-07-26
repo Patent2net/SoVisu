@@ -7,6 +7,11 @@ class Structure(models.Model):
     """
     Définition du modèle Structure dans Django
     """
+
+    class Meta:
+        verbose_name = "Structure"
+        verbose_name_plural = "Structures"
+
     structSirene = models.CharField(max_length=20, default="")
     label = models.CharField(max_length=50, default="")
     acronym = models.CharField(max_length=50, default="")
@@ -21,7 +26,9 @@ class Laboratory(models.Model):
     Définition du modèle Laboratory dans Django
     """
     class Meta:
-        verbose_name_plural = "Laboratories"
+        verbose_name = "Laboratoire"
+        verbose_name_plural = "Laboratoires"
+
     structSirene = models.CharField(max_length=20, default="")
     acronym = models.CharField(max_length=10, default="")
     label = models.CharField(max_length=300, default="")
@@ -37,6 +44,11 @@ class Researcher(models.Model):
     """
     Définition du modèle Researcher dans Django
     """
+
+    class Meta:
+        verbose_name = "Chercheur"
+        verbose_name_plural = "Chercheurs"
+
     structSirene = models.CharField(max_length=20, default="")
     ldapId = models.CharField(max_length=30, default="")
     name = models.CharField(max_length=80, default="")
