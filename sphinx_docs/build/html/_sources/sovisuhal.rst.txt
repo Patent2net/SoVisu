@@ -1,8 +1,8 @@
 Application SoVisuhal
-=================
+========================
 
 Sous-paquets
------------
+---------------
 
 .. toctree::
    :maxdepth: 4

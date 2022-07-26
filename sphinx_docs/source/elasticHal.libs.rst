@@ -37,7 +37,7 @@ elasticHal.libs.hal
    :show-inheritance:
 
 elasticHal.libs.keyword\_enrichissement
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: elasticHal.libs.keyword_enrichissement
    :members:
