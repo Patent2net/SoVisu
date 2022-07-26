@@ -75,6 +75,9 @@ Mise en route
     Avant toute mise en route de SoVisu, vérifiez que l'instance elastic avec lequel le projet interagit est active.
     Si ce n'est pas le cas, SoVisu renverra un message d'erreur au lieu de s'initialiser normalement.
 
+Initialisation des processus dans la partie Admin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 1. Lancez SoVisu:
 
 .. code-block:: console
@@ -170,10 +173,35 @@ Dans le cas de la mise en route de SoVisu, nous allons importer des données à 
     celle ci se base sur les données des modèles présent dans Django mais également les éléments déjà importés dans Elasticsearch.
     Pour cela, il suffit de sélectionner la partie qui doit être mise à jour pour lancer un processus allégé.
 
+Spécificités de la mise en route de SoVisu pour le développement
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Dans le cas d'une installation de SoVisu sur une machine de développement n'ayant pas accès à l'authentification par CAS, il est nécessaire de définir un profil utilisateur afin d'accéder à l'application.
+Dans le cas d'un profil chercheur, celui ci est identifié par SoVisu grâce à son identifiant ldapId. Le nom d'utilisateur est le même que l'identifiant ldapId.
+
+Il est cependant possible de définir un profil utilisateur nommé "adminlab", reconnu par SoVisu comme un administrateur du laboratoire et ayant donc accès complet à l'application.
+
+1. Dans l'interface d'administration de SoVisu, cliquez sur "Utilisateurs" dans "Authentification et autorisations".
+2. Cliquez sur "Ajouter utilisateur".
+3. Créez un utilisateur ayant pour nom d'utilisateur "adminlab", le mot de passe est libre de choix.
+4. Cliquez sur "Enregistrer".
+
+Initialisation des visualisations dans Kibana
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Dans Kibana, il est possible de créer des visualisations à partir des données présentes dans Elasticsearch.
+Par défaut SoVisu propose des visualisations qui sont disponibles dans les dossiers du projet:
+SoVisu/doc/Dashboards/
+
+Afin de les rendre disponible il est nécessaire de les importer dans l'instance Kibana dont dépend votre installation.
+
+1. Dans Kibana, ouvrez le menu.
+2. Dans la section Management, cliquez sur "Stack Management"
+3. Sur la nouvelle page affichée, allez dans "Saved Objects"(dans la section Kibana).
+4. Cliquez sur "Import" et importez les fichiers disponibles dans le dossier SoVisu/doc/Dashboards/, en sélectionnant  les options "check for existing objects" et "automatically overwrite conflicts".
+5. Cliquez sur "import".
+6. Kibana vous signale l'ensemble des objets modifiés; Cliquez sur "Done"
+7. répétez les points 4 à 6 pour l'ensemble des fichiers dans le dossier.
+
 Mise en production
 -------------------
 .. warning::
     à compléter
-
-
-
