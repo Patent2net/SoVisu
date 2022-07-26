@@ -71,6 +71,9 @@ Configuration de l'environnement
 
 Mise en route
 -------------
+.. warning::
+    Avant toute mise en route de SoVisu, vérifiez que l'instance elastic avec lequel le projet interagit est active.
+    Si ce n'est pas le cas, SoVisu renverra un message d'erreur au lieu de s'initialiser normalement.
 
 1. Lancez SoVisu:
 
@@ -78,14 +81,101 @@ Mise en route
 
    (.venv) $ python manage.py runserver
 
-2. Visitez l'adresse suivante: http://127.0.0.1:8000/
+2. Visitez l'adresse suivante: http://127.0.0.1:8000/admin/
 
-3. Sur l'affichage de la page d'authentification, cliquez sur administrateur
+3. Renseignez les identifiants administrateur créés précédemment.
 
-4. Renseignez les identifiants administrateur créés précédemment.
+En arrivant dans l'interface d'administration, vous pouvez voir les différentes Applications de SoVisu:
+    - "Authentification et autorisation", qui est présente par défaut dans Django. Elle permet de gérer les utilisateurs se connectant avec des identifiants créés depuis l'interface administrateur ou avec des commandes depuis manage.py.
+    - "Elastichal", qui permet d'initialiser la base de données Elasticsearch.
+    - "Uniauth", qui permet dans le cas d'une installation dans une institution de gérer la connection à partir des identifiants CAS.
 
-5. Dans l'interface d'administration,
+.. image:: images/affichage_admin.png
+   :width: 600px
+   :align: center
+
+Dans la partie "Elastichal", trois modèles sont disponibles:
+    - "Chercheurs", qui permet de stocker les informations de base concernant les objets chercheurs.
+    - "Laboratoires", qui permet de stocker les informations de base concernant les objets laboratoires.
+    - "Structures", qui permet de stocker les informations de base concernant les objets structures institutionnelles dont dépendent les laboratoires.
+
+4. Cliquez sur "Chercheurs" dans l'onglet "Elastichal".
+
+.. image:: images/visualisation_menu_elastichal.png
+   :width: 800px
+   :align: center
+
+Le menu des modèles présent dans l'application Elastichal vous propose plusieurs options disponibles en cliquant sur les boutons situés en haut à droite de l'écran:
+    - "Peupler Elastic", permet d'initialiser la base de données Elasticsearch à partir des données présentes dans les modèles Elastichal.
+    - "Mettre à jour Elastic", permet de mettre à jour les données présentes dans Elasticsearch à partir des données présentes dans les modèles Elastichal.
+    - "Importer des données", permet d'importer des données dans le modèle à partir d'un fichier CSV.
+    - "Ajouter chercheur", permet d'ajouter un chercheur manuellement dans le modèle.
+
+Dans le cas de la mise en route de SoVisu, nous allons importer des données à partir d'un fichier CSV.
+
+5. Cliquez sur "Importer des données". Sur la page suivante il vous sera demandé d'importer un fichier. Il est important que celui ci soit au format CSV, et qu'il contienne des champs précis en fonction du modèle à remplir (voir les astuces ci dessous pour plus de détails).
+
+.. tip::
+    Dans le cas du modèle "Chercheurs", le fichier csv devra contenir les colonnes suivante:
+    *structSirene, ldapId, name, type, function, mail, lab, supannAffectation,*
+    *supannEntiteAffectationPrincipale, halId_s, labHalId, idRef, structDomain, firstName, lastName, aurehalId*
+
+    exemple de fichier CSV Chercheurs:
+
+    .. csv-table::
+        :align: center
+        :file: csv_demo/researchers.csv
+        :header-rows: 1
+
+.. tip::
+    Dans le cas du modèle "Laboratoires", le fichier csv devra contenir les colonnes suivante:
+    *structSirene; acronym; label; halStructId; rsnr; idRef*
+
+    exemple de fichier CSV Laboratoires:
+
+    .. csv-table::
+        :align: center
+        :file: csv_demo/laboratories.csv
+        :delim: ;
+        :header-rows: 1
+
+.. tip::
+    Dans le cas du modèle "Structures", le fichier csv devra contenir les colonnes suivante:
+    *structSirene, label, acronym, domain*
+
+    exemple de fichier CSV structures:
+
+    .. csv-table::
+        :align: center
+        :file: csv_demo/structures.csv
+        :header-rows: 1
+
+6. Répétez l'opération pour les autres modèles dans Elastichal.
+
+7. Une fois les trois modèles complétés, retournez sur le menu d'un des modèles Elastichal et cliquez sur "Peupler Elastic".
+
+.. image:: images/peupler_elastic.png
+    :width: 800px
+    :align: center
+
+8. Par défaut, "Peupler elastic" propose de remplir la base de données Elasticsearch avec les données présentes dans les modèles Structures, Laboratoires et Chercheurs.
+    Cliquez sur "soumettre" afin de lancer le processus de collecte, Il est possible de voir l'état de la collecte dans la partie "Progression" de la page.
+
+.. warning::
+    Lors d'une première mise en route, il est impératif de lancer "peupler elastic" avec l'ensemble des modèles remplis.
+    Le modèle structure permet de délimiter la récupération dans le cas ou les laboratoires et/ou chercheurs seraient recensés dans plusieurs structures.
+    La récupération des données dans Elasticsearch est longue, et peut prendre du temps.
+.. tip::
+    La fonction "peupler elastic" peut également être utilisée par la suite pour mettre à jour en masse l'ensemble des données d'un ou de l'ensemble des modèles proposés par SoVisu:
+    celle ci se base sur les données des modèles présent dans Django mais également les éléments déjà importés dans Elasticsearch.
+    Pour cela, il suffit de sélectionner la partie qui doit être mise à jour pour lancer un processus allégé.
+
+9. Une fois le processus terminé, vous pouvez retourner sur l'acceuil 
 
 Mise en production
 -------------------
-(à compléter)
+.. warning::
+    à compléter
+
+
+
