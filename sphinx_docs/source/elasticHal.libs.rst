@@ -52,29 +52,6 @@ elasticHal.libs.location\_docs
    :undoc-members:
    :show-inheritance:
 
-elasticHal.libs.scanR
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: elasticHal.libs.scanR
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-elasticHal.libs.sherpa
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: elasticHal.libs.sherpa
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-elasticHal.libs.unpaywall
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: elasticHal.libs.unpaywall
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 elasticHal.libs.utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
