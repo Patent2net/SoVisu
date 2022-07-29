@@ -1137,22 +1137,22 @@ def search(request):  # Revoir la fonction
 
     if request.method == 'POST':
 
-        index = request.POST.get("f_index")
+        index = "*-researchers-*-doc*" #request.POST.get("f_index")
         search = request.POST.get("f_search")
 
-        if "*-researchers-*-doc*" in index:  # == 'documents':
-            search_param = {
+        #if "*-researchers-*-doc*" in index:  # == 'documents':
+        search_param = {
                 "query": {"bool": {"must": [{"query_string": {"query": search}}],
                                    "filter": [{"match": {"validated": "true"}}]}}
             }
-        elif "*-researchers" in index:  # =='researchers':
-            search_param = {
-                "query": {"query_string": {"query": search}}
-            }
-        else:  # =='researchers': par défaut
-            search_param = {
-                "query": {"query_string": {"query": search}}
-            }
+        # elif "*-researchers" in index:  # =='researchers':
+        #     search_param = {
+        #         "query": {"query_string": {"query": search}}
+        #     }
+        # else:  # =='researchers': par défaut
+        #     search_param = {
+        #         "query": {"query_string": {"query": search}}
+        #     }
 
         p_res = es.count(index=index, body=search_param)
 
@@ -1167,7 +1167,7 @@ def search(request):  # Revoir la fonction
 
         url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
 
-        return render(request, 'search.html',
+        return render(request, 'search2.html',
                       {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(val=search),
                        'count': p_res['count'],
                        'timeRange': "from:'" + date_from + "',to:'" + date_to + "'",
@@ -1175,7 +1175,7 @@ def search(request):  # Revoir la fonction
                        'results': res_cleaned, 'from': date_from, 'to': date_to,
                        'startDate': min_date, 'url': url, 'ldapid': ldapid})
 
-    return render(request, 'search.html',
+    return render(request, 'search2.html',
                   {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(), 'from': date_from, 'to': date_to,
                    'startDate': min_date, 'filter': '', 'ldapid': ldapid})
 
