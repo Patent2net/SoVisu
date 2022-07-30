@@ -104,8 +104,8 @@ def collect_laboratories_data2(self, labo):
                                                            "Collection " + lab['acronym'] + " en cours. docid : " + str(
                                                                doc['docid']))
                         # print(f"- sub processing : {str(doc['docid'])}")
-                        # Enrichssements des documents récoltés
-                        doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+                        # Enrichssements des documents récoltées
+                        doc["country_origin"] = location_docs.generate_countrys_fields(doc)
                         doc = doi_enrichissement.docs_enrichissement_doi(doc)
                         lstResum = [cle for cle in doc.keys() if "abstract" in cle]
                         for cle in lstResum:

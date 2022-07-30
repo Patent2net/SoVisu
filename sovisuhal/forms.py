@@ -168,20 +168,27 @@ class Search(forms.Form):
     def __init__(self, *args, **kwargs):
         if 'val' in kwargs:
             val = kwargs.pop('val')
-
+        else:
+            val = ""
         super(Search, self).__init__(*args, **kwargs)
-
+        self.fields['f_search'] = forms.CharField(
+            label='Recherche',
+            required=False,
+            #choices=Foo.ADDRESS_STATE_CHOICES,
+            #disabled='disabled',
+            initial=val,
+        )
     # Set choices to an empty list as it is a required argument.
 
-    indexes = (
-        ("*-researchers-*-doc*", "références"),
-        ("*-researchers", "chercheurs"),
-        ("*-laboratories", "laboratoires")
-    )
+    # indexes = (
+    #     ("*-researchers-*-doc*", "références"),
+    #     ("*-researchers", "chercheurs"),
+    #     ("*-laboratories", "laboratoires")
+    # )
 
-    f_index = forms.ChoiceField(label='Collection', choices=indexes)
+    #f_index = forms.ChoiceField(label='Collection', choices=indexes)
 
-    f_search = forms.CharField(label='Recherche', max_length=100, widget=forms.TextInput(
+    f_search = forms.CharField(label='Recherche', max_length=100, initial="*", widget=forms.TextInput(
         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
