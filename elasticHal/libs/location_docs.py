@@ -34,7 +34,7 @@ def generate_countrys_fields(doc):
         country_list_upper = [""]
     doc["country_collaboration"] = country_list_upper
 
-    facet_fields_list = ["country_s", "rteamStructCountry_s", "instStructCountry_s"]
+    facet_fields_list = ["country_s", "rteamStructCountry_s", "instStructCountry_s", "publicationLocation_s"]
 
     country_list = list()
     for facet in facet_fields_list:
