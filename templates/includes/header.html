@@ -281,9 +281,15 @@
                     updateFilters(sel_from + "-01-01", sel_to + "-01-01", sel_lang);
                 });
 
+                $(id="dashkib").ready(function() {
+                        $('.kbnTopNavMenu__wrapper').css('display', 'none');
+                        $('#kbnPresentationToolbar__solutionToolbar').css('display', 'none');
+                    });
+
 
             </script>
 
             {% endif %}
 
 {%  endif %}
+
