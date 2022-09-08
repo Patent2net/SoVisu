@@ -60,8 +60,8 @@ services:
       #- node.data=true
       - cluster.name=sovisucluster
       #- cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal2:9300
-      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - discovery.seed_hosts=elastichal2:9300,elastichal3:9302
+      #- cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - cluster.routing.allocation.enable=all
       - bootstrap.memory_lock=true
@@ -72,9 +72,11 @@ services:
       - http.max_content_length=10MB
       #- "discovery.type=single-node"
       - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=false
       - ELASTIC_USERNAME=david
       - ELASTIC_PASSWORD=MonMdp
-      - "ES_JAVA_OPTS=-Xms2G -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
+
     ulimits:
       memlock:
         soft: -1
@@ -113,13 +115,15 @@ services:
       - http.max_content_length=10MB
       #- "discovery.type=single-node"
       - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=false
       - ELASTIC_USERNAME=david
       - ELASTIC_PASSWORD=MonMdp
-      - "ES_JAVA_OPTS=-Xms2G -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
     depends_on:
       - elastichal1
     links:
       - elastichal1
+      - elastichal3
     ulimits:
       memlock:
         soft: -1
@@ -133,6 +137,52 @@ services:
       - es-data2:/usr/share/elasticsearch/data
       - es-backup1:/usr/share/elasticsearch/backup
 
+  elastichal3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+    container_name: elastichal3
+
+    ports:
+      - "9202:9200"
+      - "9302:9300"
+    environment:
+      - node.name=elastichal3
+      - node.roles=data,remote_cluster_client
+      #- node.data=true
+      - cluster.name=sovisucluster
+      - discovery.seed_hosts=elastichal1:9300,elastichal2:9301
+      #- discovery.seed_providers=elastichal1:9300
+      #- cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - "path.repo=/usr/share/elasticsearch/backup"
+      - bootstrap.memory_lock=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - http.max_content_length=10MB
+      #- "discovery.type=single-node"
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=false
+      - ELASTIC_USERNAME=david
+      - ELASTIC_PASSWORD=MonMdp
+      - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
+    depends_on:
+      - elastichal1
+    links:
+      - elastichal1
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - elk
+    volumes:
+      - es-data3:/usr/share/elasticsearch/data
+      - es-backup1:/usr/share/elasticsearch/backup
+
   kibanahal:
     image: docker.elastic.co/kibana/kibana:8.3.2
     container_name: kibanahal
@@ -142,9 +192,11 @@ services:
     depends_on:
       - elastichal1
       - elastichal2
+      - elastichal3
     links:
       - elastichal1
       - elastichal2
+      - elastichal3
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     environment:
@@ -156,7 +208,7 @@ services:
     networks:
       - elk
      
-
+volumes:
   es-data1:
      driver: local
      driver_opts:
@@ -176,14 +228,15 @@ services:
     driver_opts:
       o: bind
       type: none
-      device: "./volume/data2"
+      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\doc\\VisuStack\\volume\\data2"
 
-  modules:
-     driver: local
-     driver_opts:
-        o: bind
-        type: none
-        device: "./metricbeat/modules.d/elasticsearch.yml"
+  es-data3:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\doc\\VisuStack\\volume\\data3"
+
   metricbeatvolum:
      driver: local
      driver_opts:
