@@ -1,0 +1,30 @@
+  filebeat.config:
+    modules:
+      path: ${path.config}/modules.d/*.yml
+      reload.enabled: false
+
+  filebeat.autodiscover:
+    providers:
+      - type: docker
+        hints.enabled: true
+      - templates:
+        - condition.contains:
+          docker.container.image: nginx
+          config:
+            - type: log
+              paths:
+                - "/mnt/logs/${data.docker.container.id}/*.log"
+
+
+  processors:
+  - add_cloud_metadata: ~
+
+  output.elasticsearch:
+    hosts: ["elastichal1:9200", "elastichal2:9200"]
+    username: "david"
+    password: "MonMdp"
+
+  setup.ilm:
+    setup.ilm.enabled: auto
+    setup.ilm.rollover_alias: "filebeat"
+    setup.ilm.pattern: "{now/d}-000001"
