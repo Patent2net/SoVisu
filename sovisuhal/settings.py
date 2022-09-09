@@ -78,7 +78,7 @@ else:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 
@@ -94,9 +94,12 @@ INSTALLED_APPS = [
     'celery',
     'celery_progress',
     'elasticHal',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    #'csp.middleware.CSPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -105,6 +108,86 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://sovisu.univ-tln.fr",
+    "https://sovisu.univ-tln.fr:9200",
+    "https://sovisu.univ-tln.fr:5601",
+    "https://sovisu.univ-tln.fr:6379",
+    "http://localhost:*",
+    "http://localhost:9200",
+    "http://localhost:5601",
+    "http://localhost:6379",
+    "http://127.0.0.1:*",
+    "http://127.0.0.1:9200",
+    "http://127.0.0.1:5601",
+    "http://127.0.0.1:6379",
+]
+#ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "https://sovisu.univ-tln.fr",
+    "https://sovisu.univ-tln.fr:9200",
+    "https://sovisu.univ-tln.fr:5601",
+    "https://sovisu.univ-tln.fr:6379",
+    "http://localhost",
+    "http://localhost:9200",
+    "http://localhost:5601",
+    "http://localhost:6379",
+    "http://127.0.0.1",
+    "http://127.0.0.1:9200",
+    "http://127.0.0.1:5601",
+    "http://127.0.0.1:6379",
+]
+
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY=None
+
+CORS_URLS_REGEX = r"^/app/*"
+#CORS_ALLOW_ALL_ORIGINS = True
+
+SECURE_REFERRER_POLICY = 'origin'
+
+#test CSP
+# info : https://book.hacktricks.xyz/pentesting-web/content-security-policy-csp-bypass
+# djnago specs :
+Bibi = ["'self' 'unsafe-inline' 'unsafe-eval'"]
+Dns = ["http://localhost", "http://localhost:*", "http://127.0.0.1:*",]
+# BibiSha =  ["'self' 'sha256-r5bInLZa0y6YxHFpmz7cjyYrndjwCeDLDu/1KeMikHA='"]
+# BibiScripts =  Bibi  + Dns
+# Scripts = [
+#     "https://cdn.datatables.net",
+#     "https://cdn.jsdelivr.net",
+#     "https://code.jquery.com",
+#     "https://cdnjs.cloudflare.com",
+#     "http://cdnjs.cloudflare.com",
+#     "https://d3js.org",
+#     "https://unpkg.com",]
+#
+# Styles = ["https://cdn.datatables.net","https://cdn.jsdelivr.net","https://rsms.me","https://unpkg.com",] + Dns
+# Polices = ["https://rsms.me",]
+# CSP_DEFAULT_SRC = Bibi + Dns
+# CSP_IMG_SRC = Bibi  + Dns
+# CSP_FRAME_SRC = BibiScripts  + Dns
+# CSP_STYLE_SRC = Bibi + Styles
+# CSP_SCRIPT_SRC = BibiScripts + Scripts
+# CSP_FONT_SRC = Bibi + Polices + Dns
+#
+# CSP_BASE_URI = Bibi
+# CSP_FRAME_ANCESTORS = Bibi + Dns
+# CSP_FORM_ACTION = Bibi
+# CSP_INCLUDE_NONCE_IN = ('script-src', ) #oblige a modifier tous les templates pour envoyer un nonce 'context processor" https://www.laac.dev/blog/content-security-policy-using-django/
+# CSP_MANIFEST_SRC = Bibi
+# CSP_WORKER_SRC = Bibi
+# CSP_MEDIA_SRC = Bibi
+
+
+
+#X_FRAME_OPTIONS = 'ALLOW-FROM ' + " " .join(Dns)
+X_FRAME_OPTIONS = 'sameorigin'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -120,6 +203,9 @@ TEMPLATES = [
         ,
         'APP_DIRS': True,
         'OPTIONS': {
+            # 'libraries': {
+            #         'csp': 'csp.templatetags.csp',
+            #     },
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -176,11 +262,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') #'/data/SoVisu/staticfiles/
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join('static'),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
 # Pas sûr sur çà... J'ai l'impression qu'il y a deux zones de fichiers statiques
 # j'ai eu un stock de "Found another file with the destination path"
-STATIC_ROOT = '/data/SoVisu/staticfiles/'
+
 
 # EMAIL Setup
 # https://docs.djangoproject.com/en/3.1/topics/email/
