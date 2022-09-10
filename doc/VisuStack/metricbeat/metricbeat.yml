@@ -14,7 +14,7 @@ monitoring.enabled: true
 setup.ilm.enabled: false
 
 output.elasticsearch:
-  hosts: ["elastichal1:9200","elastichal2:9200"]
+  hosts: ["elastichal1:9200","elastichal2:9200","elastichal3:9200"]
   protocol: "http"
   username: "david"
   password: "MonMdp"
