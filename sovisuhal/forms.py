@@ -169,7 +169,7 @@ class Search(forms.Form):
         if 'val' in kwargs:
             val = kwargs.pop('val')
         else:
-            val = ""
+            val = "*"
         super(Search, self).__init__(*args, **kwargs)
         self.fields['f_search'] = forms.CharField(
             label='Recherche',
