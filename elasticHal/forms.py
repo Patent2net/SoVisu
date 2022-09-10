@@ -17,10 +17,10 @@ class PopulateLab(forms.Form):
         indexes = get_index_list()
         super(PopulateLab, self).__init__(*args, **kwargs)
 
-        self.fields['f_index'] = forms.ChoiceField(widget=forms.RadioSelect, label='Laboratoire', choices=indexes)  # self.fields[''] permet de rendre dynamique les champs du formulaire
+        self.fields['f_index'] = forms.ChoiceField(widget=forms.RadioSelect, label='Laboratoire', choices=indexes, required=False)  # self.fields[''] permet de rendre dynamique les champs du formulaire
         self.fields['collectionLabo'] = forms.BooleanField(initial=False, required=False)
         self.fields['chercheurs'] = forms.BooleanField(initial=False, required=False)
-
+        self.fields['TOUT'] = forms.BooleanField(initial=True, required=False)
 
 class ExportToElasticForm(forms.Form):
     """
