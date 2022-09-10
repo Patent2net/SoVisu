@@ -5,11 +5,12 @@ celery~=5.2.7
 celery_progress==0.1.2
 certifi==2021.10.8 #sécurité dans le cas ou requests n'installe pas ou mal la librairie
 chardet==4.0.0 # détecteur d'encodage
-Django==3.1.5
+Django==4.0.6
 djangorestframework==3.13.1
 djangorestframework-simplejwt==5.1.0
 django-tinymce
-django_uniauth==1.3.0
+django-cors-headers==3.13.0
+django_uniauth==1.3.1
 django-widget-tweaks==1.4.12
 elasticsearch~=7.16.2
 geopy
@@ -46,6 +47,6 @@ furo
 sphinx-autobuild  # à supprimer lorsque la doc sera faite
 unidecode==1.3.4
 urllib3==1.26.9
-
+gunicorn==20.1.0 
 PyPDF2~=2.4.1
 grobid-tei-xml
