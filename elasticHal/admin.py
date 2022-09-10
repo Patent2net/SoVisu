@@ -12,7 +12,7 @@ from .insert_entities import create_index
 from .collect_from_HAL import collect_data, collect_laboratories_data2, collect_researchers_data2
 
 from .forms import PopulateLab, ExportToElasticForm, CsvImportForm
-
+from .views import get_index_list
 # Celery
 from celery import shared_task
 # Celery-progress
@@ -123,6 +123,8 @@ class ElasticActions:
             #  laboratoires =
             # print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
             if form .is_valid():
+
+
                 if "chercheurs" in request .POST .keys():
                     chercheurs = True
                 else:
@@ -135,8 +137,19 @@ class ElasticActions:
                 # print('uuuu ', collection)
             laboratoire = collection . split("-")[1]
             structure = collection .split("-")[0]
+            if "TOUT" in request.POST.keys():
+                indexes = get_index_list()
+                for lab in indexes:
 
-            if collectionLabo == True:
+                    laboratoire = lab[0] .split("-")[1]
+                    structure = lab[0] .split("-")[0]
+                    result1 = collect_laboratories_data2.delay(laboratoire)
+                    task_id1 = result1.task_id
+                    result2 = collect_researchers_data2.delay(struct=structure, idx=lab[0])
+                    task_id2 = result2.task_id
+                    return render(request, "admin/elasticHal/export_to_elasticLabs.html",
+                                  context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
+            elif collectionLabo == True:
                 if chercheurs == True:
                     result1 = collect_laboratories_data2 .delay(laboratoire)
                     task_id1 = result1.task_id
@@ -157,7 +170,7 @@ class ElasticActions:
                 pass  # pas sûr
 
             return render(request, "admin/elasticHal/export_to_elasticLabs.html",
-                          context={'form': form, 'task_id2': task_id2})
+                          context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
         else:
             form = PopulateLab()
 
