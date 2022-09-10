@@ -14,7 +14,6 @@ server.host: 0.0.0.0
 elasticsearch.hosts: [ "http://elastichal1:9200", "http://elastichal2:9200", "http://elastichal3:9200" ]
 #monitoring.ui.container.elasticsearch.enabled: true
 
-
 #pack.security.authc.providers:
  # token.token1:
  #   order: 0
@@ -27,7 +26,7 @@ monitoring.ui.container.elasticsearch.enabled: false
 xpack.reporting.enabled: false
 
 xpack.encryptedSavedObjects.encryptionKey: 'fhjskloppd678ehkdfdlliverpipofcr'
-
+xpack.reporting.encryptionKey: 'fhjskloppd678ehkdfdlliverpipofcr'
 
 ## X-Pack security credentials
 # elasticsearch.username: kibana_system

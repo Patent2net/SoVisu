@@ -1,7 +1,7 @@
 - module: elasticsearch
     xpack.enabled: true
     period: 10s
-    hosts: ["http://elastichal1:9200", "http://elastichal2:9200"]
+    hosts: ["http://elastichal1:9200", "http://elastichal2:9200", "http://elastichal3:9200",]
     scope: cluster
     username: "david"
     password: "MonMdp"
