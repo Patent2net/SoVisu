@@ -3,7 +3,8 @@ from elasticsearch import helpers
 
 from datetime import datetime
 import json
-
+import time
+import random
 
 
 def es_connector(mode=True):
@@ -22,7 +23,7 @@ def es_connector(mode=True):
         #es = Elasticsearch([{'host': 'localhost', scheme:"http", 'port': 9200}])
         es = Elasticsearch('http://localhost:9200')
         #es = Elasticsearch(hosts = ['http://localhost:9200', 'http://elastichal2:9200', 'http://elastichal3:9200',                 'http://elastichal1:9200'])
-        es.options(request_timeout=100, retry_on_timeout= True, max_retries=3 )
+        es.options(request_timeout=600, retry_on_timeout= True, max_retries=5)
     return es
 
 
@@ -130,6 +131,7 @@ for ind, doudou in enumerate(chercheurs):
                           document=doc ["_source"])
             es.indices.refresh(index=idxDocs)
             es.cluster.health(wait_for_status='yellow', request_timeout=1)
+            time.sleep(int(random.random()*10))
             #resp = es.indices.put_mapping(index=idxDocs, body=docmap)
     else:
         resp = es.indices.put_mapping(index=idxDocs, body=docmap)
@@ -150,3 +152,4 @@ for ind, lab in enumerate(labos):
     resp = es.indices.put_mapping(
         index=idxDocs, body=docmap)
     print(resp)
+    time.sleep(int(random.random() * 10))
