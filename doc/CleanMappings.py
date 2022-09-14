@@ -129,6 +129,7 @@ for ind, doudou in enumerate(chercheurs):
                           id=doc['_id'],
                           document=doc ["_source"])
             es.indices.refresh(index=idxDocs)
+            es.cluster.health(wait_for_status='yellow', request_timeout=1)
             #resp = es.indices.put_mapping(index=idxDocs, body=docmap)
     else:
         resp = es.indices.put_mapping(index=idxDocs, body=docmap)
