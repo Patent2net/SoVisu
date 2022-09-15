@@ -21,9 +21,15 @@ def es_connector(mode=True):
     else:
 
         #es = Elasticsearch([{'host': 'localhost', scheme:"http", 'port': 9200}])
-        es = Elasticsearch('http://localhost:9200')
+        es = Elasticsearch('http://localhost:9200', http_compress=True,  connections_per_node=50, request_timeout=200, retry_on_timeout=True
+                           )
         #es = Elasticsearch(hosts = ['http://localhost:9200', 'http://elastichal2:9200', 'http://elastichal3:9200',                 'http://elastichal1:9200'])
-        es.options(request_timeout=600, retry_on_timeout= True, max_retries=5)
+        es.options(request_timeout=100, retry_on_timeout= True, max_retries=5).cluster.health(
+            wait_for_no_initializing_shards=True,
+            wait_for_no_relocating_shards=True,
+            wait_for_status="green" # yellow doit pas forcément marcher si pas un cluster !
+        )
+
     return es
 
 
@@ -63,6 +69,58 @@ docmap = {
     "properties": {
         "docid": {
             "type": "long"
+        },
+    "en_keyword_s": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 512
+          }
+        }
+      },
+    "en_keyword_s": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 512
+          }
+        }
+      },
+        "fr_entites": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 512
+                }
+            }
+        },
+        "en_entites": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 512
+                }
+            }
+        },
+    "fr_teeft_keywords": {
+            "type": "text",  # formerly "string"
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 512
+                }}
+        },
+    "en_teeft_keywords": {
+            "type": "text",  # formerly "string"
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 512
+                }}
         },
         "en_abstract_s": {
             "type": "text",  # formerly "string"
@@ -112,10 +170,22 @@ for ind, doudou in enumerate(chercheurs):
     structu = decoup [0]
     labo = decoup [1]
     idxDocs = structu + "-" + labo + "-researchers-"+ doudou['_id']  +"-documents"
-    mapping = es.indices.get_mapping(index=idxDocs)
-    if len(mapping.body[idxDocs]['mappings'])>0 and mapping.body[idxDocs]['mappings']['properties']['docid']['type'] != 'long':
+    if es.indices.exists(index=idxDocs):
+        mapping = es.indices.get_mapping(index=idxDocs)
+        #time.sleep(int(random.random() * 10))
         compte = es.count(index=idxDocs)['count']
         docs = es.search(index=idxDocs, size=compte)
+        doIt = sum([not isinstance(doc['_source']['docid'], int) for doc in docs["hits"]['hits']])
+        if len(mapping.body[idxDocs]['mappings'])>0 and 'docid' in mapping.body[idxDocs]['mappings']['properties'] .keys():
+            if mapping.body[idxDocs]['mappings']['properties']['docid']['type'] != 'long':
+                doIt = True
+            else:
+                doIt = False
+    else:
+        doIt = False
+
+    if doIt:
+        #time.sleep(int(random.random() * 10))
         if len(docs["hits"]['hits']) >0:
             docu = docs["hits"]['hits']
             print(len(docu)," docs. Destruction de :", idxDocs)
@@ -124,32 +194,100 @@ for ind, doudou in enumerate(chercheurs):
             dico['mappings'] = docmap
             dico['index'] = idxDocs
             es.indices.create(**dico)
-            for doc in docu:
-                doc ['_source']["docid"] = int(doc ['_source']["docid"] )
-                es.index(index=idxDocs,
-                          id=doc['_id'],
-                          document=doc ["_source"])
+            if len(docu) >10:
+                for doc in docu:
+                    doc['_source']["docid"] = int(doc['_source']["docid"])
+                for indi in range(int(len(docu) // 50) + 1):
+                    boutdeDoc = docu[indi * 50:indi * 50 + 50]
+
+                    helpers.bulk(
+                        es,
+                        boutdeDoc,
+                        index=idxDocs
+                    )
+            else:
+                for doc in docu:
+                    doc ['_source']["docid"] = int(doc ['_source']["docid"] )
+                    es.options(request_timeout=200, retry_on_timeout=True, max_retries=5).index(index=idxDocs,
+                              id=doc['_id'],
+                              document=doc ["_source"])
             es.indices.refresh(index=idxDocs)
-            es.cluster.health(wait_for_status='yellow', request_timeout=1)
-            time.sleep(int(random.random()*10))
+            es.cluster.health()
+
             #resp = es.indices.put_mapping(index=idxDocs, body=docmap)
     else:
-        resp = es.indices.put_mapping(index=idxDocs, body=docmap)
-        es.indices.refresh(index=idxDocs)
+        if es.indices.exists(index=idxDocs):
+            resp = es.indices.put_mapping(index=idxDocs, body=docmap)
+            es.indices.refresh(index=idxDocs)
+        else:
+            pass # peut-être faudrait le créer vierge ?
+
 
     print(resp)
 
 print ("Traitement des collections labo")
 
-count = es.count(index="*-laboratories", body=scope_param)['count']
-res = es.search(index="*-laboratories", body=scope_param, size=count)
+count = es.count(index="*-laboratories")['count']
+res = es.search(index="*-laboratories", size=count)
 labos = res['hits']['hits']
 for ind, lab in enumerate(labos):
     decoup = lab['_index']  .split("-")
     structu = decoup [0]
     labo = decoup [1]
     idxDocs = structu + "-" + labo + "-laboratories-documents"
-    resp = es.indices.put_mapping(
-        index=idxDocs, body=docmap)
-    print(resp)
-    time.sleep(int(random.random() * 10))
+    if es.indices.exists(index=idxDocs):
+        mapping = es.indices.get_mapping(index=idxDocs)
+        # time.sleep(int(random.random() * 10))
+        compte = es.count(index=idxDocs)['count']
+        docs = es.search(index=idxDocs, size=compte)
+        doIt = sum([not isinstance(doc['_source']['docid'], int) for doc in docs["hits"]['hits']])
+        if len(mapping.body[idxDocs]['mappings']) > 0 and 'docid' in mapping.body[idxDocs]['mappings'][
+            'properties'].keys():
+            if mapping.body[idxDocs]['mappings']['properties']['docid']['type'] != 'long':
+                doIt = True
+            else:
+                doIt = False
+    else:
+        doIt = False
+
+    if doIt:
+        #
+        if len(docs["hits"]['hits']) > 0:
+            docu = docs["hits"]['hits']
+            print(len(docu), " docs. Destruction de :", idxDocs)
+            es.options(ignore_status=[400, 404]).indices.delete(index=idxDocs)
+            dico = dict()
+            dico['mappings'] = docmap
+            dico['index'] = idxDocs
+            es.indices.create(**dico)
+            if len(docu) > 10:
+                for doc in docu:
+                    doc['_source']["docid"] = int(doc['_source']["docid"])
+                for indi in range(int(len(docu) // 50) + 1):
+                    boutdeDoc = docu[indi * 50:indi * 50 + 50]
+                    helpers.parallel_bulk(
+                        es,
+                        boutdeDoc,
+                        index=idxDocs
+                    )
+                    time.sleep(int(random.random() * 10))
+
+            else:
+                for doc in docu:
+                    doc['_source']["docid"] = int(doc['_source']["docid"])
+                    es.index(index=idxDocs,
+                             id=doc['_id'],
+                             document=doc["_source"],
+                             timeout=300)
+                    time.sleep(int(random.random() * 10))
+            es.indices.refresh(index=idxDocs)
+            es.cluster.health()
+
+            # resp = es.indices.put_mapping(index=idxDocs, body=docmap)
+    else:
+        if es.indices.exists(index=idxDocs):
+            resp = es.indices.put_mapping(index=idxDocs, body=docmap)
+            es.indices.refresh(index=idxDocs)
+        else:
+            pass  # peut-être faudrait le créer vierge ?
+
