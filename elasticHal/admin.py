@@ -123,8 +123,6 @@ class ElasticActions:
             #  laboratoires =
             # print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
             if form .is_valid():
-
-
                 if "chercheurs" in request .POST .keys():
                     chercheurs = True
                 else:
@@ -135,36 +133,36 @@ class ElasticActions:
                     collectionLabo = False
                 collection = form .cleaned_data["f_index"]
                 # print('uuuu ', collection)
-            laboratoire = collection . split("-")[1]
-            structure = collection .split("-")[0]
-            if "TOUT" in request.POST.keys():
-                indexes = get_index_list()
-                for lab in indexes:
+                laboratoire = collection . split("-")[1]
+                structure = collection .split("-")[0]
+                if "TOUT" in request.POST.keys():
+                    indexes = get_index_list()
+                    for lab in indexes:
 
-                    laboratoire = lab[0] .split("-")[1]
-                    structure = lab[0] .split("-")[0]
-                    result1 = collect_laboratories_data2.delay(laboratoire)
-                    task_id1 = result1.task_id
-                    result2 = collect_researchers_data2.delay(struct=structure, idx=lab[0])
+                        laboratoire = lab[0] .split("-")[1]
+                        structure = lab[0] .split("-")[0]
+                        result1 = collect_laboratories_data2.delay(laboratoire)
+                        task_id1 = result1.task_id
+                        result2 = collect_researchers_data2.delay(struct=structure, idx=lab[0])
+                        task_id2 = result2.task_id
+                        return render(request, "admin/elasticHal/export_to_elasticLabs.html",
+                                      context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
+                elif collectionLabo == True:
+                    if chercheurs == True:
+                        result1 = collect_laboratories_data2 .delay(laboratoire)
+                        task_id1 = result1.task_id
+                        result2 = collect_researchers_data2.delay(struct=structure, idx=collection)
+                        task_id2 = result2.task_id
+
+                    else:
+                        result1 = collect_laboratories_data2 .delay(collectionLabo, False)
+                        task_id1 = result1.task_id
+                        task_id2 = None
+
+                elif chercheurs == True:
+                    result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
                     task_id2 = result2.task_id
-                    return render(request, "admin/elasticHal/export_to_elasticLabs.html",
-                                  context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
-            elif collectionLabo == True:
-                if chercheurs == True:
-                    result1 = collect_laboratories_data2 .delay(laboratoire)
-                    task_id1 = result1.task_id
-                    result2 = collect_researchers_data2.delay(struct=structure, idx=collection)
-                    task_id2 = result2.task_id
-
-                else:
-                    result1 = collect_laboratories_data2 .delay(collectionLabo, False)
-                    task_id1 = result1.task_id
-                    task_id2 = None
-
-            elif chercheurs == True:
-                result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
-                task_id2 = result2.task_id
-                task_id1 = None
+                    task_id1 = None
 
             else:
                 pass  # pas sûr
