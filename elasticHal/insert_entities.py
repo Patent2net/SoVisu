@@ -140,15 +140,15 @@ def create_researchers_index(pg):
     cpt = 0
     docmap = {
         "properties": {
-            # "docid": {
-            #     "type": "long"
-            # },
+            "docid": {
+                "type": "long"
+            },
             "en_abstract_s": {
                 "type": "text",  # formerly "string"
                 "fields": {
                     "keyword": {
                         "type": "keyword",
-                        "ignore_above": 1000
+                        "ignore_above": 5000
                     }}
             },
             "fr_abstract_s": {
@@ -156,7 +156,7 @@ def create_researchers_index(pg):
                 "fields": {
                     "keyword": {
                         "type": "keyword",
-                        "ignore_above": 1000
+                        "ignore_above": 5000
                     }}
             },
             "it_abstract_s": {
@@ -164,7 +164,7 @@ def create_researchers_index(pg):
                 "fields": {
                     "keyword": {
                         "type": "keyword",
-                        "ignore_above": 1000
+                        "ignore_above": 5000
                     }}
             },
             "es_abstract_s": {
@@ -172,7 +172,7 @@ def create_researchers_index(pg):
                 "fields": {
                     "keyword": {
                         "type": "keyword",
-                        "ignore_above": 1000
+                        "ignore_above": 5000
                     }}
             },
             "pt_abstract_s": {
@@ -180,12 +180,11 @@ def create_researchers_index(pg):
                 "fields": {
                     "keyword": {
                         "type": "keyword",
-                        "ignore_above": 1000
+                        "ignore_above": 5000
                     }}
             }
         }
     }
-
     for row in cleaned_es_researchers:
         cpt += 1
         percentage = 66 + 33 * (cpt / len(cleaned_es_researchers))
