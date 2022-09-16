@@ -40,6 +40,17 @@
 {% block progress %}
 
 {% csrf_token %}
+    {% if taches %}
+        {% for truc in taches %}
+            <div class="text-center" style="font-size: 12px">
+                <div id="progress-bar-message1"+{% truc.0%} >Progression des index (labo)</div>
+                <div class='progress-wrapper' style="padding-top: 10px;">
+            <div id='progress-bar1'+{% truc.0%} class='progress-bar progress-bar-striped' role='progressbar' style="height:30px; width: 0%; border-radius: 5px">&nbsp;</div>
+            <div id='progress-bar2'+{% truc.0%} class='progress-bar progress-bar-striped' role='progressbar' style="height:30px; width: 0%; border-radius: 5px">&nbsp;
+                <div id="celery-result1"+{% truc.0%}></div>
+            </div>
+            </div>
+    {%  else %}
 <div class="container" style="padding-top: 20px;">
 
     <div class="text-center" style="font-size: 14px"></div>
@@ -59,7 +70,7 @@
     </div>
 
     <div id="celery-result2"></div>
-
+ {%  endif %}
 </div>
 
 {% endblock progress %}
@@ -115,6 +126,33 @@
     }
 </script>
 {% endif %}
+    {% if taches %}
+        {% for truc in taches %}
+    <script type="text/javascript">
+	// Progress Bar (JQuery)
+	$(function () {
+		var progressUrl =[];
+        progressUrl [{% truc.0%}] = "{% url 'celery_progress:task_status' truc.1 %}";
+        var progressUrl2 =[];
+         progressUrl2 [{% truc.0%}] = "{% url 'celery_progress:task_status' truc.2 %}";
+        //console.log(progressUrl1)
+		CeleryProgressBar.initProgressBar(progressUrl[{% truc.0%}], {
+			"onProgress": processProgress1,
+            "progressBarId": "progress-bar1" + {% truc.0%},
+            "progressBarMessageId": "progress-bar-message1",
+            "resultElementId": 'celery-result1'+{% truc.0%}
+		})
+        CeleryProgressBar.initProgressBar(progressUrl2[{% truc.0%}], {
+			"onProgress": processProgress2,
+            "progressBarId": "progress-bar2" + {% truc.0%},
+            "progressBarMessageId": "progress-bar-message2",
+            "resultElementId": 'celery-result2'+{% truc.0%}
+		})
+    });
+    </script>
+        {% endfor %}
+{% endif %}
+
 {% if task_id1 %}
     <script type="text/javascript">
 	// Progress Bar (JQuery)
