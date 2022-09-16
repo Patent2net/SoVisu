@@ -441,7 +441,7 @@ def dashboard(request):
         return redirect('unknown')
 
     try:
-        start_date = res['hits']['hits'][0]['_source']['submittedDate_tdate']
+        start_date = res['hits']['hits'][0]['_source']['producedDate_tdate']
     except:
         start_date = "2000"
     # /
