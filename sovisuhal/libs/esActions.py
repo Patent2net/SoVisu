@@ -96,7 +96,7 @@ def date_p(scope_field, scope_value):
     start_date_param = {
         "size": 1,
         "sort": [
-            {"submittedDate_tdate": {"order": "asc"}}
+            {"producedDate_tdate": {"order": "asc"}}
         ],
         "query": {
             "match_phrase": {scope_field: scope_value}
