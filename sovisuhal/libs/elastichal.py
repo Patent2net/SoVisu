@@ -234,9 +234,9 @@ def collecte_docs(chercheur):  # self,
         try:
             should_be_open = utils.should_be_open(doc)
             if should_be_open == 1:
-                doc["shouldBeOpen"] = True
+                doc["should_be_open"] = True
             if should_be_open == -1:
-                doc["shouldBeOpen"] = False
+                doc["should_be_open"] = False
 
             if should_be_open == 1 or should_be_open == 2:
                 doc['isOaExtra'] = True
