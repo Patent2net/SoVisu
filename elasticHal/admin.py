@@ -136,17 +136,18 @@ class ElasticActions:
                 laboratoire = collection . split("-")[1]
                 structure = collection .split("-")[0]
                 if "TOUT" in request.POST.keys():
+                    tachesChercheur, tachesLabo = [], []
                     indexes = get_index_list()
                     for lab in indexes:
-
                         laboratoire = lab[0] .split("-")[1]
                         structure = lab[0] .split("-")[0]
                         result1 = collect_laboratories_data2.delay(laboratoire)
-                        task_id1 = result1.task_id
+                        tachesLabo. append(result1.task_id)
                         result2 = collect_researchers_data2.delay(struct=structure, idx=lab[0])
-                        task_id2 = result2.task_id
+                        tachesChercheur. append(result2.task_id)
+                        taches = [range(len(tachesLabo)), tachesLabo, tachesChercheur]
                         return render(request, "admin/elasticHal/export_to_elasticLabs.html",
-                                      context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
+                                      context={'form': form, 'taches': taches})
                 elif collectionLabo == True:
                     if chercheurs == True:
                         result1 = collect_laboratories_data2 .delay(laboratoire)
