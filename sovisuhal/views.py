@@ -444,7 +444,7 @@ def dashboard(request):
     else:
         return redirect('unknown')
 
-    try:
+    try: # çà devrait pas être un min de date sur les résultats plutôt que le premier ?.???
         start_date = res['hits']['hits'][0]['_source']['producedDate_tdate']
     except:
         start_date = "2000"
