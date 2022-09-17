@@ -415,6 +415,7 @@ def dashboard(request):
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
+    dash=''
     start_date_param = ''
     if i_type == "rsr":
         indexsearch = struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents"
@@ -432,7 +433,10 @@ def dashboard(request):
     elif i_type == "lab":
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity['halStructId'])
-
+        if 'dash' in request.GET:
+            dash = request.GET['dash']
+        else:
+            dash = 'membres'
         res = es.search(index=struct + '-' + p_id + "-laboratories-documents", body=start_date_param)
         filtrechercheur = ''
         filtre_lab_a = 'harvested_from_ids: "' + p_id + '"'
@@ -453,7 +457,7 @@ def dashboard(request):
     url = viewsActions.vizualisation_url()  # permet d'ajuster l'url des visualisations en fonction du build
 
     return render(request, 'dashboard.html',
-                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
+                  {'ldapid': ldapid, 'struct': struct, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to, 'dash': dash,
                    'entity': entity,
                    'hasToConfirm': hastoconfirm,
                    'ext_key': ext_key,
