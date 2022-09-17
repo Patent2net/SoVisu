@@ -29,11 +29,11 @@ def es_connector(mode=mode):
 
     else:
         #es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-        es = Elasticsearch('http://localhost:9200', http_compress=True,  connections_per_node=50, request_timeout=200, retry_on_timeout=True)
+        es = Elasticsearch('http://localhost:9200', http_compress=True,  connections_per_node=5, request_timeout=200, retry_on_timeout=True)
 
         es.options(request_timeout=100, retry_on_timeout= True, max_retries=5).cluster.health(
             wait_for_no_initializing_shards=True,
-            wait_for_no_relocating_shards=True,
+            wait_for_no_relocating_shards=False,
             wait_for_status="green" # yellow doit pas forcément marcher si pas un cluster !
         )
 
