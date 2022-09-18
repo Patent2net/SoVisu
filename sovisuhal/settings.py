@@ -74,7 +74,7 @@ if mode == 'Prod':
     }
 else:
     SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
-    DEBUG = 'True'
+    DEBUG = 'False'#'True'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -114,6 +114,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sovisu.univ-tln.fr:9200",
     "https://sovisu.univ-tln.fr:5601",
     "https://sovisu.univ-tln.fr:6379",
+    "http://192.168.0.65:*",
     "http://localhost:*",
     "http://localhost:9200",
     "http://localhost:5601",
@@ -122,9 +123,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:9200",
     "http://127.0.0.1:5601",
     "http://127.0.0.1:6379",
+    "http://sovisu.dynalias.org",
+    "http://sovisu.dynalias.org:9200"
+    "http://sovisu.dynalias.org:5601",
+    "http://sovisu.dynalias.org:6379"
+
 ]
 #ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.65', 'sovisu.dynalias.org', 'DR','[::1]']
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -137,17 +143,24 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:9200",
     "http://localhost:5601",
     "http://localhost:6379",
+    "http://192.168.0.65",
+    "http://192.168.0.65:5601",
+    "http://192.168.0.65:6379",
     "http://127.0.0.1",
     "http://127.0.0.1:9200",
     "http://127.0.0.1:5601",
     "http://127.0.0.1:6379",
+    "http://sovisu.dynalias.org",
+    "http://sovisu.dynalias.org:5601",
+    "http://sovisu.dynalias.org:6379"
+
 ]
 
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 
 CORS_URLS_REGEX = r"^/app/*"
-#CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 SECURE_REFERRER_POLICY = 'origin'
 
