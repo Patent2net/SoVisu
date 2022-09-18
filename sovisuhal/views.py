@@ -1174,14 +1174,15 @@ def search(request):  # Revoir la fonction
         return render(request, 'search2.html',
                       {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(val=search),
                        'count': p_res['count'],
+                       'url': url,
                        'timeRange': "from:'" + date_from + "',to:'" + date_to + "'",
                        'filter': search, 'index': index, 'search': search,
                        'results': res_cleaned, 'from': date_from, 'to': date_to,
                        'startDate': min_date, 'url': url, 'ldapid': ldapid})
-
+    url = viewsActions.vizualisation_url()
     return render(request, 'search2.html',
                   {'struct': struct, 'type': i_type, 'id': p_id, 'form': forms.Search(), 'from': date_from, 'to': date_to,
-                   'startDate': min_date, 'filter': '', 'ldapid': ldapid})
+                   'startDate': min_date, 'filter': '','url': url, 'ldapid': ldapid})
 
 
 def presentation(request):
