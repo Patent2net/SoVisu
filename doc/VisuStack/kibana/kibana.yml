@@ -2,11 +2,11 @@ server:
   name: "kibanahal"
   host: localhost
   port: 5601
-  #basePath: kibana/
-  #rewriteBasePath: true
+  basePath: /kibana
+  rewriteBasePath: true
   securityResponseHeaders.referrerPolicy: null
   # When enabling encryption between Kibana and Elasticsearch, change "http" to "https" below:
-  cors.allowOrigin: ["http://localhost", "http://127.0.0.1"]
+  cors.allowOrigin: ["http://localhost", "http://127.0.0.1", "http://192.168.0.65"]
     
 
 
@@ -41,10 +41,10 @@ csp.disableUnsafeEval: false
 
 csp:
   style_src: ["*"]
-  frame_ancestors: ["http://localhost", "http://localhost:*"]
+  frame_ancestors: ["http://localhost", "http://localhost:*", "http://192.168.0.65"]
   warnLegacyBrowsers: true
 
-#server.xsrf.allowlist: ["http://localhost", "http://127.0.0.1"]
+#server.xsrf.allowlist: ["http://localhost", "http://127.0.0.1", "http://192.168.0.65"]]
 server.xsrf.disableProtection: True
 # SSL settings
 #
