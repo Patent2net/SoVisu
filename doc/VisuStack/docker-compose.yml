@@ -208,6 +208,27 @@ services:
     networks:
       - elk
      
+  nginx:
+    restart: always
+    container_name: nginx_server
+    build:
+      context: ./nginx/
+      dockerfile: Dockerfile
+    depends_on:
+      - elastichal1
+    links:
+      - elastichal1
+      - elastichal2
+      - elastichal3
+      - kibanahal
+    ports:
+      - "0.0.0.0:80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./log/nginx:/var/log/nginx
+    networks:
+      - elk
+      
 volumes:
   es-data1:
      driver: local
