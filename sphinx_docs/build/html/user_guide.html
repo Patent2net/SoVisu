@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Développement" href="modules.html" /><link rel="prev" title="Installation" href="install.html" />
 
-    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.09.29"/>
         <title>Guide de l’utilisateur - Documentation SoVisu 0.0.1</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -156,6 +156,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fonctionnement.html">Fonctionnement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Guide de l’utilisateur</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Développement</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -188,7 +189,8 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -196,14 +198,70 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
           <section id="guide-de-l-utilisateur">
-<h1>Guide de l’utilisateur<a class="headerlink" href="#guide-de-l-utilisateur" title="Lien permanent vers cette rubrique">#</a></h1>
+<h1>Guide de l’utilisateur<a class="headerlink" href="#guide-de-l-utilisateur" title="Lien permanent vers ce titre">#</a></h1>
+<p>SoVisu est fait pour accompagner l’autoarchivage des travaux de publication. Il permet de situer l’état de ses publications (sont elles présentes, ouvertes, les fichiers complets peuvent ils être déposés ?). SoVisu construit de surcroît leur représentation lexicales dans les index (quels sont les mots qui permettent de retrouver mes productions ?) en anglais et en français. Ceci s’effectue en quelques clics.</p>
+<p>Après authentification, SoVisu vous dirige vers la vérification des données de votre profil.</p>
+<section id="verification-des-donnees">
+<h2>Vérification des données<a class="headerlink" href="#verification-des-donnees" title="Lien permanent vers ce titre">#</a></h2>
+<section id="identifiants">
+<h3>Identifiants<a class="headerlink" href="#identifiants" title="Lien permanent vers ce titre">#</a></h3>
+<p>Partie incontournable pour entre du bon pied dans la science ouverte. Vous rapportez vos IdRefs, IdHal, OrcId (à créer le cas échéant).</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Si les identifiants rapportés sont faux rien de ce qui suit ne fonctionnera.</p>
+</div>
+<a class="reference internal image-reference" href="_images/Ids.png"><img alt="formulaire de demande d'ids" class="align-center" src="_images/Ids.png" style="width: 800px;" /></a>
+</section>
+<section id="notices">
+<h3>Notices<a class="headerlink" href="#notices" title="Lien permanent vers ce titre">#</a></h3>
+<p>Vous affiche la liste de vos publications et votre position d’auteur (que vous pouvez modifier à l’aide du bouton « Mise à jour de l’autorat », si mal calculée). Vous pouvez éventuellement retirer de votre profil celles que vous considérez comme marginale avec l’autre bouton. Celle-ci basculera dans le volet des notices retirées. Au plus les productions sont en phase avec votre expertise au mieux le lexique issus de ces dernières ciblera votre profil dans le moteur de recherches.</p>
+<div class="admonition tip">
+<p class="admonition-title">Astuce</p>
+<p>Si vous avez récemment modifié, le bouton « Collecter (ou mettre à jour) de nouvelles références » permet de retélécharger les notices associées à votre idhal.</p>
+</div>
+</section>
+<section id="expertise">
+<h3>Expertise<a class="headerlink" href="#expertise" title="Lien permanent vers ce titre">#</a></h3>
+<p>Cet onglet vous permet de sélectionner les domaines scientifiques issus par calcul de votre production. Vous pouvez en retirer de votre profil pour ne conserver que celles qui représentent le mieux vos travaux. Au mieux ces éléments cernent votre expertise au plus les enrichissements seront pertinents.</p>
+<a class="reference internal image-reference" href="_images/Expertise.png"><img alt="onglet expertise" class="align-center" src="_images/Expertise.png" style="width: 800px;" /></a>
+</section>
+<section id="domaines">
+<h3>Domaines<a class="headerlink" href="#domaines" title="Lien permanent vers ce titre">#</a></h3>
+<p>Même principe que précédement. L’interface vous permet de sélectionner dans la nomenclature <a href="#id1"><span class="problematic" id="id2">`</span></a>AureHal_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.</p>
+<a class="reference internal image-reference" href="_images/Domaines.png"><img alt="onglet domaines" class="align-center" src="_images/Domaines.png" style="width: 800px;" /></a>
+<div class="admonition tip">
+<p class="admonition-title">Astuce</p>
+<p>Le menu déroulant vous permet de parcourir l’arborescence des domaines diciplinaires pour y sélectionner les noeuds les plus adéquats. N’oubliez pas de valider.</p>
+</div>
+<p>–</p>
+<p>Vous pourrez, à titre de chercheur, l’utiliser pour :
+- compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu’une fois.
+- sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l’établissement)
+- sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :</p>
+<blockquote>
+<div><p>– vos tableaux de bord qui vous résument au travers d’une panoplie d’indicateurs votre « image » en science ouverte.
+– Un onglet dédié (Références) permet d’afficher vos publications. Le dispositif souligne celles qui pourraient/devraient être complétées (celles qui manqueraient sont par évidence à déposer). Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l’indexation pour vous inciter à améliorer ce point. Le dispositif s’appuie sur les services de la SO pour rapporter aussi les notices qui peuvent être déposées en texte complet (il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont dans ce cas été levées).
+– Votre domaine d’expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets « expertise et nuage de mots » pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d’indexation de vos productions.</p>
+</div></blockquote>
+<p>Notez que calendrier en haut à droite de l’interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau « métrique » qu’au plan conceptuel. L’architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est « no abstract »…), et même le texte complet ce qui affinera les représentations.Vous pourrez, à titre de chercheur, l’utiliser pour :
+- compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu’une fois.
+- sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l’établissement)
+- sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :</p>
+<blockquote>
+<div><p>– vos tableaux de bord qui vous résument au travers d’une panoplie d’indicateurs votre « image » en science ouverte.
+– Un onglet dédié (Références) permet d’afficher vos publications. Le dispositif souligne celles qui pourraient/devraient être complétées (celles qui manqueraient sont par évidence à déposer). Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l’indexation pour vous inciter à améliorer ce point. Le dispositif s’appuie sur les services de la SO pour rapporter aussi les notices qui peuvent être déposées en texte complet (il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont dans ce cas été levées).
+– Votre domaine d’expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets « expertise et nuage de mots » pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d’indexation de vos productions.</p>
+</div></blockquote>
+<p>Notez que calendrier en haut à droite de l’interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau « métrique » qu’au plan conceptuel. L’architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est « no abstract »…), et même le texte complet ce qui affinera les représentations.</p>
+</section>
+</section>
 </section>
 
         </article>
@@ -218,10 +276,10 @@
                 </div>
                 <div class="title">Développement</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="install.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -251,8 +309,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Guide de l’utilisateur</a><ul>
+<li><a class="reference internal" href="#verification-des-donnees">Vérification des données</a><ul>
+<li><a class="reference internal" href="#identifiants">Identifiants</a></li>
+<li><a class="reference internal" href="#notices">Notices</a></li>
+<li><a class="reference internal" href="#expertise">Expertise</a></li>
+<li><a class="reference internal" href="#domaines">Domaines</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -260,7 +343,6 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     <script src="_static/translations.js"></script>

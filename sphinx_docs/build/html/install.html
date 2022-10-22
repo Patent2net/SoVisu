@@ -3,12 +3,12 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Guide de l’utilisateur" href="user_guide.html" /><link rel="prev" title="SoVisu" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Guide de l’utilisateur" href="user_guide.html" /><link rel="prev" title="Fonctionnement" href="fonctionnement.html" />
 
-    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.09.29"/>
         <title>Installation - Documentation SoVisu 0.0.1</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -156,6 +156,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fonctionnement.html">Fonctionnement</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Développement</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -188,7 +189,8 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -203,21 +205,21 @@
         </div>
         <article role="main">
           <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Lien permanent vers cette rubrique">#</a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Lien permanent vers ce titre">#</a></h1>
 <p>SoVisu est un projet s’appuyant sur le <a class="reference external" href="https://www.djangoproject.com">framework Django</a> et qui est constitué de 2 applications:</p>
 <ul class="simple">
-<li><p>elasticHal, qui est chargé de récupérer les informations concernant les chercheurs ainsi que les laboratoires sur les <a class="reference external" href="https://hal.archives-ouvertes.fr">archives ouvertes HAL</a>.</p></li>
-<li><p>sovisuhal, qui permet de retranscrire les données récupérées au sein d’une interface permettant aux chercheurs et laboratoires de gérer leur rayonnement numérique.</p></li>
+<li><p>elasticHal, qui est chargée de récupérer les informations les structures et les laboratoires.</p></li>
+<li><p>sovisuhal qui collecte les identifiants chercheurs, les métadonnées de leurs publications sur Hal pour présenter l</p></li>
 </ul>
-<p>Les données récupérées sont stockées sur un Moteur de recherche <a class="reference external" href="https://www.elastic.co/fr/elasticsearch/">Elasticsearch</a>, couplé à l’interface utilisateur <a class="reference external" href="https://www.elastic.co/fr/kibana/">Kibana</a> qui est utilisée pour créer les tableaux de bord proposés aux utilisateurs.</p>
+<p>Les données récupérées sont stockées sur un moteur de recherche <a class="reference external" href="https://www.elastic.co/fr/elasticsearch/">Elasticsearch</a>, couplé à l’interface utilisateur <a class="reference external" href="https://www.elastic.co/fr/kibana/">Kibana</a> qui est utilisée pour créer les tableaux de bord proposés aux utilisateurs.</p>
 <section id="prerequis">
-<h2>Prérequis<a class="headerlink" href="#prerequis" title="Lien permanent vers cette rubrique">#</a></h2>
+<h2>Prérequis<a class="headerlink" href="#prerequis" title="Lien permanent vers ce titre">#</a></h2>
 <p>Afin d’initialiser le projet, il est nécessaire de disposer d’une machine équipée de Python (version 3.9=~), de Docker, ainsi que de Git.</p>
 <p>Il n’est pas nécessaire de créer des index pour Elasticsearch, ces derniers sont créés par elasticHal lors de la collecte.</p>
 <p>Le code de SoVisu est accessible sur <a class="reference external" href="https://github.com/Patent2net/SoVisu">https://github.com/Patent2net/SoVisu</a> .</p>
 </section>
 <section id="configuration-de-l-environnement">
-<h2>Configuration de l’environnement<a class="headerlink" href="#configuration-de-l-environnement" title="Lien permanent vers cette rubrique">#</a></h2>
+<h2>Configuration de l’environnement<a class="headerlink" href="#configuration-de-l-environnement" title="Lien permanent vers ce titre">#</a></h2>
 <ol class="arabic simple">
 <li><p>Clonez le répertoire</p></li>
 </ol>
@@ -231,8 +233,8 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li><p>Dans doc/VisuStack, créer le dossier <code class="docutils literal notranslate"><span class="pre">volume</span></code> ainsi que les sous-dossiers <code class="docutils literal notranslate"><span class="pre">backup1</span></code>, <code class="docutils literal notranslate"><span class="pre">data1</span></code>, <code class="docutils literal notranslate"><span class="pre">data2</span></code> et <code class="docutils literal notranslate"><span class="pre">MB-data</span></code>.</p></li>
-<li><p>Exécutez la commande suivante pour installer l’environnement Elastic utilisé par le projet:</p></li>
+<li><p>Dans doc/VisuStack, créer le dossier <code class="docutils literal notranslate"><span class="pre">volume</span></code> ainsi que les sous-dossiers <code class="docutils literal notranslate"><span class="pre">backup1</span></code>, <code class="docutils literal notranslate"><span class="pre">data1</span></code>, <code class="docutils literal notranslate"><span class="pre">data2</span></code>, <code class="docutils literal notranslate"><span class="pre">data3</span></code> et <code class="docutils literal notranslate"><span class="pre">MB-data</span></code>.</p></li>
+<li><p>Exécutez la commande suivante pour installer l’environnement serveur utilisé par le projet:</p></li>
 </ol>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>docker-compose doc/VisuStack/docker-compose.yml
 </pre></div>
@@ -241,6 +243,8 @@
 <p class="admonition-title">Avertissement</p>
 <p>Cette commande peut prendre du temps à s’exécuter, car elle télécharge les images Docker de Kibana, ElasticSearch et Redis qui sont nécessaires au fonctionnement du projet.</p>
 </div>
+<p>SoVisu s’appuie sur une architecture telle la figure ci-dessous: Docker héberge tous les services supports excepté le serveur Django. Nginx sert de frontal de sécurité à tous les services y compris SoVisu.</p>
+<a class="reference internal image-reference" href="_images/SoVisu-Architecture.drawio.png"><img alt="_images/SoVisu-Architecture.drawio.png" class="align-center" src="_images/SoVisu-Architecture.drawio.png" style="width: 600px;" /></a>
 <ol class="arabic simple" start="5">
 <li><p>Initialisez les migrations de SoVisu:</p></li>
 </ol>
@@ -266,14 +270,14 @@ Bien que l’identifiant et le mot de passe soient obligatoires, le champ adress
 </div>
 </section>
 <section id="mise-en-route">
-<h2>Mise en route<a class="headerlink" href="#mise-en-route" title="Lien permanent vers cette rubrique">#</a></h2>
+<h2>Mise en route<a class="headerlink" href="#mise-en-route" title="Lien permanent vers ce titre">#</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Avertissement</p>
 <p>Avant toute mise en route de SoVisu, vérifiez que l’instance elastic avec lequel le projet interagit est active.
 Si ce n’est pas le cas, SoVisu renverra un message d’erreur au lieu de s’initialiser normalement.</p>
 </div>
 <section id="initialisation-des-processus-dans-la-partie-admin">
-<h3>Initialisation des processus dans la partie Admin<a class="headerlink" href="#initialisation-des-processus-dans-la-partie-admin" title="Lien permanent vers cette rubrique">#</a></h3>
+<h3>Initialisation des processus dans la partie Admin<a class="headerlink" href="#initialisation-des-processus-dans-la-partie-admin" title="Lien permanent vers ce titre">#</a></h3>
 <ol class="arabic simple">
 <li><p>Lancez SoVisu:</p></li>
 </ol>
@@ -476,7 +480,7 @@ celle ci se base sur les données des modèles présent dans Django mais égalem
 Pour cela, il suffit de sélectionner la partie qui doit être mise à jour pour lancer un processus allégé.</p>
 </div>
 <section id="specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement">
-<h4>Spécificités de la mise en route de SoVisu pour le développement<a class="headerlink" href="#specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement" title="Lien permanent vers cette rubrique">#</a></h4>
+<h4>Spécificités de la mise en route de SoVisu pour le développement<a class="headerlink" href="#specificites-de-la-mise-en-route-de-sovisu-pour-le-developpement" title="Lien permanent vers ce titre">#</a></h4>
 <p>Dans le cas d’une installation de SoVisu sur une machine de développement n’ayant pas accès à l’authentification par CAS, il est nécessaire de définir un profil utilisateur afin d’accéder à l’application.
 Dans le cas d’un profil chercheur, celui ci est identifié par SoVisu grâce à son identifiant ldapId. Le nom d’utilisateur est le même que l’identifiant ldapId.</p>
 <p>Il est cependant possible de définir un profil utilisateur nommé « adminlab », reconnu par SoVisu comme un administrateur du laboratoire et ayant donc accès complet à l’application.</p>
@@ -489,7 +493,7 @@ Dans le cas d’un profil chercheur, celui ci est identifié par SoVisu grâce �
 </section>
 </section>
 <section id="initialisation-des-visualisations-dans-kibana">
-<h3>Initialisation des visualisations dans Kibana<a class="headerlink" href="#initialisation-des-visualisations-dans-kibana" title="Lien permanent vers cette rubrique">#</a></h3>
+<h3>Initialisation des visualisations dans Kibana<a class="headerlink" href="#initialisation-des-visualisations-dans-kibana" title="Lien permanent vers ce titre">#</a></h3>
 <p>Dans Kibana, il est possible de créer des visualisations à partir des données présentes dans Elasticsearch.
 Par défaut SoVisu propose des visualisations qui sont disponibles dans les dossiers du projet:
 SoVisu/doc/Dashboards/</p>
@@ -506,7 +510,7 @@ SoVisu/doc/Dashboards/</p>
 </section>
 </section>
 <section id="mise-en-production">
-<h2>Mise en production<a class="headerlink" href="#mise-en-production" title="Lien permanent vers cette rubrique">#</a></h2>
+<h2>Mise en production<a class="headerlink" href="#mise-en-production" title="Lien permanent vers ce titre">#</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Avertissement</p>
 <p>à compléter</p>
@@ -526,16 +530,16 @@ SoVisu/doc/Dashboards/</p>
                 </div>
                 <div class="title">Guide de l’utilisateur</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+          <a class="prev-page" href="fonctionnement.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Fonctionnement</div>
                 
               </div>
             </a>
@@ -565,7 +569,7 @@ SoVisu/doc/Dashboards/</p>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contenu
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -597,7 +601,6 @@ SoVisu/doc/Dashboards/</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     <script src="_static/translations.js"></script>
