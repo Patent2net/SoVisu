@@ -223,9 +223,11 @@ services:
       - kibanahal
     ports:
       - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./log/nginx:/var/log/nginx
+      #- ./certs/:/etc/nginx/certs
     networks:
       - elk
       
