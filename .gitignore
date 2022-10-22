@@ -10,3 +10,11 @@ doc/VisuStack/volume/
 doc/stackELK/volume/
 .run/Celery.run.xml
 .run/SoVisu.run.xml
+/staticfiles/
+doc/VisuStack/nginx/certs/77.153.196.68.crt
+doc/VisuStack/nginx/certs/77.153.196.68.csr
+doc/VisuStack/nginx/certs/77.153.196.68.key
+doc/VisuStack/nginx/certs/77.153.196.68.pem
+*.log
+.run/Celery.run.xml
+.run/SoVisu.run.xml
