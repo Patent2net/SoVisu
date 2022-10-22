@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Paquet elasticHal.libs" href="elasticHal.libs.html" /><link rel="prev" title="Développement" href="modules.html" />
 
-    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.09.29"/>
         <title>Application ElasticHal - Documentation SoVisu 0.0.1</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -156,6 +156,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fonctionnement.html">Fonctionnement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">Développement</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -188,7 +189,8 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -203,9 +205,9 @@
         </div>
         <article role="main">
           <section id="application-elastichal">
-<h1>Application ElasticHal<a class="headerlink" href="#application-elastichal" title="Lien permanent vers cette rubrique">#</a></h1>
+<h1>Application ElasticHal<a class="headerlink" href="#application-elastichal" title="Lien permanent vers ce titre">#</a></h1>
 <section id="sous-paquets">
-<h2>Sous-paquets<a class="headerlink" href="#sous-paquets" title="Lien permanent vers cette rubrique">#</a></h2>
+<h2>Sous-paquets<a class="headerlink" href="#sous-paquets" title="Lien permanent vers ce titre">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="elasticHal.libs.html">Paquet elasticHal.libs</a><ul>
@@ -225,9 +227,9 @@
 </div>
 </section>
 <section id="modules">
-<h2>Modules<a class="headerlink" href="#modules" title="Lien permanent vers cette rubrique">#</a></h2>
+<h2>Modules<a class="headerlink" href="#modules" title="Lien permanent vers ce titre">#</a></h2>
 <section id="module-elasticHal.admin">
-<span id="elastichal-admin"></span><h3>elasticHal.admin<a class="headerlink" href="#module-elasticHal.admin" title="Lien permanent vers cette rubrique">#</a></h3>
+<span id="elastichal-admin"></span><h3>elasticHal.admin<a class="headerlink" href="#module-elasticHal.admin" title="Lien permanent vers ce titre">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.admin.ElasticActions">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.admin.</span></span><span class="sig-name descname"><span class="pre">ElasticActions</span></span><a class="headerlink" href="#elasticHal.admin.ElasticActions" title="Lien permanent vers cette définition">#</a></dt>
@@ -262,7 +264,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.admin.LaboratoryAdmin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.admin.</span></span><span class="sig-name descname"><span class="pre">LaboratoryAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.admin.LaboratoryAdmin" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code>, <a class="reference internal" href="#elasticHal.admin.ExportCsv" title="elasticHal.admin.ExportCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportCsv</span></code></a></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code>, <a class="reference internal" href="#elasticHal.admin.ExportCsv" title="elasticHal.admin.ExportCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">elasticHal.admin.ExportCsv</span></code></a></p>
 <p>Modèle de l’administration des laboratoires</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="elasticHal.admin.LaboratoryAdmin.actions">
@@ -301,7 +303,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.admin.ResearcherAdmin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.admin.</span></span><span class="sig-name descname"><span class="pre">ResearcherAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.admin.ResearcherAdmin" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code>, <a class="reference internal" href="#elasticHal.admin.ExportCsv" title="elasticHal.admin.ExportCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportCsv</span></code></a></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code>, <a class="reference internal" href="#elasticHal.admin.ExportCsv" title="elasticHal.admin.ExportCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">elasticHal.admin.ExportCsv</span></code></a></p>
 <p>Modèle de l’administration des chercheurs</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="elasticHal.admin.ResearcherAdmin.actions">
@@ -345,7 +347,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.admin.StructureAdmin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.admin.</span></span><span class="sig-name descname"><span class="pre">StructureAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.admin.StructureAdmin" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code>, <a class="reference internal" href="#elasticHal.admin.ExportCsv" title="elasticHal.admin.ExportCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportCsv</span></code></a></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code>, <a class="reference internal" href="#elasticHal.admin.ExportCsv" title="elasticHal.admin.ExportCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">elasticHal.admin.ExportCsv</span></code></a></p>
 <p>Modèle de l’administration des structures</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="elasticHal.admin.StructureAdmin.actions">
@@ -378,11 +380,11 @@
 
 </section>
 <section id="module-elasticHal.apps">
-<span id="elastichal-apps"></span><h3>elasticHal.apps<a class="headerlink" href="#module-elasticHal.apps" title="Lien permanent vers cette rubrique">#</a></h3>
+<span id="elastichal-apps"></span><h3>elasticHal.apps<a class="headerlink" href="#module-elasticHal.apps" title="Lien permanent vers ce titre">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.apps.ElastichalConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.apps.</span></span><span class="sig-name descname"><span class="pre">ElastichalConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.apps.ElastichalConfig" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.apps.config.AppConfig</span></code></p>
 <p>Configuration de l’application elasticHal</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="elasticHal.apps.ElastichalConfig.default_auto_field">
@@ -397,11 +399,11 @@
 </dd></dl>
 
 </section>
-<section id="module-elasticHal.clean_researchers_from_es_base">
-<span id="elastichal-clean-researchers-from-es-base"></span><h3>elasticHal.clean_researchers_from_es_base<a class="headerlink" href="#module-elasticHal.clean_researchers_from_es_base" title="Lien permanent vers cette rubrique">#</a></h3>
+<section id="elastichal-clean-researchers-from-es-base">
+<h3>elasticHal.clean_researchers_from_es_base<a class="headerlink" href="#elastichal-clean-researchers-from-es-base" title="Lien permanent vers ce titre">#</a></h3>
 </section>
 <section id="module-elasticHal.collect_from_HAL">
-<span id="elastichal-collect-from-hal"></span><h3>elasticHal.collect_from_HAL<a class="headerlink" href="#module-elasticHal.collect_from_HAL" title="Lien permanent vers cette rubrique">#</a></h3>
+<span id="elastichal-collect-from-hal"></span><h3>elasticHal.collect_from_HAL<a class="headerlink" href="#module-elasticHal.collect_from_HAL" title="Lien permanent vers ce titre">#</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="elasticHal.collect_from_HAL.collect_data">
 <span class="sig-prename descclassname"><span class="pre">elasticHal.collect_from_HAL.</span></span><span class="sig-name descname"><span class="pre">collect_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">laboratories</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">researcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">django_enabler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.collect_from_HAL.collect_data" title="Lien permanent vers cette définition">#</a></dt>
@@ -422,7 +424,7 @@
 
 </section>
 <section id="module-elasticHal.insert_entities">
-<span id="elastichal-insert-entities"></span><h3>elasticHal.insert_entities<a class="headerlink" href="#module-elasticHal.insert_entities" title="Lien permanent vers cette rubrique">#</a></h3>
+<span id="elastichal-insert-entities"></span><h3>elasticHal.insert_entities<a class="headerlink" href="#module-elasticHal.insert_entities" title="Lien permanent vers ce titre">#</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="elasticHal.insert_entities.create_laboratories_index">
 <span class="sig-prename descclassname"><span class="pre">elasticHal.insert_entities.</span></span><span class="sig-name descname"><span class="pre">create_laboratories_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.insert_entities.create_laboratories_index" title="Lien permanent vers cette définition">#</a></dt>
@@ -461,22 +463,22 @@
 
 </section>
 <section id="module-elasticHal.models">
-<span id="elastichal-models"></span><h3>elasticHal.models<a class="headerlink" href="#module-elasticHal.models" title="Lien permanent vers cette rubrique">#</a></h3>
+<span id="elastichal-models"></span><h3>elasticHal.models<a class="headerlink" href="#module-elasticHal.models" title="Lien permanent vers ce titre">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.models.Laboratory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.models.</span></span><span class="sig-name descname"><span class="pre">Laboratory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.models.Laboratory" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>Définition du modèle Laboratory dans Django</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="elasticHal.models.Laboratory.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#elasticHal.models.Laboratory.DoesNotExist" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="elasticHal.models.Laboratory.MultipleObjectsReturned">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#elasticHal.models.Laboratory.MultipleObjectsReturned" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -538,18 +540,18 @@ object the first time, the query is executed.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.models.Researcher">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.models.</span></span><span class="sig-name descname"><span class="pre">Researcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.models.Researcher" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>Définition du modèle Researcher dans Django</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="elasticHal.models.Researcher.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#elasticHal.models.Researcher.DoesNotExist" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="elasticHal.models.Researcher.MultipleObjectsReturned">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#elasticHal.models.Researcher.MultipleObjectsReturned" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -681,18 +683,18 @@ object the first time, the query is executed.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="elasticHal.models.Structure">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elasticHal.models.</span></span><span class="sig-name descname"><span class="pre">Structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.models.Structure" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>Définition du modèle Structure dans Django</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="elasticHal.models.Structure.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#elasticHal.models.Structure.DoesNotExist" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="elasticHal.models.Structure.MultipleObjectsReturned">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#elasticHal.models.Structure.MultipleObjectsReturned" title="Lien permanent vers cette définition">#</a></dt>
-<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -739,7 +741,7 @@ object the first time, the query is executed.</p>
 
 </section>
 <section id="module-elasticHal.views">
-<span id="elastichal-views"></span><h3>elasticHal.views<a class="headerlink" href="#module-elasticHal.views" title="Lien permanent vers cette rubrique">#</a></h3>
+<span id="elastichal-views"></span><h3>elasticHal.views<a class="headerlink" href="#module-elasticHal.views" title="Lien permanent vers ce titre">#</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="elasticHal.views.get_index_list">
 <span class="sig-prename descclassname"><span class="pre">elasticHal.views.</span></span><span class="sig-name descname"><span class="pre">get_index_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#elasticHal.views.get_index_list" title="Lien permanent vers cette définition">#</a></dt>
@@ -762,10 +764,10 @@ object the first time, the query is executed.</p>
                 </div>
                 <div class="title">Paquet elasticHal.libs</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="modules.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -801,7 +803,7 @@ object the first time, the query is executed.</p>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contenu
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -812,7 +814,7 @@ object the first time, the query is executed.</p>
 <li><a class="reference internal" href="#modules">Modules</a><ul>
 <li><a class="reference internal" href="#module-elasticHal.admin">elasticHal.admin</a></li>
 <li><a class="reference internal" href="#module-elasticHal.apps">elasticHal.apps</a></li>
-<li><a class="reference internal" href="#module-elasticHal.clean_researchers_from_es_base">elasticHal.clean_researchers_from_es_base</a></li>
+<li><a class="reference internal" href="#elastichal-clean-researchers-from-es-base">elasticHal.clean_researchers_from_es_base</a></li>
 <li><a class="reference internal" href="#module-elasticHal.collect_from_HAL">elasticHal.collect_from_HAL</a></li>
 <li><a class="reference internal" href="#module-elasticHal.insert_entities">elasticHal.insert_entities</a></li>
 <li><a class="reference internal" href="#module-elasticHal.models">elasticHal.models</a></li>
@@ -833,7 +835,6 @@ object the first time, the query is executed.</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     <script src="_static/translations.js"></script>

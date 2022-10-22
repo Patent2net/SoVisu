@@ -1,15 +1,13 @@
 Installation
 =============
 
-
-
 SoVisu est un projet s'appuyant sur le `framework Django <https://www.djangoproject.com>`_ et qui est constitué de 2 applications:
 
-- elasticHal, qui est chargé de récupérer les informations concernant les chercheurs ainsi que les laboratoires sur les `archives ouvertes HAL <https://hal.archives-ouvertes.fr>`_.
+- elasticHal, qui est chargée de récupérer les informations les structures et les laboratoires.
 
-- sovisuhal, qui permet de retranscrire les données récupérées au sein d'une interface permettant aux chercheurs et laboratoires de gérer leur rayonnement numérique.
+- sovisuhal qui collecte les identifiants chercheurs, les métadonnées de leurs publications sur Hal pour présenter l
 
-Les données récupérées sont stockées sur un Moteur de recherche `Elasticsearch <https://www.elastic.co/fr/elasticsearch/>`_, couplé à l'interface utilisateur `Kibana <https://www.elastic.co/fr/kibana/>`_ qui est utilisée pour créer les tableaux de bord proposés aux utilisateurs.
+Les données récupérées sont stockées sur un moteur de recherche `Elasticsearch <https://www.elastic.co/fr/elasticsearch/>`_, couplé à l'interface utilisateur `Kibana <https://www.elastic.co/fr/kibana/>`_ qui est utilisée pour créer les tableaux de bord proposés aux utilisateurs.
 
 Prérequis
 -------------
@@ -33,10 +31,10 @@ Configuration de l'environnement
 
    (.venv) $ pip install -r requirements.txt
 
-3. Dans doc/VisuStack, créer le dossier ``volume`` ainsi que les sous-dossiers ``backup1``, ``data1``, ``data2`` et ``MB-data``.
+3. Dans doc/VisuStack, créer le dossier ``volume`` ainsi que les sous-dossiers ``backup1``, ``data1``, ``data2``, ``data3`` et ``MB-data``.
 
 
-4. Exécutez la commande suivante pour installer l'environnement Elastic utilisé par le projet:
+4. Exécutez la commande suivante pour installer l'environnement serveur utilisé par le projet:
 
 .. code-block:: console
 
@@ -44,6 +42,12 @@ Configuration de l'environnement
 
 .. warning::
     Cette commande peut prendre du temps à s'exécuter, car elle télécharge les images Docker de Kibana, ElasticSearch et Redis qui sont nécessaires au fonctionnement du projet.
+
+SoVisu s'appuie sur une architecture telle la figure ci-dessous: Docker héberge tous les services supports excepté le serveur Django. Nginx sert de frontal de sécurité à tous les services y compris SoVisu.
+
+.. image:: images/SoVisu-Architecture.drawio.png
+    :width: 600px
+    :align: center
 
 
 5. Initialisez les migrations de SoVisu:

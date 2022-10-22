@@ -10,6 +10,7 @@
    :maxdepth: 4
    :caption: Contenu:
 
+   fonctionnement
    install
    user_guide
    modules

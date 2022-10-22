@@ -3,12 +3,12 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Installation" href="install.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Fonctionnement" href="fonctionnement.html" />
 
-    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.09.29"/>
         <title>Documentation SoVisu 0.0.1</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -156,6 +156,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="fonctionnement.html">Fonctionnement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Développement</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -188,7 +189,8 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -203,22 +205,28 @@
         </div>
         <article role="main">
           <section id="sovisu">
-<h1>SoVisu<a class="headerlink" href="#sovisu" title="Lien permanent vers cette rubrique">#</a></h1>
-<p>SoVisu est un dispositif créé et pensé pour accompagner la communauté d’un établissement à la Science Ouverte(SO) en lui fournissant les instruments guides de son pilotage, tout en permettant de cartographier l’expertise des chercheurs.
-Ce dispositif prend source sur HAL pour s’inscrire dans l’écosystème de la SO côté usager en donnant la possibilité aux chercheurs de qualifier/vérifier et compléter leurs données de production, leurs domaines, leurs mot-clés « experts ».</p>
-<p>Pour un chercheur SoVisu accompagne la vérification et recensement des Id (idRef, OrcId, idHal), validation des données issues de scanr, récupération et intégration ou pas de sa production issue d’Hal à son profil chercheur.
-SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques et interactives à partir des travaux (indicateurs bibliométriques interactifs).</p>
-<p>Pour un laboratoire, ou groupe de, côté gouvernance les mêmes principes et fonctions par agrégations, extractions de la production au format HCERES (4 premiers volets avec calculs réalisés : interrogation unpaywal, appartenance d’un doctorant dans les co-publiants notamment).</p>
+<h1>SoVisu<a class="headerlink" href="#sovisu" title="Lien permanent vers ce titre">#</a></h1>
+<p>SoVisu est un dispositif créé et pensé pour accompagner la communauté d’un établissement à la Science Ouverte(SO) en lui fournissant les instruments guides de son pilotage, tout en permettant de cartographier l’expertise des chercheurs et faciliter l’autoarchivage et apprécier la qualité de l’indexation.
+Ce dispositif prend source sur HAL pour s’inscrire dans l’écosystème de la SO côté usager en donnant la possibilité aux chercheurs de qualifier/vérifier et compléter leurs données bibliographiques, leurs domaines, leurs mot-clés « experts ».</p>
+<p>Pour un chercheur SoVisu accompagne la vérification et le recensement des Id (idRef, OrcId, idHal), récupère sur HAL les notices bibliographiques associées à sa production pour produire une synthèse et des cartographies lexicales (comparable à celles produite par les index). L’interface laisse la possibilité d’exclure de son profil certaines productions. SoVisu produit alors des tableaux de bord sous forme de visualisations dynamiques et interactives à partir des travaux (indicateurs bibliométriques interactifs, extractions lexicales), des liens directs vers HAL pour chacune des notices afin de corriger/compléter certaines données, des synthèses : chacun peut apprécier la qualité de sa représentation sur les index et éventuellement corriger.</p>
+<p>Pour un laboratoire, ou groupe de, côté gouvernance les mêmes principes et fonctions par agrégations, extractions de la production au format HCERES (4 premiers volets avec calculs réalisés : interrogation unpaywal, appartenance d’un doctorant dans les co-publiants notamment). Les agrégations permettent alors d’opérer sur des données bibliographiques validées par les chercheurs.</p>
 <dl class="simple">
-<dt>SoVisu est une application web Python/Django se basant sur les données disponibles sur HAL (<a class="reference external" href="https://hal.archives-ouvertes.fr">https://hal.archives-ouvertes.fr</a>) et constitué de deux app distinctes :</dt><dd><ul class="simple">
-<li><p><strong>elasticHal</strong> : une app chargé de récupérer les données des laboratoires et chercheurs sur HAL afin de les incorporer à une base de données Elastic</p></li>
-<li><p><strong>sovisuhal</strong> : une app chargé d’afficher les données aux utilisateurs et se basant sur un environnement Django et les données récupérées puis stockées dans Elastic par elasticHal</p></li>
+<dt>SoVisu est une application web Python/Django se basant sur les données disponibles sur HAL (<a class="reference external" href="https://hal.archives-ouvertes.fr">https://hal.archives-ouvertes.fr</a>) et constitué de deux applications distinctes :</dt><dd><ul class="simple">
+<li><p><strong>elasticHal</strong> :  chargée de récupérer les données des laboratoires et chercheurs sur HAL afin de les incorporer à une base de données Elastic. Accessible via l’interface administration de Django,</p></li>
+<li><p><strong>sovisuhal</strong> : chargée d’afficher les données aux utilisateurs et se basant sur un environnement Django et les données récupérées puis stockées dans Elastic.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contenu:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="fonctionnement.html">Fonctionnement</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fonctionnement.html#initialisation-et-connexion-au-si">Initialisation et connexion au SI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fonctionnement.html#validations-des-id-et-integration-des-notices">Validations des Id et intégration des notices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fonctionnement.html#enrichissements-et-syntheses">Enrichissements et synthèses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fonctionnement.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html#prerequis">Prérequis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#configuration-de-l-environnement">Configuration de l’environnement</a></li>
@@ -233,7 +241,16 @@ SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques 
 <li class="toctree-l2"><a class="reference internal" href="install.html#mise-en-production">Mise en production</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">Guide de l’utilisateur</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#verification-des-donnees">Vérification des données</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user_guide.html#identifiants">Identifiants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide.html#notices">Notices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide.html#expertise">Expertise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide.html#domaines">Domaines</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Développement</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="elasticHal.html">Application ElasticHal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="elasticHal.html#sous-paquets">Sous-paquets</a><ul>
@@ -243,7 +260,7 @@ SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques 
 <li class="toctree-l3"><a class="reference internal" href="elasticHal.html#modules">Modules</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.admin">elasticHal.admin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.apps">elasticHal.apps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.clean_researchers_from_es_base">elasticHal.clean_researchers_from_es_base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elasticHal.html#elastichal-clean-researchers-from-es-base">elasticHal.clean_researchers_from_es_base</a></li>
 <li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.collect_from_HAL">elasticHal.collect_from_HAL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.insert_entities">elasticHal.insert_entities</a></li>
 <li class="toctree-l4"><a class="reference internal" href="elasticHal.html#module-elasticHal.models">elasticHal.models</a></li>
@@ -276,14 +293,14 @@ SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques 
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="install.html">
+          <a class="next-page" href="fonctionnement.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Installation</div>
+                <div class="title">Fonctionnement</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           
         </div>
@@ -315,7 +332,6 @@ SoVisu produit alors un tableau de bord sous forme de visualisations dynamiques 
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
     <script src="_static/translations.js"></script>
