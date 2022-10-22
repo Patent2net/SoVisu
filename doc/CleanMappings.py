@@ -68,7 +68,12 @@ chercheurs = res['hits']['hits']
 docmap = {
     "properties": {
         "docid": {
-            "type": "long"
+            "type": "long",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 512
+                }}
         },
     "en_keyword_s": {
         "type": "text",
@@ -177,10 +182,16 @@ for ind, doudou in enumerate(chercheurs):
         docs = es.search(index=idxDocs, size=compte)
         doIt = sum([not isinstance(doc['_source']['docid'], int) for doc in docs["hits"]['hits']])
         if len(mapping.body[idxDocs]['mappings'])>0 and 'docid' in mapping.body[idxDocs]['mappings']['properties'] .keys():
-            if mapping.body[idxDocs]['mappings']['properties']['docid']['type'] != 'long':
+            if mapping.body[idxDocs]['mappings']['properties']['docid']['type'] == 'long':
                 doIt = True
+            elif 'fields' in mapping.body[idxDocs]['mappings']['properties']['docid'].keys():
+                if 'keyword' not in mapping.body[idxDocs]['mappings']['properties']['docid']['fields']:
+                    doIt = True
+                else:
+                    doIt = True
+
             else:
-                doIt = False
+                doIt = True
     else:
         doIt = False
 
@@ -205,25 +216,28 @@ for ind, doudou in enumerate(chercheurs):
                         boutdeDoc,
                         index=idxDocs
                     )
+                resp= str(len(docu)) + " indexés "
             else:
                 for doc in docu:
                     doc ['_source']["docid"] = int(doc ['_source']["docid"] )
                     es.options(request_timeout=200, retry_on_timeout=True, max_retries=5).index(index=idxDocs,
                               id=doc['_id'],
                               document=doc ["_source"])
-            es.indices.refresh(index=idxDocs)
-            es.cluster.health()
+            resp=es.indices.refresh(index=idxDocs)
+            print(es.cluster.health())
 
-            #resp = es.indices.put_mapping(index=idxDocs, body=docmap)
+            es.indices.put_mapping(index=idxDocs, body=docmap)
+        else:
+            resp = "rien à faire : " + idxDocs
     else:
         if es.indices.exists(index=idxDocs):
             resp = es.indices.put_mapping(index=idxDocs, body=docmap)
             es.indices.refresh(index=idxDocs)
         else:
             pass # peut-être faudrait le créer vierge ?
-
-
-    print(resp)
+            resp =("rien à faire")
+    if doIt:
+        print(resp, idxDocs)
 
 print ("Traitement des collections labo")
 
@@ -243,10 +257,16 @@ for ind, lab in enumerate(labos):
         doIt = sum([not isinstance(doc['_source']['docid'], int) for doc in docs["hits"]['hits']])
         if len(mapping.body[idxDocs]['mappings']) > 0 and 'docid' in mapping.body[idxDocs]['mappings'][
             'properties'].keys():
-            if mapping.body[idxDocs]['mappings']['properties']['docid']['type'] != 'long':
+            if mapping.body[idxDocs]['mappings']['properties']['docid']['type'] == 'long':
                 doIt = True
+            elif 'fields' in mapping.body[idxDocs]['mappings']['properties']['docid'].keys():
+                if 'keyword' not in mapping.body[idxDocs]['mappings']['properties']['docid']['fields']:
+                    doIt = True
+                else:
+                    doIt = True
+
             else:
-                doIt = False
+                doIt = True
     else:
         doIt = False
 
