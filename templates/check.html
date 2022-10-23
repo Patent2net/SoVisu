@@ -56,16 +56,16 @@
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                            href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
-                        >Expertise</a>
+                        >Expertise identifiée</a>
                     {% endif %}
-                    <a class="px-2 pb-1
-                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
-                    >Mots-clés orienteurs</a>
+{#                    <a class="px-2 pb-1#}
+{#                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"#}
+{#                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"#}
+{#                    >Mots-clés</a>#}
                     <a class="px-2 pb-1
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
-                    >Domaines orienteurs</a>
+                    >Domaines expertise</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -324,7 +324,7 @@
 
             {% endif %}
 
-            {% if data == -1 or data == "guiding-keywords" %}
+{% comment %}            {% if data == -1 or data == "guiding-keywords" %}
 
                 <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -353,7 +353,7 @@
                            type="submit" value="Valider">
                 </form>
 
-            {% endif %}
+            {% endif %}{% endcomment %}
 
             {% if data == "research-description" %}
 
@@ -372,6 +372,11 @@
 
                 <!-- Include the Quill library -->
                 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+                <h4 class="text-xs font-semibold pb-2">Mots-clés :</h4>
+                <div id="guidingKeywords">
+                    {{ guidingKeywords | safe }}
+                </div>
 
                 <h4 class="text-xs font-semibold pb-2">Résumé des travaux :</h4>
                 <div id="research_summary">
@@ -412,7 +417,12 @@
                         [{'align': ['', 'center', 'right', 'justify']}],
                         [{list: 'ordered'}, {list: 'bullet'}]
                     ];
-
+                    var quill0 = new Quill('#guidingKeywords', {
+                        modules: {
+                            toolbar: []
+                        },
+                        theme: 'snow'
+                    });
                     var quill1 = new Quill('#research_summary', {
                         modules: {
                             toolbar: options
@@ -427,6 +437,7 @@
                         theme: 'snow'
                     });
 
+
                     var quill3 = new Quill('#research_projectsAndFundings', {
                         modules: {
                             toolbar: options
@@ -435,6 +446,25 @@
                     });
 
                     // tttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+
+
+                    var myElement0 = document.getElementById('guidingKeywords');
+                    if (window.addEventListener) {
+                        // Normal browsers
+                        myElement0.addEventListener('DOMSubtreeModified', contentChanged0, false);
+                    } else if (window.attachEvent) {
+                        // IE
+                        myElement0.attachEvent('DOMSubtreeModified', contentChanged0);
+                    }
+
+                    function contentChanged0() {
+                        document.getElementById('id_f_guidingKeywords').value = myElement0.innerText;
+                    }
+
+                    // tttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+
 
                     var myElement1 = document.getElementById('research_summary');
                     if (window.addEventListener) {

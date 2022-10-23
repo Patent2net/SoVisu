@@ -423,61 +423,61 @@ def validate_credentials(request):
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
-
-def validate_guiding_keywords(request):
-    """
-    Validation des mots clés de guidance
-    """
-    # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        return redirect('unknown')
-
-    if 'type' in request.GET and 'id' in request.GET:
-        i_type = request.GET['type']
-        p_id = request.GET['id']
-    else:
-        return redirect('unknown')
-
-    if 'data' in request.GET:
-        data = request.GET['data']
-    else:
-        data = -1
-
-    if 'from' in request.GET:
-        date_from = request.GET['from']
-    else:
-        date_from = '2000-01-01'
-
-    if 'to' in request.GET:
-        date_to = request.GET['to']
-    else:
-        date_to = datetime.today().strftime('%Y-%m-%d')
-
-    if request.method == 'POST':
-
-        guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
-
-        if i_type == "rsr":
-            scope_param = esActions.scope_p("_id", p_id)
-
-            res = es.search(index=struct + "*-researchers", body=scope_param)
-            try:
-                entity = res['hits']['hits'][0]['_source']
-            except:
-                return redirect('unknown')
-
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
-                      body={"doc": {"guidingKeywords": guiding_keywords}})
-
-        if i_type == "lab":
-            es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
-                      body={"doc": {"guidingKeywords": guiding_keywords}})
-
-    return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
-
+#
+# def validate_guiding_keywords(request):
+#     """
+#     Validation des mots clés de guidance
+#     """
+#     # Get parameters
+#     if 'struct' in request.GET:
+#         struct = request.GET['struct']
+#     else:
+#         return redirect('unknown')
+#
+#     if 'type' in request.GET and 'id' in request.GET:
+#         i_type = request.GET['type']
+#         p_id = request.GET['id']
+#     else:
+#         return redirect('unknown')
+#
+#     if 'data' in request.GET:
+#         data = request.GET['data']
+#     else:
+#         data = -1
+#
+#     if 'from' in request.GET:
+#         date_from = request.GET['from']
+#     else:
+#         date_from = '2000-01-01'
+#
+#     if 'to' in request.GET:
+#         date_to = request.GET['to']
+#     else:
+#         date_to = datetime.today().strftime('%Y-%m-%d')
+#
+#     if request.method == 'POST':
+#
+#         guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
+#
+#         if i_type == "rsr":
+#             scope_param = esActions.scope_p("_id", p_id)
+#
+#             res = es.search(index=struct + "*-researchers", body=scope_param)
+#             try:
+#                 entity = res['hits']['hits'][0]['_source']
+#             except:
+#                 return redirect('unknown')
+#
+#             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
+#                       body={"doc": {"guidingKeywords": guiding_keywords}})
+#
+#         if i_type == "lab":
+#             es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
+#                       body={"doc": {"guidingKeywords": guiding_keywords}})
+#
+#     return redirect(
+#         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+#
 
 def validate_research_description(request):
     """
@@ -511,7 +511,7 @@ def validate_research_description(request):
         date_to = datetime.today().strftime('%Y-%m-%d')
 
     if request.method == 'POST':
-
+        guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
         research_summary = request.POST.get("f_research_summary")
         research_projects_in_progress = request.POST.get("f_research_projectsInProgress")
         research_projects_and_fundings = request.POST.get("f_research_projectsAndFundings")
@@ -540,8 +540,13 @@ def validate_research_description(request):
                                     "research_projectsInProgress_raw": research_projects_in_progress_raw,
                                     "research_projectsAndFundings": research_projects_and_fundings,
                                     "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
-                                    "research_updatedDate": datetime.today().isoformat()
+                                    "research_updatedDate": datetime.today().isoformat(),
+                                    "guidingKeywords": guiding_keywords
                                     }})
+
+        elif i_type == "lab":
+            es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
+                      body={"doc": {"guidingKeywords": guiding_keywords}})
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
