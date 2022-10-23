@@ -1,7 +1,7 @@
 Guide de l'utilisateur
 ========================
 
-SoVisu est fait pour accompagner l'autoarchivage des travaux de publication. Il permet de situer l'état de ses publications (sont elles présentes, ouvertes, les fichiers complets peuvent ils être déposés ?). SoVisu construit de surcroît leur représentation lexicales dans les index (quels sont les mots qui permettent de retrouver mes productions ?) en anglais et en français. Ceci s'effectue en quelques clics.
+SoVisu est fait pour accompagner l'auto-archivage des travaux de publication. Il permet de situer l'état de ses publications (sont elles présentes, ouvertes, les fichiers complets peuvent ils être déposés ?). SoVisu construit de surcroît leur représentation lexicales dans les index (quels sont les mots qui permettent de retrouver mes productions ?) en anglais et en français. Ceci s'effectue en quelques clics.
 
 Après authentification, SoVisu vous dirige vers la vérification des données de votre profil.
 
@@ -25,7 +25,7 @@ Notices
 Vous affiche la liste de vos publications et votre position d'auteur (que vous pouvez modifier à l'aide du bouton "Mise à jour de l'autorat", si mal calculée). Vous pouvez éventuellement retirer de votre profil celles que vous considérez comme marginale avec l'autre bouton. Celle-ci basculera dans le volet des notices retirées. Au plus les productions sont en phase avec votre expertise au mieux le lexique issus de ces dernières ciblera votre profil dans le moteur de recherches.
 
 .. tip::
-  Si vous avez récemment modifié, le bouton "Collecter (ou mettre à jour) de nouvelles références" permet de retélécharger les notices associées à votre idhal.
+  Si vous avez récemment modifié, le bouton "Collecter (ou mettre à jour) de nouvelles références" permet de re-télécharger les notices associées à votre idhal.
 
 
 Expertise
@@ -39,7 +39,7 @@ Cet onglet vous permet de sélectionner les domaines scientifiques issus par cal
 
 Domaines
 ^^^^^^^^
-Même principe que précédement. L'interface vous permet de sélectionner dans la nomenclature `AureHal\_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
+Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHal\_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
 
 .. image:: images/user_guide/Domaines.png
     :width: 800px
@@ -47,7 +47,8 @@ Même principe que précédement. L'interface vous permet de sélectionner dans 
     :alt: onglet domaines
 
 .. tip::
-  Le menu déroulant vous permet de parcourir l'arborescence des domaines diciplinaires pour y sélectionner les noeuds les plus adéquats. N'oubliez pas de valider.
+  Le menu déroulant vous permet de parcourir l'arborescence des domaines disciplinaires pour y sélectionner les noeuds les plus adéquats. N'oubliez pas de valider.
+
 
 --
 
