@@ -23,11 +23,11 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = 'SoVisu'
-copyright = '2022, David Reymond, Alaric Tabariès, Esteban Bara, Clara Galliano'
-author = 'David Reymond, Alaric Tabariès, Esteban Bara, Clara Galliano'
+copyright = '2022, David Reymond, Alaric Tabariès, Esteban Bara'
+author = 'David Reymond, Alaric Tabariès, Esteban Bara'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.0.1'
 
 
 # -- General configuration ---------------------------------------------------
