@@ -112,28 +112,28 @@ class ValidLabCredentials(forms.Form):
         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
-class SetGuidingKeywords(forms.Form):
-    """
-    Formulaire de validation de mot clé de guidance
-    \n\n
-    :return:
-    """
-    def __init__(self, *args, **kwargs):
-        guiding_keywords = kwargs.pop('guidingKeywords')
-
-        super(SetGuidingKeywords, self).__init__(*args, **kwargs)
-
-        str_value = ""
-        for keyword in guiding_keywords:
-            str_value += keyword + ";"
-
-        if len(str_value) > 0:
-            str_value = str_value[:-1]
-        self.fields['f_guidingKeywords'].initial = str_value
-
-    # Set choices to an empty list as it is a required argument.
-    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(
-        attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none', 'size': 80}))
+# class SetGuidingKeywords(forms.Form):
+#     """
+#     Formulaire de validation de mot clé "orienteurs" des futurs enrichissements lexicaux.
+#     \n\n
+#     :return:
+#     """
+#     def __init__(self, *args, **kwargs):
+#         guiding_keywords = kwargs.pop('guidingKeywords')
+#
+#         super(SetGuidingKeywords, self).__init__(*args, **kwargs)
+#
+#         str_value = ""
+#         for keyword in guiding_keywords:
+#             str_value += keyword + ";"
+#
+#         if len(str_value) > 0:
+#             str_value = str_value[:-1]
+#         self.fields['f_guidingKeywords'].initial = str_value
+#
+#     # Set choices to an empty list as it is a required argument.
+#     f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(
+#         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none', 'size': 80}))
 
 
 class SetResearchDescription(forms.Form):
@@ -143,15 +143,25 @@ class SetResearchDescription(forms.Form):
     :return:
     """
     def __init__(self, *args, **kwargs):
+        guiding_keywords = kwargs.pop('guidingKeywords')
         research_summary = kwargs.pop('research_summary')
         research_projects_in_progress = kwargs.pop('research_projectsInProgress')
         research_projects_and_fundings = kwargs.pop('research_projectsAndFundings')
 
         super(SetResearchDescription, self).__init__(*args, **kwargs)
+        str_value = ""
+        for keyword in guiding_keywords:
+            str_value += keyword + ";"
 
+        if len(str_value) > 0:
+            str_value = str_value[:-1]
+        self.fields['f_guidingKeywords'].initial = str_value
         self.fields['f_research_summary'].initial = research_summary
         self.fields['f_research_projectsInProgress'].initial = research_projects_in_progress
         self.fields['f_research_projectsAndFundings'].initial = research_projects_and_fundings
+
+    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=200, widget=forms.TextInput(
+        attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none', 'size': 200}))
 
     f_research_summary = forms.CharField(widget=forms.Textarea, required=False)
     f_research_projectsInProgress = forms.CharField(widget=forms.Textarea, required=False)

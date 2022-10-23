@@ -126,12 +126,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://sovisu.dynalias.org",
     "http://sovisu.dynalias.org:9200"
     "http://sovisu.dynalias.org:5601",
-    "http://sovisu.dynalias.org:6379"
+    "http://sovisu.dynalias.org:6379",
+    "https://77.153.196.68"
 
 ]
 #ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.65', 'sovisu.dynalias.org', 'DR','[::1]']
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.0.65', 'sovisu.dynalias.org', "77.153.196.68", 'DR','[::1]']
+CSRF_TRUSTED_ORIGINS =["https://77.153.196.68","https://localhost"]
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
@@ -152,7 +153,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:6379",
     "http://sovisu.dynalias.org",
     "http://sovisu.dynalias.org:5601",
-    "http://sovisu.dynalias.org:6379"
+    "http://sovisu.dynalias.org:6379",
+    "https://77.153.196.68"
 
 ]
 

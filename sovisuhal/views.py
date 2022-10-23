@@ -220,14 +220,19 @@ def check(request):
             research_projects_in_progress = ''
         else:
             research_projects_in_progress = entity['research_projectsInProgress']
-
+        if "guidingKeywords" not in entity:
+            guidingKeywords = ''
+        else:
+            guidingKeywords = ";".join(entity ['guidingKeywords'])
         return render(request, 'check.html',
                       {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
                        'entity': entity, 'extIds': ['a', 'b', 'c'],
-                       'form': forms.SetResearchDescription(research_summary=research_summary,
+                       'form': forms.SetResearchDescription(guidingKeywords=guidingKeywords,
+                                                            research_summary=research_summary,
                                                             research_projectsInProgress=research_projects_in_progress,
                                                             research_projectsAndFundings=research_projects_and_fundings),
                        'startDate': start_date,
+                       'guidingKeywords' : guidingKeywords,
                        'research_summary': research_summary,
                        'research_projectsInProgress': research_projects_in_progress,
                        'research_projectsAndFundings': research_projects_and_fundings,
@@ -275,15 +280,15 @@ def check(request):
                        'hasToConfirm': hastoconfirm,
                        'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
-    elif data == "guiding-keywords":
-        return render(request, 'check.html',
-                      {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
-                       'entity': entity,
-                       'form': forms.SetGuidingKeywords(
-                           guidingKeywords=entity['guidingKeywords']),
-                       'startDate': start_date,
-                       'hasToConfirm': hastoconfirm,
-                       'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
+    # elif data == "guiding-keywords":
+    #     return render(request, 'check.html',
+    #                   {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
+    #                    'entity': entity,
+    #                    'form': forms.SetGuidingKeywords(
+    #                        guidingKeywords=entity['guidingKeywords']),
+    #                    'startDate': start_date,
+    #                    'hasToConfirm': hastoconfirm,
+    #                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
 
     elif data == "guiding-domains":
 
