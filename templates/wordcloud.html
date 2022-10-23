@@ -105,7 +105,9 @@
                 </div>
             {%  else %}
                   <div class="w-full h-full">
-<iframe Sec-Fetch-Dest="iframe"  src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27??embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)&show-top-menu=false&show-query-input=true&show-time-filter=true" height="100%" width="100%" id="dashkib">
+                  <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)" height="100%" width="100%" id="dashkib">
+
+{#<iframe Sec-Fetch-Dest="iframe"  src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27??embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)&show-top-menu=false&show-query-input=true&show-time-filter=true" height="100%" width="100%" id="dashkib">#}
                 </iframe></div>
             {%  endif %}
         {%  endif %}
