@@ -2,12 +2,12 @@
 {% include "includes/header.html" with title="Explorations lexicales" %}
 
 
-<script>
-
+{% comment %}<script>
  $(id="dashkib").ready(function() {
                         $('.kbnTopNavMenu__wrapper').css('display', 'none');
                         $('#kbnPresentationToolbar__solutionToolbar').css('display', 'none');
-                    });
+                   });
+
 {#$("#dashkib").on("load", function() {#}
 {#  let head = $("#myiFrame").contents().find("head");#}
 {#  let css = '<style>#kbnPresentationToolbar__solutionToolbar {display: none;}</style>';#}
@@ -29,19 +29,19 @@
 {#        });#}
 {#   });#}
 {##}
-{#    function hideMenu() {#}
-{#  var iframe = document.getElementsByTagName("iframe");#}
-{#  if (iframe && iframe.contentWindow) {#}
-{#      $("div#kbnPresentationToolbar__solutionToolbar.euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive.solutionToolbar.solutionToolbar--light").css("display", "none");#}
-{#      iframe.contentWindow.document.contents().find(".kbnTopNavMenu__wrapper").css("display", "none");#}
-{#      iframe.contentWindow.document.contents().find("#kbnPresentationToolbar__solutionToolbar").css("display", "none");#}
-{#  }#}
-{# }#}
-{#$(document).ready(function(){#}
-{#    $('dashkib').ready(function(){hideMenu()})})#}
-{##}
+    function hideMenu() {
+  var iframe = document.getElementsByTagName("iframe");
+  if (iframe && iframe.contentWindow) {
+      $("div#kbnPresentationToolbar__solutionToolbar.euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive.solutionToolbar.solutionToolbar--light").css("display", "none");
+      iframe.contentWindow.document.contents().find(".kbnTopNavMenu__wrapper").css("display", "none");
+      iframe.contentWindow.document.contents().find("#kbnPresentationToolbar__solutionToolbar").css("display", "none");
+  }
+ }
+$(document).ready(function(){
+    $('dashkib').ready(function(){hideMenu()})})
+
 {#   </script>#}
-</script>
+</script>{% endcomment %}
 <div class="h-full w-full flex ">
 
     {% include "includes/menu.html" with title="Nuage de Mots" %}
@@ -68,7 +68,7 @@
                               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
 
-                    <p>Ci dessous le lexique et sa distribution temporelle extraits des mots-clés auteur issus des productions validées associées à votre profil. Le bouton de filtrage permet de pointer spécifiquement des éventuelles erreurs ou des manques."</p>
+                    <p>Ci dessous le lexique et sa distribution temporelle extraits des mots-clés auteur issus des productions validées associées à votre profil. Le bouton de filtrage permet de pointer spécifiquement des éventuelles erreurs ou des manques.</p>
 
                 </div>
             {% if type == "lab" %}
@@ -101,8 +101,7 @@
 
                     <p>Ci dessous le lexique des notices marquées en langue française. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
                         Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
-                     Une fois les données modifiées sur Hal il suffit de revenir sur la vérification des données et de rafraîchir les références. </p>
-
+                     Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
                 </div>
 
                 <div class="w-full h-full">
@@ -122,7 +121,7 @@
 
                     <p>Ci dessous le lexique des notices marquées en langue anglaise. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
                         Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).</p>
-                        Une fois les données modifiées sur Hal il suffit de revenir sur la vérification des données et de rafraîchir les références.
+                            Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
                 </div>
             {% if type == "lab" %}
                 <div class="w-full h-full">

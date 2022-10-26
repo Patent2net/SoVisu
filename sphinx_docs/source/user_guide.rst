@@ -39,7 +39,7 @@ Cet onglet vous permet de sélectionner les domaines scientifiques issus par cal
 
 Domaines
 ^^^^^^^^
-Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHal\_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
+Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHal`_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
 
 .. image:: images/user_guide/Domaines.png
     :width: 800px
@@ -49,6 +49,9 @@ Même principe que précédemment. L'interface vous permet de sélectionner dans
 .. tip::
   Le menu déroulant vous permet de parcourir l'arborescence des domaines disciplinaires pour y sélectionner les noeuds les plus adéquats. N'oubliez pas de valider.
 
+Descriptifs de recherche
+^^^^^^^^^^^^^^^^^^^^^^^^
+Dans cet onglet vous devez renseigner les mots-clés génériques de votre expertise.
 
 --
 
