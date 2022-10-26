@@ -84,4 +84,60 @@ $(function() {
 
 $(document).ready(function () {
     $('.loading-div').fadeOut(150);
+    });
+
+
+// document.addEventListener('load', (event) => {
+//     var ifram=document.getElementById('dashkib')
+//     ifram.addEventListener("readystatechange", () => {
+//         if (ifram.contentDocument.readyState  == "complete") {
+//             ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+//     }
+// })});
+// document.onload =(event) => {
+//     var ifram=document.getElementById('dashkib')
+//     ifram.addEventListener("readystatechange", () => {
+//         if (ifram.contentDocument.readyState  == "complete") {
+//             ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+//     }
+// })};
+
+
+document.addEventListener('load', (event) => {
+    var ifram=document.getElementById('dashkib')
+    ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    });
+
+onDOMContentLoaded = (event) => {
+    var ifram=document.getElementById('dashkib')
+    ifram.addEventListener("readystatechange", () => {
+        if (ifram.contentDocument.readyState  == "complete") {
+             ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+     }
+    })};
+
+window.addEventListener("load", function () {
+  // do things after the DOM loads fully
+    const ifram=document.getElementsByTagName('iframe')[0]
+    console.log(ifram.readyState);
+    ifram.contentWindow.addEventListener ("load", function () {
+    // do things after the DOM loads fully
+    if (ifram.contentDocument.readyState  === "complete") {
+             ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+     }
+    if (ifram.contentDocument.readyState  === "loading") {
+             ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+     }
+    ifram.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+
 });
+});
+
+window.onload = function() { // can also use window.addEventListener('load', (event) => {
+
+    const iFrameEle = document.querySelector('#dashkib');
+    console.log(iFrameEle.readyState);
+    iFrameEle.onload = function() {
+        iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    };  };
+
