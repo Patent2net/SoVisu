@@ -10,7 +10,7 @@ Vérification des données
 
 Identifiants
 ^^^^^^^^^^^^
-Partie incontournable pour entre du bon pied dans la science ouverte. Vous rapportez vos IdRefs, IdHal, OrcId (à créer le cas échéant).
+Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapportez vos IdRefs, IdHal, OrcId (à créer le cas échéant).
 
 .. warning::
   Si les identifiants rapportés sont faux rien de ce qui suit ne fonctionnera.
@@ -39,7 +39,7 @@ Cet onglet vous permet de sélectionner les domaines scientifiques issus par cal
 
 Domaines
 ^^^^^^^^
-Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHal`_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
+Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHAL <https://aurehal.archives-ouvertes.fr/domain/index>`_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
 
 .. image:: images/user_guide/Domaines.png
     :width: 800px
@@ -56,18 +56,21 @@ Dans cet onglet vous devez renseigner les mots-clés génériques de votre exper
 --
 
 Vous pourrez, à titre de chercheur, l'utiliser pour :
-- compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
-- sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l'établissement)
-- sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :
-  -- vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
-  -- Un onglet dédié (Références) permet d'afficher vos publications. Le dispositif souligne celles qui pourraient/devraient être complétées (celles qui manqueraient sont par évidence à déposer). Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l'indexation pour vous inciter à améliorer ce point. Le dispositif s'appuie sur les services de la SO pour rapporter aussi les notices qui peuvent être déposées en texte complet (il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont dans ce cas été levées).
-  -- Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d'indexation de vos productions.
+
+* compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
+* sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l'établissement)
+* sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :
+    * vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
+    * Un onglet dédié (Références) permet d'afficher vos publications. Le dispositif souligne celles qui pourraient/devraient être complétées (celles qui manqueraient sont par évidence à déposer). Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l'indexation pour vous inciter à améliorer ce point. Le dispositif s'appuie sur les services de la SO pour rapporter aussi les notices qui peuvent être déposées en texte complet (il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont dans ce cas été levées).
+    * Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d'indexation de vos productions.
 Notez que calendrier en haut à droite de l'interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau "métrique" qu'au plan conceptuel. L'architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est "no abstract"...), et même le texte complet ce qui affinera les représentations.Vous pourrez, à titre de chercheur, l'utiliser pour :
-- compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
-- sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l'établissement)
-- sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :
-  -- vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
-  -- Un onglet dédié (Références) permet d'afficher vos publications. Le dispositif souligne celles qui pourraient/devraient être complétées (celles qui manqueraient sont par évidence à déposer). Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l'indexation pour vous inciter à améliorer ce point. Le dispositif s'appuie sur les services de la SO pour rapporter aussi les notices qui peuvent être déposées en texte complet (il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont dans ce cas été levées).
-  -- Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d'indexation de vos productions.
+
+* compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
+* sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l'établissement)
+* sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :
+    * vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
+    * Un onglet dédié (Références) permet d'afficher vos publications. Le dispositif souligne celles qui pourraient/devraient être complétées (celles qui manqueraient sont par évidence à déposer). Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l'indexation pour vous inciter à améliorer ce point. Le dispositif s'appuie sur les services de la SO pour rapporter aussi les notices qui peuvent être déposées en texte complet (il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont dans ce cas été levées).
+    * Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d'indexation de vos productions.
+
 Notez que calendrier en haut à droite de l'interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau "métrique" qu'au plan conceptuel. L'architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est "no abstract"...), et même le texte complet ce qui affinera les représentations.
 
