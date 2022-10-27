@@ -1,7 +1,7 @@
 Fonctionnement
 ==============
 
-SoVisu est un logiciel open source, opérationnel et installable dans un établissement universitaire. SoVisu est issue d’un projet initié en 2019 à l’origine pour cartographier les compétences des membres de l’établissement UTLN. SoViSu est destiné à l’ensemble de la communauté universitaire pour faciliter l'autoarchivage et la gestion individuelle de sa production sur HAL. SoVisu affecte un score de qualité calculé sur la quantité des métadonnées des notices, et extrait automatiquement un lexique propre à chaque document pour l'agréger en un profil informationnel individuel ou collectif. Chacun peut ainsi apprécier la représentation de ses travaux sur les index, et l'adapter pour parfaire sa lisibilité en plus de sa visibilité.
+SoVisu est un logiciel open source, opérationnel et installable dans un établissement universitaire. SoVisu est issue d’un projet initié en 2019 à l’origine pour cartographier les compétences des membres de l’Université de Toulon. SoViSu est destiné à l’ensemble de la communauté universitaire pour faciliter l'autoarchivage et la gestion individuelle de sa production sur HAL. SoVisu affecte un score de qualité calculé sur la quantité des métadonnées des notices, et extrait automatiquement un lexique propre à chaque document pour l'agréger en un profil informationnel individuel ou collectif. Chacun peut ainsi apprécier la représentation de ses travaux sur les index, et l'adapter pour parfaire sa lisibilité en plus de sa visibilité.
 
 Initialisation et connexion au SI
 ---------------------------------
@@ -33,9 +33,10 @@ Validations des Id et intégration des notices
 ---------------------------------------------
 
 Lors de l'authentification le chercheur doit renseigner ses identifiants de chercheur, les créer le cas échéant :
-- idRef : obligatoire mais non utilisé.
-- idHal : primordial si faut rien ne marche.
-- ORCId : optionnel et non utilisé.
+
+* idRef : obligatoire mais non utilisé.
+* idHal : primordial si faut rien ne marche.
+* ORCId : optionnel et non utilisé.
 
 Cette étape de validation permet à SoVisu de collecter les notices associées à l'idHal sur Hal. Celles-ci sont alors indexées dans son profil : *SIREN-labHalid-researchers-ldapid-documents*.
 
