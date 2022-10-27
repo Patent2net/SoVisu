@@ -142,7 +142,7 @@ class SetResearchDescription(forms.Form):
     \n\n
     :return:
     """
-    
+
     def __init__(self, *args, **kwargs):
         guiding_keywords = kwargs.pop('guidingKeywords')
         research_summary = kwargs.pop('research_summary')
