@@ -142,6 +142,7 @@ class SetResearchDescription(forms.Form):
     \n\n
     :return:
     """
+    
     def __init__(self, *args, **kwargs):
         guiding_keywords = kwargs.pop('guidingKeywords')
         research_summary = kwargs.pop('research_summary')
@@ -150,6 +151,8 @@ class SetResearchDescription(forms.Form):
 
         super(SetResearchDescription, self).__init__(*args, **kwargs)
         str_value = ""
+        if not isinstance(guiding_keywords, list):
+            guiding_keywords = guiding_keywords .split(';')
         for keyword in guiding_keywords:
             str_value += keyword + ";"
 
