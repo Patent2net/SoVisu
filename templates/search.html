@@ -115,25 +115,29 @@
                                 </div>
                             {%  endif %}
                         </div>
-        <!-- Si version dev changer   src="/kibana/app/visualize#  en   src="http://127.0.0.1:5601/app/visualize#  -->
 
                         <div class="px-2">
                             {% if results.0.docid %}
                                 <h3 class="text-xs font-semibold my-2">Mots-clés associés</h3> <!--4ec4e950-8716-11eb-b61e-8702cc892037--->
-                                 <iframe src="{{ url }}/app/dashboards#/view/510f2a60-cc6e-11ec-bce5-81a9737ee0c0?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="700"></iframe>
+                                 <iframe src="{{ url }}/app/dashboards#/view/510f2a60-cc6e-11ec-bce5-81a9737ee0c0?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="100%" width="100%"></iframe>
                             {%  endif %}
 
                             {% if results.0.ldapId %}
                                 <h3 class="text-xs font-semibold my-2">Mots-clés associés</h3>
                                 <!--if local use : http://127.0.0.1:5601/app    else /kibana/app -->
-                               <iframe src="{{ url }}/app/dashboards#/view/510f2a60-cc6e-11ec-bce5-81a9737ee0c0?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="700"></iframe>
+                               <iframe src="{{ url }}/app/dashboards#/view/510f2a60-cc6e-11ec-bce5-81a9737ee0c0?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="100%" width="100%"></iframe>
                             {%  endif %}
 
 
                             {% if results.0.rsnr %}
                                 <h3 class="text-xs font-semibold my-2">Mots-clés associés</h3>
-                                <iframe src="{{ url }}/app/dashboards#/view/510f2a60-cc6e-11ec-bce5-81a9737ee0c0?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="600" width="700"></iframe>
+                                <iframe src="{{ url }}/app/dashboards#/view/510f2a60-cc6e-11ec-bce5-81a9737ee0c0?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="100%" width="100%"></iframe>
                             {%  endif %}
+                        </div>
+                        <div class="px-2">
+                                <h3 class="text-xs font-semibold my-2">Mots-clés associés</h3> <!--4ec4e950-8716-11eb-b61e-8702cc892037--->
+                                 <iframe src="{{ url }}/app/dashboards#/view/2a24f410-f6ae-11ec-a664-216eaa7662bc?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filter  }}')))" height="100%" width="100%"></iframe>
+
                         </div>
 
                     </div>
