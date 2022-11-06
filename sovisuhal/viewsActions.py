@@ -54,6 +54,8 @@ def admin_access_login(request):
             return redirect("/index/?indexcat=rsr&indexstruct=130015332")
         elif auth_user == 'visiteur':
             return redirect("/index/?indexcat=rsr&indexstruct=198307662")
+        elif auth_user == 'guestutln' or auth_user == 'guestUtln':
+            return redirect("/index/?indexcat=rsr&indexstruct=198307662")
         else:
             # auth_user = request.user.get_username()
             auth_user = auth_user.replace(patternCas, '').lower()
