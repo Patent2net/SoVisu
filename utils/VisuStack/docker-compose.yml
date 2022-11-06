@@ -60,8 +60,9 @@ services:
       #- node.data=true
       - cluster.name=sovisucluster
       #- cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal2:9300,elastichal3:9302
-      #- cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - discovery.seed_hosts=elastichal2:9300
+      #
+      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - cluster.routing.allocation.enable=all
       - bootstrap.memory_lock=true
@@ -149,9 +150,9 @@ services:
       - node.roles=data,remote_cluster_client
       #- node.data=true
       - cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal1:9300,elastichal2:9301
+      - discovery.seed_hosts=elastichal1:9300,elastichal2:9300
       #- discovery.seed_providers=elastichal1:9300
-      #- cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - bootstrap.memory_lock=true
       - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
