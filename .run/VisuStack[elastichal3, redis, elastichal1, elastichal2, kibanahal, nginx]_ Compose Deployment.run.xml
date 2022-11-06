@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="VisuStack[elastichal3, redis, elastichal1, elastichal2, kibanahal, nginx]: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" singleton="false" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="envFilePath" value="" />
+        <option name="services">
+          <list>
+            <option value="elastichal3" />
+            <option value="redis" />
+            <option value="elastichal1" />
+            <option value="elastichal2" />
+            <option value="kibanahal" />
+            <option value="nginx" />
+          </list>
+        </option>
+        <option name="sourceFilePath" value="utils/VisuStack/docker-compose.yml" />
+        <option name="upDetach" value="false" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

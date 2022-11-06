@@ -19,6 +19,16 @@ services:
     networks:
       - elk
 
+#  sovisu:
+#    container_name: sovisu
+#    environment:
+#      - LOGSTASH_HOST=logstash
+#    expose:
+#      - "5959"
+#      - "8000"
+#    networks:
+#      - elk
+#    command: python manage runserver 8000
 
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-8.3.2}
@@ -36,33 +46,33 @@ services:
       - metricbeatvolum:/usr/share/metricbeat/data
       - ./metricbeat/modules.d/:/usr/share/metricbeat/modules.d/
     environment:
-      - ELASTICSEARCH_HOST=elastichal1
-      - KIBANA_HOST=kibanahal
+      - ELASTICSEARCH_HOST=elasticsovisu1
+      - KIBANA_HOST=kibanasovisu
       - ELASTICSEARCH_USERNAME=david
       - ELASTICSEARCH_PASSWORD=MonMdp
     # disable strict permission checks
     command: ["--strict.perms=false"] #, "-system.hostfs=/hostfs"]
     links:
-      - elastichal1
-      - elastichal2
-      - kibanahal
+      - elasticsovisu1
+      - elasticsovisu2
+      - kibanasovisu
 
-  elastichal1:
+  elasticsovisu1:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
-    container_name: elastichal1
+    container_name: elasticsovisu1
 
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
-      - node.name=elastichal1
+      - node.name=elasticsovisu1
       - node.roles=master,data,remote_cluster_client
       #- node.data=true
       - cluster.name=sovisucluster
       #- cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal2:9300
+      - discovery.seed_hosts=elasticsovisu2:9300
       #
-      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - cluster.initial_master_nodes=elasticsovisu1, elasticsovisu2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - cluster.routing.allocation.enable=all
       - bootstrap.memory_lock=true
@@ -92,21 +102,21 @@ services:
       - es-data1:/usr/share/elasticsearch/data
       - es-backup1:/usr/share/elasticsearch/backup
 
-  elastichal2:
+  elasticsovisu2:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
-    container_name: elastichal2
+    container_name: elasticsovisu2
 
     ports:
       - "9201:9200"
       - "9301:9300"
     environment:
-      - node.name=elastichal2
+      - node.name=elasticsovisu2
       - node.roles=master,data,remote_cluster_client
       #- node.data=true
       - cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal1:9300
-      #- discovery.seed_providers=elastichal1:9300
-      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - discovery.seed_hosts=elasticsovisu1:9300
+      #- discovery.seed_providers=elasticsovisu1:9300
+      - cluster.initial_master_nodes=elasticsovisu1, elasticsovisu2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - bootstrap.memory_lock=true
       - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
@@ -121,10 +131,10 @@ services:
       - ELASTIC_PASSWORD=MonMdp
       - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
     depends_on:
-      - elastichal1
+      - elasticsovisu1
     links:
-      - elastichal1
-      - elastichal3
+      - elasticsovisu1
+      - elasticsovisu3
     ulimits:
       memlock:
         soft: -1
@@ -138,21 +148,21 @@ services:
       - es-data2:/usr/share/elasticsearch/data
       - es-backup1:/usr/share/elasticsearch/backup
 
-  elastichal3:
+  elasticsovisu3:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
-    container_name: elastichal3
+    container_name: elasticsovisu3
 
     ports:
       - "9202:9200"
       - "9302:9300"
     environment:
-      - node.name=elastichal3
+      - node.name=elasticsovisu3
       - node.roles=data,remote_cluster_client
       #- node.data=true
       - cluster.name=sovisucluster
-      - discovery.seed_hosts=elastichal1:9300,elastichal2:9300
-      #- discovery.seed_providers=elastichal1:9300
-      - cluster.initial_master_nodes=elastichal1, elastichal2 #Pour le premier lancement seulement
+      - discovery.seed_hosts=elasticsovisu1:9300,elasticsovisu2:9300
+      #- discovery.seed_providers=elasticsovisu1:9300
+      - cluster.initial_master_nodes=elasticsovisu1, elasticsovisu2 #Pour le premier lancement seulement
       - "path.repo=/usr/share/elasticsearch/backup"
       - bootstrap.memory_lock=true
       - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
@@ -167,9 +177,9 @@ services:
       - ELASTIC_PASSWORD=MonMdp
       - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
     depends_on:
-      - elastichal1
+      - elasticsovisu1
     links:
-      - elastichal1
+      - elasticsovisu1
 
     ulimits:
       memlock:
@@ -184,20 +194,20 @@ services:
       - es-data3:/usr/share/elasticsearch/data
       - es-backup1:/usr/share/elasticsearch/backup
 
-  kibanahal:
+  kibanasovisu:
     image: docker.elastic.co/kibana/kibana:8.3.2
-    container_name: kibanahal
+    container_name: kibanasovisu
 
     ports:
       - "5601:5601"
     depends_on:
-      - elastichal1
-      - elastichal2
-      - elastichal3
+      - elasticsovisu1
+      - elasticsovisu2
+      - elasticsovisu3
     links:
-      - elastichal1
-      - elastichal2
-      - elastichal3
+      - elasticsovisu1
+      - elasticsovisu2
+      - elasticsovisu3
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     environment:
@@ -205,7 +215,7 @@ services:
       KIBANA_PASSWORD: MonMdp
       ELASTICSEARCH_PASSWORD: MonMdp
       ELASTICSEARCH_USERNAME: david
-      #ELASTICSEARCH_HOST_PORT: "http://elastichal:9200"
+      #ELASTICSEARCH_HOST_PORT: "http://elasticsovisu:9200"
     networks:
       - elk
      
@@ -216,12 +226,14 @@ services:
       context: ./nginx/
       dockerfile: Dockerfile
     depends_on:
-      - elastichal1
+      - elasticsovisu1
     links:
-      - elastichal1
-      - elastichal2
-      - elastichal3
-      - kibanahal
+      - elasticsovisu1
+      - elasticsovisu2
+      - elasticsovisu3
+      - kibanasovisu
+
+
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -231,42 +243,59 @@ services:
       #- ./certs/:/etc/nginx/certs
     networks:
       - elk
-      
+
+#  logstash:
+#    labels:
+#      com.example.service: "logstash"
+#      com.example.description: "For logging data"
+#    image: logstash:8.3.2
+#    volumes:
+#      - /d/SoVisuStack/volume/logstash:/logstash_dir
+#    command: logstash -f /logstash_dir/logstash.conf
+#    ports:
+#      - "5959:5959"
+#    depends_on:
+#      - elasticsovisu1
+#      - elasticsovisu2
+#      - elasticsovisu3
+#    networks:
+#      - elk
+
 volumes:
   es-data1:
      driver: local
      driver_opts:
         o: bind
         type: none
-        device: "./volume/data1" # /d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack
+        device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\data1"#"./volume/data1" # /d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack
 
   es-backup1:
      driver: local
      driver_opts:
         o: bind
         type: none
-        device: "./volume/backup1"
+        device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\backup1"#"./volume/backup1"
 
   es-data2:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\doc\\VisuStack\\volume\\data2"
+      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\data2"
 
   es-data3:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\doc\\VisuStack\\volume\\data3"
+      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\data3"#"./volume/data3" #"D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\doc\\VisuStack\\volume\\data3"
 
   metricbeatvolum:
      driver: local
      driver_opts:
         o: bind
         type: none
-        device: "./volume/MB-data"
+        device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\MB-data"#"./volume/MB-data"
 
 networks:
   elk:

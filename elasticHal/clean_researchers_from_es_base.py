@@ -43,11 +43,11 @@ for key in texting_dict:
         list_of_date = list()
 
         for index in texting_dict[key]:
-            # pour chaque enregistrement stock sous forme de liste la date de création du profil ainsi que sont index
+            # pour chaque enregistrement stock sous forme de liste la date de création du profil ainsi que son index
             list_of_date.append([datetime.strptime(researchers[index]["_source"]["Created"], "%Y-%m-%dT%H:%M:%S.%f"), index])
 
         while len(list_of_date) != 1:
-            # tant qu'il ne reste pas 1 seul date dans list_of_date supprime les plus vieux comptes
+            # tant qu'il ne reste pas 1 seule date dans list_of_date supprime les plus vieux comptes
             index = researchers[min(list_of_date)[1]]["_index"]
             id = researchers[min(list_of_date)[1]]["_id"]
             query = {
