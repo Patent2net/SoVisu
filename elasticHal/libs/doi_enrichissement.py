@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 
 
@@ -77,6 +79,7 @@ def docs_enrichissement_doi(doc):
         elif 'publisher' in data and 'has_repository_copy' in data:
             doc["oa_host_type"] = 'editor and open archive'
 
+
         elif not data['is_oa']:
             doc["oa_host_type"] = 'closed access'
 
@@ -84,4 +87,4 @@ def docs_enrichissement_doi(doc):
             doc["oa_host_type"] = 'N/A'
 
     return doc
-
+    
