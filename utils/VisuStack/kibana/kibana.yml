@@ -7,7 +7,7 @@ server:
   securityResponseHeaders.referrerPolicy: null
   # When enabling encryption between Kibana and Elasticsearch, change "http" to "https" below:
   cors.allowOrigin: ["http://localhost", "http://127.0.0.1", "http://192.168.0.65"]
-  publicBaseUrl: "http://77.153.196.68/kibana"  
+  publicBaseUrl: "http://localhost/kibana"  
 
 
 xpack.reporting.encryptionKey: "fhjskloppd678ehkdfdlliverpipofcr"
@@ -28,9 +28,6 @@ status:
 #xpack.monitoring.ui.container.elasticsearch.enabled: false
 monitoring.ui.container.elasticsearch.enabled: false
 xpack.reporting.enabled: false
-
-xpack.encryptedSavedObjects.encryptionKey: 'fhjskloppd678ehkdfdlliverpipofcr'
-
 
 ## X-Pack security credentials
 # elasticsearch.username: kibana_system
