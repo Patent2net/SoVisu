@@ -84,6 +84,7 @@ $(function() {
 
 $(document).ready(function () {
     $('.loading-div').fadeOut(150);
+    $(window).off('beforeunload');
     });
 
 
@@ -134,7 +135,7 @@ window.addEventListener("load", function () {
 });
 
 window.onload = function() { // can also use window.addEventListener('load', (event) => {
-
+    $(window).off('beforeunload');
     const iFrameEle = document.querySelector('#dashkib');
     console.log(iFrameEle.readyState);
     iFrameEle.onload = function() {
