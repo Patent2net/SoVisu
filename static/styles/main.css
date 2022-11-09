@@ -1,10 +1,6 @@
 @import url('https://rsms.me/inter/inter.css');
 html { font-family: 'Inter', sans-serif; }
 
-.kbnTopNavMenu__wrapper {
-    display:none;
-}
-
 .inset-center {
     position: absolute;
     top: 50%;
@@ -164,4 +160,21 @@ table.dataTable tbody tr.selected td:first-child {
     cursor: pointer;
     background-color: #a0aec0;
     /*outline: 1px solid slategrey;*/
+}
+#dashkib.html body.coreSystemRootDomElement.kbnBody.kbnBody--noHeaderBanner.kbnBody--chromeHidden.kbnVersion-8-3-2 div#kibana-body div.kbnAppWrapper.kbnAppWrapper--hiddenChrome div.kbnAppWrapper div#kbnPresentationToolbar__solutionToolbar.euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive.solutionToolbar.solutionToolbar--light
+{
+    display:none;
+}
+
+#kbnPresentationToolbar__solutionToolbar{
+    display:none;
+}
+
+.kbnTopNavMenu__wrapper {
+    display:none;
+}
+
+html body.coreSystemRootDomElement.kbnBody.kbnBody--noHeaderBanner.kbnBody--chromeHidden.kbnVersion-8-3-2 div#kibana-body div.kbnAppWrapper.kbnAppWrapper--hiddenChrome div.kbnAppWrapper span.kbnTopNavMenu__wrapper
+{
+    display:none;
 }
