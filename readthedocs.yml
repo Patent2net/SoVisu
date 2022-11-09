@@ -10,12 +10,12 @@ version: 2
 python:
   version: 3.8
   install:
-    - requirements: requirements.txt
+    - requirements: sphinx_docs/source/requirements-docs.txt
     
 sphinx:
   configuration: sphinx_docs/source/conf.py
-  install:
-     - requirements: sphinx_docs/source/requirements-docs.txt
+
+     
 # Build documentation with MkDocs
 #mkdocs:
 #  configuration: mkdocs.yml
