@@ -12,7 +12,6 @@ build:
     python: "3.9"
     
 python:
-  version: 3.8
   install:
     - requirements: sphinx_docs/source/requirements-docs.txt
 
