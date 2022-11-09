@@ -1,5 +1,5 @@
 server:
-  name: "kibanahal"
+  name: "kibanasovisu"
   host: localhost
   port: 5601
   basePath: /kibana
@@ -15,7 +15,7 @@ xpack.reporting.encryptionKey: "fhjskloppd678ehkdfdlliverpipofcr"
 
 
 server.host: 0.0.0.0
-elasticsearch.hosts: [ "http://elastichal1:9200", "http://elastichal2:9200", "http://elastichal3:9200" ]
+elasticsearch.hosts: [ "http://elasticsovisu1:9200", "http://elasticsovisu2:9200", "http://elasticsovisu3:9200" ]
 #monitoring.ui.container.elasticsearch.enabled: true
 
 #pack.security.authc.providers:
