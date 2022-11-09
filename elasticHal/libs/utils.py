@@ -3,9 +3,30 @@ import re
 import dateutil.parser
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from PyPDF2 import PdfFileReader, PdfFileWriter
+import io
+
+
+def remove_page(pdf_file, pages):
+    """
+    Supprime des pages d'un pdf
+    """
+    infile = PdfFileReader(io.BytesIO(pdf_file.content))
+    output = PdfFileWriter()
+    for i in range(infile.getNumPages()):
+        if i not in pages:
+            p = infile.getPage(i)
+            output.addPage(p)
+
+    response_bytes_stream = io.BytesIO()
+    output.write(response_bytes_stream)
+    return response_bytes_stream.getvalue()
 
 
 def should_be_open(doc):
+    """
+    Détermine si une notice devrait être ouverte
+    """
     # -1 non
     # 1 oui
     # 0 no se
@@ -43,6 +64,9 @@ def should_be_open(doc):
 
 
 def calculate_mds(doc):
+    """
+    Attribue un score à la qualité de description d'une notice.
+    """
     score = 0
 
     if 'title_s' in doc:
@@ -87,7 +111,10 @@ def calculate_mds(doc):
     if 'fileMain_s' in doc:
         has_attached_file = True
     else:
-        has_attached_file = False
+        if doc["openAccess_bool"] == 1:
+            has_attached_file = True
+        else:
+            has_attached_file = False
 
     if has_title:
         score += 1 * 0.8
@@ -106,11 +133,14 @@ def calculate_mds(doc):
 
 
 def append_to_tree(scope, rsr, tree, state):
+    """
+    Rajoute un domaine d'expertise à un arbre d'expertise
+    """
     rsr_data = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
     rsr_id = rsr['ldapId']
 
     sid = scope['id'].split('.')
-    print(f"\u00A0 \u21D2 \u00A0{scope}")
+    # print(f"\u00A0 \u21D2 \u00A0{scope}")
 
     scope_data = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
                   'children': [],
@@ -182,6 +212,9 @@ def append_to_tree(scope, rsr, tree, state):
 
 
 def filter_concepts(concepts, validated_ids):
+    """
+    Filtre les concepts qui ne sont pas dans la liste des concepts validés
+    """
     if len(concepts) > 0:
 
         for children in concepts['children']:

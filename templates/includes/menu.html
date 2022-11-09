@@ -66,7 +66,48 @@
             <ul class="flex flex-col mt-4" :class="{'block': open, 'hidden': !open}">
 
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Synthèses</h3>
+                {% if type == "lab" %}
+                    <li @click.away="open = false" x-data="{ open: false }" class=" flex w-full h-8 relative ">
+                    <a @click="open = !open"
+                       class="cursor-pointer w-full whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Tableau des dépôts' or title == 'Tableau des publications' %} text-white {% else %} text-gray-300 {% endif %}">
+                        <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                             fill="currentColor">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                        Tableaux de bord
+                        <svg fill="currentColor" viewBox="0 0 20 20" :class="{'rotate-180': open, '-rotate-0': !open}"
+                             class="inline w-3 h-3 ml-1 transition-transform duration-200 transform">
+                            <path fill-rule="evenodd"
+                                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                  clip-rule="evenodd"></path>
+                        </svg>
 
+                    </a>
+
+                        <ul class="absolute z-10 bg-gray-500 mt-8 left-4 rounded right-4"
+                            x-show="open" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                        >
+                            <li class="flex w-full h-8 ">
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold {% if title == 'Membres' %} text-white {% else %} text-gray-300 {% endif %}"
+                                   href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&dash=membres"
+                                >Membres</a></li>
+
+                            <li class="flex w-full h-8 ">
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Synthèse OA' %} text-white {% else %} text-gray-300 {% endif %}"
+                                   href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&dash=OA"
+                                >Synthèse OA</a></li>
+                            <li class="flex w-full h-8 ">
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Projets' %} text-white {% else %} text-gray-300 {% endif %}"
+                                   href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&dash=projets"
+                                >Projets</a></li>
+                        </ul>
+                </li>
+                    {% else %}
                 <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Tableau des dépôts' %} text-white {% else %} text-gray-300 {% endif %}"
                          href="/dashboard/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
@@ -76,7 +117,7 @@
                         </svg>
                     Tableau de bord
                 </a></li>
-
+                {% endif %}
                 <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Références' %} text-white {% else %} text-gray-300 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=uncomplete">
@@ -110,7 +151,7 @@
                               d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"
                               clip-rule="evenodd"/>
                     </svg>
-                    Nuage de Mots
+                    Lexiques extraits
                 </a></li>
 
                 <li class="flex h-8 "><a
@@ -119,7 +160,7 @@
                  <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"fill="currentColor">
                   <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                  </svg>
-                    Mesure de l'impact international
+                    Impact international
                 </a></li>
 
 

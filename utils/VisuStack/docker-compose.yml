@@ -1,0 +1,303 @@
+---
+version: "3.8"
+services:
+  redis:
+    image: "redis:alpine"
+
+    command: redis-server #--requirepass MonMdp
+
+    ports:
+     - "6379:6379"
+
+    volumes:
+     - ./redis/redis-data:/var/lib/redis
+     - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+
+    environment:
+     - REDIS_REPLICATION_MODE=master
+
+    networks:
+      - elk
+
+#  sovisu:
+#    container_name: sovisu
+#    environment:
+#      - LOGSTASH_HOST=logstash
+#    expose:
+#      - "5959"
+#      - "8000"
+#    networks:
+#      - elk
+#    command: python manage runserver 8000
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-8.3.2}
+    # https://github.com/docker/swarmkit/issues/1951
+    hostname: "metricbeathal"
+    user: root
+    networks:
+      - elk
+    volumes:
+      #- /proc:/hostfs/proc:ro
+      #- /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      #- /:/hostfs:ro
+      #- /var/run/docker.sock:/var/run/docker.sock
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - metricbeatvolum:/usr/share/metricbeat/data
+      - ./metricbeat/modules.d/:/usr/share/metricbeat/modules.d/
+    environment:
+      - ELASTICSEARCH_HOST=elasticsovisu1
+      - KIBANA_HOST=kibanasovisu
+      - ELASTICSEARCH_USERNAME=david
+      - ELASTICSEARCH_PASSWORD=MonMdp
+    # disable strict permission checks
+    command: ["--strict.perms=false"] #, "-system.hostfs=/hostfs"]
+    links:
+      - elasticsovisu1
+      - elasticsovisu2
+      - kibanasovisu
+
+  elasticsovisu1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+    container_name: elasticsovisu1
+
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - node.name=elasticsovisu1
+      - node.roles=master,data,remote_cluster_client
+      #- node.data=true
+      - cluster.name=sovisucluster
+      #- cluster.name=sovisucluster
+      - discovery.seed_hosts=elasticsovisu2:9300
+      #
+      - cluster.initial_master_nodes=elasticsovisu1, elasticsovisu2 #Pour le premier lancement seulement
+      - "path.repo=/usr/share/elasticsearch/backup"
+      - cluster.routing.allocation.enable=all
+      - bootstrap.memory_lock=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - http.max_content_length=10MB
+      #- "discovery.type=single-node"
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=false
+      - ELASTIC_USERNAME=david
+      - ELASTIC_PASSWORD=MonMdp
+      - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    networks:
+      - elk
+    volumes:
+      - es-data1:/usr/share/elasticsearch/data
+      - es-backup1:/usr/share/elasticsearch/backup
+
+  elasticsovisu2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+    container_name: elasticsovisu2
+
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    environment:
+      - node.name=elasticsovisu2
+      - node.roles=master,data,remote_cluster_client
+      #- node.data=true
+      - cluster.name=sovisucluster
+      - discovery.seed_hosts=elasticsovisu1:9300
+      #- discovery.seed_providers=elasticsovisu1:9300
+      - cluster.initial_master_nodes=elasticsovisu1, elasticsovisu2 #Pour le premier lancement seulement
+      - "path.repo=/usr/share/elasticsearch/backup"
+      - bootstrap.memory_lock=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - http.max_content_length=10MB
+      #- "discovery.type=single-node"
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=false
+      - ELASTIC_USERNAME=david
+      - ELASTIC_PASSWORD=MonMdp
+      - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
+    depends_on:
+      - elasticsovisu1
+    links:
+      - elasticsovisu1
+      - elasticsovisu3
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - elk
+    volumes:
+      - es-data2:/usr/share/elasticsearch/data
+      - es-backup1:/usr/share/elasticsearch/backup
+
+  elasticsovisu3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+    container_name: elasticsovisu3
+
+    ports:
+      - "9202:9200"
+      - "9302:9300"
+    environment:
+      - node.name=elasticsovisu3
+      - node.roles=data,remote_cluster_client
+      #- node.data=true
+      - cluster.name=sovisucluster
+      - discovery.seed_hosts=elasticsovisu1:9300,elasticsovisu2:9300
+      #- discovery.seed_providers=elasticsovisu1:9300
+      - cluster.initial_master_nodes=elasticsovisu1, elasticsovisu2 #Pour le premier lancement seulement
+      - "path.repo=/usr/share/elasticsearch/backup"
+      - bootstrap.memory_lock=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+      - http.cors.enabled=true
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - http.max_content_length=10MB
+      #- "discovery.type=single-node"
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=false
+      - ELASTIC_USERNAME=david
+      - ELASTIC_PASSWORD=MonMdp
+      - "ES_JAVA_OPTS=-Xms3G -Xmx3G"
+    depends_on:
+      - elasticsovisu1
+    links:
+      - elasticsovisu1
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - elk
+    volumes:
+      - es-data3:/usr/share/elasticsearch/data
+      - es-backup1:/usr/share/elasticsearch/backup
+
+  kibanasovisu:
+    image: docker.elastic.co/kibana/kibana:8.3.2
+    container_name: kibanasovisu
+
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsovisu1
+      - elasticsovisu2
+      - elasticsovisu3
+    links:
+      - elasticsovisu1
+      - elasticsovisu2
+      - elasticsovisu3
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    environment:
+      KIBANA_USERNAME: david_system
+      KIBANA_PASSWORD: MonMdp
+      ELASTICSEARCH_PASSWORD: MonMdp
+      ELASTICSEARCH_USERNAME: david
+      #ELASTICSEARCH_HOST_PORT: "http://elasticsovisu:9200"
+    networks:
+      - elk
+     
+  nginx:
+    restart: always
+    container_name: nginx_server
+    build:
+      context: ./nginx/
+      dockerfile: Dockerfile
+    depends_on:
+      - elasticsovisu1
+    links:
+      - elasticsovisu1
+      - elasticsovisu2
+      - elasticsovisu3
+      - kibanasovisu
+
+
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./log/nginx:/var/log/nginx
+      #- ./certs/:/etc/nginx/certs
+    networks:
+      - elk
+
+#  logstash:
+#    labels:
+#      com.example.service: "logstash"
+#      com.example.description: "For logging data"
+#    image: logstash:8.3.2
+#    volumes:
+#      - /d/SoVisuStack/volume/logstash:/logstash_dir
+#    command: logstash -f /logstash_dir/logstash.conf
+#    ports:
+#      - "5959:5959"
+#    depends_on:
+#      - elasticsovisu1
+#      - elasticsovisu2
+#      - elasticsovisu3
+#    networks:
+#      - elk
+
+volumes:
+  es-data1:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\data1"#"./volume/data1" # /d/AnacondaProjects/SoVisu-Dev/SoVisu/doc/VisuStack
+
+  es-backup1:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\backup1"#"./volume/backup1"
+
+  es-data2:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\data2"
+
+  es-data3:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\data3"#"./volume/data3" #"D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\doc\\VisuStack\\volume\\data3"
+
+  metricbeatvolum:
+     driver: local
+     driver_opts:
+        o: bind
+        type: none
+        device: "D:\\AnacondaProjects\\SoVisu-Dev\\SoVisu\\utils\\VisuStack\\volume\\MB-data"#"./volume/MB-data"
+
+networks:
+  elk:
+    driver: bridge
+    

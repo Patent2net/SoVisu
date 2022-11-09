@@ -1,16 +1,36 @@
 import requests
+import grobid_tei_xml
+import io
+from elasticHal.libs import utils
+
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+retry_strategy = Retry(
+    total=3,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["HEAD", "GET", "DELETE", "PUT", "OPTIONS"]
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
 
 
 def find_publications(idhal, field, increment=0):
-
+    """
+    Cherche les publications d'un auteur dans HAL à partir de son IDHAL
+    """
     articles = []
     flags = 'docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,' \
             'publicationDate_tdate,submittedDate_tdate,modifiedDate_tdate,producedDate_tdate,' \
-            'fileMain_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,' \
+            'fileMain_s,fileType_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,' \
             'version_i,journalDate_s,journalTitle_s,journalPublisher_s,funding_s,' \
             'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s,' \
             'bookTitle_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,' \
             'conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,' \
+            'contributorFullName_s,' \
             'isbn_s,' \
             'publicationDateY_i,' \
             'defenseDate_tdate,' \
@@ -26,7 +46,9 @@ def find_publications(idhal, field, increment=0):
             'structCountry_s,' \
             'structCountry_t'
 
-    req = requests.get('http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(increment))
+    req = http.get(
+        'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(
+            increment) + '&sort=docid%20asc')
 
     if req.status_code == 200:
         data = req.json()
@@ -54,8 +76,9 @@ def find_publications(idhal, field, increment=0):
             if (count > 30) and (increment < count):
                 increment += 30
                 tmp_articles = find_publications(idhal, field, increment=increment)
-                for tmp_article in tmp_articles:
-                    articles.append(tmp_article)
+                if tmp_articles != -1:
+                    for tmp_article in tmp_articles:
+                        articles.append(tmp_article)
                 return articles
             else:
                 return articles
@@ -65,3 +88,26 @@ def find_publications(idhal, field, increment=0):
     else:
         print('Error : can not reach HAL API endpoint')
         return articles
+
+
+def get_content(hal_url):
+    """
+    Récupère le contenu d'un article HAL à partir de son URL
+    """
+    pdf_file = http.get(hal_url)
+    pdf_file.raise_for_status()
+
+    grobid_resp = requests.post(
+        "https://cloud.science-miner.com/grobid/api/processFulltextDocument",
+        files={
+            'input': utils.remove_page(pdf_file, [0]),  # remove first page (HAL header)
+            'consolidate_Citations': 0,
+            'includeRawCitations': 1,
+        },
+        timeout=60.0,
+    )
+    grobid_resp.raise_for_status()
+
+    doc = grobid_tei_xml.parse_document_xml(grobid_resp.text)
+
+    return doc.body

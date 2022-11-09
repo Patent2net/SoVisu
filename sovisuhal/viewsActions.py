@@ -16,6 +16,9 @@ from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
 import pandas as pd
 from io import BytesIO as B_io
 
+from elasticHal import collect_from_HAL
+
+
 try:
     from decouple import config
     from ldap3 import Server, Connection, ALL
@@ -35,6 +38,9 @@ es = esActions.es_connector()
 
 @login_required
 def admin_access_login(request):
+    """
+    Fonction gérant les accès à SoVisu
+    """
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
@@ -69,6 +75,9 @@ def admin_access_login(request):
 
 
 def create_credentials(request):
+    """
+    Fonction gérant la création du nouveau profil d'un chercheur à partir des données renseignées dans le formulaire CreateCredentials
+    """
     ldapid = request.GET['ldapid']
     idref = request.POST.get('f_IdRef')
     idhal = request.POST.get('f_halId_s')
@@ -111,6 +120,9 @@ def create_credentials(request):
 # Redirects
 
 def validate_references(request):
+    """
+    Validation des références HAL
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -198,6 +210,9 @@ def validate_references(request):
 
 
 def validate_guiding_domains(request):
+    """
+    Validation des domaines de guidance
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -250,6 +265,9 @@ def validate_guiding_domains(request):
 
 
 def validate_expertise(request):
+    """
+    Validation des domaines d'expertise
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -347,6 +365,9 @@ def validate_expertise(request):
 
 
 def validate_credentials(request):
+    """
+    Validation des identifiants
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -404,60 +425,66 @@ def validate_credentials(request):
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
-
-def validate_guiding_keywords(request):
-    # Get parameters
-    if 'struct' in request.GET:
-        struct = request.GET['struct']
-    else:
-        return redirect('unknown')
-
-    if 'type' in request.GET and 'id' in request.GET:
-        i_type = request.GET['type']
-        p_id = request.GET['id']
-    else:
-        return redirect('unknown')
-
-    if 'data' in request.GET:
-        data = request.GET['data']
-    else:
-        data = -1
-
-    if 'from' in request.GET:
-        date_from = request.GET['from']
-    else:
-        date_from = '2000-01-01'
-
-    if 'to' in request.GET:
-        date_to = request.GET['to']
-    else:
-        date_to = datetime.today().strftime('%Y-%m-%d')
-
-    if request.method == 'POST':
-
-        guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
-
-        if i_type == "rsr":
-            scope_param = esActions.scope_p("_id", p_id)
-
-            res = es.search(index=struct + "*-researchers", body=scope_param)
-            try:
-                entity = res['hits']['hits'][0]['_source']
-            except:
-                return redirect('unknown')
-
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
-                      body={"doc": {"guidingKeywords": guiding_keywords}})
-
-        if i_type == "lab":
-            es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
-                      body={"doc": {"guidingKeywords": guiding_keywords}})
-
-    return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
-
+#
+# def validate_guiding_keywords(request):
+#     """
+#     Validation des mots clés de guidance
+#     """
+#     # Get parameters
+#     if 'struct' in request.GET:
+#         struct = request.GET['struct']
+#     else:
+#         return redirect('unknown')
+#
+#     if 'type' in request.GET and 'id' in request.GET:
+#         i_type = request.GET['type']
+#         p_id = request.GET['id']
+#     else:
+#         return redirect('unknown')
+#
+#     if 'data' in request.GET:
+#         data = request.GET['data']
+#     else:
+#         data = -1
+#
+#     if 'from' in request.GET:
+#         date_from = request.GET['from']
+#     else:
+#         date_from = '2000-01-01'
+#
+#     if 'to' in request.GET:
+#         date_to = request.GET['to']
+#     else:
+#         date_to = datetime.today().strftime('%Y-%m-%d')
+#
+#     if request.method == 'POST':
+#
+#         guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
+#
+#         if i_type == "rsr":
+#             scope_param = esActions.scope_p("_id", p_id)
+#
+#             res = es.search(index=struct + "*-researchers", body=scope_param)
+#             try:
+#                 entity = res['hits']['hits'][0]['_source']
+#             except:
+#                 return redirect('unknown')
+#
+#             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
+#                       body={"doc": {"guidingKeywords": guiding_keywords}})
+#
+#         if i_type == "lab":
+#             es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
+#                       body={"doc": {"guidingKeywords": guiding_keywords}})
+#
+#     return redirect(
+#         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+#
 
 def validate_research_description(request):
+    """
+    Validation de la description de recherche
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -486,7 +513,7 @@ def validate_research_description(request):
         date_to = datetime.today().strftime('%Y-%m-%d')
 
     if request.method == 'POST':
-
+        guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
         research_summary = request.POST.get("f_research_summary")
         research_projects_in_progress = request.POST.get("f_research_projectsInProgress")
         research_projects_and_fundings = request.POST.get("f_research_projectsAndFundings")
@@ -515,14 +542,22 @@ def validate_research_description(request):
                                     "research_projectsInProgress_raw": research_projects_in_progress_raw,
                                     "research_projectsAndFundings": research_projects_and_fundings,
                                     "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
-                                    "research_updatedDate": datetime.today().isoformat()
+                                    "research_updatedDate": datetime.today().isoformat(),
+                                    "guidingKeywords": guiding_keywords
                                     }})
+
+        elif i_type == "lab":
+            es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
+                      body={"doc": {"guidingKeywords": guiding_keywords}})
 
     return redirect(
         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
 
 
 def refresh_aurehal_id(request):
+    """
+    Mise à jour de l'id aurehal
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -572,6 +607,9 @@ def refresh_aurehal_id(request):
 
 
 def force_update_references(request):
+    """
+    Force la mise à jour des références
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -609,6 +647,7 @@ def force_update_references(request):
             entity = res['hits']['hits'][0]['_source']
         except:
             return redirect('unknown')
+
         collecte_docs(entity)
 
     return redirect(
@@ -616,6 +655,9 @@ def force_update_references(request):
 
 
 def update_members(request):
+    """
+    Permet la mise à jour du profil utilisateur
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -666,6 +708,9 @@ def update_members(request):
 
 
 def update_authorship(request):
+    """
+    Met à jour l'autorat des documents d'un utlisateur après vérification de ce dernier
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -776,6 +821,9 @@ def update_authorship(request):
 
 
 def export_hceres_xls(request):
+    """
+    Export des données de l'HCERES d'un laboratoire sous fichier Excel (XLS)
+    """
     # Get parameters
     if 'struct' in request.GET:
         struct = request.GET['struct']
@@ -894,6 +942,9 @@ def export_hceres_xls(request):
 
 
 def idhal_checkout(idhal):
+    """
+    Vérifie si le halId renseigné existe
+    """
     # idhal = "luc-quoniam" valeur test
     html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
     response = urlopen(html)
@@ -910,10 +961,14 @@ def idhal_checkout(idhal):
 
 
 def vizualisation_url():
+    """
+    Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
+    """
     print("mode: ")
     print(mode)
     if mode == "dev":
         url = "http://127.0.0.1:5601"
+        url = "/kibana"
     else:
         url = "/kibana"
 

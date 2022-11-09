@@ -15,6 +15,9 @@ except:
 
 # Use that base code in other files to use es_connector function: es = esActions.es_connector()
 def es_connector(mode=mode):
+    """
+    Assure la connexion de SoVisu à l'instance ElasticSearch
+    """
     if mode == "Prod":
 
         secret = config('ELASTIC_PASSWORD')
@@ -22,11 +25,18 @@ def es_connector(mode=mode):
         es = Elasticsearch('localhost',
                            http_auth=('elastic', secret),
                            scheme="http",
-                           port=9200,
-                           # ssl_context=context,
-                           timeout=10)
+                           port=9200)
+
     else:
-        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+        #es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+        es = Elasticsearch('http://localhost:9200', http_compress=True,  connections_per_node=5, request_timeout=200, retry_on_timeout=True)
+
+        es.options(request_timeout=100, retry_on_timeout= True, max_retries=5).cluster.health(
+            wait_for_no_initializing_shards=True,
+            wait_for_no_relocating_shards=False,
+            wait_for_status="green" # yellow doit pas forcément marcher si pas un cluster !
+        )
+
     return es
 
 
@@ -34,6 +44,9 @@ def es_connector(mode=mode):
 
 # Use that base code in other files to use scope_all function: variable_name = esActions.scope_all()
 def scope_all():
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne tous les documents
+    """
     scope = {
         "query": {
             "match_all": {}
@@ -44,6 +57,9 @@ def scope_all():
 
 # Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
 def scope_p(scope_field, scope_value):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction d'un filtre
+    """
     scope = {
         "query": {
             "match": {
@@ -56,6 +72,9 @@ def scope_p(scope_field, scope_value):
 
 # Use that base code in other files to use date_all function: variable_name = esActions.date_all()
 def date_all():
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne tous les documents, triés par date de publication
+    """
     start_date_param = {
         "size": 1,
         "sort": [
@@ -71,6 +90,9 @@ def date_all():
 
 # Use that base code in other files to use date_p function: variable_name = esActions.date_p(scope_field, scope_value)
 def date_p(scope_field, scope_value):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction d'un filtre, triés par date de publication
+    """
     start_date_param = {
         "size": 1,
         "sort": [
@@ -87,6 +109,9 @@ def date_p(scope_field, scope_value):
 # entity[key], validate, date_range_type, dateFrom, dateTo)
 
 def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from, scope_date_to):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction de différents filtres, dans une période donnée
+    """
     ref_param = {
         "query": {
             "bool": {
@@ -121,6 +146,9 @@ def ref_p(scope_bool_type, scope_field, scope_value, validate, date_range_type, 
 
 def ref_p_filter(p_filter, scope_bool_type, scope_field, scope_value, validate, date_range_type, scope_date_from,
                  scope_date_to):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction de différents filtres, dans une période donnée et d'un filtre p_filter("uncomplete","complete", "all").
+    """
     if p_filter == "uncomplete":
         ref_param = {
             "query": {
@@ -227,6 +255,9 @@ def ref_p_filter(p_filter, scope_bool_type, scope_field, scope_value, validate, 
 
 
 def confirm_p(scope_field, scope_value, validate):
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne un ensemble de documents spécifique en fonction d'un filtre, qui ont leur champ validated à une certaine valeur.
+    """
     has_to_confirm_param = {
         "query": {
             "bool": {

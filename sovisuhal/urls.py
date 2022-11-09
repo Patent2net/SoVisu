@@ -14,15 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.shortcuts import redirect
 from . import views, viewsActions
 
 urlpatterns = [
     path('admin/logout/', lambda request: redirect('/accounts/logout/', permanent=False)),  # need to be placed before admin.site.urls to overide default redirect. return to uniauth logout instead default admin/logout page
     path('admin/', admin.site.urls),
-
-
+    re_path(r'^celery-progress/', include('celery_progress.urls')),  # the endpoint is configurable
     path('', viewsActions.admin_access_login, name='login'),
 
     path('create/', views.create, name='creation'),
@@ -55,7 +54,7 @@ urlpatterns = [
     path('validate_references/', viewsActions.validate_references, name='validate_references'),
     path('validate_expertise/', viewsActions.validate_expertise, name='invalidate_concepts'),
     path('validate_guiding-domains/', viewsActions.validate_guiding_domains, name='validate_guiding-domains'),
-    path('validate_guiding-keywords/', viewsActions.validate_guiding_keywords, name='validate_guiding-keywords'),
+    #path('validate_guiding-keywords/', viewsActions.validate_guiding_keywords, name='validate_guiding-keywords'),
     path('validate_research-description/', viewsActions.validate_research_description, name='validate_research-description'),
     path('force-update_references/', viewsActions.force_update_references, name='force-update_references'),
     path('export_hceres_xls/', viewsActions.export_hceres_xls, name='export_hceres_xls'),

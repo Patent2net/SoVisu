@@ -5,17 +5,23 @@ struct = "198307662"  # mesure temporaire, valable tant que seuls les chercheurs
 
 
 class CreateCredentials(forms.Form):
+    """
+    Formulaire de création de compte.
+    Créé un profil utilisateur à partir des données saisies.
+    \n\n
+    :return:
+    """
     # Set choices to an empty list as it is a required argument.
     # f_more = forms.CharField()
 
-    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'),
+    roles = [('chercheur', 'chercheur'), ('adminlab', 'responsable ou directeur de laboratoire'), ('doctorant', 'doctorant'),
              ('visiteur', 'visiteur')
              ]
     f_role = forms.CharField(label='Role', widget=forms.Select(choices=roles))
 
-    f_halId_s = forms.CharField(label='ID HAL (texte, par ex. david-reymond)')
-    f_IdRef = forms.CharField(label='IdRef - identifiant de la notice champ facultatif', required=False)
-    f_orcId = forms.CharField(label='ORCID (numéro sous la forme: 0000-0003-2071-6594) champ facultatif',
+    f_halId_s = forms.CharField(label='ID HAL (texte, exemple. david-reymond)')
+    f_IdRef = forms.CharField(label='IdRef (identifiant de la notice, exemple : 166695475) - champ facultatif', required=False)
+    f_orcId = forms.CharField(label='ORCID (exemple : 0000-0003-2071-6594) - champ facultatif',
                               required=False)
     # f_more = forms.CharField(label='autres')
 
@@ -38,7 +44,11 @@ class CreateCredentials(forms.Form):
 
 
 class ValidCredentials(forms.Form):
-
+    """
+    Formulaire de validation de compte
+    \n\n
+    :return:
+    """
     def __init__(self, *args, **kwargs):
         halid_s = kwargs.pop('halId_s')
         idref = kwargs.pop('idRef')
@@ -75,6 +85,11 @@ class ValidCredentials(forms.Form):
 
 
 class ValidLabCredentials(forms.Form):
+    """
+    Formulaire de validation de compte
+    \n\n
+    :return:
+    """
     def __init__(self, *args, **kwargs):
         halstructid = kwargs.pop('halStructId')
         rsnr = kwargs.pop('rsnr')
@@ -97,36 +112,59 @@ class ValidLabCredentials(forms.Form):
         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
 
 
-class SetGuidingKeywords(forms.Form):
+# class SetGuidingKeywords(forms.Form):
+#     """
+#     Formulaire de validation de mot clé "orienteurs" des futurs enrichissements lexicaux.
+#     \n\n
+#     :return:
+#     """
+#     def __init__(self, *args, **kwargs):
+#         guiding_keywords = kwargs.pop('guidingKeywords')
+#
+#         super(SetGuidingKeywords, self).__init__(*args, **kwargs)
+#
+#         str_value = ""
+#         for keyword in guiding_keywords:
+#             str_value += keyword + ";"
+#
+#         if len(str_value) > 0:
+#             str_value = str_value[:-1]
+#         self.fields['f_guidingKeywords'].initial = str_value
+#
+#     # Set choices to an empty list as it is a required argument.
+#     f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(
+#         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none', 'size': 80}))
+
+
+class SetResearchDescription(forms.Form):
+    """
+    Formulaire de validation de description de recherche
+    \n\n
+    :return:
+    """
+
     def __init__(self, *args, **kwargs):
         guiding_keywords = kwargs.pop('guidingKeywords')
+        research_summary = kwargs.pop('research_summary')
+        research_projects_in_progress = kwargs.pop('research_projectsInProgress')
+        research_projects_and_fundings = kwargs.pop('research_projectsAndFundings')
 
-        super(SetGuidingKeywords, self).__init__(*args, **kwargs)
-
+        super(SetResearchDescription, self).__init__(*args, **kwargs)
         str_value = ""
+        if not isinstance(guiding_keywords, list):
+            guiding_keywords = guiding_keywords .split(';')
         for keyword in guiding_keywords:
             str_value += keyword + ";"
 
         if len(str_value) > 0:
             str_value = str_value[:-1]
         self.fields['f_guidingKeywords'].initial = str_value
-
-    # Set choices to an empty list as it is a required argument.
-    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=100, widget=forms.TextInput(
-        attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none', 'size': 80}))
-
-
-class SetResearchDescription(forms.Form):
-    def __init__(self, *args, **kwargs):
-        research_summary = kwargs.pop('research_summary')
-        research_projects_in_progress = kwargs.pop('research_projectsInProgress')
-        research_projects_and_fundings = kwargs.pop('research_projectsAndFundings')
-
-        super(SetResearchDescription, self).__init__(*args, **kwargs)
-
         self.fields['f_research_summary'].initial = research_summary
         self.fields['f_research_projectsInProgress'].initial = research_projects_in_progress
         self.fields['f_research_projectsAndFundings'].initial = research_projects_and_fundings
+
+    f_guidingKeywords = forms.CharField(label='Mot-clés orienteurs', max_length=200, widget=forms.TextInput(
+        attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none', 'size': 200}))
 
     f_research_summary = forms.CharField(widget=forms.Textarea, required=False)
     f_research_projectsInProgress = forms.CharField(widget=forms.Textarea, required=False)
@@ -134,22 +172,36 @@ class SetResearchDescription(forms.Form):
 
 
 class Search(forms.Form):
+    """
+    Formulaire de recherche
+    \n\n
+    :return:
+    """
 
     def __init__(self, *args, **kwargs):
         if 'val' in kwargs:
             val = kwargs.pop('val')
-
+        else:
+            val = "*"
         super(Search, self).__init__(*args, **kwargs)
-
+        self.fields['f_search'] = forms.CharField(
+            label='Recherche',
+            required=False,
+            #choices=Foo.ADDRESS_STATE_CHOICES,
+            #disabled='disabled',
+            initial=val,
+        )
     # Set choices to an empty list as it is a required argument.
 
-    indexes = (
-        ("*-researchers-*-doc*", "références"),
-        ("*-researchers", "chercheurs"),
-        ("*-laboratories", "laboratoires")
-    )
+    # indexes = (
+    #     ("*-researchers-*-doc*", "références"),
+    #     ("*-researchers", "chercheurs"),
+    #     ("*-laboratories", "laboratoires")
+    # )
 
-    f_index = forms.ChoiceField(label='Collection', choices=indexes)
+    #f_index = forms.ChoiceField(label='Collection', choices=indexes)
 
-    f_search = forms.CharField(label='Recherche', max_length=100, widget=forms.TextInput(
+    f_search = forms.CharField(label='Recherche', max_length=100, initial="*", widget=forms.TextInput(
         attrs={'class': 'flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none'}))
+
+

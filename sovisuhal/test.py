@@ -41,3 +41,8 @@ scope_param = {
 
 res = es.search(index=struct + "*-researchers", body=scope_param, size=count)
 entities = res['hits']['hits']
+
+res = es.search(request_timeout=50,
+                index=searcher["structSirene"] + "-" + searcher["labHalId"] + "-researchers-" + searcher["ldapId"] + "-documents",
+                # -researchers" + searcher["ldapId"] + "-documents
+            )

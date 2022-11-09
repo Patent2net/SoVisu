@@ -1,0 +1,60 @@
+server:
+  name: "kibanasovisu"
+  host: localhost
+  port: 5601
+  basePath: /kibana
+  rewriteBasePath: true
+  securityResponseHeaders.referrerPolicy: null
+  # When enabling encryption between Kibana and Elasticsearch, change "http" to "https" below:
+  cors.allowOrigin: ["http://localhost", "http://127.0.0.1", "http://192.168.0.65"]
+  publicBaseUrl: "http://localhost/kibana"  
+
+
+xpack.reporting.encryptionKey: "fhjskloppd678ehkdfdlliverpipofcr"
+
+
+
+server.host: 0.0.0.0
+elasticsearch.hosts: [ "http://elasticsovisu1:9200", "http://elasticsovisu2:9200", "http://elasticsovisu3:9200" ]
+#monitoring.ui.container.elasticsearch.enabled: true
+
+#pack.security.authc.providers:
+ # token.token1:
+ #   order: 0
+
+status:
+  allowAnonymous: true
+
+#xpack.monitoring.ui.container.elasticsearch.enabled: false
+monitoring.ui.container.elasticsearch.enabled: false
+xpack.reporting.enabled: false
+
+## X-Pack security credentials
+# elasticsearch.username: kibana_system
+# elasticsearch.password: MonMdp
+csp.strict: false
+csp.disableUnsafeEval: false
+
+
+csp:
+  style_src: ["*"]
+  frame_ancestors: ["http://localhost", "http://localhost:*", "http://192.168.0.65"]
+  warnLegacyBrowsers: true
+
+#server.xsrf.allowlist: ["http://localhost", "http://127.0.0.1", "http://192.168.0.65"]]
+server.xsrf.disableProtection: True
+# SSL settings
+#
+server.ssl.enabled: false
+#erver.ssl.certificate: ./config/certs/kibana.crt
+#erver.ssl.key: ./config/certs/kibana.key
+#erver.ssl.certificateAuthorities: ./config/certs/ca.crt
+
+## X-Pack security credentials
+#elasticsearch.ssl.certificateAuthorities: ./config/certs/ca.crt
+#xpack.reporting.kibanaServer.hostname: sovisu.univ-tln.fr
+xpack.reporting.kibanaServer.protocol: http
+
+#explorer in dashboard
+xpack.discoverEnhanced.actions.exploreDataInChart.enabled: true
+

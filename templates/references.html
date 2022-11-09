@@ -25,15 +25,15 @@
                     <a class="pl-0  px-2 pb-1
                         {% if filter == "uncomplete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=uncomplete"
-                    >Références à compléter</a>
+                    >Notices à compléter</a>
                     <a class="pr-0 px-2 pb-1
                         {% if filter == "complete" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=complete"
-                    >Références complètes</a>
+                    >Notices complètes</a>
                 <a class="px-2 pb-1
                         {% if filter == -1 or filter == "all" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                         href="/references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&filter=all"
-                    >Toutes les références</a>
+                    >Toutes les notices</a>
                 </h1>
 
 
@@ -51,10 +51,7 @@
                         <th>URL</th>
                         <th>Année</th>
 
-                        {% if entity.ldapId %}
-                            <th>Citations</th>
-                            <th>Almetrics</th>
-                        {% endif %}
+                        <th>Citations</th>
 
                         <th>Titre</th>
 
@@ -62,7 +59,7 @@
                             <th>Auteurs</th>
                         {% endif %}
 
-                        <th class="defaultSort">MDS</th>
+                        <th class="defaultSort">QD</th>
 
                         {% if filter == "uncomplete" %}
                             <th>Texte complet</th>
@@ -81,12 +78,13 @@
 
                             <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
 
-                            {% if entity.ldapId %}
-                                <td><span class="__dimensions_badge_embed__" data-doi="{{ ref.doiId_s }}" data-hide-zero-citations="true" data-style="small_rectangle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
-                                </td>
-                                <td> <div data-badge-popover="right" data-badge-type="4" data-doi="{{ ref.doiId_s }}" data-hide-no-mentions="false" data-hide-less-than="1" class="altmetric-embed"></div>
-                                </td> <!-- from : https://api.altmetric.com/embeds.html -->
-                            {% endif %}
+                            <td>
+                                    {% if entity.halStructId %}
+                                        {{ ref.times_cited }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                    </td>
 
 
                             <td>{{ ref.title_s.0 | safe }}</td>
@@ -98,7 +96,7 @@
                             <td>{{ ref.MDS|floatformat:'0' }}</td>
 
 							{% if filter == "uncomplete" %}
-                                <td>{{ ref.shouldBeOpen }}</td>
+                                <td>{{ ref.should_be_open }}</td>
                             {% endif %}
 
                             <td>{{ ref.label_bibtex }}</td>
@@ -191,68 +189,6 @@
                         "className": "text-center",
                     },
                     {
-                        "targets": [ 5 ],
-                        "render": function(data, type, row, meta){
-                            if (data == 'True') {
-                                data = 'À ajouter'
-                            } else if (data == 'False') {
-                                data = 'Sous embargo'
-                            } else {
-                                data = ''
-                            }
-                            return data;
-                        },
-						"visible": true,
-                        "className": "text-center",
-                        "orderable": false
-                    },
-					{
-                        "targets": [ 6 ],
-                        "visible": false,
-                    }
-                ]
-            } else {
-                v_columnDefs = [
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                            }
-                            return data;
-                        },
-                        "className": "text-center",
-                        "orderable": false
-                    },
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
-                    },
-					{
-                        "targets": [ 5 ],
-                        "visible": false,
-                    }
-                ]
-            }
-        } else {
-            if (getUrlParameter('filter') == 'uncomplete') {
-                v_columnDefs = [
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                            }
-                            return data;
-                        },
-                        "className": "text-center",
-                        "orderable": false
-                    },
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
-                    },
-                    {
                         "targets": [ 6 ],
                         "render": function(data, type, row, meta){
                             if (data == 'True') {
@@ -292,6 +228,68 @@
                     },
 					{
                         "targets": [ 6 ],
+                        "visible": false,
+                    }
+                ]
+            }
+        } else {
+            if (getUrlParameter('filter') == 'uncomplete') {
+                v_columnDefs = [
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+                    {
+                        "targets": [ 5 ],
+                        "render": function(data, type, row, meta){
+                            if (data == 'True') {
+                                data = 'À ajouter'
+                            } else if (data == 'False') {
+                                data = 'Sous embargo'
+                            } else {
+                                data = ''
+                            }
+                            return data;
+                        },
+						"visible": true,
+                        "className": "text-center",
+                        "orderable": false
+                    },
+					{
+                        "targets": [ 6 ],
+                        "visible": false,
+                    }
+                ]
+            } else {
+                v_columnDefs = [
+                    {
+                        "targets": [ 0 ],
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                            }
+                            return data;
+                        },
+                        "className": "text-center",
+                        "orderable": false
+                    },
+                    {
+                        "targets": [ 1 ],
+                        "className": "text-center",
+                    },
+					{
+                        "targets": [ 5 ],
                         "visible": false,
                     }
                 ]

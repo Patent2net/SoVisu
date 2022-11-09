@@ -56,16 +56,16 @@
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                            href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
-                        >Expertise</a>
+                        >Expertise identifiée</a>
                     {% endif %}
-                    <a class="px-2 pb-1
-                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"
-                    >Mots-clés orienteurs</a>
+{#                    <a class="px-2 pb-1#}
+{#                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"#}
+{#                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-keywords"#}
+{#                    >Mots-clés</a>#}
                     <a class="px-2 pb-1
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
-                    >Domaines orienteurs</a>
+                    >Domaines expertise</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -190,8 +190,8 @@
                                                                  class="underline" target="_blank"> sur ce lien.</a>
                         </li>
                         <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... les
-                            moissoneurs se chargeront de publier automatiquement vos notices sur ces médias si
-                            nécessaire (<i> ; </i>).
+                            moissonneurs se chargeront de publier automatiquement vos notices sur ces médias si
+                            nécessaires (<i> ; </i>).
                         </li>
                         <li> Le champ autre (s'il apparait) est libre, mais la fonctionnalité n'est pas activée.</li>
                         <li><strong>merci de vérifier vos identifiants avant de les renseigner ; un mauvais identifiant
@@ -324,7 +324,7 @@
 
             {% endif %}
 
-            {% if data == -1 or data == "guiding-keywords" %}
+{% comment %}            {% if data == -1 or data == "guiding-keywords" %}
 
                 <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
                     <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -353,7 +353,7 @@
                            type="submit" value="Valider">
                 </form>
 
-            {% endif %}
+            {% endif %}{% endcomment %}
 
             {% if data == "research-description" %}
 
@@ -365,13 +365,18 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <p>Dans cet onglet, vous pouvez renseigner un descriptif plus ou moins long présentant vos
-                        recherches. Vous pouvez utiliser la barre d'outil pour mettre en forme votre texte, ajouter des
+                    <p>Dans cet onglet, vous devez renseigner les mots-clés génériques de votre expertise, séparés par des ";". Vous pouvez aussi proposer un descriptif plus ou moins long présentant vos
+                        recherches (actuellement non utilisé). Vous pouvez utiliser la barre d'outil pour mettre en forme votre texte, ajouter des
                         images, etc.</p>
                 </div>
 
                 <!-- Include the Quill library -->
                 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+                <h4 class="text-xs font-semibold pb-2">Mots-clés :</h4>
+                <div id="guidingKeywords">
+                    {{ guidingKeywords | safe }}
+                </div>
 
                 <h4 class="text-xs font-semibold pb-2">Résumé des travaux :</h4>
                 <div id="research_summary">
@@ -412,7 +417,12 @@
                         [{'align': ['', 'center', 'right', 'justify']}],
                         [{list: 'ordered'}, {list: 'bullet'}]
                     ];
-
+                    var quill0 = new Quill('#guidingKeywords', {
+                        modules: {
+                            toolbar: []
+                        },
+                        theme: 'snow'
+                    });
                     var quill1 = new Quill('#research_summary', {
                         modules: {
                             toolbar: options
@@ -427,6 +437,7 @@
                         theme: 'snow'
                     });
 
+
                     var quill3 = new Quill('#research_projectsAndFundings', {
                         modules: {
                             toolbar: options
@@ -435,6 +446,25 @@
                     });
 
                     // tttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+
+
+                    var myElement0 = document.getElementById('guidingKeywords');
+                    if (window.addEventListener) {
+                        // Normal browsers
+                        myElement0.addEventListener('DOMSubtreeModified', contentChanged0, false);
+                    } else if (window.attachEvent) {
+                        // IE
+                        myElement0.attachEvent('DOMSubtreeModified', contentChanged0);
+                    }
+
+                    function contentChanged0() {
+                        document.getElementById('id_f_guidingKeywords').value = myElement0.innerText;
+                    }
+
+                    // tttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+
 
                     var myElement1 = document.getElementById('research_summary');
                     if (window.addEventListener) {
@@ -533,10 +563,14 @@
 
                     <div class="dt-buttons-rplc flex items-center text-xs">
                         {% if type == "rsr" %}
-                            <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b border-gray-300 pb-1 whitespace-nowrap
-                        text-gray-600 "
+                            <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b-2 border-blue-300 pb-1 whitespace-nowrap text-blue-700
+                        text-gray-600 flex"
                                href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
-                            >Collecter de nouvelles références</a>
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+</svg>
+                                Collecter (ou mettre à jour) de nouvelles références</a>
 
                         {% endif %}
 
@@ -924,11 +958,10 @@
             };
 
             var table = document.getElementById("references");
-            console.log(references);
             for (let i in table.rows) {
                 try {
                     let row = table.rows[i]
-                    let curr_rsr = getObjectByValue(references, "docid", parseInt(row.cells[5].textContent));
+                    let curr_rsr = getObjectByValue(references, "docid", row.cells[5].textContent);
                     if (curr_rsr[0].authorship) {
                         let curr_val = getObjectByValue(curr_rsr[0].authorship, "halId_s", document.querySelector(".halId_s").textContent);
                         row.cells[3].querySelector('#authorship').value = curr_val[0].authorship;
