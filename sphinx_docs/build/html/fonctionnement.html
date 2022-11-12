@@ -93,11 +93,11 @@
 <a class="reference internal image-reference" href="_images/Init.png"><img alt="Initialisation des données" class="align-center" src="_images/Init.png" style="width: 800px;" /></a>
 <p>Cette étape construit dans Elastic les index suivant :</p>
 <ul class="simple">
-<li><p><em>SIREN-structures</em>                            # données de structure</p></li>
-<li><p><em>SIREN-labHalid-laboratories</em>                 # données de laboratoire</p></li>
-<li><p><em>SIREN-labHalid-laboratories-documents</em>       # collection de laboratoire</p></li>
-<li><p><em>SIREN-labHalid-researchers</em>                  # chercheurs du laboratoire</p></li>
-<li><p><em>SIREN-labHalid-researchers-ldapid-documents</em> # documents du ldapid de chercheur</p></li>
+<li><p><strong>SIREN-structures</strong>                            # données de structure</p></li>
+<li><p><strong>SIREN-labHalid-laboratories</strong>                 # données de laboratoire</p></li>
+<li><p><strong>SIREN-labHalid-laboratories-documents</strong>       # collection de laboratoire</p></li>
+<li><p><strong>SIREN-labHalid-researchers</strong>                 # chercheurs du laboratoire</p></li>
+<li><p><strong>SIREN-labHalid-researchers-ldapid-documents</strong> # documents du ldapid de chercheur</p></li>
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Astuce</p>
@@ -108,9 +108,9 @@
 <h2>Validations des Id et intégration des notices<a class="headerlink" href="#validations-des-id-et-integration-des-notices" title="Lien permanent vers ce titre"></a></h2>
 <p>Lors de l’authentification le chercheur doit renseigner ses identifiants de chercheur, les créer le cas échéant :</p>
 <ul class="simple">
-<li><p>idRef : obligatoire mais non utilisé.</p></li>
-<li><p>idHal : primordial si faut rien ne marche.</p></li>
-<li><p>ORCId : optionnel et non utilisé.</p></li>
+<li><p>idRef : obligatoire mais non utilisé. Mis ici pour informer de son existence et pour que chacun vérifie (problèmes d’homonymie, de changement de noms, ou si la thèse n’a pas été soutenu en France, cet Id n’existe pas)</p></li>
+<li><p>idHal : primordial, si faux rien ne marche.</p></li>
+<li><p>ORCId : optionnel  (non utilisé). Mis ici pour suggérer aux chercheurs de s’en créer un. A terme devrait être l’id principal de SoVisu pour les chercheurs.</p></li>
 </ul>
 <p>Cette étape de validation permet à SoVisu de collecter les notices associées à l’idHal sur Hal. Celles-ci sont alors indexées dans son profil : <em>SIREN-labHalid-researchers-ldapid-documents</em>.</p>
 <a class="reference internal image-reference" href="_images/CollecterValider.png"><img alt="principes de la collecte et de l'indexation" class="align-center" src="_images/CollecterValider.png" style="width: 800px;" /></a>
