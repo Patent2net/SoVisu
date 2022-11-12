@@ -15,7 +15,7 @@ Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapp
 .. warning::
   Si les identifiants rapportés sont faux rien de ce qui suit ne fonctionnera.
 
-.. image:: ./images/user_guide/Ids.png
+.. image:: ./images/Ids.png
     :width: 800px
     :align: center
     :alt: formulaire de demande d'ids
@@ -32,7 +32,7 @@ Expertise
 ^^^^^^^^^
 Cet onglet vous permet de sélectionner les domaines scientifiques issus par calcul de votre production. Vous pouvez en retirer de votre profil pour ne conserver que celles qui représentent le mieux vos travaux. Au mieux ces éléments cernent votre expertise au plus les enrichissements seront pertinents.
 
-.. image:: ./images/user_guide/Expertise.png
+.. image:: ./images/Expertise.png
     :width: 800px
     :align: center
     :alt: onglet expertise
@@ -41,7 +41,7 @@ Domaines
 ^^^^^^^^
 Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHAL <https://aurehal.archives-ouvertes.fr/domain/index>`_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
 
-.. image:: ./images/user_guide/Domaines.png
+.. image:: ./images/Domaines.png
     :width: 800px
     :align: center
     :alt: onglet domaines
@@ -54,7 +54,7 @@ Descriptifs de recherche
 Dans cet onglet vous devez renseigner les mots-clés génériques de votre expertise.
 
 
-.. image:: ./images/user_guide/Descriptifs.png
+.. image:: ./images/Descriptifs.png
     :width: 800px
     :align: center
     :alt: onglet domaines
