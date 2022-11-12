@@ -10,7 +10,7 @@ Vérification des données
 
 Identifiants
 ^^^^^^^^^^^^
-Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapportez vos IdRefs, IdHal, OrcId (à créer le cas échéant).
+Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapportez vos `IdRefs <https://www.idref.fr/>`_, `IdHal <https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/>`_ , `OrcId <https://orcid.org/>`_ (à créer le cas échéant).
 
 .. warning::
   Si les identifiants rapportés sont faux rien de ce qui suit ne fonctionnera.
@@ -132,25 +132,8 @@ Grâce à cette interface, vous pourrez modifier la représentation lexicale de 
 .. tip:: N'hésitez pas non plus à déposer le texte complet (pdf), mais n'oubliez pas de renseigner mots-clés et résumés utilisés par les index pour appuyer votre référencement.
 
 
----
 
-Vous pourrez, à titre de chercheur, l'utiliser pour :
 
-* compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
-* sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l'établissement)
-* sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :
-    * vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
-    * Un onglet dédié (Références)
-    * Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d'extraction et d'indexation de vos productions.
 
-Notez que calendrier en haut à droite de l'interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau "métrique" qu'au plan conceptuel. L'architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est "no abstract"...), et même le texte complet ce qui affinera les représentations. Vous pourrez, à titre de chercheur, l'utiliser pour :
 
-* compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
-* sélectionner les publications retrouvées automatiquement et les intégrer à votre profil (et ce faisant à votre laboratoire et à la base de connaissance de l'établissement)
-* sélectionner et supprimer les concepts associés (les affichés restant complètent votre profil), rajouter des domaines disciplinaires primaires ainsi que des mots clés. Cette étape passée vous aurez accès à :
-    * vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
-
-    * Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d’extraction et d'indexation de vos productions.
-
-Notez que calendrier en haut à droite de l'interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau "métrique" qu'au plan conceptuel. L'architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est "no abstract"...), et même le texte complet ce qui affinera les représentations.
 
