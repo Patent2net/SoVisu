@@ -75,15 +75,15 @@ Références
 ^^^^^^^^^^
 Permet d'afficher vos publications en trois rubriques : les notices qui mériteraient d'être complétées (champs manquants), celles qui sont complètes et l'ensemble de vos publications (hors celles retirées volontairement). Le dispositif souligne également si la publication complète peut être archivée avec le texte complet (en fichier pdf ou autre) : notez qu'il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont, dans ce cas, été levées. Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l'indexation pour vous inciter à améliorer ce point.
 
-.. image:: images/Descriptifs.png
+.. image:: images/References.png
     :width: 800px
     :align: center
-    :alt: onglet domaines
+    :alt: Références
 
 
 
 
---
+---
 
 Vous pourrez, à titre de chercheur, l'utiliser pour :
 
