@@ -15,7 +15,7 @@ Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapp
 .. warning::
   Si les identifiants rapportés sont faux rien de ce qui suit ne fonctionnera.
 
-.. image:: ./images/Ids.png
+.. image:: images/Ids.png
     :width: 800px
     :align: center
     :alt: formulaire de demande d'ids
@@ -32,7 +32,7 @@ Expertise
 ^^^^^^^^^
 Cet onglet vous permet de sélectionner les domaines scientifiques issus par calcul de votre production. Vous pouvez en retirer de votre profil pour ne conserver que celles qui représentent le mieux vos travaux. Au mieux ces éléments cernent votre expertise au plus les enrichissements seront pertinents.
 
-.. image:: ./images/Expertise.png
+.. image:: images/Expertise.png
     :width: 800px
     :align: center
     :alt: onglet expertise
@@ -41,7 +41,7 @@ Domaines
 ^^^^^^^^
 Même principe que précédemment. L'interface vous permet de sélectionner dans la nomenclature `AureHAL <https://aurehal.archives-ouvertes.fr/domain/index>`_ le ou les domaines de vos travaux. Encore une fois, au mieux ces domaines décrivent votre expertise au plus les enrichissements seront pertinents.
 
-.. image:: ./images/Domaines.png
+.. image:: images/Domaines.png
     :width: 800px
     :align: center
     :alt: onglet domaines
@@ -54,7 +54,7 @@ Descriptifs de recherche
 Dans cet onglet vous devez renseigner les mots-clés génériques de votre expertise.
 
 
-.. image:: ./images/Descriptifs.png
+.. image:: images/Descriptifs.png
     :width: 800px
     :align: center
     :alt: onglet domaines
@@ -63,11 +63,22 @@ Les autres champs permettent de spécifier vos projets, travaux, etc.
 .. tip::
   Ces derniers sont non utilisés dans cette version.
 
-Références
-----------
+Synthèses
+---------
 
+Tableau de bord
+^^^^^^^^^^^^^^^
+Différentes cartographies de vos publications. Le commutateur validé permet d'inclure ou pas vos productions que vous auriez invalidées. Le baromètre de vos publications vous donne la tendance d'ouverture fonctions de vos choix d'éditeurs. Si la courbe indécidable diminue, que la courbe ouvert augmente, continuez vous êtes sur la bonne voie !  
+
+
+Références
+^^^^^^^^^^
 Permet d'afficher vos publications en trois rubriques : les notices qui mériteraient d'être complétées (champs manquants), celles qui sont complètes et l'ensemble de vos publications (hors celles retirées volontairement). Le dispositif souligne également si la publication complète peut être archivée avec le texte complet (en fichier pdf ou autre) : notez qu'il convient toujours de demander aux co-auteurs bien sûr, mais les conditions juridiques par rapport aux éditeurs ont, dans ce cas, été levées. Un score de 0 à 100 attribue une note à ces métadonnées, clés du référencement et de l'indexation pour vous inciter à améliorer ce point.
 
+.. image:: images/Descriptifs.png
+    :width: 800px
+    :align: center
+    :alt: onglet domaines
 
 
 
