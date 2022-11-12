@@ -16,8 +16,8 @@ import django
 sys.path.insert(0, os.path.abspath('../../'))
 
 # os.environ['DJANGO_SETTINGS_MODULE'] = 'SoVisu.settings'
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sovisuhal.settings')
-django.setup()
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sovisuhal.settings')
+#django.setup()
 
 
 # -- Project information -----------------------------------------------------
@@ -37,7 +37,7 @@ release = '1.0.1'
 # ones.
 extensions = [
     'sphinx.ext.duration',
-    #'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
