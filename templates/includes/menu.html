@@ -227,6 +227,18 @@
             <ul class="flex flex-col mt-4">
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Plus d'informations</h3>
                 <li class="flex h-8 "><a
+                        class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Lien vers la doc' %} text-white {% else %} text-gray-300 {% endif %}"
+                        href="http://sovisu.rtfd.io/">
+                    <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M10.496 2.132a1 1 0 00-.992 0l-7 4A1 1 0 003 8v7a1 1 0 100 2h14a1 1 0 100-2V8a1 1 0 00.496-1.868l-7-4zM6 9a1 1 0 00-1 1v3a1 1 0 102 0v-3a1 1 0 00-1-1zm3 1a1 1 0 012 0v3a1 1 0 11-2 0v-3zm5-1a1 1 0 00-1 1v3a1 1 0 102 0v-3a1 1 0 00-1-1z"
+                              clip-rule="evenodd"/>
+                    </svg>
+                    Lien vers la doc
+                </a></li>
+				
+				<li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Présentation' %} text-white {% else %} text-gray-300 {% endif %}"
                         href="/presentation/?{% if struct %}struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
