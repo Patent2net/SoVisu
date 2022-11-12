@@ -60,6 +60,7 @@ Dans cet onglet vous devez renseigner les mots-clés génériques de votre exper
     :alt: onglet domaines
 
 Les autres champs permettent de spécifier vos projets, travaux, etc.
+
 .. tip::
   Ces derniers sont non utilisés dans cette version.
 
@@ -80,7 +81,47 @@ Permet d'afficher vos publications en trois rubriques : les notices qui mériter
     :align: center
     :alt: Références
 
+Façonner sa représentation lexicale
+------------------------------------
 
+Lexiques extraits
+^^^^^^^^^^^^^^^^^^
+
+SoVisu vous affiche la représentation lexicale de vos travaux en deux langues à partir des mots-clés des notices et sa distribution historique.
+
+.. image:: images/LexiqueGen.png
+    :width: 800px
+    :align: center
+    :alt: Lexiques
+
+Le sélecteur des langues vous permet de filtrer sur une langue en particulier.
+
+.. image:: images/LexiquesChoixLangue.png
+    :width: 800px
+    :align: center
+    :alt: Lexiques choix langue
+
+
+Vous avez alors accès à une représentation plus complète dans la langue choisie :
+
+1. les mots clés auteurs, ceux qui sont présents sur les notices. Les notices sans mots-clés sont marquées "manquants",
+2. à droite des précédents, les mots extraits automatiquement des résumés à partir du service de l'inist `term-extraction <https://objectif-tdm.inist.fr/2021/12/20/extraction-de-termes-teeft/>`_
+3. En bas à gauche de l'interface, les entités nommées identifiées (dates, noms propres, lieux) par traitement des résumés à l'aide d'outils de traitement automatique du langage (`Spacy <https://spacy.io/>`_)
+4. Vos références avec un lien pour éditer la notice directement sur HAL (il faudra vous authentifier la première fois).
+
+.. image:: images/LexiqueFr.png
+    :width: 800px
+    :align: center
+    :alt: Lexiques
+
+Grâce à cette interface, vous pourrez modifier la représentation lexicale de vos travaux, appuyer sur certains termes, en rajouter d'autres. A terme, SoVisu vous suggèrera d'apposer d'autres termes. En sélectionnant les manquants vous filtrez les notices qui n'auraient pas de mots-clés ou celles sans résumés. En sélectionnant des termes qui vous paraissent étranges vous ciblez les notices dont sont extraits ces termes. Chaque fois, la sélection provoque une mise à jour du filtre de requête en haut à gauche de l'interface que vous pouvez supprimer (la croix) pour revenir en arrière.
+
+.. image:: images/LexiqueChoixLangueRes.png
+    :width: 800px
+    :align: center
+    :alt: Lexiques
+
+.. tip:: N'hésitez pas non plus à déposer le texte complet (pdf), mais n'oubliez pas de renseigner mots-clés et résumés utilisés par les index pour appuyer votre référencement.
 
 
 ---
@@ -93,6 +134,7 @@ Vous pourrez, à titre de chercheur, l'utiliser pour :
     * vos tableaux de bord qui vous résument au travers d'une panoplie d'indicateurs votre "image" en science ouverte.
     * Un onglet dédié (Références)
     * Votre domaine d'expertise vous est aussi restitué sous forme graphique et visuelle par les deux onglets "expertise et nuage de mots" pour apprécier la qualité de la représentation conséquente de traitement d'extraction et d'indexation de vos productions.
+
 Notez que calendrier en haut à droite de l'interface vous permet de glisser sur des périodes de temps à votre guise et explorer la dynamique des travaux de chacun tant au niveau "métrique" qu'au plan conceptuel. L'architecture du dispositif le prête à une évolution facile. Nous pourrons intégrer facilement les résumés dans les représentations (à ce stade 75% en moyenne des publications qui ont un résumé le contenu est "no abstract"...), et même le texte complet ce qui affinera les représentations. Vous pourrez, à titre de chercheur, l'utiliser pour :
 
 * compléter vos identifiants chercheur, (il peut falloir quelques heures/jours pour passer à la suite). Étape de vérification la plus fastidieuse à ne faire qu'une fois.
