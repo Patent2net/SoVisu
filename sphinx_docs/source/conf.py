@@ -12,12 +12,13 @@
 #
 import os
 import sys
-#import django
+
 sys.path.insert(0, os.path.abspath('../../'))
 
+# import django
 # os.environ['DJANGO_SETTINGS_MODULE'] = 'SoVisu.settings'
 # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sovisuhal.settings')
-#django.setup()
+# django.setup()
 
 
 # -- Project information -----------------------------------------------------
