@@ -94,13 +94,18 @@ SoVisu vous affiche la représentation lexicale de vos travaux en deux langues �
     :align: center
     :alt: Lexiques
 
-Le sélecteur des langues vous permet de filtrer sur une langue en particulier.
+Sélecteur de langues
+^^^^^^^^^^^^^^^^^^^^^
+
+Le sélecteur des langues vous permet de filtrer sur une langue en particulier. Sélectionnez et mettez à jour.
 
 .. image:: images/LexiquesChoixLangue.png
     :width: 800px
     :align: center
-    :alt: Lexiques choix langue
+    :alt: Lexiques sélecteur de langue
 
+Interface d'une langue
+^^^^^^^^^^^^^^^^^^^^^^
 
 Vous avez alors accès à une représentation plus complète dans la langue choisie :
 
@@ -112,14 +117,17 @@ Vous avez alors accès à une représentation plus complète dans la langue choi
 .. image:: images/LexiqueFr.png
     :width: 800px
     :align: center
-    :alt: Lexiques
+    :alt: Lexiques sélection langue (fr)
 
-Grâce à cette interface, vous pourrez modifier la représentation lexicale de vos travaux, appuyer sur certains termes, en rajouter d'autres. A terme, SoVisu vous suggèrera d'apposer d'autres termes. En sélectionnant les manquants vous filtrez les notices qui n'auraient pas de mots-clés ou celles sans résumés. En sélectionnant des termes qui vous paraissent étranges vous ciblez les notices dont sont extraits ces termes. Chaque fois, la sélection provoque une mise à jour du filtre de requête en haut à gauche de l'interface que vous pouvez supprimer (la croix) pour revenir en arrière.
+Mode opératoire suggéré
+^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: images/LexiqueChoixLangueRes.png
+Grâce à cette interface, vous pourrez modifier la représentation lexicale de vos travaux, appuyer  certains termes (par synonymie), en rajouter d'autres. A terme, SoVisu vous suggèrera d'apposer d'autres termes. En sélectionnant les manquants vous filtrez les notices qui n'auraient pas de mots-clés ou celles sans résumés (celles ci sont moins *lisibles*). En sélectionnant des termes qui vous paraissent étranges, vous ciblez les notices dont sont extraits ces termes. Chaque fois, la sélection provoque une mise à jour du filtre de requête en haut à gauche de l'interface que vous pouvez supprimer (la croix) pour revenir en arrière.
+
+.. image:: images/LexiqueChoixNoticeRes.png
     :width: 800px
     :align: center
-    :alt: Lexiques
+    :alt: Lexiques et choix de notice
 
 .. tip:: N'hésitez pas non plus à déposer le texte complet (pdf), mais n'oubliez pas de renseigner mots-clés et résumés utilisés par les index pour appuyer votre référencement.
 
