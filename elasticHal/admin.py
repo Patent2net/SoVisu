@@ -74,33 +74,14 @@ class ElasticActions:
                 else:
                     task_id3 = None
 
-                if (task_id3 is not None and task_id2 is not None and task_id1 is not None):
-                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form,
-                                                                                               'task_id1': task_id1,
-                                                                                               'task_id2': task_id2,
-                                                                                               'task_id3': task_id3})
-                if (task_id2 is not None and task_id1 is not None):
-                    return render(request, "admin/elasticHal/export_to_elastic.html",
-                                  context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
-                if (task_id3 is not None and task_id2 is not None):
-                    return render(request, "admin/elasticHal/export_to_elastic.html",
-                                  context={'form': form,
-                                           'task_id2': task_id2,
-                                           'task_id3': task_id3})
-                if (task_id3 is not None and task_id1 is not None):
-                    return render(request, "admin/elasticHal/export_to_elastic.html",
-                                  context={'form': form,
-                                           'task_id1': task_id1,
-                                           'task_id3': task_id3})
+                # créée dynamiquement le contexte de la collecte demandé lors de la validation du formulaire
+                context = {'form': form, }
+                for task_content in ["task_id1", "task_id2", "task_id3"]:
+                    if eval(task_content) is not None:
+                        context[task_content] = eval(task_content)
 
-                if task_id1 is not None:
-                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id1': task_id1})
-                if task_id2 is not None:
-                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id2': task_id2})
-                if task_id3 is not None:
-                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form, 'task_id3': task_id3})
-                else:
-                    return render(request, "admin/elasticHal/export_to_elastic.html", context={'form': form})
+                return render(request, "admin/elasticHal/export_to_elastic.html", context=context)
+
             else:
                 form = ExportToElasticForm()
                 return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})
@@ -139,7 +120,7 @@ class ElasticActions:
                     tachesChercheur, tachesLabo = [], []
                     indexes = get_index_list()
 
-                    for ind,lab in enumerate(indexes):
+                    for ind, lab in enumerate(indexes):
                         laboratoire = lab[0] .split("-")[1]
                         structure = lab[0] .split("-")[0]
                         result1 = collect_laboratories_data2.delay(laboratoire)
@@ -179,7 +160,7 @@ class ElasticActions:
                     return render(request, "admin/elasticHal/export_to_elasticLabs.html",
                                   context={'form': form, 'task_id1': task_id1})
             else:
-                return  render(request, "admin/elasticHal/export_to_elasticLabs.html", context={'form': form})
+                return render(request, "admin/elasticHal/export_to_elasticLabs.html", context={'form': form})
         else:
             form = PopulateLab()
 
