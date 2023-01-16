@@ -262,9 +262,7 @@ def create_researchers_index(pg):
                     es.indices.put_mapping(
                         index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                             "ldapId"] + "-documents",
-                        doc_type='_doc',
                         body=docmap,
-                        include_type_name=True
                     )
                     es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                              body=json.dumps(row))
@@ -274,9 +272,7 @@ def create_researchers_index(pg):
                         "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                     es.indices.put_mapping(
                         index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
-                        doc_type='_doc',
                         body=docmap,
-                        include_type_name=True
                     )
                 else:
                     try:
@@ -299,9 +295,7 @@ def create_researchers_index(pg):
                     index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")
                 es.indices.put_mapping(
                     index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
-                    doc_type='_doc',
                     body=docmap,
-                    include_type_name=True
                     )
 
             if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-laboratories"):
@@ -309,9 +303,7 @@ def create_researchers_index(pg):
 
                 es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents")
                 es.indices.put_mapping(index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents",
-                                       doc_type='_doc',
                                        body=docmap,
-                                       include_type_name=True
                                        )
             percentage += (33.0 / len(cleaned_es_researchers))
             progress_description = row["ldapId"] + " updated"
@@ -468,10 +460,7 @@ def create_laboratories_index(pg):
 
             es.indices.create(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
             es.indices.put_mapping(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents",
-                                   doc_type='_doc',
                                    body=docmap,
-                                   include_type_name=True
-
                                    )
         percentage += (33.0 / len(cleaned_es_laboratories))
         progress_description = row["acronym"] + " updated"
