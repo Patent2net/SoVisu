@@ -45,10 +45,7 @@ def admin_access_login(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, '/'))
     else:
         auth_user = request.user.get_username().lower()
-        """
-        if auth_user == 'admin':
-            return redirect('/admin/')
-        """
+
         if auth_user == 'admin':
             return redirect("/index/?indexcat=lab&indexstruct=198307662")
         elif auth_user == 'adminlab':
