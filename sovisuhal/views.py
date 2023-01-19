@@ -332,7 +332,6 @@ def check(request):
                 body=ref_param, size=count)
 
         elif i_type == "lab":
-            f"{struct}-{entity['halStructId']}-laboratories-documents"
             count = es.count(index=f"{struct}-{entity['halStructId']}-laboratories-documents",
                              body=ref_param)['count']
             references = es.search(
