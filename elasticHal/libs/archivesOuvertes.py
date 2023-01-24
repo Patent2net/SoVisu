@@ -1,6 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import networkx as nx
-
+import requests
+import time
 # lets go
 sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
 sparql.setReturnFormat(JSON)
@@ -225,3 +226,50 @@ def get_concepts_and_keywords(aurehalid):
     except:
         concepts_and_keywords = {'concepts': [], 'keywords': []}
         return concepts_and_keywords
+
+
+
+def get_aurehalId(authIdHal_s):
+    """
+    get the aurehalId (authIdHal_i) of the searcher with authIdHal_s (halId_s)
+    """
+    """
+    url = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + authIdHal_s + "&fl=authIdHal_s,authIdHal_i"
+
+    req = requests.request("GET", url)
+    data = req.json()
+
+    sample = data["response"]["docs"][0]
+    index = sample['authIdHal_s'].index(authIdHal_s)
+
+    aurehalId = sample['authIdHal_i'][index]
+
+    print(f" {authIdHal_s} => {aurehalId}")
+    # print(f"https://aurehal.archives-ouvertes.fr/person/read/id/{aurehalId}")
+    return aurehalId
+    """
+    url = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + authIdHal_s + "&fl=authFullNamePersonIDIDHal_fs&rows=1&sort=docid%20asc"
+
+    res_status = False
+    while res_status is False:
+        print(f"{authIdHal_s}")
+        req = requests.request("GET", url)
+        data = req.json()
+        print(f"{data}")
+        if "error" in data.keys():
+            print("Error: ", end=":")
+            print(data["error"])
+            time.sleep(5)
+
+        if "response" in data.keys():
+            res_status = True
+
+            sample = data["response"]["docs"][0]
+            print(f"sample = {sample}")
+            curr = 0
+            for auth in sample["authFullNamePersonIDIDHal_fs"]:
+                curr += 1
+                if auth.split("_FacetSep_")[-1] == authIdHal_s:
+                    break
+            aurehalId = sample["authFullNamePersonIDIDHal_fs"][curr - 1].split("_FacetSep_")[1]
+            return aurehalId
