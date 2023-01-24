@@ -647,7 +647,7 @@ def collect_researchers_data2(self, struct, idx):
 
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
-        # Enrichssements des documents récoltés
+        # Enrichissements des documents récoltés
         # print ("2e " + str(type (docs)))
 
         # Insert documents collection
@@ -858,7 +858,7 @@ def init_labo():
 
 def collect_data(laboratories=False, researcher=False, django_enabler=None):
     """
-    Collecte les données de HAL et les indexe dans ElasticSearch
+    Collecte les données d'HAL et les indexe dans ElasticSearch
     """
     global djangodb_open
     tache1 = tache2 = None
