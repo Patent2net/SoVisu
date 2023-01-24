@@ -210,7 +210,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
             csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
 
             for line in csv_data:
-                fields = line.split(",")
+                fields = line.split(";")
                 Structure.objects.update_or_create(
                     structSirene=fields[0],
                     label=fields[1],
@@ -330,7 +330,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
             csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
 
             for x in csv_data:
-                fields = x.split(",")
+                fields = x.split(";")
                 Researcher.objects.update_or_create(
                     structSirene=fields[0],
                     ldapId=fields[1],
@@ -347,7 +347,6 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     structDomain=fields[12],
                     firstName=fields[13],
                     lastName=fields[14],
-                    aurehalId=fields[15],
 
                 )
                 # print(created)
