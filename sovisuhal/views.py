@@ -751,10 +751,12 @@ def wordcloud(request):
     else:
         struct = -1
 
-    if 'lang' in request.GET:
-        lang = str(request.GET["lang"])
-    else:
-        lang = "all"
+    lang_options = ["ALL", "FR", "EN"]  # Permet la création des onglets dans l'affichage de Sovisu. À remplacer plus tard par une création dynamique, mais les dashboards doivent être modifiés en conséquence également
+    lang = "ALL"
+    if 'lang' in request.GET:  # Permet de limiter le choix de langue afin que Sovisu affiche toujours quelque chose. Dans le cas ou la langue demandée n'est pas dans les options initiales => le paramètre renvoyé est all.
+        temp_lang = str(request.GET["lang"])
+        if temp_lang in lang_options:
+            lang = temp_lang
 
     if 'ldapid' in request.GET:
         ldapid = request.GET['ldapid']
@@ -834,6 +836,7 @@ def wordcloud(request):
                    'filterRsr': filtrechercheur,
                    'filterLab': filtrelab,
                    'url': url,
+                   'lang_options': lang_options,
                    'lang': lang,
                    'startDate': start_date,
                    'timeRange': f"from:'{date_from}',to:'{date_to}'"})
