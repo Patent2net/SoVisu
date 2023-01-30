@@ -6,12 +6,12 @@ from urllib.request import urlopen
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from sovisuhal.libs.elastichal import indexe_chercheur, collecte_docs, get_aurehal
+from sovisuhal.libs.elastichal import indexe_chercheur, collecte_docs
 from . import settings
 from .libs import esActions
 from elasticHal.libs import utils
 
-from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
 
 import pandas as pd
 from io import BytesIO as B_io
@@ -47,7 +47,7 @@ def admin_access_login(request):
         auth_user = request.user.get_username().lower()
 
         if auth_user == 'admin':
-            return redirect('/admin/')
+            return redirect("/index/?indexcat=lab&indexstruct=198307662")
         elif auth_user == 'adminlab':
             return redirect("/index/?indexcat=lab&indexstruct=198307662")
         elif auth_user == 'invitamu':
@@ -100,8 +100,10 @@ def create_credentials(request):
 
     else:
         print("idhal found")
+        # création de l'entrée pour le chercheur dans Elastic
         chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
+        # récupération de la documentation de l'utilisateur
         collecte_docs(chercheur)
         # récupération du struct du nouveau profil pour la redirection
         field = "halId_s"
@@ -593,7 +595,7 @@ def refresh_aurehal_id(request):
     except:
         return redirect('unknown')
 
-    aurehal_id = get_aurehal(entity['halId_s'])
+    aurehal_id = get_aurehalId(entity['halId_s'])
     concepts = []
     if aurehal_id != -1:
         archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)

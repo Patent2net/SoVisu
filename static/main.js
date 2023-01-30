@@ -79,13 +79,14 @@ $(function() {
         window.location.href = "/" + document.URL.split("/")[3] + "/?struct="+ getUrlParameter('struct') +"&type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + "&from=" + start.format('YYYY-MM-DD') + "&to=" + end.format('YYYY-MM-DD');
     });
 
-});
-
-
-$(document).ready(function () {
+	$(document).ready(function () {
     $('.loading-div').fadeOut(150);
     $(window).off('beforeunload');
     });
+});
+
+
+
 
 
 // document.addEventListener('load', (event) => {

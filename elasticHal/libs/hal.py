@@ -46,9 +46,7 @@ def find_publications(idhal, field, increment=0):
             'structCountry_s,' \
             'structCountry_t'
 
-    req = http.get(
-        'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idhal) + '&fl=' + flags + '&start=' + str(
-            increment) + '&sort=docid%20asc')
+    req = http.get(f'http://api.archives-ouvertes.fr/search/?q={field}:{str(idhal)}&fl={flags}&start={str(increment)}&sort=docid%20asc')
 
     if req.status_code == 200:
         data = req.json()

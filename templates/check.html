@@ -585,6 +585,7 @@
                         <tr class="bg-gray-100 text-gray-700 text-xs">
                             <th>URL</th>
                             <th>Année</th>
+                            <th>Type</th>
                             <th>Titre</th>
                             {% if validation == "1" and type == "rsr" %}
                                 <th>Autorat</th>
@@ -600,6 +601,7 @@
                             <tr class="text-gray-500">
                                 <td class="whitespace-nowrap">{{ ref.halId_s }}</td>
                                 <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
+                                <td>{{ ref.docType_s }}</td>
                                 <td>{{ ref.title_s.0 | safe }}</td>
                                 {% if validation == "1" and type == "rsr" %}
                                     <td>
@@ -961,12 +963,12 @@
             for (let i in table.rows) {
                 try {
                     let row = table.rows[i]
-                    let curr_rsr = getObjectByValue(references, "docid", row.cells[5].textContent);
+                    let curr_rsr = getObjectByValue(references, "docid", row.cells[6].textContent);
                     if (curr_rsr[0].authorship) {
                         let curr_val = getObjectByValue(curr_rsr[0].authorship, "halId_s", document.querySelector(".halId_s").textContent);
-                        row.cells[3].querySelector('#authorship').value = curr_val[0].authorship;
+                        row.cells[4].querySelector('#authorship').value = curr_val[0].authorship;
                     } else {
-                        row.cells[3].querySelector('#authorship').value = "";
+                        row.cells[4].querySelector('#authorship').value = "";
                     }
                 } catch (error) {
                 }
@@ -994,7 +996,7 @@
                     "className": "text-center",
                 },
                 {
-                    "targets": [2],
+                    "targets": [3],
                     "orderable": false
                 },
                 {
@@ -1009,7 +1011,7 @@
                     "orderable": false
                 },
                 {
-                    "targets": [4],
+                    "targets": [5],
                     "visible": false
                 }
             ]
@@ -1020,7 +1022,7 @@
                     "className": "text-center",
                 },
                 {
-                    "targets": [2],
+                    "targets": [3],
                     "orderable": false
                 },
                 {
@@ -1035,11 +1037,11 @@
                     "orderable": false
                 },
                 {
-                    "targets": [3],
+                    "targets": [4],
                     "visible": false
                 },
                 {
-                    "targets": [4],
+                    "targets": [5],
                     "visible": false
                 }
             ]
