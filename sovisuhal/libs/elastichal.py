@@ -1,6 +1,6 @@
 # from libs import hal, utils, unpaywall, scanR
 from django.shortcuts import redirect
-from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
 from elasticHal.libs import utils, hal, archivesOuvertes, location_docs, doi_enrichissement, \
     keyword_enrichissement
 from elasticsearch import helpers
@@ -119,7 +119,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     # New step ?
 
     if idhal != '':
-        aurehal = get_aurehal(idhal)
+        aurehal = get_aurehalId(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     else:  # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
@@ -281,36 +281,3 @@ def collecte_docs(chercheur):  # self,
     )
 
     return chercheur  # au cas où
-
-
-def get_aurehal(idhal):
-    """
-    Vérifie si l'Idhal renseigné existe dans la base de données de HAL
-    """
-    print(idhal)
-
-    sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
-    sparql.setReturnFormat(JSON)
-
-    sparql.setQuery("""
-        select ?p ?o
-        where  {
-        <https://data.archives-ouvertes.fr/author/%s> ?p ?o
-        }""" % idhal)
-    results = sparql.query().convert()
-
-    print(results)
-
-    aurehal = [truc for truc in results['results']['bindings'] if
-               truc['p']['value'] == "http://www.openarchives.org/ore/terms/aggregates"]
-
-    ret_aurehal = -1
-
-    for a_id in aurehal:
-        print(a_id['o']['value'])
-        res = requests.get(a_id['o']['value'])
-
-        if 'Ressource inexistante' not in res.text:
-            ret_aurehal = a_id['o']['value'].split('/')[-1]
-
-    return ret_aurehal

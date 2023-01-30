@@ -39,8 +39,9 @@ def get_structid_list():
     structIdlist = []
     res = es.search(index="*-structures", body=scope_param, filter_path=["hits.hits._source.structSirene"],
                     request_timeout=50)
-    # print(res)
-    structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
+    print(res)
+    if res:
+        structIdlist = [hit['_source']['structSirene'] for hit in res['hits']['hits']]
     # print("\u00A0 \u21D2 ", structIdlist)
     return structIdlist
 
@@ -646,7 +647,7 @@ def collect_researchers_data2(self, struct, idx):
 
         k = 0
         docs = hal.find_publications(searcher['halId_s'], 'authIdHal_s')
-        # Enrichssements des documents récoltés
+        # Enrichissements des documents récoltés
         # print ("2e " + str(type (docs)))
 
         # Insert documents collection
@@ -857,10 +858,10 @@ def init_labo():
 
 def collect_data(laboratories=False, researcher=False, django_enabler=None):
     """
-    Collecte les données de HAL et les indexe dans ElasticSearch
+    Collecte les données d'HAL et les indexe dans ElasticSearch
     """
     global djangodb_open
-
+    tache1 = tache2 = None
     djangodb_open = django_enabler
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
     print('Begin index completion')
@@ -874,7 +875,6 @@ def collect_data(laboratories=False, researcher=False, django_enabler=None):
         print('collecting laboratories data')
         tache1 = collect_laboratories_data.delay()
     else:
-        tache1 = None
         print('laboratories is disabled, skipping to next process')
 
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=' : ')
@@ -883,7 +883,6 @@ def collect_data(laboratories=False, researcher=False, django_enabler=None):
         for struct in structIdlist:
             tache2 = collect_researchers_data.delay(struct)
     else:
-        tache2 = None
         print('researcher is disabled, skipping to next process')
 
     print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')

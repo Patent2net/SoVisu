@@ -1,125 +1,125 @@
-structSirene,ldapId,name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-198307662,monte,MONTE Michèle,Personnel,Emérite,michele.monte@univ-tln.fr,BABEL,BABEL EA 2649,BABEL,michele-monte,156602,69239096,univ-tln.fr,Michèle,MONTE,842754
-198307662,ledouble,LEDOUBLE Hélène,Personnel,Enseignant Chercheur Titulaire,helene.ledouble@univ-tln.fr,BABEL,BABEL,UFR Lettres,helene-ledouble,156602,76485862,univ-tln.fr,Hélène,LEDOUBLE,1259635
-198307662,berthon,BERTHON Guillaume,Personnel,Enseignant Chercheur Titulaire,guillaume.berthon@univ-tln.fr,BABEL,BABEL,UFR Lettres,guillaume-berthon,156602,111131871,univ-tln.fr,Guillaume,BERTHON,1510448
-198307662,lgaudin,GAUDIN BORDES Lucile,Personnel,Enseignant Chercheur Titulaire,lucile.gaudin-bordes@univ-tln.fr,BABEL,BABEL,UFR Lettres,lucile-gaudin-bordes,156602,119732734,univ-tln.fr,BORDES,GAUDIN,1194045
-198307662,giordano,GIORDANO Emanuele,Personnel,Enseignant Chercheur Titulaire,emanuele.giordano@univ-tln.fr,BABEL,BABEL,UFR Lettres,emanuele-giordano,156602,225617463,univ-tln.fr,Emanuele,GIORDANO,1329664
-198307662,elie,ELIE Marie-pierre,Personnel,Enseignant Chercheur Titulaire,marie-pierre.elie-geslin@univ-tln.fr,CDPC,CDPC,UFR Droit,marie-pierre-elie,217754,76991229,univ-tln.fr,Marie-pierre,ELIE,11527709
-198307662,schmitt,SCHMITT Sylvie,Personnel,Enseignant Chercheur Titulaire,sylvie.schmitt@univ-tln.fr,CDPC,CDPC,UFR Droit,sylvie-schmitt,217754,193190966,univ-tln.fr,Sylvie,SCHMITT,1500914
-198307662,romani,ROMANI Anne-marie,Personnel,Enseignant Chercheur Titulaire,anne-marie.romani@univ-tln.fr,CDPC,CDPC,UFR Droit,anne-marie-romani,217754,174175140,univ-tln.fr,Anne-marie,ROMANI,11125818
-198307662,santolin,SANTOLINI Thierry,Personnel,Enseignant Chercheur Titulaire,thierry.santolini@univ-tln.fr,CDPC,CDPC,UFR Droit,thierry-santolini,217754,115680195,univ-tln.fr,Thierry,SANTOLINI,460237
-198307662,severino,SEVERINO Caterina,Personnel,Enseignant Chercheur Titulaire,caterina.severino@univ-tln.fr,CDPC,CDPC,UFR Droit,caterina-severino,217754,60407409,univ-tln.fr,Caterina,SEVERINO,133551
-198307662,regad,REGAD Caroline,Personnel,Enseignant Chercheur Titulaire,caroline.regad@univ-tln.fr,CDPC,CDPC,UFR Droit,caroline-regad,217754,175158193,univ-tln.fr,Caroline,REGAD,1486966
-198307662,payan,PAYAN Guillaume,Personnel,Enseignant Chercheur Titulaire,guillaume.payan@univ-tln.fr,CDPC,CDPC,UFR Droit,guillaume-payan,217754,130224634,univ-tln.fr,Guillaume,PAYAN,1495706
-198307662,riot,RIOT Cedric,Personnel,Enseignant Chercheur Titulaire,cedric.riot@univ-tln.fr,CDPC,CDPC,UFR Droit,cedric-riot,217754,87621231,univ-tln.fr,Cedric,RIOT,11152248
-198307662,hmohamed922,MOHAMED RAFSANDJANI HASSANI,Etudiants,Doctorant,hassani-mohamed-rafsandjani@etud.univ-tln.fr,CDPC,Doctorat Sciences juridiques,Formations ED 509 et 548,hassani-mohamed-rafsandjani,217754,19301887X,univ-tln.fr,RAFSANDJANI,MOHAMED,1627877
-198307662,taleb,TALEB KARLSSON Akila,Personnel,Enseignant Chercheur Titulaire,akila.taleb-karlsson@univ-tln.fr,CDPC,CDPC,UFR Droit,akila-taleb-karlsson,217754,175892695,univ-tln.fr,KARLSSON,TALEB,1498195
-198307662,balmond,BALMOND Louis,Personnel,Emérite,louis.balmond@univ-tln.fr,CDPC,CDPC UMR 7318,CDPC,louis-balmond,217754,34548947,univ-tln.fr,Louis,BALMOND,11193541
-198307662,mohamedr,MOHAMED RAFSANDJANI Hassani,Personnel,Enseignant Vacataire,hassani.mohamed-rafsandjani@univ-tln.fr,CDPC,UFR Droit,DRT,hassani-mohamed-rafsandjani,217754,19301887X,univ-tln.fr,RAFSANDJANI,MOHAMED,1627877
-198307662,cmounguen386,MOUNGUENGUI CEDRIC FLEURY,Etudiants,Doctorant,cedric-fleury-mounguengui@etud.univ-tln.fr,CDPC,Doctorat Sciences juridiques,Formations ED 509 et 548,cedric-fleury,217754,223474142,univ-tln.fr,CEDRIC,MOUNGUENGUI,906621
-198307662,mberardi010,BERARDI MARCO,Etudiants,Doctorant,marco-berardi@etud.univ-tln.fr,CDPC,Doctorat Sciences juridiques,Formations ED 509 et 548,marco-berardi,217754,204736196,univ-tln.fr,MARCO,BERARDI,1650386
-198307662,berardi,BERARDI Marco,Personnel,Enseignant Chercheur Contractuel,marco.berardi@univ-tln.fr,CDPC,CDPC,UFR Droit,marco-berardi,217754,204736196,univ-tln.fr,Marco,BERARDI,1650386
-198307662,sereno,SERENO Sophie,Personnel,Enseignant Vacataire,sophie.sereno@univ-tln.fr,CDPC,IUT TC,IUTTCO,sophie-sereno,217754,196131936,univ-tln.fr,Sophie,SERENO,1475205
-198307662,maillafet,MAILLAFET Celine,Personnel,Personnel Administratif ou Technique Contractuel,celine.maillafet@univ-tln.fr,CDPC,CDPC,CDPC,celine-maillafet,217754,192146475,univ-tln.fr,Celine,MAILLAFET,11750025
-198307662,tzutzuiano,TZUTZUIANO Catherine,Personnel,Enseignant Chercheur Titulaire,catherine.tzutzuiano@univ-tln.fr,CDPC,CDPC,UFR Droit,catherine-tzutzuiano,217754,192127373,univ-tln.fr,Catherine,TZUTZUIANO,1107197
-198307662,fcolin,COLIN Frederic,Personnel,Enseignant Vacataire,frederic.colin@univ-tln.fr,CDPC,UFR Droit,DRT,frederic-colin,217754,52633594,univ-tln.fr,Frederic,COLIN,354737
-198307662,farhi,FARHI Sarah,Personnel,Enseignant Chercheur Titulaire,sarah.farhi@univ-tln.fr,CERC,CERC,UFR Droit,sarah-farhi,14768,175794359,univ-tln.fr,Sarah,FARHI,11155700
-198307662,donier,DONIER Virginie,Personnel,Enseignant Chercheur Titulaire,virginie.donier@univ-tln.fr,CERC,CERC,UFR Droit,virginie-donier,14768,85131466,univ-tln.fr,Virginie,DONIER,1510352
-198307662,benlarbi,BEN LARBI Sami,Personnel,Enseignant Chercheur Titulaire,sami.ben-larbi@univ-tln.fr,CERGAM,CERGAM,IUT GEA Draguignan,sami-ben-larbi,108098,08061969X,univ-tln.fr,LARBI,BEN,1014926
-198307662,muratore,MURATORE Isabelle,Personnel,Enseignant Chercheur Titulaire,isabelle.muratore@univ-tln.fr,CERGAM,CERGAM,IUT GEA La Garde,isabelle-muratore,108098,122954033,univ-tln.fr,Isabelle,MURATORE,1474417
-198307662,hollet,HOLLET HAUDEBERT Sandrine,Personnel,Enseignant Chercheur Titulaire,sandrine.hollet-haudebert@univ-tln.fr,CERGAM,CERGAM,IAE,sandrine-hollet-haudebert,108098,138933960,univ-tln.fr,HAUDEBERT,HOLLET,1267246
-198307662,dune,DUNE Claire,Personnel,Enseignant Chercheur Titulaire,claire.dune@univ-tln.fr,COSMER,COSMER,IUT MMI,claire-dune,460236,135214629,univ-tln.fr,Claire,DUNE,851475
-198307662,hugel,HUGEL Vincent,Personnel,Enseignant Chercheur Titulaire,vincent.hugel@univ-tln.fr,COSMER,COSMER,IUT GMP,vincent-hugel,460236,162162723,univ-tln.fr,Vincent,HUGEL,1537325
-198307662,campocas,CAMPOCASSO Sebastien,Personnel,Enseignant Chercheur Titulaire,sebastien.campocasso@univ-tln.fr,COSMER,COSMER,IUT GMP,sebastien-campocasso,460236,175703973,univ-tln.fr,Sebastien,CAMPOCASSO,973273
-198307662,oguyon445,GUYON OLIVIER,Etudiants,Doctorant,olivier-guyon2@etud.univ-tln.fr,COSMER,"Doct Mécanique solid, génie méca,produc, transp génie civil",Formations ED 509 et 548,olivier-guyon,460236,14827160X,univ-tln.fr,OLIVIER,GUYON,817784
-198307662,asch,ASCH Joachim,Personnel,Enseignant Chercheur Titulaire,joachim.asch@univ-tln.fr,CPT,CPT,UFR Sc. et Tech.,joachim-asch,179898,113918550,univ-tln.fr,Joachim,ASCH,62636
-198307662,gandolfo,GANDOLFO Daniel,Personnel,Enseignant Chercheur Titulaire,daniel.gandolfo@univ-tln.fr,CPT,CPT,UFR Sc. et Tech.,daniel-gandolfo,179898,115504826,univ-tln.fr,Daniel,GANDOLFO,998971
-198307662,leopold,LEOPOLD Elie,Personnel,Enseignant Chercheur Titulaire,elie.leopold@univ-tln.fr,CPT,CPT,UFR Sciences Eco.,elie-leopold,179898,83541462,univ-tln.fr,Elie,LEOPOLD,71612
-198307662,pillet,PILLET Claude-alain,Personnel,Enseignant Chercheur Titulaire,claude-alain.pillet@univ-tln.fr,CPT,CPT,UFR Sc. et Tech.,claude-alain-pillet,179898,91557860,univ-tln.fr,Claude-alain,PILLET,52903
-198307662,vaienti,VAIENTI Sandro,Personnel,Enseignant Chercheur Titulaire,sandro.vaienti@univ-tln.fr,CPT,CPT,UFR Sc. et Tech.,sandro-vaienti,179898,101431392,univ-tln.fr,Sandro,VAIENTI,1138418
-198307662,barbarou,BARBAROUX Jean-marie,Personnel,Enseignant Chercheur Titulaire,jean-marie.barbaroux@univ-tln.fr,CPT,CPT,UFR Sc. et Tech.,barbarou,179898,193878585,univ-tln.fr,Jean-marie,BARBAROUX,57934
-198307662,rouleux,ROULEUX Michel,Personnel,Enseignant Chercheur Titulaire,michel.rouleux@univ-tln.fr,CPT,CPT,UFR Sc. et Tech.,michel-rouleux,179898,139706216,univ-tln.fr,Michel,ROULEUX,159466
-198307662,ginoux,GINOUX Jean-marc,Personnel,Enseignant Chercheur Titulaire,jean-marc.ginoux@univ-tln.fr,HORS LAB.,HORS LAB.,IUT GMP,jean-marc-ginoux,,10451079X,univ-tln.fr,Jean-marc,GINOUX,1114283
-198307662,vallier,VALLIER Jean-marc,Personnel,Enseignant Chercheur Titulaire,jean-marc.vallier@univ-tln.fr,IAPS,IAPS,UFR Staps,jean-marc-vallier,558924,70464502,univ-tln.fr,Jean-marc,VALLIER,1360885
-198307662,faupin,FAUPIN Arnaud,Personnel,Enseignant Chercheur Titulaire,arnaud.faupin@univ-tln.fr,IAPS,IAPS,UFR Staps,arnaud-faupin,558924,149815255,univ-tln.fr,Arnaud,FAUPIN,11269861
-198307662,watelain,WATELAIN Eric,Personnel,Enseignant Chercheur Titulaire,eric.watelain@univ-tln.fr,IAPS,IAPS,UFR Staps,eric-watelain,558924,93548974,univ-tln.fr,Eric,WATELAIN,70316
-198307662,barrere,BARRERE Jean,Personnel,Personnel Administratif ou Technique Titulaire,jean.barrere@univ-tln.fr,IM2NP,IM2NP,IM2NP,jean-barrere,199957,197704964,univ-tln.fr,Jean,BARRERE,1445917
-198307662,chabriel,CHABRIEL Gilles,Personnel,Enseignant Chercheur Titulaire,gilles.chabriel@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,gilles-chabriel,199957,197707971,univ-tln.fr,Gilles,CHABRIEL,1003641
-198307662,cheva,CHEVALLIER Virginie,Personnel,Enseignant Chercheur Titulaire,virginie.chevallier@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,virginie-chevallier,199957,156208482,univ-tln.fr,Virginie,CHEVALLIER,949864
-198307662,guineton,GUINNETON Frédéric,Personnel,Enseignant Chercheur Titulaire,frederic.guinneton@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,frederic-guinneton,199957,96255684,univ-tln.fr,Frédéric,GUINNETON,1453685
-198307662,jauffret,JAUFFRET Claude,Personnel,Enseignant Chercheur Titulaire,claude.jauffret@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,claude-jauffret,199957,69435715,univ-tln.fr,Claude,JAUFFRET,11225205
-198307662,leroux,LEROUX Christine,Personnel,Enseignant Chercheur Titulaire,christine.leroux@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,chl,199957,115565329,univ-tln.fr,Christine,LEROUX,1089572
-198307662,lucas,LUCAS Yves,Personnel,Enseignant Chercheur Titulaire,yves.lucas@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,yves-lucas,199957,96433639,univ-tln.fr,Yves,LUCAS,11534533
-198307662,villain,VILLAIN Sylvie,Personnel,Enseignant Chercheur Titulaire,sylvie.villain@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,sylvie-villain,199957,118267906,univ-tln.fr,Sylvie,VILLAIN,1381638
-198307662,xerri,XERRI Bernard,Personnel,Enseignant Chercheur Titulaire,bernard.xerri@univ-tln.fr,IM2NP,IM2NP,SeaTech,bernard-xerri,199957,114908508,univ-tln.fr,Bernard,XERRI,11228220
-198307662,pferran,FERRANDIS Philippe,Personnel,Enseignant Chercheur Titulaire,philippe.ferrandis@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,philippe-ferrandis,199957,77646606,univ-tln.fr,Philippe,FERRANDIS,1653082
-198307662,gies,GIES Valentin,Personnel,Enseignant Chercheur Titulaire,valentin.gies@univ-tln.fr,IM2NP,IM2NP,IUT GEII,valentingies,199957,105962430,univ-tln.fr,Valentin,GIES,508445
-198307662,arab,ARAB Madjid,Personnel,Enseignant Chercheur Titulaire,madjid.arab@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,madjid-arab,199957,105663204,univ-tln.fr,Madjid,ARAB,11271994
-198307662,merdy,MERDY Patricia,Personnel,Enseignant Chercheur Titulaire,patricia.merdy@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,patricia-merdy,199957,06694614X,univ-tln.fr,Patricia,MERDY,1000387
-198307662,merlen,MERLEN Alexandre,Personnel,Enseignant Chercheur Titulaire,alexandre.merlen@univ-tln.fr,IM2NP,IM2NP,UFR Sc. et Tech.,alexandre-merlen,199957,95162879,univ-tln.fr,Alexandre,MERLEN,70847
-198307662,bahlali,BAHLALI Khaled,Personnel,Enseignant Chercheur Titulaire,khaled.bahlali@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,khaled-bahlali,68760,33471274,univ-tln.fr,Khaled,BAHLALI,1315895
-198307662,bouchi,BOUCHITTE Guy,Personnel,Emérite,guy.bouchitte@univ-tln.fr,IMATH,IMATH EA 2134,IMATH,guy-bouchitte,68760,32076134,univ-tln.fr,Guy,BOUCHITTE,536531
-198307662,freddy,GOLAY Frédéric,Personnel,Enseignant Chercheur Titulaire,frederic.golay@univ-tln.fr,IMATH,IMATH,SeaTech,frederic-golay,68760,156484250,univ-tln.fr,Frédéric,GOLAY,1013347
-198307662,langevin,LANGEVIN Philippe,Personnel,Enseignant Chercheur Titulaire,philippe.langevin@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,philippe-langevin,68760,157633918,univ-tln.fr,Philippe,LANGEVIN,1024068
-198307662,nguyen,NGUYEN Christian,Personnel,Enseignant Chercheur Titulaire,christian.nguyen@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,christian-nguyen,68760,188333975,univ-tln.fr,Christian,NGUYEN,1023970
-198307662,novotny,NOVOTNY Antonin,Personnel,Enseignant Chercheur Titulaire,antonin.novotny@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,antonin-novotny,68760,83649948,univ-tln.fr,Antonin,NOVOTNY,1025561
-198307662,seppeche,SEPPECHER Pierre,Personnel,Enseignant Chercheur Titulaire,pierre.seppecher@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,pierre-seppecher,68760,33236038,univ-tln.fr,Pierre,SEPPECHER,334686
-198307662,veron,VERON Pascal,Personnel,Enseignant Chercheur Titulaire,pascal.veron@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,pascal-veron,68760,91474515,univ-tln.fr,Pascal,VERON,697252
-198307662,champion,CHAMPION Thierry,Personnel,Enseignant Chercheur Titulaire,thierry.champion@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,thierry-champion,68760,192521373,univ-tln.fr,Thierry,CHAMPION,489683
-198307662,yaubry,AUBRY Yves,Personnel,Enseignant Chercheur Titulaire,yves.aubry@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,yves-aubry,68760,94650756,univ-tln.fr,Yves,AUBRY,431652
-198307662,galusins,GALUSINSKI Cédric,Personnel,Enseignant Chercheur Titulaire,cedric.galusinski@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,cedric-galusinski,68760,119019922,univ-tln.fr,Cédric,GALUSINSKI,1023969
-198307662,herbaut,HERBAUT Fabien,Personnel,Personnel Hébergé,fabien.herbaut@univ-tln.fr,IMATH,UO Reprise,UO_REP,fabien-herbaut,68760,104822562,univ-tln.fr,Fabien,HERBAUT,189053
-198307662,yushchen,YUSHCHENKO Lyudmyla,Personnel,Enseignant Chercheur Titulaire,lyudmyla.yushchenko@univ-tln.fr,IMATH,IMATH,SeaTech,lyudmyla-yushchenko,68760,93403372,univ-tln.fr,Lyudmyla,YUSHCHENKO,956990
-198307662,meloni,MELONI Nicolas,Personnel,Enseignant Chercheur Titulaire,nicolas.meloni@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,nicolas-meloni,68760,83648526,univ-tln.fr,Nicolas,MELONI,227457
-198307662,faccanon,FACCANONI Gloria,Personnel,Enseignant Chercheur Titulaire,gloria.faccanoni@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,gloria-faccanoni,68760,13212405X,univ-tln.fr,Gloria,FACCANONI,1013614
-198307662,meradji,MERADJI Sofiane,Personnel,Personnel Administratif ou Technique Titulaire,sofiane.meradji@univ-tln.fr,IMATH,IMATH,IMATH,sofiane-meradji,68760,248352164,univ-tln.fr,Sofiane,MERADJI,300606
-198307662,ersoy,ERSOY Mehmet,Personnel,Enseignant Chercheur Titulaire,mehmet.ersoy@univ-tln.fr,IMATH,IMATH,SeaTech,mehmet-ersoy,68760,150156952,univ-tln.fr,Mehmet,ERSOY,1244567
-198307662,jrobert,ROBERT Jean-marc,Personnel,Enseignant Chercheur Titulaire,jean-marc.robert@univ-tln.fr,IMATH,IMATH,UFR Sc. et Tech.,jean-marc-robert,68760,190125136,univ-tln.fr,Jean-marc,ROBERT,97778
-198307662,abellard,ABELLARD Patrick,Personnel,Emérite,patrick.abellard@univ-tln.fr,IMSIC,IMSIC EA 4262,IMSIC,patrick-abellard,527028,99531771,univ-tln.fr,Patrick,ABELLARD,11204179
-198307662,quoniam,QUONIAM Luc,Personnel,Enseignant Chercheur Titulaire,luc.quoniam@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,luc-quoniam,527028,34105700,univ-tln.fr,Luc,QUONIAM,86680
-198307662,renucci,RENUCCI Franck,Personnel,Enseignant Chercheur Titulaire,franck.renucci@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,franck-renucci,527028,99134004,univ-tln.fr,Franck,RENUCCI,11170762
-198307662,bulinge,BULINGE Franck,Personnel,Enseignant Chercheur Titulaire,franck.bulinge@univ-tln.fr,IMSIC,IMSIC,IUT MMI,franck-bulinge,527028,95070699,univ-tln.fr,Franck,BULINGE,86805
-198307662,duvernay,DUVERNAY Daphné,Personnel,Enseignant Chercheur Titulaire,daphne.duvernay@univ-tln.fr,IMSIC,IMSIC,IUT TC,daphne-duvernay,527028,92248438,univ-tln.fr,Daphné,DUVERNAY,660578
-198307662,aabellar,ABELLARD Alexandre,Personnel,Enseignant Chercheur Titulaire,alexandre.abellard@univ-tln.fr,IMSIC,IMSIC,IUT GEII,alexandre-abellard,527028,87663562,univ-tln.fr,Alexandre,ABELLARD,11204180
-198307662,zenouda,ZENOUDA Herve,Personnel,Enseignant Chercheur Titulaire,herve.zenouda@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,herve-zenouda,527028,112532594,univ-tln.fr,Herve,ZENOUDA,412984
-198307662,durampar,DURAMPART Michel,Personnel,Enseignant Chercheur Titulaire,michel.durampart@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,michel-durampart,527028,60850728,univ-tln.fr,Michel,DURAMPART,86778
-198307662,collet,COLLET Laurent,Personnel,Enseignant Chercheur Titulaire,laurent.collet@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,laurent-collet,527028,186366116,univ-tln.fr,Laurent,COLLET,362678
-198307662,dreymond,REYMOND David,Personnel,Enseignant Chercheur Titulaire,david.reymond@univ-tln.fr,IMSIC,IMSIC,IUT TC,david-reymond,527028,122796527,univ-tln.fr,David,REYMOND,599503
-198307662,nannipie,NANNIPIERI Olivier,Personnel,Enseignant Chercheur Titulaire,olivier.nannipieri@univ-tln.fr,IMSIC,IMSIC,IUT GEA La Garde,olivier-nannipieri,527028,177559748,univ-tln.fr,Olivier,NANNIPIERI,1191100
-198307662,amato,AMATO Stephane,Personnel,Enseignant Chercheur Titulaire,stephane.amato@univ-tln.fr,IMSIC,IMSIC,IUT MMI,stephane-amato,527028,18246508X,univ-tln.fr,Stephane,AMATO,854973
-198307662,mcisse418,CISSE Mahamadou,Etudiants,Doctorant,mahamadou-cisse@etud.univ-tln.fr,IMSIC,Doctorat Sciences de l'information et de la communication,Formations ED 509 et 548,mahamadou-cisse,527028,84639989,univ-tln.fr,Mahamadou,CISSE,11721013
-198307662,denizart,DENIZART Jean-michel,Personnel,Enseignant Chercheur Titulaire,jean-michel.denizart@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,jean-micheldenizart,527028,230749313,univ-tln.fr,Jean-michel,DENIZART,1662705
-198307662,gagnebien,GAGNEBIEN Anne,Personnel,Enseignant Chercheur Titulaire,anne.gagnebien@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,anne-gagnebien,527028,175282838,univ-tln.fr,Anne,GAGNEBIEN,11772905
-198307662,pelissie,PELISSIER THIERIOT Maud,Personnel,Enseignant Chercheur Titulaire,maud.pelissier-thieriot@univ-tln.fr,IMSIC,IMSIC,UFR Ingémédia,maud-pelissier-thieriot,527028,13740641X,univ-tln.fr,THIERIOT,PELISSIER,362244
-198307662,bruno,BRUNO Emmanuel,Personnel,Enseignant Chercheur Titulaire,emmanuel.bruno@univ-tln.fr,LIS,LIS,UFR Sc. et Tech.,emmanuel-bruno,527033,102365776,univ-tln.fr,Emmanuel,BRUNO,11292650
-198307662,glotin,GLOTIN Hervé,Personnel,Enseignant Chercheur Titulaire,herve.glotin@univ-tln.fr,LIS,LIS,UFR Sc. et Tech.,herve-glotin,527033,112112501,univ-tln.fr,Hervé,GLOTIN,237725
-198307662,boizot,BOIZOT Nicolas,Personnel,Enseignant Chercheur Titulaire,nicolas.boizot@univ-tln.fr,LIS,IUT GEII,LIS,nicolas-boizot,527033,146919300,univ-tln.fr,Nicolas,BOIZOT,572220
-198307662,chittaro,CHITTARO Francesca,Personnel,Enseignant Chercheur Titulaire,francesca.chittaro@univ-tln.fr,LIS,IUT GEII,LIS,francesca-carlotta-chittaro,527033,22614688X,univ-tln.fr,Francesca,CHITTARO,531137
-198307662,luciani,LUCIANI Xavier,Personnel,Enseignant Chercheur Titulaire,xavier.luciani@univ-tln.fr,LIS,LIS,SeaTech,xavier-luciani,527033,120562871,univ-tln.fr,Xavier,LUCIANI,754883
-198307662,busvelle,BUSVELLE Eric,Personnel,Enseignant Chercheur Titulaire,eric.busvelle@univ-tln.fr,LIS,IUT GEII,LIS,eric-busvelle,527033,146919726,univ-tln.fr,Eric,BUSVELLE,805237
-198307662,tnguyen108,NGUYEN THANH TUAN,Etudiants,Doctorant,thanh-tuan-nguyen2@etud.univ-tln.fr,LIS,Doctorat Informatique,Formations ED 509 et 548,nguyen-tuan-thanh-le,527033,22134196X,univ-tln.fr,THANH,NGUYEN,1456356
-198307662,mtlig458,TLIG MOHAMED,Etudiants,Doctorant,mohamed-tlig@etud.univ-tln.fr,LIS,"Doctorat Automatique, signal, productique, robotique",Formations ED 509 et 548,mtlig,527033,18624973X,univ-tln.fr,MOHAMED,TLIG,997431
-198307662,chailan,CHAILAN Jean-francois,Personnel,Enseignant Chercheur Titulaire,jean-francois.chailan@univ-tln.fr,MAPIEM,MAPIEM,UFR Sc. et Tech.,jean-francois-chailan,84790,112506933,univ-tln.fr,Jean-francois,CHAILAN,1380737
-198307662,piazzola,PIAZZOLA Jacques,Personnel,Enseignant Chercheur Titulaire,jacques.piazzola@univ-tln.fr,MIO,MIO,SeaTech,jacques-piazzola,191652,87894904,univ-tln.fr,Jacques,PIAZZOLA,1211913
-198307662,tedeschi,TEDESCHI Gilles,Personnel,Enseignant Chercheur Titulaire,gilles.tedeschi@univ-tln.fr,MIO,MIO,SeaTech,gilles-tedeschi,191652,114335346,univ-tln.fr,Gilles,TEDESCHI,779357
-198307662,luce,LUCE Hubert,Personnel,Enseignant Chercheur Titulaire,hubert.luce@univ-tln.fr,MIO,UFR Sc. et Tech.,TEC,hubert-luce,191652,167930826,univ-tln.fr,Hubert,LUCE,103074
-198307662,guerin,GUERIN Charles-antoine,Personnel,Enseignant Chercheur Titulaire,charles-antoine.guerin@univ-tln.fr,MIO,MIO,UFR Sc. et Tech.,charles-antoine-guerin,191652,102521530,univ-tln.fr,Charles-antoine,GUERIN,72055
-198307662,sous,SOUS Damien,Personnel,Enseignant Chercheur Titulaire,damien.sous@univ-tln.fr,MIO,MIO,SeaTech,sous-damien,191652,77924916,univ-tln.fr,Damien,SOUS,666703
-198307662,touboul,TOUBOUL Julien,Personnel,Enseignant Chercheur Titulaire,julien.touboul@univ-tln.fr,MIO,MIO,SeaTech,julien-touboul,191652,123399424,univ-tln.fr,Julien,TOUBOUL,728844
-198307662,coupe,COUPE Stephane,Personnel,Enseignant Chercheur Titulaire,stephane.coupe@univ-tln.fr,MIO,IUT BIO,MIO,stephane-coupe,191652,102195749,univ-tln.fr,Stephane,COUPE,11398272
-198307662,prevot,PREVOT D'ALVISE Nathalie,Personnel,Enseignant Chercheur Titulaire,nathalie.prevot-dalvise@univ-tln.fr,MIO,IUT BIO,MIO,nathalie-prevot-dalvise,191652,122034996,univ-tln.fr,D'ALVISE,PREVOT,11231231
-198307662,pioch,PIOCH Sébastien,Personnel,Enseignant Chercheur Titulaire,sebastien.pioch@univ-tln.fr,MIO,IUT GEII,MIO,sebastien-pioch,191652,87541491,univ-tln.fr,Sébastien,PIOCH,729070
-198307662,zakardji,ZAKARDJIAN Bruno,Personnel,Enseignant Chercheur Titulaire,bruno.zakardjian@univ-tln.fr,MIO,MIO,UFR Sc. et Tech.,bruno-zakardjian,191652,174789033,univ-tln.fr,Bruno,ZAKARDJIAN,730057
-198307662,francius,FRANCIUS Marc,Personnel,Enseignant Chercheur Titulaire,marc.francius@univ-tln.fr,MIO,MIO,SeaTech,marc-francius,191652,79087337,univ-tln.fr,Marc,FRANCIUS,11202528
-198307662,ourmiere,OURMIERES Yann,Personnel,Enseignant Chercheur Titulaire,yann.ourmieres@univ-tln.fr,MIO,MIO,UFR Sc. et Tech.,yann-ourmieres,191652,17497857X,univ-tln.fr,Yann,OURMIERES,1068862
-198307662,misson,MISSON Benjamin,Personnel,Enseignant Chercheur Titulaire,benjamin.misson@univ-tln.fr,MIO,IUT BIO,MIO,benjamin-misson,191652,159028760,univ-tln.fr,Benjamin,MISSON,702215
-198307662,hajjoul,HAJJOUL Houssam,Personnel,Personnel Administratif ou Technique Titulaire,houssam.hajjoul@univ-tln.fr,MIO,MIO,MIO,houssam-hajjoul,191652,156887975,univ-tln.fr,Houssam,HAJJOUL,797497
-198307662,enavarro,NAVARRO Elisabeth,Personnel,Personnel Hébergé,elisabeth.navarro@univ-tln.fr,MIO,UO Reprise,UO_REP,elisabeth-navarro,191652,87109255,univ-tln.fr,Elisabeth,NAVARRO,174340
-198307662,sanial,SANIAL Virginie,Personnel,Enseignant Chercheur Titulaire,virginie.sanial@univ-tln.fr,MIO,MIO,UFR Sc. et Tech.,virginie-sanial,191652,194011127,univ-tln.fr,Virginie,SANIAL,1224612
-198307662,cebrean,BREANDON Christine,Personnel,Enseignant Titulaire,christine.breandon@univ-tln.fr,,IUT MMI,IUTMMI,christine-breandon,,169002896,univ-tln.fr,Christine,BREANDON,421378
-198307662,slafon,LAFON Sylvie,Personnel,Enseignant Titulaire,sylvie.lafon@univ-tln.fr,,IUT GEA La Garde,IUTGEA,sylvie-kleiman-lafon,,32121725,univ-tln.fr,Sylvie,LAFON,1439949
-198307662,mille,MILLE Marie-laure,Personnel,Enseignant Chercheur Titulaire,marie-laure.mille@univ-tln.fr,,Labo. Extérieurs,UFR Staps,marie-laure-mille,,07095240X,univ-tln.fr,Marie-laure,MILLE,1407154
-198307662,rabah,RABAH Nadia,Personnel,Enseignant Chercheur Titulaire,nadia.rabah@univ-tln.fr,,UFR Sc. et Tech.,TEC,rabahrabah,,182695697,univ-tln.fr,Nadia,RABAH,1434210
-198307662,irichard,RICHARD Isabelle,Personnel,Enseignant Titulaire,isabelle.richard@univ-tln.fr,,UFR Sc. et Tech.,TEC,isabelle-richard,,177586249,univ-tln.fr,Isabelle,RICHARD,11528541
-198307662,moutte,PERRIN Julie,Personnel,Enseignant Titulaire,julie.perrin@univ-tln.fr,,IUT TC,IUTTCO,perrin-julie,,111079322,univ-tln.fr,Julie,PERRIN,817881
-198307662,lassalle,LASSALLE Geoffrey,Personnel,Enseignant Contractuel,geoffrey.lassalle@univ-tln.fr,,UFR Staps,STA,geoffrey-lassalle,,235601179,univ-tln.fr,Geoffrey,LASSALLE,1475924
+structSirene;ldapId;name;type;function;mail;lab;supannAffectation;supannEntiteAffectationPrincipale;halId_s;labHalId;idRef;structDomain;firstName;lastName
+198307662;monte;MONTE Michèle;Personnel;Emérite;michele.monte@univ-tln.fr;BABEL;BABEL EA 2649;BABEL;michele-monte;156602;69239096;univ-tln.fr;Michèle;MONTE
+198307662;ledouble;LEDOUBLE Hélène;Personnel;Enseignant Chercheur Titulaire;helene.ledouble@univ-tln.fr;BABEL;BABEL;UFR Lettres;helene-ledouble;156602;76485862;univ-tln.fr;Hélène;LEDOUBLE
+198307662;berthon;BERTHON Guillaume;Personnel;Enseignant Chercheur Titulaire;guillaume.berthon@univ-tln.fr;BABEL;BABEL;UFR Lettres;guillaume-berthon;156602;111131871;univ-tln.fr;Guillaume;BERTHON
+198307662;lgaudin;GAUDIN BORDES Lucile;Personnel;Enseignant Chercheur Titulaire;lucile.gaudin-bordes@univ-tln.fr;BABEL;BABEL;UFR Lettres;lucile-gaudin-bordes;156602;119732734;univ-tln.fr;BORDES;GAUDIN
+198307662;giordano;GIORDANO Emanuele;Personnel;Enseignant Chercheur Titulaire;emanuele.giordano@univ-tln.fr;BABEL;BABEL;UFR Lettres;emanuele-giordano;156602;225617463;univ-tln.fr;Emanuele;GIORDANO
+198307662;elie;ELIE Marie-pierre;Personnel;Enseignant Chercheur Titulaire;marie-pierre.elie-geslin@univ-tln.fr;CDPC;CDPC;UFR Droit;marie-pierre-elie;217754;76991229;univ-tln.fr;Marie-pierre;ELIE
+198307662;schmitt;SCHMITT Sylvie;Personnel;Enseignant Chercheur Titulaire;sylvie.schmitt@univ-tln.fr;CDPC;CDPC;UFR Droit;sylvie-schmitt;217754;193190966;univ-tln.fr;Sylvie;SCHMITT
+198307662;romani;ROMANI Anne-marie;Personnel;Enseignant Chercheur Titulaire;anne-marie.romani@univ-tln.fr;CDPC;CDPC;UFR Droit;anne-marie-romani;217754;174175140;univ-tln.fr;Anne-marie;ROMANI
+198307662;santolin;SANTOLINI Thierry;Personnel;Enseignant Chercheur Titulaire;thierry.santolini@univ-tln.fr;CDPC;CDPC;UFR Droit;thierry-santolini;217754;115680195;univ-tln.fr;Thierry;SANTOLINI
+198307662;severino;SEVERINO Caterina;Personnel;Enseignant Chercheur Titulaire;caterina.severino@univ-tln.fr;CDPC;CDPC;UFR Droit;caterina-severino;217754;60407409;univ-tln.fr;Caterina;SEVERINO
+198307662;regad;REGAD Caroline;Personnel;Enseignant Chercheur Titulaire;caroline.regad@univ-tln.fr;CDPC;CDPC;UFR Droit;caroline-regad;217754;175158193;univ-tln.fr;Caroline;REGAD
+198307662;payan;PAYAN Guillaume;Personnel;Enseignant Chercheur Titulaire;guillaume.payan@univ-tln.fr;CDPC;CDPC;UFR Droit;guillaume-payan;217754;130224634;univ-tln.fr;Guillaume;PAYAN
+198307662;riot;RIOT Cedric;Personnel;Enseignant Chercheur Titulaire;cedric.riot@univ-tln.fr;CDPC;CDPC;UFR Droit;cedric-riot;217754;87621231;univ-tln.fr;Cedric;RIOT
+198307662;hmohamed922;MOHAMED RAFSANDJANI HASSANI;Etudiants;Doctorant;hassani-mohamed-rafsandjani@etud.univ-tln.fr;CDPC;Doctorat Sciences juridiques;Formations ED 509 et 548;hassani-mohamed-rafsandjani;217754;19301887X;univ-tln.fr;RAFSANDJANI;MOHAMED
+198307662;taleb;TALEB KARLSSON Akila;Personnel;Enseignant Chercheur Titulaire;akila.taleb-karlsson@univ-tln.fr;CDPC;CDPC;UFR Droit;akila-taleb-karlsson;217754;175892695;univ-tln.fr;KARLSSON;TALEB
+198307662;balmond;BALMOND Louis;Personnel;Emérite;louis.balmond@univ-tln.fr;CDPC;CDPC UMR 7318;CDPC;louis-balmond;217754;34548947;univ-tln.fr;Louis;BALMOND
+198307662;mohamedr;MOHAMED RAFSANDJANI Hassani;Personnel;Enseignant Vacataire;hassani.mohamed-rafsandjani@univ-tln.fr;CDPC;UFR Droit;DRT;hassani-mohamed-rafsandjani;217754;19301887X;univ-tln.fr;RAFSANDJANI;MOHAMED
+198307662;cmounguen386;MOUNGUENGUI CEDRIC FLEURY;Etudiants;Doctorant;cedric-fleury-mounguengui@etud.univ-tln.fr;CDPC;Doctorat Sciences juridiques;Formations ED 509 et 548;cedric-fleury;217754;223474142;univ-tln.fr;CEDRIC;MOUNGUENGUI
+198307662;mberardi010;BERARDI MARCO;Etudiants;Doctorant;marco-berardi@etud.univ-tln.fr;CDPC;Doctorat Sciences juridiques;Formations ED 509 et 548;marco-berardi;217754;204736196;univ-tln.fr;MARCO;BERARDI
+198307662;berardi;BERARDI Marco;Personnel;Enseignant Chercheur Contractuel;marco.berardi@univ-tln.fr;CDPC;CDPC;UFR Droit;marco-berardi;217754;204736196;univ-tln.fr;Marco;BERARDI
+198307662;sereno;SERENO Sophie;Personnel;Enseignant Vacataire;sophie.sereno@univ-tln.fr;CDPC;IUT TC;IUTTCO;sophie-sereno;217754;196131936;univ-tln.fr;Sophie;SERENO
+198307662;maillafet;MAILLAFET Celine;Personnel;Personnel Administratif ou Technique Contractuel;celine.maillafet@univ-tln.fr;CDPC;CDPC;CDPC;celine-maillafet;217754;192146475;univ-tln.fr;Celine;MAILLAFET
+198307662;tzutzuiano;TZUTZUIANO Catherine;Personnel;Enseignant Chercheur Titulaire;catherine.tzutzuiano@univ-tln.fr;CDPC;CDPC;UFR Droit;catherine-tzutzuiano;217754;192127373;univ-tln.fr;Catherine;TZUTZUIANO
+198307662;fcolin;COLIN Frederic;Personnel;Enseignant Vacataire;frederic.colin@univ-tln.fr;CDPC;UFR Droit;DRT;frederic-colin;217754;52633594;univ-tln.fr;Frederic;COLIN
+198307662;farhi;FARHI Sarah;Personnel;Enseignant Chercheur Titulaire;sarah.farhi@univ-tln.fr;CERC;CERC;UFR Droit;sarah-farhi;14768;175794359;univ-tln.fr;Sarah;FARHI
+198307662;donier;DONIER Virginie;Personnel;Enseignant Chercheur Titulaire;virginie.donier@univ-tln.fr;CERC;CERC;UFR Droit;virginie-donier;14768;85131466;univ-tln.fr;Virginie;DONIER
+198307662;benlarbi;BEN LARBI Sami;Personnel;Enseignant Chercheur Titulaire;sami.ben-larbi@univ-tln.fr;CERGAM;CERGAM;IUT GEA Draguignan;sami-ben-larbi;108098;08061969X;univ-tln.fr;LARBI;BEN
+198307662;muratore;MURATORE Isabelle;Personnel;Enseignant Chercheur Titulaire;isabelle.muratore@univ-tln.fr;CERGAM;CERGAM;IUT GEA La Garde;isabelle-muratore;108098;122954033;univ-tln.fr;Isabelle;MURATORE
+198307662;hollet;HOLLET HAUDEBERT Sandrine;Personnel;Enseignant Chercheur Titulaire;sandrine.hollet-haudebert@univ-tln.fr;CERGAM;CERGAM;IAE;sandrine-hollet-haudebert;108098;138933960;univ-tln.fr;HAUDEBERT;HOLLET
+198307662;dune;DUNE Claire;Personnel;Enseignant Chercheur Titulaire;claire.dune@univ-tln.fr;COSMER;COSMER;IUT MMI;claire-dune;460236;135214629;univ-tln.fr;Claire;DUNE
+198307662;hugel;HUGEL Vincent;Personnel;Enseignant Chercheur Titulaire;vincent.hugel@univ-tln.fr;COSMER;COSMER;IUT GMP;vincent-hugel;460236;162162723;univ-tln.fr;Vincent;HUGEL
+198307662;campocas;CAMPOCASSO Sebastien;Personnel;Enseignant Chercheur Titulaire;sebastien.campocasso@univ-tln.fr;COSMER;COSMER;IUT GMP;sebastien-campocasso;460236;175703973;univ-tln.fr;Sebastien;CAMPOCASSO
+198307662;oguyon445;GUYON OLIVIER;Etudiants;Doctorant;olivier-guyon2@etud.univ-tln.fr;COSMER;Doct Mécanique solid, génie méca,produc, transp génie civil;Formations ED 509 et 548;olivier-guyon;460236;14827160X;univ-tln.fr;OLIVIER;GUYON
+198307662;asch;ASCH Joachim;Personnel;Enseignant Chercheur Titulaire;joachim.asch@univ-tln.fr;CPT;CPT;UFR Sc. et Tech.;joachim-asch;179898;113918550;univ-tln.fr;Joachim;ASCH
+198307662;gandolfo;GANDOLFO Daniel;Personnel;Enseignant Chercheur Titulaire;daniel.gandolfo@univ-tln.fr;CPT;CPT;UFR Sc. et Tech.;daniel-gandolfo;179898;115504826;univ-tln.fr;Daniel;GANDOLFO
+198307662;leopold;LEOPOLD Elie;Personnel;Enseignant Chercheur Titulaire;elie.leopold@univ-tln.fr;CPT;CPT;UFR Sciences Eco.;elie-leopold;179898;83541462;univ-tln.fr;Elie;LEOPOLD
+198307662;pillet;PILLET Claude-alain;Personnel;Enseignant Chercheur Titulaire;claude-alain.pillet@univ-tln.fr;CPT;CPT;UFR Sc. et Tech.;claude-alain-pillet;179898;91557860;univ-tln.fr;Claude-alain;PILLET
+198307662;vaienti;VAIENTI Sandro;Personnel;Enseignant Chercheur Titulaire;sandro.vaienti@univ-tln.fr;CPT;CPT;UFR Sc. et Tech.;sandro-vaienti;179898;101431392;univ-tln.fr;Sandro;VAIENTI
+198307662;barbarou;BARBAROUX Jean-marie;Personnel;Enseignant Chercheur Titulaire;jean-marie.barbaroux@univ-tln.fr;CPT;CPT;UFR Sc. et Tech.;barbarou;179898;193878585;univ-tln.fr;Jean-marie;BARBAROUX
+198307662;rouleux;ROULEUX Michel;Personnel;Enseignant Chercheur Titulaire;michel.rouleux@univ-tln.fr;CPT;CPT;UFR Sc. et Tech.;michel-rouleux;179898;139706216;univ-tln.fr;Michel;ROULEUX
+198307662;ginoux;GINOUX Jean-marc;Personnel;Enseignant Chercheur Titulaire;jean-marc.ginoux@univ-tln.fr;HORS LAB.;HORS LAB.;IUT GMP;jean-marc-ginoux;;10451079X;univ-tln.fr;Jean-marc;GINOUX
+198307662;vallier;VALLIER Jean-marc;Personnel;Enseignant Chercheur Titulaire;jean-marc.vallier@univ-tln.fr;IAPS;IAPS;UFR Staps;jean-marc-vallier;558924;70464502;univ-tln.fr;Jean-marc;VALLIER
+198307662;faupin;FAUPIN Arnaud;Personnel;Enseignant Chercheur Titulaire;arnaud.faupin@univ-tln.fr;IAPS;IAPS;UFR Staps;arnaud-faupin;558924;149815255;univ-tln.fr;Arnaud;FAUPIN
+198307662;watelain;WATELAIN Eric;Personnel;Enseignant Chercheur Titulaire;eric.watelain@univ-tln.fr;IAPS;IAPS;UFR Staps;eric-watelain;558924;93548974;univ-tln.fr;Eric;WATELAIN
+198307662;barrere;BARRERE Jean;Personnel;Personnel Administratif ou Technique Titulaire;jean.barrere@univ-tln.fr;IM2NP;IM2NP;IM2NP;jean-barrere;199957;197704964;univ-tln.fr;Jean;BARRERE
+198307662;chabriel;CHABRIEL Gilles;Personnel;Enseignant Chercheur Titulaire;gilles.chabriel@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;gilles-chabriel;199957;197707971;univ-tln.fr;Gilles;CHABRIEL
+198307662;cheva;CHEVALLIER Virginie;Personnel;Enseignant Chercheur Titulaire;virginie.chevallier@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;virginie-chevallier;199957;156208482;univ-tln.fr;Virginie;CHEVALLIER
+198307662;guineton;GUINNETON Frédéric;Personnel;Enseignant Chercheur Titulaire;frederic.guinneton@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;frederic-guinneton;199957;96255684;univ-tln.fr;Frédéric;GUINNETON
+198307662;jauffret;JAUFFRET Claude;Personnel;Enseignant Chercheur Titulaire;claude.jauffret@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;claude-jauffret;199957;69435715;univ-tln.fr;Claude;JAUFFRET
+198307662;leroux;LEROUX Christine;Personnel;Enseignant Chercheur Titulaire;christine.leroux@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;chl;199957;115565329;univ-tln.fr;Christine;LEROUX
+198307662;lucas;LUCAS Yves;Personnel;Enseignant Chercheur Titulaire;yves.lucas@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;yves-lucas;199957;96433639;univ-tln.fr;Yves;LUCAS
+198307662;villain;VILLAIN Sylvie;Personnel;Enseignant Chercheur Titulaire;sylvie.villain@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;sylvie-villain;199957;118267906;univ-tln.fr;Sylvie;VILLAIN
+198307662;xerri;XERRI Bernard;Personnel;Enseignant Chercheur Titulaire;bernard.xerri@univ-tln.fr;IM2NP;IM2NP;SeaTech;bernard-xerri;199957;114908508;univ-tln.fr;Bernard;XERRI
+198307662;pferran;FERRANDIS Philippe;Personnel;Enseignant Chercheur Titulaire;philippe.ferrandis@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;philippe-ferrandis;199957;77646606;univ-tln.fr;Philippe;FERRANDIS
+198307662;gies;GIES Valentin;Personnel;Enseignant Chercheur Titulaire;valentin.gies@univ-tln.fr;IM2NP;IM2NP;IUT GEII;valentingies;199957;105962430;univ-tln.fr;Valentin;GIES
+198307662;arab;ARAB Madjid;Personnel;Enseignant Chercheur Titulaire;madjid.arab@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;madjid-arab;199957;105663204;univ-tln.fr;Madjid;ARAB
+198307662;merdy;MERDY Patricia;Personnel;Enseignant Chercheur Titulaire;patricia.merdy@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;patricia-merdy;199957;06694614X;univ-tln.fr;Patricia;MERDY
+198307662;merlen;MERLEN Alexandre;Personnel;Enseignant Chercheur Titulaire;alexandre.merlen@univ-tln.fr;IM2NP;IM2NP;UFR Sc. et Tech.;alexandre-merlen;199957;95162879;univ-tln.fr;Alexandre;MERLEN
+198307662;bahlali;BAHLALI Khaled;Personnel;Enseignant Chercheur Titulaire;khaled.bahlali@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;khaled-bahlali;68760;33471274;univ-tln.fr;Khaled;BAHLALI
+198307662;bouchi;BOUCHITTE Guy;Personnel;Emérite;guy.bouchitte@univ-tln.fr;IMATH;IMATH EA 2134;IMATH;guy-bouchitte;68760;32076134;univ-tln.fr;Guy;BOUCHITTE
+198307662;freddy;GOLAY Frédéric;Personnel;Enseignant Chercheur Titulaire;frederic.golay@univ-tln.fr;IMATH;IMATH;SeaTech;frederic-golay;68760;156484250;univ-tln.fr;Frédéric;GOLAY
+198307662;langevin;LANGEVIN Philippe;Personnel;Enseignant Chercheur Titulaire;philippe.langevin@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;philippe-langevin;68760;157633918;univ-tln.fr;Philippe;LANGEVIN
+198307662;nguyen;NGUYEN Christian;Personnel;Enseignant Chercheur Titulaire;christian.nguyen@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;christian-nguyen;68760;188333975;univ-tln.fr;Christian;NGUYEN
+198307662;novotny;NOVOTNY Antonin;Personnel;Enseignant Chercheur Titulaire;antonin.novotny@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;antonin-novotny;68760;83649948;univ-tln.fr;Antonin;NOVOTNY
+198307662;seppeche;SEPPECHER Pierre;Personnel;Enseignant Chercheur Titulaire;pierre.seppecher@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;pierre-seppecher;68760;33236038;univ-tln.fr;Pierre;SEPPECHER
+198307662;veron;VERON Pascal;Personnel;Enseignant Chercheur Titulaire;pascal.veron@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;pascal-veron;68760;91474515;univ-tln.fr;Pascal;VERON
+198307662;champion;CHAMPION Thierry;Personnel;Enseignant Chercheur Titulaire;thierry.champion@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;thierry-champion;68760;192521373;univ-tln.fr;Thierry;CHAMPION
+198307662;yaubry;AUBRY Yves;Personnel;Enseignant Chercheur Titulaire;yves.aubry@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;yves-aubry;68760;94650756;univ-tln.fr;Yves;AUBRY
+198307662;galusins;GALUSINSKI Cédric;Personnel;Enseignant Chercheur Titulaire;cedric.galusinski@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;cedric-galusinski;68760;119019922;univ-tln.fr;Cédric;GALUSINSKI
+198307662;herbaut;HERBAUT Fabien;Personnel;Personnel Hébergé;fabien.herbaut@univ-tln.fr;IMATH;UO Reprise;UO_REP;fabien-herbaut;68760;104822562;univ-tln.fr;Fabien;HERBAUT
+198307662;yushchen;YUSHCHENKO Lyudmyla;Personnel;Enseignant Chercheur Titulaire;lyudmyla.yushchenko@univ-tln.fr;IMATH;IMATH;SeaTech;lyudmyla-yushchenko;68760;93403372;univ-tln.fr;Lyudmyla;YUSHCHENKO
+198307662;meloni;MELONI Nicolas;Personnel;Enseignant Chercheur Titulaire;nicolas.meloni@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;nicolas-meloni;68760;83648526;univ-tln.fr;Nicolas;MELONI
+198307662;faccanon;FACCANONI Gloria;Personnel;Enseignant Chercheur Titulaire;gloria.faccanoni@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;gloria-faccanoni;68760;13212405X;univ-tln.fr;Gloria;FACCANONI
+198307662;meradji;MERADJI Sofiane;Personnel;Personnel Administratif ou Technique Titulaire;sofiane.meradji@univ-tln.fr;IMATH;IMATH;IMATH;sofiane-meradji;68760;248352164;univ-tln.fr;Sofiane;MERADJI
+198307662;ersoy;ERSOY Mehmet;Personnel;Enseignant Chercheur Titulaire;mehmet.ersoy@univ-tln.fr;IMATH;IMATH;SeaTech;mehmet-ersoy;68760;150156952;univ-tln.fr;Mehmet;ERSOY
+198307662;jrobert;ROBERT Jean-marc;Personnel;Enseignant Chercheur Titulaire;jean-marc.robert@univ-tln.fr;IMATH;IMATH;UFR Sc. et Tech.;jean-marc-robert;68760;190125136;univ-tln.fr;Jean-marc;ROBERT
+198307662;abellard;ABELLARD Patrick;Personnel;Emérite;patrick.abellard@univ-tln.fr;IMSIC;IMSIC EA 4262;IMSIC;patrick-abellard;527028;99531771;univ-tln.fr;Patrick;ABELLARD
+198307662;quoniam;QUONIAM Luc;Personnel;Enseignant Chercheur Titulaire;luc.quoniam@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;luc-quoniam;527028;34105700;univ-tln.fr;Luc;QUONIAM
+198307662;renucci;RENUCCI Franck;Personnel;Enseignant Chercheur Titulaire;franck.renucci@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;franck-renucci;527028;99134004;univ-tln.fr;Franck;RENUCCI
+198307662;bulinge;BULINGE Franck;Personnel;Enseignant Chercheur Titulaire;franck.bulinge@univ-tln.fr;IMSIC;IMSIC;IUT MMI;franck-bulinge;527028;95070699;univ-tln.fr;Franck;BULINGE
+198307662;duvernay;DUVERNAY Daphné;Personnel;Enseignant Chercheur Titulaire;daphne.duvernay@univ-tln.fr;IMSIC;IMSIC;IUT TC;daphne-duvernay;527028;92248438;univ-tln.fr;Daphné;DUVERNAY
+198307662;aabellar;ABELLARD Alexandre;Personnel;Enseignant Chercheur Titulaire;alexandre.abellard@univ-tln.fr;IMSIC;IMSIC;IUT GEII;alexandre-abellard;527028;87663562;univ-tln.fr;Alexandre;ABELLARD
+198307662;zenouda;ZENOUDA Herve;Personnel;Enseignant Chercheur Titulaire;herve.zenouda@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;herve-zenouda;527028;112532594;univ-tln.fr;Herve;ZENOUDA
+198307662;durampar;DURAMPART Michel;Personnel;Enseignant Chercheur Titulaire;michel.durampart@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;michel-durampart;527028;60850728;univ-tln.fr;Michel;DURAMPART
+198307662;collet;COLLET Laurent;Personnel;Enseignant Chercheur Titulaire;laurent.collet@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;laurent-collet;527028;186366116;univ-tln.fr;Laurent;COLLET
+198307662;dreymond;REYMOND David;Personnel;Enseignant Chercheur Titulaire;david.reymond@univ-tln.fr;IMSIC;IMSIC;IUT TC;david-reymond;527028;122796527;univ-tln.fr;David;REYMOND
+198307662;nannipie;NANNIPIERI Olivier;Personnel;Enseignant Chercheur Titulaire;olivier.nannipieri@univ-tln.fr;IMSIC;IMSIC;IUT GEA La Garde;olivier-nannipieri;527028;177559748;univ-tln.fr;Olivier;NANNIPIERI
+198307662;amato;AMATO Stephane;Personnel;Enseignant Chercheur Titulaire;stephane.amato@univ-tln.fr;IMSIC;IMSIC;IUT MMI;stephane-amato;527028;18246508X;univ-tln.fr;Stephane;AMATO
+198307662;mcisse418;CISSE Mahamadou;Etudiants;Doctorant;mahamadou-cisse@etud.univ-tln.fr;IMSIC;Doctorat Sciences de l'information et de la communication;Formations ED 509 et 548;mahamadou-cisse;527028;84639989;univ-tln.fr;Mahamadou;CISSE
+198307662;denizart;DENIZART Jean-michel;Personnel;Enseignant Chercheur Titulaire;jean-michel.denizart@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;jean-micheldenizart;527028;230749313;univ-tln.fr;Jean-michel;DENIZART
+198307662;gagnebien;GAGNEBIEN Anne;Personnel;Enseignant Chercheur Titulaire;anne.gagnebien@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;anne-gagnebien;527028;175282838;univ-tln.fr;Anne;GAGNEBIEN
+198307662;pelissie;PELISSIER THIERIOT Maud;Personnel;Enseignant Chercheur Titulaire;maud.pelissier-thieriot@univ-tln.fr;IMSIC;IMSIC;UFR Ingémédia;maud-pelissier-thieriot;527028;13740641X;univ-tln.fr;THIERIOT;PELISSIER
+198307662;bruno;BRUNO Emmanuel;Personnel;Enseignant Chercheur Titulaire;emmanuel.bruno@univ-tln.fr;LIS;LIS;UFR Sc. et Tech.;emmanuel-bruno;527033;102365776;univ-tln.fr;Emmanuel;BRUNO
+198307662;glotin;GLOTIN Hervé;Personnel;Enseignant Chercheur Titulaire;herve.glotin@univ-tln.fr;LIS;LIS;UFR Sc. et Tech.;herve-glotin;527033;112112501;univ-tln.fr;Hervé;GLOTIN
+198307662;boizot;BOIZOT Nicolas;Personnel;Enseignant Chercheur Titulaire;nicolas.boizot@univ-tln.fr;LIS;IUT GEII;LIS;nicolas-boizot;527033;146919300;univ-tln.fr;Nicolas;BOIZOT
+198307662;chittaro;CHITTARO Francesca;Personnel;Enseignant Chercheur Titulaire;francesca.chittaro@univ-tln.fr;LIS;IUT GEII;LIS;francesca-carlotta-chittaro;527033;22614688X;univ-tln.fr;Francesca;CHITTARO
+198307662;luciani;LUCIANI Xavier;Personnel;Enseignant Chercheur Titulaire;xavier.luciani@univ-tln.fr;LIS;LIS;SeaTech;xavier-luciani;527033;120562871;univ-tln.fr;Xavier;LUCIANI
+198307662;busvelle;BUSVELLE Eric;Personnel;Enseignant Chercheur Titulaire;eric.busvelle@univ-tln.fr;LIS;IUT GEII;LIS;eric-busvelle;527033;146919726;univ-tln.fr;Eric;BUSVELLE
+198307662;tnguyen108;NGUYEN THANH TUAN;Etudiants;Doctorant;thanh-tuan-nguyen2@etud.univ-tln.fr;LIS;Doctorat Informatique;Formations ED 509 et 548;nguyen-tuan-thanh-le;527033;22134196X;univ-tln.fr;THANH;NGUYEN
+198307662;mtlig458;TLIG MOHAMED;Etudiants;Doctorant;mohamed-tlig@etud.univ-tln.fr;LIS;Doctorat Automatique, signal, productique, robotique;Formations ED 509 et 548;mtlig;527033;18624973X;univ-tln.fr;MOHAMED;TLIG
+198307662;chailan;CHAILAN Jean-francois;Personnel;Enseignant Chercheur Titulaire;jean-francois.chailan@univ-tln.fr;MAPIEM;MAPIEM;UFR Sc. et Tech.;jean-francois-chailan;84790;112506933;univ-tln.fr;Jean-francois;CHAILAN
+198307662;piazzola;PIAZZOLA Jacques;Personnel;Enseignant Chercheur Titulaire;jacques.piazzola@univ-tln.fr;MIO;MIO;SeaTech;jacques-piazzola;191652;87894904;univ-tln.fr;Jacques;PIAZZOLA
+198307662;tedeschi;TEDESCHI Gilles;Personnel;Enseignant Chercheur Titulaire;gilles.tedeschi@univ-tln.fr;MIO;MIO;SeaTech;gilles-tedeschi;191652;114335346;univ-tln.fr;Gilles;TEDESCHI
+198307662;luce;LUCE Hubert;Personnel;Enseignant Chercheur Titulaire;hubert.luce@univ-tln.fr;MIO;UFR Sc. et Tech.;TEC;hubert-luce;191652;167930826;univ-tln.fr;Hubert;LUCE
+198307662;guerin;GUERIN Charles-antoine;Personnel;Enseignant Chercheur Titulaire;charles-antoine.guerin@univ-tln.fr;MIO;MIO;UFR Sc. et Tech.;charles-antoine-guerin;191652;102521530;univ-tln.fr;Charles-antoine;GUERIN
+198307662;sous;SOUS Damien;Personnel;Enseignant Chercheur Titulaire;damien.sous@univ-tln.fr;MIO;MIO;SeaTech;sous-damien;191652;77924916;univ-tln.fr;Damien;SOUS
+198307662;touboul;TOUBOUL Julien;Personnel;Enseignant Chercheur Titulaire;julien.touboul@univ-tln.fr;MIO;MIO;SeaTech;julien-touboul;191652;123399424;univ-tln.fr;Julien;TOUBOUL
+198307662;coupe;COUPE Stephane;Personnel;Enseignant Chercheur Titulaire;stephane.coupe@univ-tln.fr;MIO;IUT BIO;MIO;stephane-coupe;191652;102195749;univ-tln.fr;Stephane;COUPE
+198307662;prevot;PREVOT D'ALVISE Nathalie;Personnel;Enseignant Chercheur Titulaire;nathalie.prevot-dalvise@univ-tln.fr;MIO;IUT BIO;MIO;nathalie-prevot-dalvise;191652;122034996;univ-tln.fr;D'ALVISE;PREVOT
+198307662;pioch;PIOCH Sébastien;Personnel;Enseignant Chercheur Titulaire;sebastien.pioch@univ-tln.fr;MIO;IUT GEII;MIO;sebastien-pioch;191652;87541491;univ-tln.fr;Sébastien;PIOCH
+198307662;zakardji;ZAKARDJIAN Bruno;Personnel;Enseignant Chercheur Titulaire;bruno.zakardjian@univ-tln.fr;MIO;MIO;UFR Sc. et Tech.;bruno-zakardjian;191652;174789033;univ-tln.fr;Bruno;ZAKARDJIAN
+198307662;francius;FRANCIUS Marc;Personnel;Enseignant Chercheur Titulaire;marc.francius@univ-tln.fr;MIO;MIO;SeaTech;marc-francius;191652;79087337;univ-tln.fr;Marc;FRANCIUS
+198307662;ourmiere;OURMIERES Yann;Personnel;Enseignant Chercheur Titulaire;yann.ourmieres@univ-tln.fr;MIO;MIO;UFR Sc. et Tech.;yann-ourmieres;191652;17497857X;univ-tln.fr;Yann;OURMIERES
+198307662;misson;MISSON Benjamin;Personnel;Enseignant Chercheur Titulaire;benjamin.misson@univ-tln.fr;MIO;IUT BIO;MIO;benjamin-misson;191652;159028760;univ-tln.fr;Benjamin;MISSON
+198307662;hajjoul;HAJJOUL Houssam;Personnel;Personnel Administratif ou Technique Titulaire;houssam.hajjoul@univ-tln.fr;MIO;MIO;MIO;houssam-hajjoul;191652;156887975;univ-tln.fr;Houssam;HAJJOUL
+198307662;enavarro;NAVARRO Elisabeth;Personnel;Personnel Hébergé;elisabeth.navarro@univ-tln.fr;MIO;UO Reprise;UO_REP;elisabeth-navarro;191652;87109255;univ-tln.fr;Elisabeth;NAVARRO
+198307662;sanial;SANIAL Virginie;Personnel;Enseignant Chercheur Titulaire;virginie.sanial@univ-tln.fr;MIO;MIO;UFR Sc. et Tech.;virginie-sanial;191652;194011127;univ-tln.fr;Virginie;SANIAL
+198307662;cebrean;BREANDON Christine;Personnel;Enseignant Titulaire;christine.breandon@univ-tln.fr;;IUT MMI;IUTMMI;christine-breandon;;169002896;univ-tln.fr;Christine;BREANDON
+198307662;slafon;LAFON Sylvie;Personnel;Enseignant Titulaire;sylvie.lafon@univ-tln.fr;;IUT GEA La Garde;IUTGEA;sylvie-kleiman-lafon;;32121725;univ-tln.fr;Sylvie;LAFON
+198307662;mille;MILLE Marie-laure;Personnel;Enseignant Chercheur Titulaire;marie-laure.mille@univ-tln.fr;;Labo. Extérieurs;UFR Staps;marie-laure-mille;;07095240X;univ-tln.fr;Marie-laure;MILLE
+198307662;rabah;RABAH Nadia;Personnel;Enseignant Chercheur Titulaire;nadia.rabah@univ-tln.fr;;UFR Sc. et Tech.;TEC;rabahrabah;;182695697;univ-tln.fr;Nadia;RABAH
+198307662;irichard;RICHARD Isabelle;Personnel;Enseignant Titulaire;isabelle.richard@univ-tln.fr;;UFR Sc. et Tech.;TEC;isabelle-richard;;177586249;univ-tln.fr;Isabelle;RICHARD
+198307662;moutte;PERRIN Julie;Personnel;Enseignant Titulaire;julie.perrin@univ-tln.fr;;IUT TC;IUTTCO;perrin-julie;;111079322;univ-tln.fr;Julie;PERRIN
+198307662;lassalle;LASSALLE Geoffrey;Personnel;Enseignant Contractuel;geoffrey.lassalle@univ-tln.fr;;UFR Staps;STA;geoffrey-lassalle;;235601179;univ-tln.fr;Geoffrey;LASSALLE

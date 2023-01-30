@@ -189,6 +189,7 @@ def create_researchers_index(pg):
         cpt += 1
         percentage = 66 + 33 * (cpt / len(cleaned_es_researchers))
         pg.set_progress(int(percentage), 100, description=progress_description)
+        # rajouter la fonction idhalcheckout pour valider la ligne avant d'essayer de la traiter
         if row["structSirene"] in structIdlist:
             row["labHalId"] = row["labHalId"].strip()
             if 'validated' in row.keys():
@@ -206,15 +207,16 @@ def create_researchers_index(pg):
                 connait_lab = row["labHalId"]
                 old_lab = row['labHalId']
 
-            row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empêchant une erreur venant de SPARQL
+            row['aurehalId'] = archivesOuvertes.get_aurehalId(row['halId_s'])
+            print(row['aurehalId'])
+            # row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empêchant une erreur venant de SPARQL
             try:
-                row['aurehalId'] = row['aurehalId'].replace(' --> En erreur, contactez-nous', '').strip()
                 archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(int(row['aurehalId']))
             except:
                 archives_ouvertes_data = dict()
                 archives_ouvertes_data['concepts'] = []
-                row['aurehalId'] = str(row['aurehalId']) + " --> En erreur, contactez-nous"
-                print("aille archives_ouvertes_data, ", row['aurehalId'])
+                row['aurehalId'] = -1
+                print(f"erreur archives_ouvertes_data, {row['halId_s']}:{row['aurehalId']}")
             time.sleep(1)
 
             if "guidingKeywords" not in row:  # si le champ n'existe pas (ou vide) met la valeur à [], sinon persistance des données
@@ -262,9 +264,7 @@ def create_researchers_index(pg):
                     es.indices.put_mapping(
                         index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row[
                             "ldapId"] + "-documents",
-                        doc_type='_doc',
                         body=docmap,
-                        include_type_name=True
                     )
                     es.index(index=row['structSirene'] + "-" + connait_lab + "-researchers", id=row['ldapId'],
                              body=json.dumps(row))
@@ -274,9 +274,7 @@ def create_researchers_index(pg):
                         "ldapId"] + "-documents")  # -researchers" + row["ldapId"] + "-documents" ?
                     es.indices.put_mapping(
                         index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
-                        doc_type='_doc',
                         body=docmap,
-                        include_type_name=True
                     )
                 else:
                     try:
@@ -299,9 +297,7 @@ def create_researchers_index(pg):
                     index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents")
                 es.indices.put_mapping(
                     index=row["structSirene"] + "-" + connait_lab + "-researchers-" + row["ldapId"] + "-documents",
-                    doc_type='_doc',
                     body=docmap,
-                    include_type_name=True
                     )
 
             if not es.indices.exists(index=row["structSirene"] + "-" + connait_lab + "-laboratories"):
@@ -309,9 +305,7 @@ def create_researchers_index(pg):
 
                 es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents")
                 es.indices.put_mapping(index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents",
-                                       doc_type='_doc',
                                        body=docmap,
-                                       include_type_name=True
                                        )
             percentage += (33.0 / len(cleaned_es_researchers))
             progress_description = row["ldapId"] + " updated"
@@ -468,10 +462,7 @@ def create_laboratories_index(pg):
 
             es.indices.create(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents")
             es.indices.put_mapping(index=row['structSirene'] + "-" + row["halStructId"] + "-laboratories-documents",
-                                   doc_type='_doc',
                                    body=docmap,
-                                   include_type_name=True
-
                                    )
         percentage += (33.0 / len(cleaned_es_laboratories))
         progress_description = row["acronym"] + " updated"
