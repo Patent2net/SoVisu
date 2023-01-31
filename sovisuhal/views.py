@@ -1237,9 +1237,11 @@ def default_checker(request, basereverse, default_data=None):
     # default_data ='' #use only if that parameter is needed
     # basereverse = ''
     # return default_checker(request, basereverse)
-
-    p_id = request.user.get_username()  # check si l'utilisateur est log
-    p_id = p_id.replace(viewsActions.patternCas, '').lower()
+    try:
+        p_id = request.user.get_display_id() # cas log ?
+    except:
+        p_id = request.user.get_username()  # check si l'utilisateur est log
+    #p_id = p_id.replace(viewsActions.patternCas, '').lower()
 
     if p_id == 'adminlab':  # si p_id adminlab on considère que son i_type par défaut est lab
         indexcat = "lab"
@@ -1346,5 +1348,4 @@ def get_date(request, start_date):
         date_to = request.GET['to']
     else:
         date_to = datetime.today().strftime('%Y-%m-%d')
-
     return date_from, date_to

@@ -25,7 +25,7 @@ try:
     from uniauth.decorators import login_required
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-    patternCas = 'cas-utln-'  # motif à enlever aux identifiants CAS
+    patternCas = 'cas-universite-de-toulon-'  # motif à enlever aux identifiants CAS
 except:
     from django.contrib.auth.decorators import login_required
 
