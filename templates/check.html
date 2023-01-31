@@ -1235,9 +1235,9 @@
                 table.rows('.selected').data().map(function (row) {
 
                     {% if validation == "1" and type == "rsr" %}
-                        toValidate.push(row[5])
+                        toValidate.push(row[6])
                     {% else %}
-                        toValidate.push(row[4])
+                        toValidate.push(row[5])
                     {% endif %}
                 });
 
