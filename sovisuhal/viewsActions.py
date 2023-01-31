@@ -1,23 +1,18 @@
 import json
-from bs4 import BeautifulSoup
 from datetime import datetime
+from io import BytesIO as B_io
 from urllib.request import urlopen
 
+import pandas as pd
+from bs4 import BeautifulSoup
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
+from elasticHal.libs import utils
+from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
 from sovisuhal.libs.elastichal import indexe_chercheur, collecte_docs
 from . import settings
 from .libs import esActions
-from elasticHal.libs import utils
-
-from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
-
-import pandas as pd
-from io import BytesIO as B_io
-
-from elasticHal import collect_from_HAL
-
 
 try:
     from decouple import config
@@ -57,7 +52,6 @@ def admin_access_login(request):
         elif auth_user == 'guestutln' or auth_user == 'guestUtln':
             return redirect("/index/?indexcat=rsr&indexstruct=198307662")
         else:
-            # auth_user = request.user.get_username()
             auth_user = auth_user.replace(patternCas, '').lower()
 
             field = "_id"
@@ -69,9 +63,9 @@ def admin_access_login(request):
                 struct = entity['structSirene']
                 date_to = datetime.today().strftime('%Y-%m-%d')
                 return redirect(
-                    'check/?struct=' + struct + '&type=rsr&id=' + auth_user + '&from=1990-01-01&to='+date_to+'&data=credentials')
+                    f"check/?struct={struct}&type=rsr&id={auth_user}&from=1990-01-01&to={date_to}&data=credentials")
             else:
-                return redirect('create/?ldapid=' + auth_user + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone')
+                return redirect(f"create/?ldapid={auth_user}&halId_s=nullNone&orcId=nullNone&idRef=nullNone")
 
 
 def create_credentials(request):
@@ -82,7 +76,7 @@ def create_credentials(request):
     idref = request.POST.get('f_IdRef')
     idhal = request.POST.get('f_halId_s')
     orcid = request.POST.get('f_orcId')
-    # structId = request.POST.get ('structId')
+
     tempo_lab = request.POST.get('f_labo')  # chaine de caractère
     tempo_lab = tempo_lab.replace("'", "")
     tempo_lab = tempo_lab.replace('(', '')
@@ -96,7 +90,7 @@ def create_credentials(request):
 
     if idhal_test == 0:
         print("idhal not found")
-        return redirect('/create/?ldapid=' + ldapid + '&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True')
+        return redirect(f"/create/?ldapid={ldapid}&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
 
     else:
         print("idhal found")
@@ -116,7 +110,7 @@ def create_credentials(request):
         # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
         date_to = datetime.today().strftime('%Y-%m-%d')
         return redirect(
-            '/check/?struct=' + struct + '&type=rsr&id=' + ldapid + '&orcId=' + orcid + '&from=1990-01-01&to='+date_to+'&data=credentials')
+            f"/check/?struct={struct}&type=rsr&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials")
 
 
 # Redirects
@@ -168,7 +162,7 @@ def validate_references(request):
     if i_type == "rsr":
         scope_param = esActions.scope_p("_id", p_id)
 
-        res = es.search(index=struct + "-*-researchers", body=scope_param)
+        res = es.search(index=f"{struct}-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
         except Exception as e:
@@ -179,22 +173,22 @@ def validate_references(request):
 
             to_validate = request.POST.get("toValidate", "").split(",")
             for docid in to_validate:
-                es.update(index=struct + '-' + entity['labHalId'] + "-researchers-" + entity['ldapId'] + "-documents",
+                es.update(index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
                           refresh='wait_for', id=docid,
                           body={"doc": {"validated": validate}})
                 try:
-                    es.update(index=struct + '-' + entity["labHalId"] + "-laboratories-documents", refresh='wait_for',
+                    es.update(index=f"{struct}-{entity['labHalId']}-laboratories-documents", refresh='wait_for',
                               id=docid,
                               body={"doc": {"validated": validate}})
                 except Exception as e:
-                    print(struct + '-' + entity["labHalId"] + "-laboratories-documents")
+                    print(f"{struct}-{entity['labHalId']}-laboratories-documents")
                     print(e)
                     pass  # doc du chercheur pas dans le labo
 
     if i_type == "lab":
         scope_param = esActions.scope_p("_id", p_id)
 
-        res = es.search(index=struct + "-*-laboratories", body=scope_param)
+        res = es.search(index=f"{struct}-*-laboratories", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
         except:
@@ -203,12 +197,12 @@ def validate_references(request):
         if request.method == 'POST':
             to_validate = request.POST.get("toValidate", "").split(",")
             for docid in to_validate:
-                es.update(index=struct + '-' + entity["halStructId"] + "-laboratories-documents", refresh='wait_for',
+                es.update(index=f"{struct}-{entity['halStructId']}-laboratories-documents", refresh='wait_for',
                           id=docid,
                           body={"doc": {"validated": validate}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data + '&validation=' + validation)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}")
 
 
 def validate_guiding_domains(request):
@@ -249,21 +243,21 @@ def validate_guiding_domains(request):
         if i_type == "rsr":
             scope_param = esActions.scope_p("_id", p_id)
 
-            res = es.search(index=struct + "-*-researchers", body=scope_param)
+            res = es.search(index=f"{struct}-*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
             except:
                 return redirect('unknown')
 
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
+            es.update(index=f"{struct}-{entity['labHalId']}-researchers", refresh='wait_for', id=p_id,
                       body={"doc": {"guidingDomains": to_validate}})
 
         if i_type == "lab":
-            es.update(index=struct + "-" + p_id + "-laboratories", refresh='wait_for', id=p_id,
+            es.update(index=f"{struct}-{p_id}-laboratories", refresh='wait_for', id=p_id,
                       body={"doc": {"guidingDomains": to_validate}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}")
 
 
 def validate_expertise(request):
@@ -313,19 +307,19 @@ def validate_expertise(request):
     if i_type == "rsr":
         scope_param = esActions.scope_p("_id", p_id)
 
-        res = es.search(index=struct + "-*-researchers", body=scope_param)
+        res = es.search(index=f"{struct}-*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
         except:
             return redirect('unknown')
 
-        index = struct + '-' + entity['labHalId'] + '-researchers'
-        lab_index = struct + '-' + entity['labHalId'] + '-laboratories'
+        index = f"{struct}-{entity['labHalId']}-researchers"
+        lab_index = f"{struct}-{entity['labHalId']}-laboratories"
 
         # get tree from lab
         lab_scope_param = esActions.scope_p("_id", entity['labHalId'])
 
-        res = es.search(index=struct + "*-laboratories", body=lab_scope_param)
+        res = es.search(index=f"{struct}*-laboratories", body=lab_scope_param)
         entity_lab = res['hits']['hits'][0]['_source']
 
         lab_tree = entity_lab['concepts']
@@ -362,8 +356,7 @@ def validate_expertise(request):
                       body={"doc": {"concepts": lab_tree}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data
-        + '&validation=' + validation)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}")
 
 
 def validate_credentials(request):
@@ -406,82 +399,27 @@ def validate_credentials(request):
 
             scope_param = esActions.scope_p("_id", p_id)
 
-            res = es.search(index=struct + "*-researchers", body=scope_param)
+            res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
             except:
                 return redirect('unknown')
 
-            print(struct + "-" + entity['labHalId'] + '-researchers')
+            print(f"{struct}-{entity['labHalId']}-researchers")
 
-            es.update(index=struct + "-" + entity['labHalId'] + '-researchers', refresh='wait_for', id=p_id,
+            es.update(index=f"{struct}-{entity['labHalId']}-researchers", refresh='wait_for', id=p_id,
                       body={"doc": {"idRef": idref, "orcId": orcid, "validated": True, "function": function}})
 
         if i_type == "lab":
             rsnr = request.POST.get("f_rsnr")
             idref = request.POST.get("f_IdRef")
 
-            es.update(index=struct + "-" + p_id + "-laboratories", refresh='wait_for', id=p_id,
+            es.update(index=f"{struct}-{p_id}-laboratories", refresh='wait_for', id=p_id,
                       body={"doc": {"rsnr": rsnr, "idRef": idref, "validated": True}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}")
 
-#
-# def validate_guiding_keywords(request):
-#     """
-#     Validation des mots clés de guidance
-#     """
-#     # Get parameters
-#     if 'struct' in request.GET:
-#         struct = request.GET['struct']
-#     else:
-#         return redirect('unknown')
-#
-#     if 'type' in request.GET and 'id' in request.GET:
-#         i_type = request.GET['type']
-#         p_id = request.GET['id']
-#     else:
-#         return redirect('unknown')
-#
-#     if 'data' in request.GET:
-#         data = request.GET['data']
-#     else:
-#         data = -1
-#
-#     if 'from' in request.GET:
-#         date_from = request.GET['from']
-#     else:
-#         date_from = '2000-01-01'
-#
-#     if 'to' in request.GET:
-#         date_to = request.GET['to']
-#     else:
-#         date_to = datetime.today().strftime('%Y-%m-%d')
-#
-#     if request.method == 'POST':
-#
-#         guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
-#
-#         if i_type == "rsr":
-#             scope_param = esActions.scope_p("_id", p_id)
-#
-#             res = es.search(index=struct + "*-researchers", body=scope_param)
-#             try:
-#                 entity = res['hits']['hits'][0]['_source']
-#             except:
-#                 return redirect('unknown')
-#
-#             es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
-#                       body={"doc": {"guidingKeywords": guiding_keywords}})
-#
-#         if i_type == "lab":
-#             es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
-#                       body={"doc": {"guidingKeywords": guiding_keywords}})
-#
-#     return redirect(
-#         '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
-#
 
 def validate_research_description(request):
     """
@@ -532,13 +470,13 @@ def validate_research_description(request):
         if i_type == "rsr":
             scope_param = esActions.scope_p("_id", p_id)
 
-            res = es.search(index=struct + "*-researchers", body=scope_param)
+            res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res['hits']['hits'][0]['_source']
             except:
                 return redirect('unknown')
 
-            es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
+            es.update(index=f"{struct}-{entity['labHalId']}-researchers", refresh='wait_for', id=p_id,
                       body={"doc": {"research_summary": research_summary, "research_summary_raw": research_summary_raw,
                                     "research_projectsInProgress": research_projects_in_progress,
                                     "research_projectsInProgress_raw": research_projects_in_progress_raw,
@@ -549,11 +487,11 @@ def validate_research_description(request):
                                     }})
 
         elif i_type == "lab":
-            es.update(index=struct + "-" + str(p_id) + "-laboratories", refresh='wait_for', id=p_id,
+            es.update(index=f"{struct}-{str(p_id)}-laboratories", refresh='wait_for', id=p_id,
                       body={"doc": {"guidingKeywords": guiding_keywords}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}")
 
 
 def refresh_aurehal_id(request):
@@ -589,7 +527,7 @@ def refresh_aurehal_id(request):
 
     scope_param = esActions.scope_p("_id", p_id)
 
-    res = es.search(index=struct + "*-researchers", body=scope_param)
+    res = es.search(index=f"{struct}*-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
     except:
@@ -601,11 +539,11 @@ def refresh_aurehal_id(request):
         archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)
         concepts = utils.filter_concepts(archives_ouvertes_data['concepts'], validated_ids=[])
 
-    es.update(index=struct + "-" + entity['labHalId'] + "-researchers", refresh='wait_for', id=p_id,
+    es.update(index=f"{struct}-{entity['labHalId']}-researchers", refresh='wait_for', id=p_id,
               body={"doc": {"aurehalId": aurehal_id, 'concepts': concepts}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}")
 
 
 def force_update_references(request):
@@ -644,7 +582,7 @@ def force_update_references(request):
     if i_type == "rsr":
         scope_param = esActions.scope_p("_id", p_id)
 
-        res = es.search(index=struct + "*-researchers", body=scope_param)
+        res = es.search(index=f"{struct}*-researchers", body=scope_param)
         try:
             entity = res['hits']['hits'][0]['_source']
         except:
@@ -653,7 +591,7 @@ def force_update_references(request):
         collecte_docs(entity)
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=references' + '&validation=1')
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data=references&validation=1")
 
 
 def update_members(request):
@@ -700,13 +638,13 @@ def update_members(request):
                 entity = res['hits']['hits'][0]['_source']
             except:
                 return redirect(
-                    '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+                    f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}")
             es.update(index=res['hits']['hits'][0]['_index'],
                       refresh='wait_for', id=entity['ldapId'],
                       body={"doc": {"axis": element[1]}})
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data)
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}")
 
 
 def update_authorship(request):
@@ -742,7 +680,7 @@ def update_authorship(request):
 
     scope_param = esActions.scope_p("ldapId", p_id)
 
-    res = es.search(index=struct + "-" + "*" + "-researchers", body=scope_param)
+    res = es.search(index=f"{struct}-*-researchers", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
     except:
@@ -757,7 +695,7 @@ def update_authorship(request):
             field = "_id"
             doc_param = esActions.scope_p(field, doc["docid"])
 
-            res = es.search(index=struct + "-" + entity["labHalId"] + "-researchers-" + entity["ldapId"] + "-documents",
+            res = es.search(index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
                             body=doc_param)
 
             if len(res['hits']['hits']) > 0:
@@ -779,7 +717,7 @@ def update_authorship(request):
                     {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
                 ]
 
-            es.update(index=struct + '-' + entity['labHalId'] + "-researchers-" + entity["ldapId"] + '-documents',
+            es.update(index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
                       refresh='wait_for', id=doc['docid'],
                       body={"doc": {"authorship": authorship}})
 
@@ -787,7 +725,7 @@ def update_authorship(request):
             field = "_id"
             doc_param = esActions.scope_p(field, doc["docid"])
 
-            res = es.search(index=struct + "-" + entity["labHalId"] + "-laboratories-documents",
+            res = es.search(index=f"{struct}-{entity['labHalId']}-laboratories-documents",
                             body=doc_param)
 
             try:
@@ -810,16 +748,16 @@ def update_authorship(request):
                         {"authorship": doc["authorship"], "halId_s": entity['halId_s']}
                     ]
 
-                es.update(index=struct + '-' + entity['labHalId'] + "-laboratories-documents",
+                es.update(index=f"{struct}-{entity['labHalId']}-laboratories-documents",
                           refresh='wait_for', id=doc['docid'],
                           body={"doc": {"authorship": authorship}})
             except:
-                print("docid " + str(doc["docid"]) + " non trouvé dans l'index des labs...")
+                print(f"docid {str(doc['docid'])} non trouvé dans l'index des labs...")
     except:
         pass
 
     return redirect(
-        '/check/?struct=' + struct + '&type=' + i_type + '&id=' + p_id + '&from=' + date_from + '&to=' + date_to + '&data=' + data + "&validation=1")
+        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation=1")
 
 
 def export_hceres_xls(request):
@@ -843,7 +781,7 @@ def export_hceres_xls(request):
     key = "halStructId"
     ext_key = "harvested_from_ids"
 
-    res = es.search(index=struct + "-" + p_id + "-laboratories", body=scope_param)
+    res = es.search(index=f"{struct}-{p_id}-laboratories", body=scope_param)
     try:
         entity = res['hits']['hits'][0]['_source']
     except:
@@ -865,10 +803,10 @@ def export_hceres_xls(request):
     date_to = "2021-12-31"
     ref_param = esActions.ref_p(scope_bool_type, ext_key, entity[key], validate, date_range_type, date_from, date_to)
 
-    count = es.count(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param)['count']
-    print(struct + "-" + entity["halStructId"] + "-laboratories-documents")
+    count = es.count(index=f"{struct}-{entity['halStructId']}-laboratories-documents", body=ref_param)['count']
+    print(f"{struct}-{entity['halStructId']}-laboratories-documents")
     print(count)
-    references = es.search(index=struct + "-" + entity["halStructId"] + "-laboratories-documents", body=ref_param,
+    references = es.search(index=f"{struct}-{entity['halStructId']}-laboratories-documents", body=ref_param,
                            size=count)
 
     from .libs import hceres
@@ -933,7 +871,7 @@ def export_hceres_xls(request):
 
     output.seek(0)
 
-    filename = 'hceres_' + entity["acronym"] + '.xlsx'
+    filename = f"hceres_{entity['acronym']}.xlsx"
     response = HttpResponse(
         output,
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -948,7 +886,7 @@ def idhal_checkout(idhal):
     Vérifie si le halId renseigné existe
     """
     # idhal = "luc-quoniam" valeur test
-    html = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + idhal
+    html = f"https://api.archives-ouvertes.fr/search/?q=authIdHal_s:{idhal}"
     response = urlopen(html)
 
     data_json = json.loads(response.read())
@@ -969,10 +907,9 @@ def vizualisation_url():
     print("mode: ")
     print(mode)
     if mode == "dev":
-        url = "http://127.0.0.1:5601"
-        url = "/kibana"
+        url = "http://127.0.0.1:5601/kibana"
+        # url = "/kibana"
     else:
         url = "/kibana"
 
     return url
-
