@@ -30,7 +30,7 @@ SECRET_KEY = 'zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)'
 
 if mode == 'Prod':
     SECRET_KEY = config('DjangoKey')
-    DEBUG = config('DJANGO_DEBUG')
+    DEBUG = False # config('DJANGO_DEBUG')
     # Settings used by Uniauth
     LOGIN_URL = '/accounts/login/'
     # PASSWORD_RESET_TIMEOUT_DAYS = 3
@@ -77,8 +77,6 @@ else:
     DEBUG = 'False'#'True'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
-
 
 # Application definition
 
@@ -185,8 +183,6 @@ Dns = ["http://localhost", "http://localhost:*", "http://127.0.0.1:*",]
 # CSP_MANIFEST_SRC = Bibi
 # CSP_WORKER_SRC = Bibi
 # CSP_MEDIA_SRC = Bibi
-
-
 
 #X_FRAME_OPTIONS = 'ALLOW-FROM ' + " " .join(Dns)
 X_FRAME_OPTIONS = 'sameorigin'

@@ -22,19 +22,20 @@ def es_connector(mode=mode):
 
         secret = config('ELASTIC_PASSWORD')
         # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch('localhost',
-                           http_auth=('elastic', secret),
-                           scheme="http",
-                           port=9200)
+        es = Elasticsearch('http://elasticsearch:9200',
+                           basic_auth=('elastic', secret),
+                           http_compress=True, connections_per_node=5, request_timeout=200, retry_on_timeout=True)
+        es.options(request_timeout=100, retry_on_timeout=True, max_retries=5)
 
     else:
-        #es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-        es = Elasticsearch('http://localhost:9200', http_compress=True,  connections_per_node=5, request_timeout=200, retry_on_timeout=True)
+        # es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+        es = Elasticsearch('http://localhost:9200', http_compress=True, connections_per_node=5, request_timeout=200,
+                           retry_on_timeout=True)
 
-        es.options(request_timeout=100, retry_on_timeout= True, max_retries=5).cluster.health(
+        es.options(request_timeout=100, retry_on_timeout=True, max_retries=5).cluster.health(
             wait_for_no_initializing_shards=True,
             wait_for_no_relocating_shards=False,
-            wait_for_status="green" # yellow doit pas forcément marcher si pas un cluster !
+            wait_for_status="green"  # yellow doit pas forcément marcher si pas un cluster !
         )
 
     return es
