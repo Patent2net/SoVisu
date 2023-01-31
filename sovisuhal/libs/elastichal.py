@@ -28,13 +28,14 @@ except:
 from SPARQLWrapper import SPARQLWrapper, JSON
 import requests
 
+# Connect to DB
+es = esActions.es_connector()
 
 # @shared_task(bind=True)
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
     """
-    es = esActions.es_connector()
     #   progress_recorder = ProgressRecorder(self)
     #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
     if mode == "Prod":
@@ -160,7 +161,6 @@ def collecte_docs(chercheur):  # self,
     init = False  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
 
-    es = esActions.es_connector()
     #  progress_recorder = ProgressRecorder(self)
     #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
     # Insert documents collection
