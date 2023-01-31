@@ -1,52 +1,10 @@
-{#{% load csp %}##}
 {% include "includes/header.html" with title="Explorations lexicales" %}
 
-
-{% comment %}<script>
- $(id="dashkib").ready(function() {
-                        $('.kbnTopNavMenu__wrapper').css('display', 'none');
-                        $('#kbnPresentationToolbar__solutionToolbar').css('display', 'none');
-                   });
-
-{#$("#dashkib").on("load", function() {#}
-{#  let head = $("#myiFrame").contents().find("head");#}
-{#  let css = '<style>#kbnPresentationToolbar__solutionToolbar {display: none;}</style>';#}
-{#  $(head).append(css);#}
-{# });#}
-{#    $(document).ready(function(){#}
-{#        var ifram=document.getElementById('dashkib');#}
-{#        if (ifram.contentDocument.readyState=="complete") {#}
-{#            ifram.contentWindow.$("div#kbnPresentationToolbar__solutionToolbar.euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive.solutionToolbar.solutionToolbar--light").css("display", "none");#}
-{#        }#}
-{#        else {setTimeout(hideMenu(), 500);}#}
-{#    })#}
-{##}
-{#    $(document).ready(function(){#}
-{#        $('dashkib').ready(function(){#}
-{#          $("div#kbnPresentationToolbar__solutionToolbar.euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive.solutionToolbar.solutionToolbar--light").css("display", "none");#}
-{#            $("dashkib").contents().find(".kbnTopNavMenu__wrapper").css("display", "none");#}
-{#            $("dashkib").contents().find("#kbnPresentationToolbar__solutionToolbar").css("display", "none");#}
-{#        });#}
-{#   });#}
-{##}
-    function hideMenu() {
-  var iframe = document.getElementsByTagName("iframe");
-  if (iframe && iframe.contentWindow) {
-      $("div#kbnPresentationToolbar__solutionToolbar.euiFlexGroup.euiFlexGroup--gutterSmall.euiFlexGroup--directionRow.euiFlexGroup--responsive.solutionToolbar.solutionToolbar--light").css("display", "none");
-      iframe.contentWindow.document.contents().find(".kbnTopNavMenu__wrapper").css("display", "none");
-      iframe.contentWindow.document.contents().find("#kbnPresentationToolbar__solutionToolbar").css("display", "none");
-  }
- }
-$(document).ready(function(){
-    $('dashkib').ready(function(){hideMenu()})})
-
-{#   </script>#}
-</script>{% endcomment %}
-<div class="h-full w-full flex ">
+<div class="w-full flex" style="height:calc(100% - 48px)">
 
     {% include "includes/menu.html" with title="Nuage de Mots" %}
 
-    <div class="w-full h-full p-1 relative" style="background: #fafbfd;">
+    <div class="w-full  p-3 relative" style="background: #fafbfd;">
 
         <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
             <div class="absolute inset-center text-sm flex">
@@ -60,89 +18,90 @@ $(document).ready(function(){
             </div>
         </div>
 
-        {% if lang == "all" %}
-            <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-
-                    <p>Ci dessous le lexique et sa distribution temporelle extraits des mots-clés auteur issus des productions validées associées à votre profil. Le bouton de filtrage permet de pointer spécifiquement des éventuelles erreurs ou des manques.</p>
-
+        <div class="flex flex-col bg-white rounded h-full relative w-full" style="border: 1px solid rgb(211, 218, 230); padding: 6px 8px">
+            <div class="flex justify-between items-start">
+                <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1 pt-2">
+                        {% for language in lang_options %}
+                           <a class="px-2 pb-1 text-gray-600 {% if lang == language %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}"
+                              href="/wordcloud/?struct={{ struct }}&type={{ type }}&id={{ id }}&lang={{ language }}">
+                               {{ language }}</a> {% endfor %}
                 </div>
-            {% if type == "lab" %}
-                <div class="w-full h-full">
+            </div>
 
-{#                    <iframe src="{{ url }}/app/dashboards#/view/d4df0830-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%"></iframe>#}
-                    <iframe src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%" id="dashkib"></iframe>
+            {% if lang == "ALL" %}
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                        <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
 
-                </div>
-            {%  else %}
-                <div class="w-full h-full">
-                    <iframe src="{{ url }}/app/dashboards#/view/8c338430-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%" id="dashkib"></iframe>
-                </div>
+                        <p>Ci dessous le lexique et sa distribution temporelle extraits des mots-clés auteur issus des productions validées associées à votre profil. Le bouton de filtrage permet de pointer spécifiquement des éventuelles erreurs ou des manques.</p>
+
+                    </div>
+                {% if type == "lab" %}
+                    <div class="w-full h-full">
+                        <iframe src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%" id="dashkib"></iframe>
+                    </div>
+                {%  else %}
+                    <div class="w-full h-full">
+                        <iframe src="{{ url }}/app/dashboards#/view/8c338430-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%" id="dashkib"></iframe>
+                    </div>
+                {%  endif %}
+
+            {% elif lang == "FR" %}
+
+                {% if type == "lab" %}
+                    <div class="w-full h-full">
+                        <iframe src="{{ url }}/app/dashboards#/view/db8a8f80-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%" id="dashkib"></iframe>
+                    </div>
+
+                {%  else %}
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                        <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+
+                        <p>Ci dessous le lexique des notices marquées en langue française. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
+                            Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
+                         Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
+                    </div>
+
+                    <div class="w-full h-full">
+                    <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/934e9630-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)" height="100%" width="100%" id="dashkib">
+
+                    </iframe></div>
+                {%  endif %}
+            {% elif lang == "EN" %}
+                            <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                        <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+
+                        <p>Ci dessous le lexique des notices marquées en langue anglaise. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
+                            Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
+                                Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
+                    </div>
+                {% if type == "lab" %}
+                    <div class="w-full h-full">
+                        <iframe src="{{ url }}/app/dashboards#/view/c0feaf00-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!(
+                        (meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),
+                        refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))&show-top-menu=false&show-query-input=true&show-time-filter=true" height="100%" width="100%" id="dashkib">
+
+                        </iframe>
+                    </div>
+                {%  else %}
+                      <div class="w-full h-full">
+                      <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)" height="100%" width="100%" id="dashkib">
+
+                    </iframe></div>
+                {%  endif %}
             {%  endif %}
-
-        {% elif lang == "FR" %}
-
-            {% if type == "lab" %}
-                <div class="w-full h-full">
-                    <iframe src="{{ url }}/app/dashboards#/view/db8a8f80-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%" id="dashkib"></iframe>
-                </div>
-
-            {%  else %}
-            <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-
-                    <p>Ci dessous le lexique des notices marquées en langue française. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
-                        Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
-                     Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
-                </div>
-
-                <div class="w-full h-full">
-                {#<iframe referrerpolicy="no-referrer-when-downgrade" Sec-Fetch-Dest="iframe" src="http://localhost:5601/app/dashboards#/view/934e9630-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)" height="100%" width="100%" id="dashkib">#}
-                <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/934e9630-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)" height="100%" width="100%" id="dashkib">
-
-                </iframe></div>
-{#    <iframe src="{{ url }}/app/dashboards#/view/fa3af1c0-0128-11ed-9568-bb4b000aad25?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(description:'Ce%20Dashboard%20couvre%20la%20terminologie%20chercheurs%20en%20fran%C3%A7ais',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f),panels:!((embeddableConfig:(enhancements:(),savedVis:(data:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:fr_keyword_s.keyword,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:'1',otherBucket:!t,otherBucketLabel:Autres,size:50),schema:segment,type:terms)),searchSource:(filter:!(),index:'3bc3de40-f378-11ec-a0f0-8fb596d90e57',query:(language:kuery,query:'{{ filterRsr }}'))),description:'',id:'',params:(maxFontSize:49,minFontSize:8,orientation:single,palette:(name:default,type:palette),scale:linear,showLabel:!t),title:'',type:tagcloud,uiState:())),gridData:(h:21,i:ff5010d0-2624-4b31-99bf-cff13beb3282,w:16,x:0,y:0),panelIndex:ff5010d0-2624-4b31-99bf-cff13beb3282,type:visualization,version:'7.16.2'),(embeddableConfig:(enhancements:(),hidePanelTitles:!t,savedVis:(data:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Termes%20extraits%20(FR).%20Si%20vide,%20le%20r%C3%A9sum%C3%A9%20en%20anglais%20est%20probablement%20absent',field:fr_teeft_keywords.keyword,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:'1',otherBucket:!t,otherBucketLabel:Autres,size:50),schema:segment,type:terms)),searchSource:(filter:!(),index:'3bc3de40-f378-11ec-a0f0-8fb596d90e57',query:(language:kuery,query:'{{ filterRsr }}'))),description:'',params:(maxFontSize:45,minFontSize:8,orientation:single,palette:(name:default,type:palette),scale:linear,showLabel:!t),title:fr_teeft,type:tagcloud,uiState:())),gridData:(h:21,i:'4c8d8630-ddf0-402c-a612-1539935794b8',w:16,x:16,y:0),panelIndex:'4c8d8630-ddf0-402c-a612-1539935794b8',type:visualization,version:'7.16.2'),(embeddableConfig:(enhancements:(),savedVis:(data:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:fr_entites.keyword,missingBucket:!f,missingBucketLabel:Missing,order:desc,orderBy:'1',otherBucket:!t,otherBucketLabel:Autres,size:50),schema:segment,type:terms)),searchSource:(filter:!(),index:'3bc3de40-f378-11ec-a0f0-8fb596d90e57',query:(language:kuery,query:'{{ filterRsr }}'))),description:'',id:'',params:(maxFontSize:72,minFontSize:18,orientation:single,palette:(name:default,type:palette),scale:linear,showLabel:!t),title:'',type:tagcloud,uiState:())),gridData:(h:21,i:'6539132f-ea62-4d9a-b5b9-98c44ecddf33',w:16,x:32,y:0),panelIndex:'6539132f-ea62-4d9a-b5b9-98c44ecddf33',type:visualization,version:'7.16.2'),(embeddableConfig:(attributes:(references:!((id:'3bc3de40-f378-11ec-a0f0-8fb596d90e57',name:indexpattern-datasource-current-indexpattern,type:index-pattern),(id:'3bc3de40-f378-11ec-a0f0-8fb596d90e57',name:indexpattern-datasource-layer-34d48a89-fa68-489f-9c0a-d291326e5e42,type:index-pattern)),state:(datasourceStates:(indexpattern:(layers:('34d48a89-fa68-489f-9c0a-d291326e5e42':(columnOrder:!('49e02df7-5c05-4bed-b35a-3e9ef2f9294a','43281695-9858-45e1-bf6c-9355e67d7689','99c78bb8-f976-4a53-bfde-3d6db3589305','62ba9e3c-fe76-4908-8174-9eca7dbe40b9'),columns:('43281695-9858-45e1-bf6c-9355e67d7689':(customLabel:!t,dataType:string,isBucketed:!t,label:Titre,operationType:terms,params:(missingBucket:!f,orderBy:(columnId:'62ba9e3c-fe76-4908-8174-9eca7dbe40b9',type:column),orderDirection:desc,otherBucket:!t,size:6),scale:ordinal,sourceField:title_s.keyword),'49e02df7-5c05-4bed-b35a-3e9ef2f9294a':(customLabel:!t,dataType:string,isBucketed:!t,label:'Notice%20Hal',operationType:terms,params:(missingBucket:!f,orderBy:(columnId:'62ba9e3c-fe76-4908-8174-9eca7dbe40b9',type:column),orderDirection:desc,otherBucket:!t,size:20),scale:ordinal,sourceField:docid.keyword),'62ba9e3c-fe76-4908-8174-9eca7dbe40b9':(customLabel:!t,dataType:number,isBucketed:!f,label:Documents,operationType:unique_count,scale:ratio,sourceField:docid.keyword),'99c78bb8-f976-4a53-bfde-3d6db3589305':(customLabel:!t,dataType:string,isBucketed:!t,label:Auteur,operationType:terms,params:(missingBucket:!f,orderBy:(columnId:'62ba9e3c-fe76-4908-8174-9eca7dbe40b9',type:column),orderDirection:desc,otherBucket:!f,size:8),scale:ordinal,sourceField:authFullName_s.keyword)),incompleteColumns:())))),filters:!(),query:(language:kuery,query:'{{ filterRsr }}'),visualization:(columns:!((columnId:'62ba9e3c-fe76-4908-8174-9eca7dbe40b9',hidden:!t,isTransposed:!f),(columnId:'49e02df7-5c05-4bed-b35a-3e9ef2f9294a',isTransposed:!f,width:134.16666666666663),(columnId:'43281695-9858-45e1-bf6c-9355e67d7689',isTransposed:!f,width:896.6666666666667),(columnId:'99c78bb8-f976-4a53-bfde-3d6db3589305',isTransposed:!f)),layerId:'34d48a89-fa68-489f-9c0a-d291326e5e42',layerType:data)),title:'',type:lens,visualizationType:lnsDatatable),enhancements:(),hidePanelTitles:!t),gridData:(h:23,i:e9b0cf7f-67e4-4aff-8176-b17235251e37,w:48,x:0,y:21),panelIndex:e9b0cf7f-67e4-4aff-8176-b17235251e37,type:lens,version:'7.16.2')),query:(language:kuery,query:'{{ filterRsr }}'),tags:!(a0a62870-aca4-11eb-b298-750a560150e0),timeRestore:!f,title:'Dashboard%20%20Exploration%20Bis%20(FR)%20',viewMode:edit)&show-query-input=true" height="100%" width="100%"></iframe>                </div>#}
-            {%  endif %}
-        {% elif lang == "EN" %}
-                        <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-
-                    <p>Ci dessous le lexique des notices marquées en langue anglaise. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
-                        Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).</p>
-                            Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
-                </div>
-            {% if type == "lab" %}
-                <div class="w-full h-full">
-                    <iframe src="{{ url }}/app/dashboards#/view/c0feaf00-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!(
-                    (meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),
-                    refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))&show-top-menu=false&show-query-input=true&show-time-filter=true" height="100%" width="100%" id="dashkib">
-
-                    </iframe>
-                </div>
-            {%  else %}
-                  <div class="w-full h-full">
-                  <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)" height="100%" width="100%" id="dashkib">
-
-{#<iframe Sec-Fetch-Dest="iframe"  src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27??embed=true&_g=(filters%3A!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange}}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:edit)&show-top-menu=false&show-query-input=true&show-time-filter=true" height="100%" width="100%" id="dashkib">#}
-                </iframe></div>
-            {%  endif %}
-        {%  endif %}
-
-
-
+        </div>
     </div>
 </div>
 {% include "includes/footer.html" %}
-
