@@ -965,7 +965,10 @@
                     let row = table.rows[i]
                     let curr_rsr = getObjectByValue(references, "docid", row.cells[6].textContent);
                     if (curr_rsr[0].authorship) {
-                        let curr_val = getObjectByValue(curr_rsr[0].authorship, "halId_s", document.querySelector(".halId_s").textContent);
+                        let curr_val = getObjectByValue(curr_rsr[0].authorship, "authIdHal_s", document.querySelector(".halId_s").textContent);
+console.log(curr_rsr[0].authorship)
+console.log(document.querySelector(".halId_s").textContent)
+console.log(curr_val);
                         row.cells[4].querySelector('#authorship').value = curr_val[0].authorship;
                     } else {
                         row.cells[4].querySelector('#authorship').value = "";
