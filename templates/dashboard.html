@@ -1,10 +1,10 @@
 {% include "includes/header.html" with title="Tableau des dépôts" %}
 
-<div class="h-full w-full flex ">
+<div class="w-full flex" style="height:calc(100% - 48px)">
 
     {% include "includes/menu.html" with title="Tableau des dépôts" %}
 
-    <div class="w-full h-full p-1 relative" style="background: #fafbfd;">
+    <div class="w-full  p-3 relative" style="background: #fafbfd;">
 
         <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
             <div class="absolute inset-center text-sm flex">
@@ -15,35 +15,36 @@
                 Chargement des données
             </div>
         </div>
-        {% comment %}
-        Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#
-        {% endcomment %}
-        {% if type == "rsr" %}
-        <div class="w-full h-full">
 
-<iframe src="{{ url }}/app/dashboards#/view/2e1ef800-c1f2-11eb-b466-1b2443e30920?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%" title="Tableau de bord chercheur"></iframe>
+        <div class="flex flex-col bg-white rounded h-full relative w-full" style="border: 1px solid rgb(211, 218, 230); padding: 6px 8px">
+                {% comment %}
+                Si version dev changer   src="/kibana/app/dashboards#  en   src="http://127.0.0.1:5601/app/dashboards#
+                {% endcomment %}
+                {% if type == "rsr" %}
+                    <div class="w-full h-full">
+                        <iframe src="{{ url }}/app/dashboards#/view/2e1ef800-c1f2-11eb-b466-1b2443e30920?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%" title="Tableau de bord chercheur"></iframe>
+                    </div>
+                {% else %}
+                    {% comment %}
+                    <div class="w-full h-full">
+                    <iframe src="/kibana/app/dashboards#/view/3426d960-c1fd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlab  }}')))" height="100%" width="100%"></iframe>
+                    </div>
+                    {% endcomment %}
+
+                    <div class="w-full h-full overflow-auto">
+                        {% if dash == "membres" %}
+                            <iframe src="{{ url }}/app/dashboards#/view/99379510-a113-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabB }}')))" height="100%" width="100%"></iframe>
+                        {% endif %}
+                        {% if dash == "OA" %}
+                            <iframe src="{{ url }}/app/dashboards#/view/4a37d8e0-a112-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
+                        {% endif %}
+                        {% if dash == "projets" %}
+                            <iframe src="{{ url }}/app/dashboards#/view/13661560-a122-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        {% else %}
-            {% comment %}
-            <div class="w-full h-full">
-            <iframe src="/kibana/app/dashboards#/view/3426d960-c1fd-11eb-9da8-399e11029bf2?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlab  }}')))" height="100%" width="100%"></iframe>
-            </div>
-            {% endcomment %}
-
-            <div class="w-full h-full overflow-auto">
-            {% if dash == "membres" %}
-                <iframe src="{{ url }}/app/dashboards#/view/99379510-a113-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0))&hide-filter-bar=false&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabB }}')))" height="100%" width="100%"></iframe>
-            {% endif %}
-            {% if dash == "OA" %}
-                <iframe src="{{ url }}/app/dashboards#/view/4a37d8e0-a112-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
-            {% endif %}
-            {% if dash == "projets" %}
-                <iframe src="{{ url }}/app/dashboards#/view/13661560-a122-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=true&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')))" height="100%" width="100%"></iframe>
-            {% endif %}
-            </div>
-
-        {% endif %}
-
     </div>
 </div>
 {% include "includes/footer.html" %}
