@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.shortcuts import redirect
-from . import views, viewsActions
+from . import views, viewsActions, settings
+from django.views.static import serve
+
+
 
 urlpatterns = [
     path('admin/logout/', lambda request: redirect('/accounts/logout/', permanent=False)),  # need to be placed before admin.site.urls to overide default redirect. return to uniauth logout instead default admin/logout page
@@ -26,7 +29,7 @@ urlpatterns = [
 
     path('create/', views.create, name='creation'),
     path('check/', views.check, name='check'),
-
+    path('static/<path:path>/', serve, {'document_root': settings.STATIC_ROOT, }),
 
 
     path('index/', views.index, name='index'),
