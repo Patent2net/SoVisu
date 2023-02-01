@@ -277,16 +277,6 @@ def check(request):
                        'hasToConfirm': hastoconfirm,
                        'timeRange': f"from:'{date_from}',to:'{date_to}'"})
 
-    # elif data == "guiding-keywords":
-    #     return render(request, 'check.html',
-    #                   {'struct': struct, 'data': data, 'type': i_type, 'id': p_id, 'from': date_from, 'to': date_to,
-    #                    'entity': entity,
-    #                    'form': forms.SetGuidingKeywords(
-    #                        guidingKeywords=entity['guidingKeywords']),
-    #                    'startDate': start_date,
-    #                    'hasToConfirm': hastoconfirm,
-    #                    'timeRange': "from:'" + date_from + "',to:'" + date_to + "'"})
-
     elif data == "guiding-domains":
 
         domains = halConcepts.concepts()
@@ -388,7 +378,7 @@ def dashboard(request):
     # Get scope data
     key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
-    res = es.search(index=struct + "-" + search_id + index_pattern, body=scope_param)
+    res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res['hits']['hits'][0]['_source']
@@ -1049,7 +1039,7 @@ def search(request):  # Revoir la fonction
     if 'from' in request.GET:
         date_from = request.GET['from']
     else:
-        date_from = min_date[0:4] + '-01-01'
+        date_from = f"{min_date[0:4]}-01-01"
 
     if 'to' in request.GET:
         date_to = request.GET['to']
@@ -1255,7 +1245,7 @@ def get_date(request, start_date):
     if 'from' in request.GET:
         date_from = request.GET['from']
     else:
-        date_from = start_date[0:4] + '-01-01'
+        date_from = f"{start_date[0:4]}-01-01"
 
     if 'to' in request.GET:
         date_to = request.GET['to']

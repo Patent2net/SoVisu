@@ -196,26 +196,31 @@ def collecte_docs(chercheur):  # self,
         doc["authorship"] = []
 
         authhalid_s_filled = []
-        if "authId_i" in doc:
-            for auth in doc["authId_i"]:
+        # replace authId_i per authIdHal_i after test
+        if "authIdHal_i" in doc:
+            print(f"authIdHal_i is in doc")
+            for auth in doc["authIdHal_i"]:
                 try:
                     aurehal = archivesOuvertes.get_halid_s(auth)
                     authhalid_s_filled.append(aurehal)
                 except:
+                    print(f"Collecte_docs: authIdHal_i Exception case")
                     authhalid_s_filled.append("")
+        else:
+            print(f"no authIdHal_i found in doc")
 
         authors_count = len(authhalid_s_filled)
-        print(authors_count)
+        print(f"{authors_count} authors found in document")
         i = 0
-        print(authhalid_s_filled)
+        print(f"list of authors found: {authhalid_s_filled}")
         for auth in authhalid_s_filled:
-            print(auth)
             i += 1
             if i == 1 and auth != "":
-                doc["authorship"].append({"authorship": "firstAuthor", "authFullName_s": auth})
+                doc["authorship"].append({"authorship": "firstAuthor", "authIdHal_s": auth})
             elif i == authors_count and auth != "":
-                doc["authorship"].append({"authorship": "lastAuthor", "authFullName_s": auth})
+                doc["authorship"].append({"authorship": "lastAuthor", "authIdHal_s": auth})
 
+        print(doc["authorship"])
         doc["harvested_from_ids"].append(chercheur['halId_s'])
 
         # historique d'appartenance du docId
