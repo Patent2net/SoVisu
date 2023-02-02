@@ -143,3 +143,8 @@ window.onload = function() { // can also use window.addEventListener('load', (ev
         iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
     };  };
 
+const iFrameEle = document.querySelector('#ifram');
+
+iFrameEle.onload = function() {
+        iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    };
