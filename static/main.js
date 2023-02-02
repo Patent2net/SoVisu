@@ -82,7 +82,12 @@ $(function() {
 	$(document).ready(function () {
     $('.loading-div').fadeOut(150);
     $(window).off('beforeunload');
-    });
+
+    const iFrameEle = document.querySelector('#ifram');
+
+    iFrameEle.onload = function() {
+        iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    };};
 });
 
 
@@ -104,6 +109,7 @@ $(function() {
 //     }
 // })};
 
+/*
 
 document.addEventListener('load', (event) => {
     var ifram=document.getElementById('dashkib')
@@ -149,3 +155,4 @@ const iFrameEle = document.querySelector('#ifram');
 iFrameEle.onload = function() {
         iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
     };
+*/
