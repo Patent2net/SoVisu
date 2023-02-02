@@ -137,8 +137,8 @@ window.addEventListener("load", function () {
 
 window.onload = function() { // can also use window.addEventListener('load', (event) => {
     $(window).off('beforeunload');
-    const iFrameEle = document.querySelector('#dashkib');
-    console.log(iFrameEle.readyState);
+    const iFrameEle = document.querySelector('#ifram');
+
     iFrameEle.onload = function() {
         iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
     };  };
