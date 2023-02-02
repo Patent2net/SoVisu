@@ -91,8 +91,6 @@ $(function() {
 
 
 
-
-
 // document.addEventListener('load', (event) => {
 //     var ifram=document.getElementById('dashkib')
 //     ifram.addEventListener("readystatechange", () => {
