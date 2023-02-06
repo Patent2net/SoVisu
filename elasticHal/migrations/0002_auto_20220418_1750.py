@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('elasticHal', '0001_initial'),
+        ("elasticHal", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='elastichal',
-            name='balance',
+            model_name="elastichal",
+            name="balance",
         ),
         migrations.RemoveField(
-            model_name='elastichal',
-            name='name',
+            model_name="elastichal",
+            name="name",
         ),
     ]

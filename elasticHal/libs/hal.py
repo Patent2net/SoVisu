@@ -10,7 +10,7 @@ retry_strategy = Retry(
     total=3,
     backoff_factor=1,
     status_forcelist=[429, 500, 502, 503, 504],
-    allowed_methods=["HEAD", "GET", "DELETE", "PUT", "OPTIONS"]
+    allowed_methods=["HEAD", "GET", "DELETE", "PUT", "OPTIONS"],
 )
 adapter = HTTPAdapter(max_retries=retry_strategy)
 http = requests.Session()
@@ -23,41 +23,54 @@ def find_publications(idhal, field, increment=0):
     Cherche les publications d'un auteur dans HAL à partir de son IDHAL
     """
     articles = []
-    flags = 'docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,' \
-            'publicationDate_tdate,submittedDate_tdate,modifiedDate_tdate,producedDate_tdate,' \
-            'fileMain_s,fileType_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,' \
-            'version_i,journalDate_s,journalTitle_s,journalPublisher_s,funding_s,' \
-            'openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s,' \
-            'bookTitle_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,' \
-            'conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,' \
-            'contributorFullName_s,' \
-            'isbn_s,' \
-            'publicationDateY_i,' \
-            'defenseDate_tdate,' \
-            'authId_i,' \
-            'country_s, ' \
-            'deptStructCountry_s,' \
-            'labStructCountry_s,' \
-            'location,' \
-            'rgrpInstStructCountry_s,' \
-            'rgrpLabStructCountry_s,' \
-            'rteamStructCountry_s,' \
-            'instStructCountry_s,' \
-            'structCountry_s,' \
-            'structCountry_t'
+    flags = (
+        "docid,halId_s,docType_s,labStructId_i,authIdHal_s,authIdHal_i,authFullName_s,authFirstName_s,authLastName_s,doiId_s,journalIssn_s,"
+        "publicationDate_tdate,submittedDate_tdate,modifiedDate_tdate,producedDate_tdate,"
+        "fileMain_s,fileType_s,language_s,title_s,*_subTitle_s,*_abstract_s,*_keyword_s,label_bibtex,fulltext_t,"
+        "version_i,journalDate_s,journalTitle_s,journalPublisher_s,funding_s,"
+        "openAccess_bool,journalSherpaPostPrint_s,journalSherpaPrePrint_s,journalSherpaPostRest_s,journalSherpaPreRest_s,"
+        "bookTitle_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,"
+        "conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,"
+        "contributorFullName_s,"
+        "isbn_s,"
+        "publicationDateY_i,"
+        "defenseDate_tdate,"
+        "authId_i,"
+        "country_s, "
+        "deptStructCountry_s,"
+        "labStructCountry_s,"
+        "location,"
+        "rgrpInstStructCountry_s,"
+        "rgrpLabStructCountry_s,"
+        "rteamStructCountry_s,"
+        "instStructCountry_s,"
+        "structCountry_s,"
+        "structCountry_t"
+    )
 
-    req = http.get(f'http://api.archives-ouvertes.fr/search/?q={field}:{str(idhal)}&fl={flags}&start={str(increment)}&sort=docid%20asc')
+    req = http.get(
+        f"http://api.archives-ouvertes.fr/search/?q={field}:{str(idhal)}&fl={flags}&start={str(increment)}&sort=docid%20asc"
+    )
 
     if req.status_code == 200:
         data = req.json()
         if "response" in data.keys():
-            data = data['response']
-            count = data['numFound']
+            data = data["response"]
+            count = data["numFound"]
 
-            for article in data['docs']:
-                facet_fields_list = ["country_s", "deptStructCountry_s", "labStructCountry_s", "location",
-                                     "rgrpInstStructCountry_s", "rgrpLabStructCountry_s", "rteamStructCountry_s",
-                                     "instStructCountry_s", "structCountry_s", "structCountry_t"]
+            for article in data["docs"]:
+                facet_fields_list = [
+                    "country_s",
+                    "deptStructCountry_s",
+                    "labStructCountry_s",
+                    "location",
+                    "rgrpInstStructCountry_s",
+                    "rgrpLabStructCountry_s",
+                    "rteamStructCountry_s",
+                    "instStructCountry_s",
+                    "structCountry_s",
+                    "structCountry_t",
+                ]
                 country_list = list()
                 for facet in facet_fields_list:
                     if facet in article.keys():
@@ -81,10 +94,10 @@ def find_publications(idhal, field, increment=0):
             else:
                 return articles
         else:
-            print('Error : wrong response from HAL API endpoint')
+            print("Error : wrong response from HAL API endpoint")
             return -1
     else:
-        print('Error : can not reach HAL API endpoint')
+        print("Error : can not reach HAL API endpoint")
         return articles
 
 
@@ -98,9 +111,9 @@ def get_content(hal_url):
     grobid_resp = requests.post(
         "https://cloud.science-miner.com/grobid/api/processFulltextDocument",
         files={
-            'input': utils.remove_page(pdf_file, [0]),  # remove first page (HAL header)
-            'consolidate_Citations': 0,
-            'includeRawCitations': 1,
+            "input": utils.remove_page(pdf_file, [0]),  # remove first page (HAL header)
+            "consolidate_Citations": 0,
+            "includeRawCitations": 1,
         },
         timeout=60.0,
     )

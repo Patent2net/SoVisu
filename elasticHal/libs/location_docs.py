@@ -16,8 +16,13 @@ def generate_countrys_fields(doc):
         instStructCountry_s -->  Structure/institution : Pays
     en se basant sur les métadonnées Hal du document
     """
-    facet_fields_list = ["deptStructCountry_s", "labStructCountry_s", "structCountry_s", #"structCountry_t",
-                         "rgrpInstStructCountry_s", "rgrpLabStructCountry_s" ]
+    facet_fields_list = [
+        "deptStructCountry_s",
+        "labStructCountry_s",
+        "structCountry_s",  # "structCountry_t",
+        "rgrpInstStructCountry_s",
+        "rgrpLabStructCountry_s",
+    ]
     country_list = list()
     for facet in facet_fields_list:
         if facet in doc.keys():
@@ -34,7 +39,12 @@ def generate_countrys_fields(doc):
         country_list_upper = [""]
     doc["country_collaboration"] = country_list_upper
 
-    facet_fields_list = ["country_s", "rteamStructCountry_s", "instStructCountry_s", "publicationLocation_s"]
+    facet_fields_list = [
+        "country_s",
+        "rteamStructCountry_s",
+        "instStructCountry_s",
+        "publicationLocation_s",
+    ]
 
     country_list = list()
     for facet in facet_fields_list:
@@ -49,7 +59,7 @@ def generate_countrys_fields(doc):
     country_list = list(set(country_list))
     country_list_upper = [country.upper() for country in country_list]
     if "FR" in country_list_upper:
-        country_list_upper.remove('FR')
+        country_list_upper.remove("FR")
     else:
         pass
 
