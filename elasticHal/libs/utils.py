@@ -32,23 +32,27 @@ def should_be_open(doc):
     # 0 no se
     # 2 déjà open
 
-    if 'fileMain_s' not in doc:
-        if 'journalSherpaPostPrint_s' in doc:
-            if doc['journalSherpaPostPrint_s'] == 'can':
+    if "fileMain_s" not in doc:
+        if "journalSherpaPostPrint_s" in doc:
+            if doc["journalSherpaPostPrint_s"] == "can":
                 return 1
-            if doc['journalSherpaPostPrint_s'] == 'restricted':
-                matches = re.finditer('(\S+\s+){2}(?=embargo)', doc['journalSherpaPostRest_s'].replace('[', ' '))
+            if doc["journalSherpaPostPrint_s"] == "restricted":
+                matches = re.finditer(
+                    "(\S+\s+){2}(?=embargo)",
+                    doc["journalSherpaPostRest_s"].replace("[", " "),
+                )
                 maxi = 0
 
                 for m in matches:
-
-                    c = m.group().split(' ')[0]
+                    c = m.group().split(" ")[0]
                     if c.isnumeric():
                         # check if sometimes there is year but atm, nope
                         if int(c) > maxi:
                             maxi = int(c)
 
-                p_date = dateutil.parser.parse(doc['publicationDate_tdate']).replace(tzinfo=None)
+                p_date = dateutil.parser.parse(doc["publicationDate_tdate"]).replace(
+                    tzinfo=None
+                )
                 curr_date = datetime.now()
                 diff = relativedelta(curr_date, p_date)
 
@@ -57,7 +61,7 @@ def should_be_open(doc):
                     return 1
                 else:
                     return -1
-            if doc['journalSherpaPostPrint_s'] == 'cannot':
+            if doc["journalSherpaPostPrint_s"] == "cannot":
                 return -1
         return 0
     return 2
@@ -69,17 +73,17 @@ def calculate_mds(doc):
     """
     score = 0
 
-    if 'title_s' in doc:
+    if "title_s" in doc:
         has_title = True
     else:
         has_title = False
 
-    if 'doiId_s' in doc:
+    if "doiId_s" in doc:
         has_doi = True
     else:
         has_doi = False
 
-    if 'publicationDate_tdate' in doc:
+    if "publicationDate_tdate" in doc:
         has_publication_date = True
     else:
         has_publication_date = False
@@ -108,7 +112,7 @@ def calculate_mds(doc):
     else:
         has_abstract = False
 
-    if 'fileMain_s' in doc:
+    if "fileMain_s" in doc:
         has_attached_file = True
     else:
         if doc["openAccess_bool"] == 1:
@@ -136,77 +140,87 @@ def append_to_tree(scope, rsr, tree, state):
     """
     Rajoute un domaine d'expertise à un arbre d'expertise
     """
-    rsr_data = {'ldapId': rsr['ldapId'], 'firstName': rsr['firstName'], 'lastName': rsr['lastName'], 'state': state}
-    rsr_id = rsr['ldapId']
+    rsr_data = {
+        "ldapId": rsr["ldapId"],
+        "firstName": rsr["firstName"],
+        "lastName": rsr["lastName"],
+        "state": state,
+    }
+    rsr_id = rsr["ldapId"]
 
-    sid = scope['id'].split('.')
+    sid = scope["id"].split(".")
     # print(f"\u00A0 \u21D2 \u00A0{scope}")
 
-    scope_data = {'id': scope['id'], 'label_fr': scope['label_fr'], 'label_en': scope['label_en'],
-                  'children': [],
-                  'researchers': [
-                      rsr_data
-                  ]}
+    scope_data = {
+        "id": scope["id"],
+        "label_fr": scope["label_fr"],
+        "label_en": scope["label_en"],
+        "children": [],
+        "researchers": [rsr_data],
+    }
 
     if len(sid) == 1:
         exists = False
-        for child in tree['children']:
-            if sid[0] == child['id'] and 'researchers' in child:
-                for rsr in child['researchers']:
+        for child in tree["children"]:
+            if sid[0] == child["id"] and "researchers" in child:
+                for rsr in child["researchers"]:
                     rsr_exists = False
-                    if rsr['ldapId'] == rsr_id:
-                        rsr['state'] = state
+                    if rsr["ldapId"] == rsr_id:
+                        rsr["state"] = state
                         rsr_exists = True
                 if not rsr_exists:
-                    child['researchers'].append(rsr_data)
+                    child["researchers"].append(rsr_data)
                 exists = True
         if not exists:
-            tree['children'].append(scope_data)
+            tree["children"].append(scope_data)
 
     if len(sid) == 2:
         exists = False
-        for child in tree['children']:
-            if sid[0] == child['id'] and 'children' in child:
-                for child1 in child['children']:
-                    if sid[0] + '.' + sid[1] == child1['id'] and 'researchers' in child1:
-                        for rsr in child1['researchers']:
+        for child in tree["children"]:
+            if sid[0] == child["id"] and "children" in child:
+                for child1 in child["children"]:
+                    if (
+                        sid[0] + "." + sid[1] == child1["id"]
+                        and "researchers" in child1
+                    ):
+                        for rsr in child1["researchers"]:
                             rsr_exists = False
-                            if rsr['ldapId'] == rsr_id:
-                                rsr['state'] = state
+                            if rsr["ldapId"] == rsr_id:
+                                rsr["state"] = state
                                 rsr_exists = True
                         if not rsr_exists:
-                            child1['researchers'].append(rsr_data)
+                            child1["researchers"].append(rsr_data)
                         exists = True
 
         if not exists:
-            for child in tree['children']:
-                if 'children' in child and sid[0] == child['id']:
-                    child['children'].append(scope_data)
+            for child in tree["children"]:
+                if "children" in child and sid[0] == child["id"]:
+                    child["children"].append(scope_data)
 
     if len(sid) == 3:
         exists = False
-        for child in tree['children']:
-            if sid[0] == child['id'] and 'children' in child:
-                for child1 in child['children']:
-                    if sid[0] + '.' + sid[1] == child1['id'] and 'children' in child1:
-                        for child2 in child1['children']:
-                            if sid[0] + '.' + sid[1] + '.' + sid[2] == child2['id']:
-                                if 'researchers' in child2:
-                                    for rsr in child2['researchers']:
+        for child in tree["children"]:
+            if sid[0] == child["id"] and "children" in child:
+                for child1 in child["children"]:
+                    if sid[0] + "." + sid[1] == child1["id"] and "children" in child1:
+                        for child2 in child1["children"]:
+                            if sid[0] + "." + sid[1] + "." + sid[2] == child2["id"]:
+                                if "researchers" in child2:
+                                    for rsr in child2["researchers"]:
                                         rsr_exists = False
-                                        if rsr['ldapId'] == rsr_id:
-                                            rsr['state'] = state
+                                        if rsr["ldapId"] == rsr_id:
+                                            rsr["state"] = state
                                             rsr_exists = True
                                 if not rsr_exists:
-                                    child2['researchers'].append(rsr_data)
+                                    child2["researchers"].append(rsr_data)
                                 exists = True
 
         if not exists:
-            for child in tree['children']:
-                if 'children' in child and sid[0] == child['id']:
-                    for child1 in child['children']:
-                        if sid[0] + '.' + sid[1] == child1['id']:
-                            child1['children'].append(scope_data)
+            for child in tree["children"]:
+                if "children" in child and sid[0] == child["id"]:
+                    for child1 in child["children"]:
+                        if sid[0] + "." + sid[1] == child1["id"]:
+                            child1["children"].append(scope_data)
 
     return tree
 
@@ -216,17 +230,16 @@ def filter_concepts(concepts, validated_ids):
     Filtre les concepts qui ne sont pas dans la liste des concepts validés
     """
     if len(concepts) > 0:
-
-        for children in concepts['children']:
-            if children['id'] in validated_ids:
-                children['state'] = 'validated'
-            if 'children' in children:
-                for children1 in children['children']:
-                    if children1['id'] in validated_ids:
-                        children1['state'] = 'validated'
-                    if 'children' in children1:
-                        for children2 in children1['children']:
-                            if children2['id'] in validated_ids:
-                                children2['state'] = 'validated'
+        for children in concepts["children"]:
+            if children["id"] in validated_ids:
+                children["state"] = "validated"
+            if "children" in children:
+                for children1 in children["children"]:
+                    if children1["id"] in validated_ids:
+                        children1["state"] = "validated"
+                    if "children" in children1:
+                        for children2 in children1["children"]:
+                            if children2["id"] in validated_ids:
+                                children2["state"] = "validated"
 
     return concepts

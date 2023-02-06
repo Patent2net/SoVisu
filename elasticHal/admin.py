@@ -9,12 +9,18 @@ from .models import Structure, Laboratory, Researcher
 from django.contrib.auth.models import User, Group
 
 from .insert_entities import create_index
-from .collect_from_HAL import collect_data, collect_laboratories_data2, collect_researchers_data2
+from .collect_from_HAL import (
+    collect_data,
+    collect_laboratories_data2,
+    collect_researchers_data2,
+)
 
 from .forms import PopulateLab, ExportToElasticForm, CsvImportForm
 from .views import get_index_list
+
 # Celery
 from celery import shared_task
+
 # Celery-progress
 from celery_progress.backend import ProgressRecorder
 
@@ -29,9 +35,9 @@ class ExportCsv:
         meta = self.model._meta
         field_names = [field.name for field in meta.fields]
 
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
-        response.write(u'\ufeff'.encode('utf8'))
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = "attachment; filename={}.csv".format(meta)
+        response.write("\ufeff".encode("utf8"))
 
         writer = csv.writer(response)
 
@@ -48,6 +54,7 @@ class ElasticActions:
     """
     Actions pour l'index Elasticsearch
     """
+
     @staticmethod
     def export_to_elastic(request):
         """
@@ -57,14 +64,23 @@ class ElasticActions:
         if request.method == "POST":
             form = ExportToElasticForm(request.POST)
             if form.is_valid():
-                structure = form.cleaned_data['Structures']
-                laboratoires = form.cleaned_data['Laboratoires']
-                chercheurs = form.cleaned_data['Chercheurs']
+                structure = form.cleaned_data["Structures"]
+                laboratoires = form.cleaned_data["Laboratoires"]
+                chercheurs = form.cleaned_data["Chercheurs"]
 
-                result1 = create_index.delay(structure=structure, laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
+                result1 = create_index.delay(
+                    structure=structure,
+                    laboratories=laboratoires,
+                    researcher=chercheurs,
+                    django_enabler=True,
+                )
                 task_id1 = result1.task_id
 
-                result2 = collect_data(laboratories=laboratoires, researcher=chercheurs, django_enabler=True)
+                result2 = collect_data(
+                    laboratories=laboratoires,
+                    researcher=chercheurs,
+                    django_enabler=True,
+                )
                 if result2[0] is not None:
                     task_id2 = result2[0].task_id
                 else:
@@ -75,21 +91,29 @@ class ElasticActions:
                     task_id3 = None
 
                 # créée dynamiquement le contexte de la collecte demandé lors de la validation du formulaire
-                context = {'form': form, }
+                context = {
+                    "form": form,
+                }
                 for task_content in ["task_id1", "task_id2", "task_id3"]:
                     if eval(task_content) is not None:
                         context[task_content] = eval(task_content)
 
-                return render(request, "admin/elasticHal/export_to_elastic.html", context=context)
+                return render(
+                    request, "admin/elasticHal/export_to_elastic.html", context=context
+                )
 
             else:
                 form = ExportToElasticForm()
-                return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})
+                return render(
+                    request, "admin/elasticHal/export_to_elastic.html", {"form": form}
+                )
         else:
             # Get form instance
             form = ExportToElasticForm()
             # Return
-            return render(request, 'admin/elasticHal/export_to_elastic.html', {'form': form})
+            return render(
+                request, "admin/elasticHal/export_to_elastic.html", {"form": form}
+            )
 
     @staticmethod
     def update_elastic(request):
@@ -104,16 +128,16 @@ class ElasticActions:
             #  laboratoires =
             # print(f"structure: {structure}, laboratoires: {laboratoires}, chercheurs: {chercheurs}")
             taches = []
-            if form .is_valid():
-                if "chercheurs" in request .POST .keys():
+            if form.is_valid():
+                if "chercheurs" in request.POST.keys():
                     chercheurs = True
                 else:
                     chercheurs = False
-                if "collectionLabo" in request .POST .keys():
+                if "collectionLabo" in request.POST.keys():
                     collectionLabo = True
                 else:
                     collectionLabo = False
-                collection = form .cleaned_data["f_index"]
+                collection = form.cleaned_data["f_index"]
                 # print('uuuu ', collection)
 
                 if "TOUT" in request.POST.keys():
@@ -121,23 +145,29 @@ class ElasticActions:
                     indexes = get_index_list()
 
                     for ind, lab in enumerate(indexes):
-                        laboratoire = lab[0] .split("-")[1]
-                        structure = lab[0] .split("-")[0]
+                        laboratoire = lab[0].split("-")[1]
+                        structure = lab[0].split("-")[0]
                         result1 = collect_laboratories_data2.delay(laboratoire)
-                        result2 = collect_researchers_data2.delay(struct=structure, idx=lab[0])
-                        taches .append([ind, result1.task_id, result2.task_id])
+                        result2 = collect_researchers_data2.delay(
+                            struct=structure, idx=lab[0]
+                        )
+                        taches.append([ind, result1.task_id, result2.task_id])
 
                 elif collectionLabo == True:
                     if chercheurs == True:
                         laboratoire = collection.split("-")[1]
                         structure = collection.split("-")[0]
-                        result1 = collect_laboratories_data2 .delay(laboratoire)
+                        result1 = collect_laboratories_data2.delay(laboratoire)
                         task_id1 = result1.task_id
-                        result2 = collect_researchers_data2.delay(struct=structure, idx=collection)
+                        result2 = collect_researchers_data2.delay(
+                            struct=structure, idx=collection
+                        )
                         task_id2 = result2.task_id
 
                     else:
-                        result1 = collect_laboratories_data2 .delay(collectionLabo, False)
+                        result1 = collect_laboratories_data2.delay(
+                            collectionLabo, False
+                        )
                         task_id1 = result1.task_id
                         task_id2 = None
 
@@ -148,23 +178,40 @@ class ElasticActions:
 
             else:
                 pass  # pas sûr
-            if len(taches)>0:
+            if len(taches) > 0:
                 print(taches)
-                return render(request, "admin/elasticHal/export_to_elasticLabs.html",
-                              context={'form': form, 'taches': taches})
+                return render(
+                    request,
+                    "admin/elasticHal/export_to_elasticLabs.html",
+                    context={"form": form, "taches": taches},
+                )
             elif task_id1 in locals():
                 if task_id2 in locals():
-                    return render(request, "admin/elasticHal/export_to_elasticLabs.html",
-                          context={'form': form, 'task_id1': task_id1, 'task_id2': task_id2})
+                    return render(
+                        request,
+                        "admin/elasticHal/export_to_elasticLabs.html",
+                        context={
+                            "form": form,
+                            "task_id1": task_id1,
+                            "task_id2": task_id2,
+                        },
+                    )
                 else:
-                    return render(request, "admin/elasticHal/export_to_elasticLabs.html",
-                                  context={'form': form, 'task_id1': task_id1})
+                    return render(
+                        request,
+                        "admin/elasticHal/export_to_elasticLabs.html",
+                        context={"form": form, "task_id1": task_id1},
+                    )
             else:
-                return render(request, "admin/elasticHal/export_to_elasticLabs.html", context={'form': form})
+                return render(
+                    request,
+                    "admin/elasticHal/export_to_elasticLabs.html",
+                    context={"form": form},
+                )
         else:
             form = PopulateLab()
 
-        data = {'form': form}
+        data = {"form": form}
         return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
 
 
@@ -173,7 +220,8 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
     """
     Modèle de l'administration des structures
     """
-    list_display = ('structSirene', 'acronym', 'label')
+
+    list_display = ("structSirene", "acronym", "label")
     actions = ["export_as_csv"]
 
     def get_urls(self):
@@ -182,9 +230,9 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         """
         urls = super().get_urls()
         new_urls = [
-            path('upload-csv/', self.upload_csv),
-            path('update_elastic/', ElasticActions.update_elastic),
-            path('export-elastic/', ElasticActions.export_to_elastic),
+            path("upload-csv/", self.upload_csv),
+            path("update_elastic/", ElasticActions.update_elastic),
+            path("export-elastic/", ElasticActions.export_to_elastic),
         ]
         return new_urls + urls
 
@@ -196,7 +244,7 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
         if request.method == "POST":
             csv_file = request.FILES["importer_un_fichier"]
 
-            if not csv_file.name.endswith('.csv'):
+            if not csv_file.name.endswith(".csv"):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
                 return HttpResponseRedirect(request.path_info)
 
@@ -205,9 +253,13 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
 
             csv_data.pop(0)  # supprime l'en-tête du csv
 
-            csv_data = list(map(str.strip, csv_data))  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+            csv_data = list(
+                map(str.strip, csv_data)
+            )  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
 
-            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
+            csv_data = list(
+                filter(None, csv_data)
+            )  # supprime les lignes vides dans le fichier.
 
             for line in csv_data:
                 fields = line.split(";")
@@ -216,10 +268,9 @@ class StructureAdmin(admin.ModelAdmin, ExportCsv):
                     label=fields[1],
                     acronym=fields[2],
                     domain=fields[3],
-
                 )
                 # print(created)
-            url = reverse('admin:index')
+            url = reverse("admin:index")
             return HttpResponseRedirect(url)
 
         form = CsvImportForm()
@@ -231,8 +282,9 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
     """
     Modèle de l'administration des laboratoires
     """
-    list_display = ('acronym', 'label', 'halStructId', 'idRef', 'structSirene')
-    list_filter = ('structSirene',)
+
+    list_display = ("acronym", "label", "halStructId", "idRef", "structSirene")
+    list_filter = ("structSirene",)
     actions = ["export_as_csv"]
 
     def get_urls(self):
@@ -241,9 +293,9 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         """
         urls = super().get_urls()
         new_urls = [
-            path('upload-csv/', self.upload_csv),
-            path('update_elastic/', ElasticActions.update_elastic),
-            path('export-elastic/', ElasticActions.export_to_elastic),
+            path("upload-csv/", self.upload_csv),
+            path("update_elastic/", ElasticActions.update_elastic),
+            path("export-elastic/", ElasticActions.export_to_elastic),
         ]
         return new_urls + urls
 
@@ -255,7 +307,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         if request.method == "POST":
             csv_file = request.FILES["importer_un_fichier"]
 
-            if not csv_file.name.endswith('.csv'):
+            if not csv_file.name.endswith(".csv"):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
                 return HttpResponseRedirect(request.path_info)
 
@@ -264,9 +316,13 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
 
             csv_data.pop(0)  # supprime l'en-tête du csv
 
-            csv_data = list(map(str.strip, csv_data))  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+            csv_data = list(
+                map(str.strip, csv_data)
+            )  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
 
-            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
+            csv_data = list(
+                filter(None, csv_data)
+            )  # supprime les lignes vides dans le fichier.
 
             for x in csv_data:
                 fields = x.split(";")  # sépare les lignes en champs
@@ -279,7 +335,7 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
                     idRef=fields[5],
                 )
                 # print(created)
-            url = reverse('admin:index')
+            url = reverse("admin:index")
             return HttpResponseRedirect(url)
 
         form = CsvImportForm()
@@ -291,9 +347,14 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
     """
     Modèle de l'administration des chercheurs
     """
-    list_display = ('ldapId', 'name', 'function', 'lab')
-    list_filter = ('structSirene', 'lab', 'function',)
-    search_fields = ('name',)
+
+    list_display = ("ldapId", "name", "function", "lab")
+    list_filter = (
+        "structSirene",
+        "lab",
+        "function",
+    )
+    search_fields = ("name",)
     actions = ["export_as_csv"]
 
     def get_urls(self):
@@ -302,9 +363,9 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         """
         urls = super().get_urls()
         new_urls = [
-            path('upload-csv/', self.upload_csv),
-            path('update_elastic/', ElasticActions.update_elastic),
-            path('export-elastic/', ElasticActions.export_to_elastic),
+            path("upload-csv/", self.upload_csv),
+            path("update_elastic/", ElasticActions.update_elastic),
+            path("export-elastic/", ElasticActions.export_to_elastic),
         ]
         return new_urls + urls
 
@@ -316,7 +377,7 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
         if request.method == "POST":
             csv_file = request.FILES["importer_un_fichier"]
 
-            if not csv_file.name.endswith('.csv'):
+            if not csv_file.name.endswith(".csv"):
                 messages.warning(request, "Le fichier importé n'est pas un .csv")
                 return HttpResponseRedirect(request.path_info)
 
@@ -325,9 +386,13 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
 
             csv_data.pop(0)  # supprime l'en-tête du csv
 
-            csv_data = list(map(str.strip, csv_data))  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
+            csv_data = list(
+                map(str.strip, csv_data)
+            )  # enlève les caractères spéciaux tels que '\r' afin d'avoir le contenu exact des lignes
 
-            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
+            csv_data = list(
+                filter(None, csv_data)
+            )  # supprime les lignes vides dans le fichier.
 
             for x in csv_data:
                 fields = x.split(";")
@@ -347,15 +412,15 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
                     structDomain=fields[12],
                     firstName=fields[13],
                     lastName=fields[14],
-
                 )
                 # print(created)
-            url = reverse('admin:index')
+            url = reverse("admin:index")
             return HttpResponseRedirect(url)
 
         form = CsvImportForm()
         data = {"form": form}
         return render(request, "admin/csv_upload.html", data)
+
 
 # Unregister the default admin site
 # admin.site.unregister(User)

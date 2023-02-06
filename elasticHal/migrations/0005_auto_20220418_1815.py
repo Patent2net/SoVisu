@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('elasticHal', '0004_auto_20220418_1814'),
+        ("elasticHal", "0004_auto_20220418_1814"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Elastichal_csv',
-            new_name='ElastichalCsv',
+            old_name="Elastichal_csv",
+            new_name="ElastichalCsv",
         ),
     ]

@@ -12,13 +12,23 @@ print(f"snapshot get: \n {snapshot_name}")
 # print(f"snapshot status: \n {es.snapshot.status(repository=path, snapshot='snapshot_2022-06-10_14-12-29')}")
 
 # es.snapshot.delete(repository=path, snapshot='snapshot_2022-06-10_14-12-29')
-name_test = 'snapshot_2022-06-22_18-19-18'  # use a snapshot name shown by snapshot.get()
-#["*-researchers", "*-documents", "*-researchers-*", "*-documents-*"]
+name_test = (
+    "snapshot_2022-06-22_18-19-18"  # use a snapshot name shown by snapshot.get()
+)
+# ["*-researchers", "*-documents", "*-researchers-*", "*-documents-*"]
 restore_index_body = {"indices": ["*"]}
-print(f"closing all the indices. state: {es.indices.close(index='_all')}")  # necessary to restore
-print(es.snapshot.restore(repository=path, snapshot=name_test, body=restore_index_body, request_timeout=60))
+print(
+    f"closing all the indices. state: {es.indices.close(index='_all')}"
+)  # necessary to restore
+print(
+    es.snapshot.restore(
+        repository=path, snapshot=name_test, body=restore_index_body, request_timeout=60
+    )
+)
 
-print(f"Opening all the indices. state: {es.indices.open(index='_all')}")  # indices can be not reopened, security to avoid kibana crash
+print(
+    f"Opening all the indices. state: {es.indices.open(index='_all')}"
+)  # indices can be not reopened, security to avoid kibana crash
 
 
 """
