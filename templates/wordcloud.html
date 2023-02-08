@@ -21,7 +21,7 @@
                 <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1 pt-2">
                         {% for language in lang_options %}
                            <a class="px-2 pb-1 text-gray-600 {% if lang == language %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}"
-                              href="/wordcloud/?struct={{ struct }}&type={{ type }}&id={{ id }}&lang={{ language }}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}">
+                              href="/wordcloud/?struct={{ struct }}&type={{ type }}&id={{ id }}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&lang={{ language }}">
                                {{ language }}</a> {% endfor %}
                 </div>
             </div>

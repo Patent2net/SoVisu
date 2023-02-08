@@ -1292,6 +1292,12 @@ def index(request):
         cleaned_entities = sorted(cleaned_entities, key=lambda k: k["lastName"])
     # /
     print(f"For process: {time.time() - start} seconds")
+
+    # Get date parameters
+    start_date = "2000"
+    date_from, date_to = get_date(request, start_date)
+    # /
+
     if (
         i_type == -1 and p_id == -1
     ):  # Si l'i_type et l'id ne sont pas renseignés, ceux ci ne sont pas renvoyés
@@ -1305,6 +1311,8 @@ def index(request):
                 "indexcat": indexcat,
                 "indexstruct": indexstruct,
                 "ldapid": ldapid,
+                "from": date_from,
+                "to": date_to,
             },
         )
     else:  # L'i_type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
@@ -1320,6 +1328,8 @@ def index(request):
                 "id": p_id,
                 "struct": struct,
                 "ldapid": ldapid,
+                "from": date_from,
+                "to": date_to,
             },
         )
 
@@ -1441,10 +1451,15 @@ def presentation(request):
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
+    # Get date parameters
+    start_date = "2000"
+    date_from, date_to = get_date(request, start_date)
+    # /
     return render(
         request,
         "presentation.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid},
+        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
+            "to": date_to},
     )
 
 
@@ -1455,10 +1470,15 @@ def ressources(request):
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
+    # Get date parameters
+    start_date = "2000"
+    date_from, date_to = get_date(request, start_date)
+    # /
     return render(
         request,
         "ressources.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid},
+        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
+            "to": date_to},
     )
 
 
@@ -1469,10 +1489,15 @@ def faq(request):
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
     # /
+    # Get date parameters
+    start_date = "2000"
+    date_from, date_to = get_date(request, start_date)
+    # /
     return render(
         request,
         "faq.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid},
+        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
+            "to": date_to},
     )
 
 
