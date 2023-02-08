@@ -158,7 +158,7 @@ def collecte_docs(chercheur):  # self,
     """
     collecte les documents d'un chercheur
     """
-    init = False  # If True, data persistence is lost when references are updated
+    init = True  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur['halId_s'], 'authIdHal_s')
 
     #  progress_recorder = ProgressRecorder(self)
