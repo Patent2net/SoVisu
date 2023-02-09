@@ -774,7 +774,6 @@ def update_authorship(request):
 
     try:
         to_process = json.loads(request.POST.get("toProcess", ""))
-
         for doc in to_process:
             # update in researcher's collection
             field = "_id"
@@ -784,29 +783,28 @@ def update_authorship(request):
                 index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
                 body=doc_param,
             )
-
             if len(res["hits"]["hits"]) > 0:
-                if "autorship" in res["hits"]["hits"][0]["_source"]:
+                if "authorship" in res["hits"]["hits"][0]["_source"]:
                     authorship = res["hits"]["hits"][0]["_source"]["authorship"]
                     exists = False
                     for author in authorship:
-                        if author["halId_s"] == entity["halId_s"]:
+                        if author["authIdHal_s"] == entity["halId_s"]:
                             exists = True
                             author["authorship"] = doc["authorship"]
                     if not exists:
                         authorship.append(
                             {
                                 "authorship": doc["authorship"],
-                                "halId_s": entity["halId_s"],
+                                "authIdHal_s": entity["halId_s"],
                             }
                         )
                 else:
                     authorship = [
-                        {"authorship": doc["authorship"], "halId_s": entity["halId_s"]}
+                        {"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}
                     ]
             else:
                 authorship = [
-                    {"authorship": doc["authorship"], "halId_s": entity["halId_s"]}
+                    {"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}
                 ]
 
             es.update(
@@ -831,26 +829,26 @@ def update_authorship(request):
                         authorship = res["hits"]["hits"][0]["_source"]["authorship"]
                         exists = False
                         for author in authorship:
-                            if author["halId_s"] == entity["halId_s"]:
+                            if author["authIdHal_s"] == entity["halId_s"]:
                                 exists = True
                                 author["authorship"] = doc["authorship"]
                         if not exists:
                             authorship.append(
                                 {
                                     "authorship": doc["authorship"],
-                                    "halId_s": entity["halId_s"],
+                                    "authIdHal_s": entity["halId_s"],
                                 }
                             )
                     else:
                         authorship = [
                             {
                                 "authorship": doc["authorship"],
-                                "halId_s": entity["halId_s"],
+                                "authIdHal_s": entity["halId_s"],
                             }
                         ]
                 else:
                     authorship = [
-                        {"authorship": doc["authorship"], "halId_s": entity["halId_s"]}
+                        {"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}
                     ]
 
                 es.update(

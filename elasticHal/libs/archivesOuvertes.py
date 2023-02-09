@@ -277,21 +277,6 @@ def get_aurehalId(authIdHal_s):
     """
     get the aurehalId (authIdHal_i) of the searcher with authIdHal_s (halId_s)
     """
-    """
-    url = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:" + authIdHal_s + "&fl=authIdHal_s,authIdHal_i"
-
-    req = requests.request("GET", url)
-    data = req.json()
-
-    sample = data["response"]["docs"][0]
-    index = sample['authIdHal_s'].index(authIdHal_s)
-
-    aurehalId = sample['authIdHal_i'][index]
-
-    print(f" {authIdHal_s} => {aurehalId}")
-    # print(f"https://aurehal.archives-ouvertes.fr/person/read/id/{aurehalId}")
-    return aurehalId
-    """
     url = (
         "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:"
         + authIdHal_s
