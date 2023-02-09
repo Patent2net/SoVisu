@@ -442,10 +442,20 @@ def validate_credentials(request):
             res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
+                print(f"entity = {entity}")
             except:
                 return redirect("unknown")
 
             print(f"{struct}-{entity['labHalId']}-researchers")
+
+            if entity['aurehalId'] != '':
+                print(f"initialize concept and keywords gathering")
+                archives_ouvertes_data = get_concepts_and_keywords(entity['aurehalId'])
+                archives_ouvertes_data = archives_ouvertes_data["concepts"]
+                print(f"concepts: {archives_ouvertes_data}")
+            else:
+                print(f"no aurehalid available to gather")
+                archives_ouvertes_data = ""
 
             es.update(
                 index=f"{struct}-{entity['labHalId']}-researchers",
@@ -457,6 +467,7 @@ def validate_credentials(request):
                         "orcId": orcid,
                         "validated": True,
                         "function": function,
+                        "concepts": archives_ouvertes_data
                     }
                 },
             )

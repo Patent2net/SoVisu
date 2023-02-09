@@ -68,6 +68,7 @@ class ValidCredentials(forms.Form):
 
     def __init__(self, *args, **kwargs):
         halid_s = kwargs.pop("halId_s")
+        aurehalId = kwargs.pop("aurehalId")
         idref = kwargs.pop("idRef")
         orcid = kwargs.pop("orcId")
         function = kwargs.pop("function")
@@ -76,6 +77,8 @@ class ValidCredentials(forms.Form):
 
         self.fields["f_halId_s"].initial = halid_s
         self.fields["f_halId_s"].disabled = True
+        self.fields["f_aurehalId"].initial = aurehalId
+        self.fields["f_aurehalId"].disabled = True
         self.fields["f_IdRef"].initial = idref
         self.fields["f_orcId"].initial = orcid
         self.fields["f_more"].initial = "0"
@@ -99,6 +102,7 @@ class ValidCredentials(forms.Form):
     # Set choices to an empty list as it is a required argument.
     f_more = forms.CharField()
     f_halId_s = forms.CharField(label="ID HAL (texte)")
+    f_aurehalId = forms.CharField(label="aurehal ID")
     f_status = forms.ChoiceField(label="Statut", choices=status)
     f_IdRef = forms.CharField(label="IdRef", required=False)
     f_orcId = forms.CharField(label="ORCID", required=False)
