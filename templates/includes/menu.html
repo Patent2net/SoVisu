@@ -3,17 +3,16 @@
         <div>
         <!-- Date param -->
         <ul class="flex flex-col" :class="{'block': open, 'hidden': !open}">
-            <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Période de soumission</h3>
+            <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Fenêtre de dépôt</h3>
 
             <li class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full text-gray-300">
-                <div class="px-4 py-2">
+                <div class="py-2">
                     <div>
-                        <label for="yearpicker">De:</label><select style="color:black" name="yearpickerfrom" id="sel-from"></select>
-
-                    <label for="yearpicker">À:</label><select style="color:black" name="yearpickerto" id="sel-to"></select>
+                        <label for="yearpicker"></label><select class="rounded bg-gray-200 mr-1 px-0.5 py-0.5 text-gray-900" name="yearpickerfrom" id="sel-from"></select>
+                        <label for="yearpicker"> - </label><select class="rounded bg-gray-200 mr-1 px-0.5 py-0.5 text-gray-900" name="yearpickerto" id="sel-to"></select>
                     </div>
                     <div>
-                    <button id="update-filters" class="mt-2 flex w-full bg-gray-600 py-2 text-gray-200 items-center justify-center rounded-b font-semibold">Mettre à jour la période</button>
+                    <button id="update-filters" class="mt-2 flex w-full bg-gray-500 py-2 text-gray-200 items-center justify-center rounded-b font-semibold">Actualiser</button>
                     </div>
                 </div>
             </li>
