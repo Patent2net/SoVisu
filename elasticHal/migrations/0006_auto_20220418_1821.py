@@ -4,28 +4,43 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('elasticHal', '0005_auto_20220418_1815'),
+        ("elasticHal", "0005_auto_20220418_1815"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Researcher',
+            name="Researcher",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(default='', max_length=50)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(default="", max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Structure',
+            name="Structure",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(default='', max_length=50)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(default="", max_length=50)),
             ],
         ),
         migrations.RenameModel(
-            old_name='ElastichalCsv',
-            new_name='Laboratory',
+            old_name="ElastichalCsv",
+            new_name="Laboratory",
         ),
     ]

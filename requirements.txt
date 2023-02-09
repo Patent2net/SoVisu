@@ -1,3 +1,7 @@
+# Code formatter
+black
+
+# dependancies
 asgiref==3.5.1
 beautifulsoup4==4.11.1
 bs4==0.0.1

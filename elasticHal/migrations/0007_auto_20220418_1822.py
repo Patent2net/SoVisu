@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('elasticHal', '0006_auto_20220418_1821'),
+        ("elasticHal", "0006_auto_20220418_1821"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='laboratory',
-            options={'verbose_name_plural': 'Laboratories'},
+            name="laboratory",
+            options={"verbose_name_plural": "Laboratories"},
         ),
     ]
