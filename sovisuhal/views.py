@@ -158,7 +158,7 @@ def check(request):
         #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
-    print(hastoconfirm)
+    print(f"hastoconfirm = {hastoconfirm}")
 
     if data == "state":
         field = "labHalId"
@@ -216,6 +216,7 @@ def check(request):
                     "extIds": ["a", "b", "c"],
                     "form": forms.ValidCredentials(
                         halId_s=entity["halId_s"],
+                        aurehalId=entity["aurehalId"],
                         idRef=entity["idRef"],
                         orcId=orcid,
                         function=function,
