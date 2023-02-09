@@ -20,11 +20,11 @@ L'initialisation comprend l'intégration des données chercheurs (issues de ldap
 
 Cette étape construit dans Elastic les index suivant :
 
-- *SIREN-structures*                            # données de structure
-- *SIREN-labHalid-laboratories*                 # données de laboratoire
-- *SIREN-labHalid-laboratories-documents*       # collection de laboratoire
-- *SIREN-labHalid-researchers*                  # chercheurs du laboratoire
-- *SIREN-labHalid-researchers-ldapid-documents* # documents du ldapid de chercheur
+- **SIREN-structures**                            # données de structure
+- **SIREN-labHalid-laboratories**                 # données de laboratoire
+- **SIREN-labHalid-laboratories-documents**       # collection de laboratoire
+- **SIREN-labHalid-researchers**                 # chercheurs du laboratoire
+- **SIREN-labHalid-researchers-ldapid-documents** # documents du ldapid de chercheur
 
 .. tip::
     Le labHalid Non-labo est créé pour les chercheurs non rattachés.
@@ -34,9 +34,9 @@ Validations des Id et intégration des notices
 
 Lors de l'authentification le chercheur doit renseigner ses identifiants de chercheur, les créer le cas échéant :
 
-* idRef : obligatoire mais non utilisé.
-* idHal : primordial si faut rien ne marche.
-* ORCId : optionnel et non utilisé.
+* idRef : obligatoire mais non utilisé. Mis ici pour informer de son existence et pour que chacun vérifie (problèmes d'homonymie, de changement de noms, ou si la thèse n'a pas été soutenu en France, cet Id n'existe pas)
+* idHal : primordial, si faux rien ne marche.
+* ORCId : optionnel  (non utilisé). Mis ici pour suggérer aux chercheurs de s'en créer un. A terme devrait être l'id principal de SoVisu pour les chercheurs.
 
 Cette étape de validation permet à SoVisu de collecter les notices associées à l'idHal sur Hal. Celles-ci sont alors indexées dans son profil : *SIREN-labHalid-researchers-ldapid-documents*.
 

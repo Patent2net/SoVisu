@@ -78,7 +78,6 @@ else:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -113,7 +112,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sovisu.univ-tln.fr:9200",
     "https://sovisu.univ-tln.fr:5601",
     "https://sovisu.univ-tln.fr:6379",
-    "http://192.168.0.65:*",
+    "http://194.214.84.14:*",
     "http://localhost:*",
     "http://localhost:9200",
     "http://localhost:5601",
@@ -122,22 +121,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:9200",
     "http://127.0.0.1:5601",
     "http://127.0.0.1:6379",
-    "http://sovisu.dynalias.org",
-    "http://sovisu.dynalias.org:9200" "http://sovisu.dynalias.org:5601",
-    "http://sovisu.dynalias.org:6379",
-    "https://77.153.196.68",
 ]
-# ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "192.168.0.65",
-    "sovisu.dynalias.org",
-    "77.153.196.68",
-    "DR",
-    "[::1]",
-]
-CSRF_TRUSTED_ORIGINS = ["https://77.153.196.68", "https://localhost"]
+
+#ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '194.214.84.14', 'sovisu.univ-tln.fr']
+CSRF_TRUSTED_ORIGINS =["https://194.214.84.14","https://localhost"]
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
@@ -149,17 +138,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:9200",
     "http://localhost:5601",
     "http://localhost:6379",
-    "http://192.168.0.65",
-    "http://192.168.0.65:5601",
-    "http://192.168.0.65:6379",
     "http://127.0.0.1",
     "http://127.0.0.1:9200",
     "http://127.0.0.1:5601",
     "http://127.0.0.1:6379",
-    "http://sovisu.dynalias.org",
-    "http://sovisu.dynalias.org:5601",
-    "http://sovisu.dynalias.org:6379",
-    "https://77.153.196.68",
 ]
 
 
@@ -207,9 +189,9 @@ Dns = [
 # CSP_WORKER_SRC = Bibi
 # CSP_MEDIA_SRC = Bibi
 
-
 # X_FRAME_OPTIONS = 'ALLOW-FROM ' + " " .join(Dns)
 X_FRAME_OPTIONS = "sameorigin"
+
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -283,9 +265,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  #'/data/SoVisu/staticfiles/
-STATIC_URL = "/static/"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static') #'/data/SoVisu/staticfiles/
+
+STATICFILES_DIRS = (os.path.join(BASE_DIR,'staticfiles'),)
+
 # Pas sûr sur çà... J'ai l'impression qu'il y a deux zones de fichiers statiques
 # j'ai eu un stock de "Found another file with the destination path"
 
@@ -306,8 +290,10 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_PORT = 587
+
 EMAIL_HOST_USER = "testsovis@gmail.com"
-EMAIL_HOST_PASSWORD = "ckpfbawohpgrhykz"
+EMAIL_HOST_PASSWORD = config("mailSovisu")
+
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_SUBJECT_PREFIX = "[SoVisu]"
 
