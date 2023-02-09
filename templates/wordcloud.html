@@ -39,7 +39,7 @@
                     </div>
                 {% if type == "lab" %}
                     <div class="w-full h-full">
-                        <iframe src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%" id="dashkib"></iframe>
+                        <iframe src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')),viewMode:edit,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%" id="dashkib"></iframe>
                     </div>
                 {%  else %}
                     <div class="w-full h-full">

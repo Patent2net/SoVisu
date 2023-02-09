@@ -1,0 +1,60 @@
+server:
+  name: "kibana"
+  host: localhost
+  port: 5601
+  basePath: /kibana
+  rewriteBasePath: true
+  securityResponseHeaders.referrerPolicy: null
+  # When enabling encryption between Kibana and Elasticsearch, change "http" to "https" below:
+  cors.allowOrigin: ["http://localhost", "http://127.0.0.1", "http://194.214.84.14", "https://194.214.84.14"]
+  publicBaseUrl: "https://sovisu.univ-tln.fr/kibana"  
+
+xpack.reporting.encryptionKey: "fhjsklopapd678ehkdfdlliverpipofcr"
+xpack.security.encryptionKey: "fkk8smmlopapd413ehkdfdlliver964bhr"
+
+server.host: 0.0.0.0
+elasticsearch.hosts: [ "http://elasticsearch:9200"]
+
+xpack.security.authc.providers:
+ token.token1:
+   order: 0
+
+status:
+  allowAnonymous: true
+
+
+monitoring.ui.container.elasticsearch.enabled: false
+xpack.reporting.roles.enabled: true
+
+xpack.reporting.enabled: false
+
+## X-Pack security credentials
+elasticsearch.username: kibana_system
+elasticsearch.password: oUrv3XiBg5QfepKftUwZ
+
+csp.strict: false
+csp.disableUnsafeEval: false
+
+
+csp:
+  style_src: ["*"]
+  frame_ancestors: ["http://localhost", "http://localhost:*", "http://194.214.84.14:*"]
+  warnLegacyBrowsers: true
+
+#server.xsrf.allowlist: ["http://localhost", "http://127.0.0.1", "http://192.168.0.65"]]
+
+server.xsrf.disableProtection: False
+# SSL settings
+#
+server.ssl.enabled: false
+#server.ssl.certificate: ./config/certs/kibana.crt
+#server.ssl.key: ./config/certs/kibana.key
+#server.ssl.certificateAuthorities: ./config/certs/ca.crt
+
+## X-Pack security credentials
+#elasticsearch.ssl.certificateAuthorities: ./config/certs/ca.crt
+#xpack.reporting.kibanaServer.hostname: sovisu.univ-tln.fr
+#xpack.reporting.kibanaServer.protocol: http
+
+#explorer in dashboard
+xpack.discoverEnhanced.actions.exploreDataInChart.enabled: true

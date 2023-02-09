@@ -35,7 +35,9 @@ def es_connector(mode=mode):
         es.options(request_timeout=100, retry_on_timeout=True, max_retries=5).cluster.health(
             wait_for_no_initializing_shards=True,
             wait_for_no_relocating_shards=False,
-            wait_for_status="yellow"  # green  doit pas forcément marcher si pas un cluster !
+            wait_for_status="yellow"  #green  doit pas forcément marcher si pas un cluster !
+        )
+
 
     return es
 

@@ -82,10 +82,12 @@ $(function() {
 	$(document).ready(function () {
     $('.loading-div').fadeOut(150);
     $(window).off('beforeunload');
-    });
-});
 
+    const iFrameEle = document.querySelector('#ifram');
 
+    iFrameEle.onload = function() {
+        iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    }})});
 
 
 
@@ -104,6 +106,7 @@ $(function() {
 //     }
 // })};
 
+/*
 
 document.addEventListener('load', (event) => {
     var ifram=document.getElementById('dashkib')
@@ -136,10 +139,17 @@ window.addEventListener("load", function () {
 });
 
 window.onload = function() { // can also use window.addEventListener('load', (event) => {
-    $(window).off('beforeunload');
-    const iFrameEle = document.querySelector('#dashkib');
-    console.log(iFrameEle.readyState);
+    //$(window).off('beforeunload');
+    document.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    const iFrameEle = document.querySelector('#ifram');
+
     iFrameEle.onload = function() {
         iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
     };  };
 
+const iFrameEle = document.querySelector('#ifram');
+
+iFrameEle.onload = function() {
+        iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
+    };
+*/

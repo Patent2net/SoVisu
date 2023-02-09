@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.shortcuts import redirect
-from . import views, viewsActions
+from . import views, viewsActions, settings
+from django.views.static import serve
+
+
 
 urlpatterns = [
     path(

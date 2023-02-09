@@ -1528,8 +1528,12 @@ def default_checker(request, basereverse, default_data=None):
     # basereverse = ''
     # return default_checker(request, basereverse)
 
-    p_id = request.user.get_username()  # check si l'utilisateur est log
-    p_id = p_id.replace(viewsActions.patternCas, "").lower()
+    try:
+        p_id = request.user.get_display_id() # cas log ?
+    except:
+        p_id = request.user.get_username()  # check si l'utilisateur est log
+    #p_id = p_id.replace(viewsActions.patternCas, '').lower()
+
 
     if (
         p_id == "adminlab"
@@ -1645,6 +1649,7 @@ def get_date(request, start_date):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
+
         date_to = datetime.today().strftime("%Y-%m-%d")
 
     return date_from, date_to
