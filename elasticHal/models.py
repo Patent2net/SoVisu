@@ -25,6 +25,7 @@ class Laboratory(models.Model):
     """
     Définition du modèle Laboratory dans Django
     """
+
     class Meta:
         verbose_name = "Laboratoire"
         verbose_name_plural = "Laboratoires"

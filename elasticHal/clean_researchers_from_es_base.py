@@ -10,22 +10,20 @@ travers de son halId. Une fois les doublons repérés, les index *-researchers e
 sont supprimés
 """
 
-print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+print(time.strftime("%H:%M:%S", time.localtime()), end=" : ")
 print("process start")
 
-es = Elasticsearch([{'host': 'localhost', 'port': 9200}])  # Creation d'un instance ElasticSeach
+es = Elasticsearch(
+    [{"host": "localhost", "port": 9200}]
+)  # Creation d'un instance ElasticSeach
 structId = "198307662"  # UTLN Struct ID de l'université de Toulon
 
-scope_param = {
-        "query": {
-            "match_all": {}
-        }
-    }
-count = es.count(index="*-researchers", body=scope_param)['count']
+scope_param = {"query": {"match_all": {}}}
+count = es.count(index="*-researchers", body=scope_param)["count"]
 res = es.search(index="*-researchers", body=scope_param, size=count)
 
 
-researchers = res['hits']['hits']  # pour chaque laboratoire
+researchers = res["hits"]["hits"]  # pour chaque laboratoire
 texting_dict = dict()
 
 
@@ -44,7 +42,14 @@ for key in texting_dict:
 
         for index in texting_dict[key]:
             # pour chaque enregistrement stock sous forme de liste la date de création du profil ainsi que son index
-            list_of_date.append([datetime.strptime(researchers[index]["_source"]["Created"], "%Y-%m-%dT%H:%M:%S.%f"), index])
+            list_of_date.append(
+                [
+                    datetime.strptime(
+                        researchers[index]["_source"]["Created"], "%Y-%m-%dT%H:%M:%S.%f"
+                    ),
+                    index,
+                ]
+            )
 
         while len(list_of_date) != 1:
             # tant qu'il ne reste pas 1 seule date dans list_of_date supprime les plus vieux comptes
@@ -57,12 +62,16 @@ for key in texting_dict:
                     }
                 }
             }
-            es.delete_by_query(index=researchers[min(list_of_date)[1]]["_index"], body=query)  # suppression du chercheur
-            es.indices.delete(index=index + "-" + id + "-documents")  # suppression des documents associer
+            es.delete_by_query(
+                index=researchers[min(list_of_date)[1]]["_index"], body=query
+            )  # suppression du chercheur
+            es.indices.delete(
+                index=index + "-" + id + "-documents"
+            )  # suppression des documents associer
             count_deleted = count_deleted + 1
             list_of_date.remove(min(list_of_date))
 
 
-print(str(count_deleted)+" doublons supprimés")
-print(time.strftime("%H:%M:%S", time.localtime()), end=' : ')
+print(str(count_deleted) + " doublons supprimés")
+print(time.strftime("%H:%M:%S", time.localtime()), end=" : ")
 print("process start")

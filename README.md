@@ -1,6 +1,8 @@
 SoVisu
 ======
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+## De quoi s'agit il?
 SoVisu est un dispositif créé et pensé pour accompagner la communauté d'un établissement à la Science Ouverte (SO) en lui fournissant les instruments guides de son pilotage, tout en permettant de cartographier l'expertise des chercheurs, faciliter l'autoarchivage et apprécier la qualité de l'indexation. 
 Ce dispositif prend source sur HAL pour s'inscrire dans l'écosystème de la SO côté usager en donnant la possibilité aux chercheurs de qualifier/vérifier et compléter leurs données bibliographiques, leurs domaines et leurs mot-clés "experts".
 

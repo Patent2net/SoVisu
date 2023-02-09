@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('elasticHal', '0002_auto_20220418_1750'),
+        ("elasticHal", "0002_auto_20220418_1750"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='elastichal',
-            name='name',
-            field=models.CharField(default='', max_length=50),
+            model_name="elastichal",
+            name="name",
+            field=models.CharField(default="", max_length=50),
         ),
     ]
