@@ -399,14 +399,11 @@ def check(request):
         if "validation" in request.GET:
             validation = request.GET["validation"]
 
-            if validation == "1":
-                validate = True
-            elif validation == "0":
+            if validation == "0":
                 validate = False
             else:
-                return redirect("unknown")
-        else:
-            return redirect("unknown")
+                validation = "1"
+                validate = True
 
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"

@@ -235,7 +235,7 @@
                 <h3 class="px-4 text-xs font-semibold uppercase text-gray-400 mb-1">Plus d'informations</h3>
                      <li class="flex h-8 "><a
                         class="whitespace-nowrap px-4 pr-6 flex items-center text-xs font-semibold h-full {% if title == 'Lien vers la doc' %} text-white {% else %} text-gray-300 {% endif %}"
-                        href="http://sovisu.rtfd.io/">
+                        href="http://sovisu.rtfd.io/" target="_blank">
                     <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                          fill="currentColor">
                         <path fill-rule="evenodd"
@@ -394,7 +394,31 @@
                     } else {
                         ldapid_cond = "";
                     }
-                    window.location.href = "/" + document.URL.split("/")[3] + "/?struct="+ getUrlParameter('struct') +"&type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + ldapid_cond + filter_cond + "&from=" + start + "&to=" + end;
+                    if (getUrlParameter('data') != undefined) {
+                        data_cond = "&data=" + getUrlParameter('data');
+                    } else {
+                        data_cond = "";
+                    }
+                    if (getUrlParameter('lang') != undefined) {
+                        lang_cond = "&lang=" + getUrlParameter('lang');
+                    } else {
+                        lang_cond = "";
+                    }
+                    if (getUrlParameter('validation') != undefined) {
+                        validation_cond = "&validation=" + getUrlParameter('validation');
+                    } else {
+                        validation_cond = "";
+                    }
+                    if (getUrlParameter('indexcat') != undefined) {
+                        indexcat_cond = "&indexcat=" + getUrlParameter('indexcat');
+                    } else {
+                        indexcat_cond = "";
+                    }if (getUrlParameter('indexstruct') != undefined) {
+                        indexstruct_cond = "&indexstruct=" + getUrlParameter('indexstruct');
+                    } else {
+                        indexstruct_cond = "";
+                    }
+                    window.location.href = "/" + document.URL.split("/")[3] + "/?struct="+ getUrlParameter('struct') +"&type=" + getUrlParameter('type') + "&id=" + getUrlParameter('id') + ldapid_cond + filter_cond + "&from=" + start + "&to=" + end + data_cond + validation_cond + lang_cond+ indexcat_cond + indexstruct_cond;
                 }
 
                 var sel_from = getUrlParameter('from').split('-')[0];
