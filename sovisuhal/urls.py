@@ -17,8 +17,9 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.shortcuts import redirect
 from . import views, viewsActions, settings
-from django.views.static import serve
-
+# from django.views.static import serve
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -90,4 +91,4 @@ urlpatterns = [
     path("unknown/", views.unknown, name="unknown"),
     path("accounts/", include("uniauth.urls", namespace="uniauth")),
     path("tinymce/", include("tinymce.urls")),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
