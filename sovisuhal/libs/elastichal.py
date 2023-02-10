@@ -190,11 +190,11 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
 
 
 # @shared_task(bind=True)
-def collecte_docs(chercheur):  # self,
+def collecte_docs(chercheur, overwrite=False):  # self,
     """
-    collecte les documents d'un chercheur
+    Collecte les documents d'un chercheur
     """
-    init = False  # If True, data persistence is lost when references are updated
+    init = overwrite  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
 
     #  progress_recorder = ProgressRecorder(self)
@@ -240,6 +240,7 @@ def collecte_docs(chercheur):  # self,
 
         authhalid_s_filled = []
         # replace authId_i per authIdHal_i after test
+        print(f"document reference: {doc['halId_s']}")
         if "authIdHal_i" in doc:
             print(f"authIdHal_i is in doc")
             for auth in doc["authIdHal_i"]:
