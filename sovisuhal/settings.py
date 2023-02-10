@@ -266,12 +266,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static') #'/data/SoVisu/staticfiles/
+if mode == "dev":
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static') #'/data/SoVisu/staticfiles/
+"""
+Permet de résoudre le soucis MIME sur les navigateurs. Le STATIC_ROOT est a paramétrer avec NGINX pour fonctionner
+le STATICFILES_DIRS est une solution adaptée principalement pour le dev
+"""
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR,'staticfiles'),)
-
-# Pas sûr sur çà... J'ai l'impression qu'il y a deux zones de fichiers statiques
-# j'ai eu un stock de "Found another file with the destination path"
 
 
 # EMAIL Setup
