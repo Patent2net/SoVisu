@@ -129,22 +129,6 @@ CSRF_TRUSTED_ORIGINS =["https://194.214.84.14","https://localhost"]
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "https://sovisu.univ-tln.fr",
-    "https://sovisu.univ-tln.fr:9200",
-    "https://sovisu.univ-tln.fr:5601",
-    "https://sovisu.univ-tln.fr:6379",
-    "http://localhost",
-    "http://localhost:9200",
-    "http://localhost:5601",
-    "http://localhost:6379",
-    "http://127.0.0.1",
-    "http://127.0.0.1:9200",
-    "http://127.0.0.1:5601",
-    "http://127.0.0.1:6379",
-]
-
-
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 CORS_URLS_REGEX = r"^/app/*"
