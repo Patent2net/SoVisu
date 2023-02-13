@@ -28,11 +28,6 @@ except:
     mode = "Dev"
     structId = "198307662"  # UTLN
 
-# from celery import shared_task
-# from celery_progress.backend import ProgressRecorder
-
-from SPARQLWrapper import SPARQLWrapper, JSON
-import requests
 
 # Connect to DB
 es = esActions.es_connector()
@@ -242,16 +237,16 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         # replace authId_i per authIdHal_i after test
         print(f"document reference: {doc['halId_s']}")
         if "authIdHal_i" in doc:
-            print(f"authIdHal_i is in doc")
+            print("authIdHal_i is in doc")
             for auth in doc["authIdHal_i"]:
                 try:
                     aurehal = archivesOuvertes.get_halid_s(auth)
                     authhalid_s_filled.append(aurehal)
                 except:
-                    print(f"Collecte_docs: authIdHal_i Exception case")
+                    print("Collecte_docs: authIdHal_i Exception case")
                     authhalid_s_filled.append("")
         else:
-            print(f"no authIdHal_i found in doc")
+            print("no authIdHal_i found in doc")
 
         authors_count = len(authhalid_s_filled)
         print(f"{authors_count} authors found in document")

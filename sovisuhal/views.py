@@ -1419,7 +1419,6 @@ def search(request):  # Revoir la fonction
                 "from": date_from,
                 "to": date_to,
                 "startDate": min_date,
-                "url": url,
                 "ldapid": ldapid,
             },
         )
@@ -1456,8 +1455,14 @@ def presentation(request):
     return render(
         request,
         "presentation.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
-            "to": date_to},
+        {
+            "struct": struct,
+            "type": i_type,
+            "id": p_id,
+            "ldapid": ldapid,
+            "from": date_from,
+            "to": date_to,
+        },
     )
 
 
@@ -1475,8 +1480,14 @@ def ressources(request):
     return render(
         request,
         "ressources.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
-            "to": date_to},
+        {
+            "struct": struct,
+            "type": i_type,
+            "id": p_id,
+            "ldapid": ldapid,
+            "from": date_from,
+            "to": date_to,
+        },
     )
 
 
@@ -1494,8 +1505,14 @@ def faq(request):
     return render(
         request,
         "faq.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
-            "to": date_to},
+        {
+            "struct": struct,
+            "type": i_type,
+            "id": p_id,
+            "ldapid": ldapid,
+            "from": date_from,
+            "to": date_to,
+        },
     )
 
 
@@ -1526,11 +1543,10 @@ def default_checker(request, basereverse, default_data=None):
     # return default_checker(request, basereverse)
 
     try:
-        p_id = request.user.get_display_id() # cas log ?
+        p_id = request.user.get_display_id()  # cas log ?
     except:
         p_id = request.user.get_username()  # check si l'utilisateur est log
-    #p_id = p_id.replace(viewsActions.patternCas, '').lower()
-
+    # p_id = p_id.replace(viewsActions.patternCas, '').lower()
 
     if (
         p_id == "adminlab"
@@ -1646,7 +1662,6 @@ def get_date(request, start_date):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-
         date_to = datetime.today().strftime("%Y-%m-%d")
 
     return date_from, date_to

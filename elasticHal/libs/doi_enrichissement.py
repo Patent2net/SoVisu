@@ -1,5 +1,3 @@
-import datetime
-
 import requests
 
 
@@ -63,12 +61,12 @@ def docs_enrichissement_doi(doc):
                 doc["oa_status"] = data["oa_status"]
             if "is_oa" in data.keys():
                 if (
-                    data["is_oa"] == True
+                    data["is_oa"] is True
                 ):  # Test si le doi est en open access sur l'api Unpaywall
                     doc["is_oa"] = "open access"
-                    if data["first_oa_location"]["oa_date"] != None:
+                    if data["first_oa_location"]["oa_date"] is not None:
                         doc["date_depot_oa"] = data["first_oa_location"]["oa_date"]
-                    elif data["first_oa_location"]["updated"] != None:
+                    elif data["first_oa_location"]["updated"] is not None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
                         pass  # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type

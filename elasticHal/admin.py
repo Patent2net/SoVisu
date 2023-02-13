@@ -18,13 +18,10 @@ from .collect_from_HAL import (
 from .forms import PopulateLab, ExportToElasticForm, CsvImportForm
 from .views import get_index_list
 
-# Celery
-from celery import shared_task
-
-# Celery-progress
-from celery_progress.backend import ProgressRecorder
-
 admin.site.site_header = "Administration de SoVisu"
+
+# Celery tasks
+# task_id1 = task_id2 = task_id3 = None
 
 
 class ExportCsv:
@@ -153,8 +150,8 @@ class ElasticActions:
                         )
                         taches.append([ind, result1.task_id, result2.task_id])
 
-                elif collectionLabo == True:
-                    if chercheurs == True:
+                elif collectionLabo is True:
+                    if chercheurs is True:
                         laboratoire = collection.split("-")[1]
                         structure = collection.split("-")[0]
                         result1 = collect_laboratories_data2.delay(laboratoire)

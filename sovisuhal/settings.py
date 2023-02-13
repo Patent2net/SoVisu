@@ -123,9 +123,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:6379",
 ]
 
-#ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '194.214.84.14', 'sovisu.univ-tln.fr']
-CSRF_TRUSTED_ORIGINS =["https://194.214.84.14","https://localhost"]
+# ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "194.214.84.14", "sovisu.univ-tln.fr"]
+CSRF_TRUSTED_ORIGINS = ["https://194.214.84.14", "https://localhost"]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -265,16 +265,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 if mode == "dev":
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 else:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static') #'/data/SoVisu/staticfiles/
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")  #'/data/SoVisu/staticfiles/
 """
 Permet de résoudre le soucis MIME sur les navigateurs. Le STATIC_ROOT est a paramétrer avec NGINX pour fonctionner
 le STATICFILES_DIRS est une solution adaptée principalement pour le dev
 """
-
 
 
 # EMAIL Setup

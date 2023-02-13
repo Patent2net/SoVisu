@@ -140,7 +140,7 @@ def sort_references(articles, halstructid):
         if "openAccess_bool" in article:
             if (
                 article["openAccess_bool"] == "true"
-                or article["openAccess_bool"] == True
+                or article["openAccess_bool"] is True
             ):
                 article["openAccess_bool_s"] = "O"
             else:
