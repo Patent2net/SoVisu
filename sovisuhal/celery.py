@@ -5,7 +5,7 @@ from celery import Celery
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sovisuhal.settings")
 
-app = Celery("elasticHal")#, backend="redis://localhost", broker="redis://localhost")
+app = Celery("sovisuhal")#, backend="redis://localhost", broker="redis://localhost")
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.

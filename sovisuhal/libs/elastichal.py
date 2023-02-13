@@ -12,6 +12,8 @@ from elasticHal.libs import (
 from elasticsearch import helpers
 import json
 import datetime
+# Celery
+from celery import shared_task
 
 from . import esActions
 
@@ -31,14 +33,11 @@ except:
 # from celery import shared_task
 # from celery_progress.backend import ProgressRecorder
 
-from SPARQLWrapper import SPARQLWrapper, JSON
-import requests
-
 # Connect to DB
 es = esActions.es_connector()
 
 
-# @shared_task(bind=True)
+@shared_task(bind=True)
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
@@ -194,7 +193,7 @@ def collecte_docs(chercheur):  # self,
     """
     collecte les documents d'un chercheur
     """
-    init = False  # If True, data persistence is lost when references are updated
+    init = True  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
 
     #  progress_recorder = ProgressRecorder(self)
