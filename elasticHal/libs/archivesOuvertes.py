@@ -221,7 +221,7 @@ def get_concepts_and_keywords(aurehalid):
             tree = nx.DiGraph()
 
             tree.add_node("Concepts")
-            domains = [list(filter(lambda x: x != None, truc)) for truc in domains]
+            domains = [list(filter(lambda x: x is not None, truc)) for truc in domains]
 
             for dom1 in domains:
                 tree.add_node(dom1[0][0])
