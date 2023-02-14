@@ -21,7 +21,7 @@ try:
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
-    patternCas = 'cas-universite-de-toulon-'  # motif à enlever aux identifiants CAS
+    patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
 
 except:
     from django.contrib.auth.decorators import login_required
@@ -450,13 +450,13 @@ def validate_credentials(request):
 
             print(f"{struct}-{entity['labHalId']}-researchers")
 
-            if entity['aurehalId'] != '':
-                print(f"initialize concept and keywords gathering")
-                archives_ouvertes_data = get_concepts_and_keywords(entity['aurehalId'])
+            if entity["aurehalId"] != "":
+                print("initialize concept and keywords gathering")
+                archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])
                 archives_ouvertes_data = archives_ouvertes_data["concepts"]
                 print(f"concepts: {archives_ouvertes_data}")
             else:
-                print(f"no aurehalid available to gather")
+                print("no aurehalid available to gather")
                 archives_ouvertes_data = ""
 
             es.update(
@@ -469,7 +469,7 @@ def validate_credentials(request):
                         "orcId": orcid,
                         "validated": True,
                         "function": function,
-                        "concepts": archives_ouvertes_data
+                        "concepts": archives_ouvertes_data,
                     }
                 },
             )
@@ -813,7 +813,10 @@ def update_authorship(request):
                         )
                 else:
                     authorship = [
-                        {"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}
+                        {
+                            "authorship": doc["authorship"],
+                            "authIdHal_s": entity["halId_s"],
+                        }
                     ]
             else:
                 authorship = [
@@ -861,7 +864,10 @@ def update_authorship(request):
                         ]
                 else:
                     authorship = [
-                        {"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}
+                        {
+                            "authorship": doc["authorship"],
+                            "authIdHal_s": entity["halId_s"],
+                        }
                     ]
 
                 es.update(
