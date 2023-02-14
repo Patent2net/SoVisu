@@ -1194,6 +1194,7 @@ def init_labo():
     return labos, dico_acronym
 
 
+
 def collect_data(laboratories=False, researcher=False, django_enabler=None):
     """
     Collecte les données d'HAL et les indexe dans ElasticSearch
@@ -1224,7 +1225,7 @@ def collect_data(laboratories=False, researcher=False, django_enabler=None):
     print("\u2022", time.strftime("%H:%M:%S", time.localtime()), end=" : ")
     if researcher:
         print("collecting researchers data")
-        for struct in structIdlist:
+        for struct in structIdlist: # c'est bizarre une tache écrasée...
             tache2 = collect_researchers_data.delay(struct)
     else:
         print("researcher is disabled, skipping to next process")

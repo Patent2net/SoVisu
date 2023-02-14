@@ -311,5 +311,5 @@ MANAGERS = (("BU", "dreymond@univ-tln.fr"), ("BU_1", ""))  # changer l'adresse
 # Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés. Dans le cas où un seul admin est présent pour le système, merci de laisser le 2e profil sans adresse mail renseignée.
 
 # Celery Settings
-BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
