@@ -162,15 +162,17 @@ def collect_laboratories_data2(self, labo):
                         authid_s_filled = []
                         if "authId_i" in doc:
                             for auth in doc["authId_i"]:
-                                try:
-                                    aurehal = archivesOuvertes.get_halid_s(auth)
-                                    authid_s_filled.append(aurehal)
-                                except:
-                                    authid_s_filled.append("")
-
+                                if len(auth.strip()) >0:
+                                    try:
+                                        aurehal = archivesOuvertes.get_halid_s(auth) # pourquoi on va chercher l'auréhal de chaque auteur ???
+                                        authid_s_filled.append(aurehal)
+                                    except:
+                                        authid_s_filled.append("")
+                        else:
+                            print("des docs sans auteurs ?????")
                         authors_count = len(authid_s_filled)
                         i = 0
-                        for auth in authid_s_filled:
+                        for auth in authid_s_filled: # d'autant que pour chaque auteur qui a pas d'aurehal çà va foirer la numérotation (passer en 1er auteur si aucun aurehal avant).
                             i += 1
                             if i == 1 and auth != "":
                                 doc["authorship"].append(
@@ -183,6 +185,13 @@ def collect_laboratories_data2(self, labo):
                                 doc["authorship"].append(
                                     {"authorship": "lastAuthor", "authFullName_s": auth}
                                 )
+
+                        # d'autant que j'aurais fait comme çà :  et l'autorat sur une notice de labo on calcule çà comment ???
+                        # je collabore avec X du labo, je suis premier auteur, X dernier, pour chacune de nos notices.
+                        # vu du labo first ou last ?
+                        # Position = { 0 : "firstAuthor", len(doc["authId_i"])-1 :"lastAuthor"  }
+                        # posi = doc["authId_i"] . index(auteurencours)
+                        # doc["authorship"] = Position []
 
                         harvet_history.append(
                             {"docid": doc["docid"], "from": lab["halStructId"]}
@@ -333,7 +342,7 @@ def collect_researchers_data(self, struct):
             for researcher in django_researchers
             if researcher["halId_s"] != "" and researcher.pop("id")
         ]  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
-        if researchers_list:
+        if len(researchers_list) >0:
             print("checking DjangoDb laboratory list:")
             for searcher in django_researchers:
                 if any(
@@ -573,7 +582,7 @@ def collect_researchers_data(self, struct):
                             # -researchers" + searcher["ldapId"] + "-documents
                         )
                         print(str(len(boutdeDoc)) + " indexés " + searcher["ldapId"])
-                        time.sleep(1)
+#                        time.sleep(1)
 
             else:
                 doc_progress_recorder.set_progress(
@@ -896,8 +905,6 @@ def collect_researchers_data2(self, struct, idx):
         # {'id': 'sdv.mhep.phy', 'label_en': 'Tissues and Organs', 'label_fr': 'Physiologie', 'state': 'invalidated'}], 'label_en': 'Human health and pathology', 'label_fr': 'Médecine humaine et pathologie', 'state': 'invalidated'}], 'label_en': 'Life Sciences', 'label_fr': 'Sciences du Vivant', 'state': 'invalidated'}, {'id': 'info', 'children': [{'id': 'info.info-ai', 'label_en': 'Artificial Intelligence', 'label_fr': 'Intelligence artificielle', 'state': 'invalidated'}], 'label_en': 'Computer Science', 'label_fr': 'Informatique', 'state': 'invalidated'}, {'id': 'shs.edu', 'label_en': 'Education', 'label_fr': 'Education', 'state': 'invalidated'}, {'id': 'sde', 'label_en': 'Environmental Sciences', 'label_fr': "Sciences de l'environnement", 'state': 'invalidated'}]}, 'guidingKeywords': ['Activité physique adaptée ', ' locomotion ', ' biomécanique ', ' fauteuil roulant manuel '], 'Created': '2022-06-29T11:53:17.569225', 'orcId': '0000-0001-6837-623X', 'guidingDomains': ['sdv.mhep.phy'], 'researchDescription': '', 'axis': 'IAPS'}
 
         k = 0
-        if len(searcher["halId_s"].strip())<3:
-            print("hou un halid tout mini :", searcher["halId_s"] +1)
         docs = hal.find_publications(searcher["halId_s"], "authIdHal_s")
         # Enrichissements des documents récoltés
         # print ("2e " + str(type (docs)))

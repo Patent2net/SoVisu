@@ -399,11 +399,14 @@ def check(request):
         if "validation" in request.GET:
             validation = request.GET["validation"]
 
-            if validation == "0":
+            if validation == "1":
+                validate = True
+            elif validation == "0":
                 validate = False
             else:
-                validation = "1"
-                validate = True
+                return redirect("unknown")
+        else:
+            return redirect("unknown")
 
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
@@ -1455,8 +1458,14 @@ def presentation(request):
     return render(
         request,
         "presentation.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid, "from": date_from,
-            "to": date_to},
+        {
+            "struct": struct,
+            "type": i_type,
+            "id": p_id,
+            "ldapid": ldapid,
+            "from": date_from,
+            "to": date_to,
+        },
     )
 
 

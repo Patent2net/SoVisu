@@ -28,17 +28,17 @@ except:
     mode = "Dev"
     structId = "198307662"  # UTLN
 
-# from celery import shared_task
-# from celery_progress.backend import ProgressRecorder
+from celery import shared_task
+from celery_progress.backend import ProgressRecorder
 
-from SPARQLWrapper import SPARQLWrapper, JSON
-import requests
+# from SPARQLWrapper import SPARQLWrapper, JSON
+# import requests
 
 # Connect to DB
 es = esActions.es_connector()
 
 
-# @shared_task(bind=True)
+@shared_task(bind=True)
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
@@ -189,7 +189,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     return chercheur
 
 
-# @shared_task(bind=True)
+@shared_task(bind=True)
 def collecte_docs(chercheur, overwrite=False):  # self,
     """
     Collecte les documents d'un chercheur
