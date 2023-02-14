@@ -18,12 +18,17 @@ def es_connector(mode=Mode):
         #                    port=9200,
         #                    # ssl_context=context,
         #                    timeout=10)
-        es = Elasticsearch('http://localhost:9200',
-                           basic_auth=('elastic', secret),
-                           http_compress=True,  connections_per_node=5, request_timeout=200, retry_on_timeout=True)
+        es = Elasticsearch(
+            "http://localhost:9200",
+            basic_auth=("elastic", secret),
+            http_compress=True,
+            connections_per_node=5,
+            request_timeout=200,
+            retry_on_timeout=True,
+        )
     else:
         print("Niet !!!")
-        es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+        es = Elasticsearch([{"host": "localhost", "port": 9200}])
 
     return es
 
@@ -67,4 +72,3 @@ entities = res['hits']['hits']
 print (Mode)
 
 print(entities)
-

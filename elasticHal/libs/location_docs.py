@@ -1,6 +1,3 @@
-import requests
-
-
 def generate_countrys_fields(doc):
     """
     Enrichi les notices avec les champs country_collaboration qui fusionne :

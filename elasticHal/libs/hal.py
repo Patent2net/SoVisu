@@ -1,6 +1,5 @@
 import requests
 import grobid_tei_xml
-import io
 from elasticHal.libs import utils
 
 from requests.adapters import HTTPAdapter
