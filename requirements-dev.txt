@@ -1,0 +1,10 @@
+-r requirements.txt
+pre-commit # Git rules for push and pull
+black # Code formatter
+ruff == 0.0.243 # Linter, looks for common errors
+isort # sort the imports
+pyupgrade # make better syntax
+# Test units libraries
+pytest
+coverage
+pytest-cov
