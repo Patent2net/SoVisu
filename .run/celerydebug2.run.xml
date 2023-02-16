@@ -1,21 +1,21 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="celerydebug" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="celerydebug2" type="PythonConfigurationType" factoryName="Python">
     <module name="SoVisu" />
     <option name="INTERPRETER_OPTIONS" value="" />
-    <option name="PARENT_ENVS" value="true" />
+    <option name="PARENT_ENVS" value="false" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
       <env name="DJANGO_SETTINGS_MODULE" value="sovisuhal.settings" />
       <env name="mailSoVisu" value="&quot;&quot;" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/workers" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/venv/Lib/site-packages/tests" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
-    <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension"  enabled="false" sample_coverage="true" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="celery" />
-    <option name="PARAMETERS" value="-A elasticHal -A sovisuhal worker -n qrc -Q qrc -P solo -P gevent -E --loglevel=debug" />
+    <option name="PARAMETERS" value="-A elasticHal -A sovisuhal worker -P solo --loglevel=info -E" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
