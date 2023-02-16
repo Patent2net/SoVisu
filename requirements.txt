@@ -1,7 +1,3 @@
-# Code formatter
-black
-
-# dependancies
 asgiref==3.5.1
 beautifulsoup4==4.11.1
 bs4==0.0.1
@@ -46,9 +42,8 @@ spacy==3.3.1
 https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.3.0/fr_core_news_md-3.3.0.tar.gz
 https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.3.0/en_core_web_md-3.3.0.tar.gz
 SPARQLWrapper==2.0.0
-
 unidecode==1.3.4
 urllib3==1.26.9
-gunicorn==20.1.0 
+gunicorn==20.1.0
 PyPDF2~=2.4.1
 grobid-tei-xml
