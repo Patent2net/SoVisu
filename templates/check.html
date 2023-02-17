@@ -56,7 +56,7 @@
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                            href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
-                        >Expertise identifiée</a>
+                        >Expertises identifiées</a>
                     {% endif %}
 {#                    <a class="px-2 pb-1#}
 {#                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"#}
@@ -65,7 +65,7 @@
                     <a class="px-2 pb-1
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
-                    >Domaines expertise</a>
+                    >Domaines d'expertise</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -1096,7 +1096,7 @@
             var table2 = $('#concepts').DataTable(
                 {
                     language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json',
                     },
                     dom: 'Bfrtip',
                     select: true,
@@ -1131,6 +1131,7 @@
                 $('.dataTables_scrollHeadInner').css('padding-right', 0);
                 $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
 
+                $('.dataTables_empty').text('Aucune expertise validée, pensez à regarder l\'onglet "Expertises retirées"');
 
                 $('.dataTables_filter').addClass('flex items-center');
                 $('.dt-buttons').addClass('mr-2');
