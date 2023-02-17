@@ -681,7 +681,7 @@ def force_update_references(request):
         except:
             return redirect("unknown")
 
-        collecte_docs(entity)
+        collecte_docs(entity, True)
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data=references&validation=1"

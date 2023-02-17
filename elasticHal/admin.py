@@ -139,10 +139,13 @@ class ElasticActions:
                     collectionLabo = False
                 collection = form.cleaned_data["f_index"]
                 # print('uuuu ', collection)
-
+                indexes = get_index_list()
+                structures = []
+                for ind, lab in enumerate(indexes):
+                    structures.append(lab[0].split("-")[0])
                 if "TOUT" in request.POST.keys():
                     tachesChercheur, tachesLabo = [], []
-                    indexes = get_index_list()
+
 
                     for ind, lab in enumerate(indexes):
                         laboratoire = lab[0].split("-")[1]
@@ -171,10 +174,14 @@ class ElasticActions:
                         task_id1 = result1.task_id
                         task_id2 = None
 
-                # elif chercheurs == True:
-                #     result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
-                #     task_id2 = result2.task_id
-                #     task_id1 = None
+                elif chercheurs == True: # ici çà peut pas fonctionner (d'ou le comment. Quelle structure prends-on
+                    indexes = get_index_list()
+
+                    result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
+                    task_id2 = result2.task_id
+                    task_id1 = None
+                else:
+                    pass # on devrait pas être là
 
             else:
                 pass  # pas sûr
@@ -185,8 +192,8 @@ class ElasticActions:
                     "admin/elasticHal/export_to_elasticLabs.html",
                     context={"form": form, "taches": taches},
                 )
-            elif task_id1 in locals():
-                if task_id2 in locals():
+            elif "task_id1" in locals():
+                if "task_id2" in locals():
                     return render(
                         request,
                         "admin/elasticHal/export_to_elasticLabs.html",

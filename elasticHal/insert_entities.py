@@ -210,9 +210,11 @@ def create_researchers_index(pg):
             else:
                 connait_lab = row["labHalId"]
                 old_lab = row["labHalId"]
-
-            row["aurehalId"] = archivesOuvertes.get_aurehalId(row["halId_s"])
-            print(row["aurehalId"])
+            if '--> En erreur contactez-nous' not in row["halId_s"]:
+                row["aurehalId"] = archivesOuvertes.get_aurehalId(row["halId_s"])
+            else:
+                pass # on va chercher aurehalId sur une autre info ?
+            # print(row["aurehalId"])
             # row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empêchant une erreur venant de SPARQL
             try:
                 archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(

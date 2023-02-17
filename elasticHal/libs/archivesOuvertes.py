@@ -277,6 +277,8 @@ def get_aurehalId(authIdHal_s):
     """
     get the aurehalId (authIdHal_i) of the searcher with authIdHal_s (halId_s)
     """
+    if len(authIdHal_s) == 0:
+        return 0
     url = (
         "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:"
         + authIdHal_s
@@ -285,7 +287,7 @@ def get_aurehalId(authIdHal_s):
 
     res_status = False
     while res_status is False:
-        print(f"{authIdHal_s}")
+        #print(f"{authIdHal_s}")
         req = requests.request("GET", url)
         data = req.json()
         print(f"{data}")
