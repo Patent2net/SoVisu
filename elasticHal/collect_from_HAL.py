@@ -707,14 +707,17 @@ def collect_laboratories_data(self):
                         doc["authorship"] = []
 
                         authid_s_filled = []
-                        if "authId_i" in doc:
-                            for auth in doc["authId_i"]:
-                                try:
-                                    aurehal = archivesOuvertes.get_halid_s(auth)
-                                    authid_s_filled.append(aurehal)
-                                except:
-                                    authid_s_filled.append("")
-
+                        # si je comprends bien le passage ci-dessous c'est pour retrouver l'idhal de tous les auteurs ????
+                        # je crois qu'il faut laisser çà à Hal
+                        # et prendre direc le champ, authIdHal_s
+                        # if "authId_i" in doc:
+                        #     for auth in doc["authId_i"]:
+                        #         try:
+                        #             aurehal = archivesOuvertes.get_halid_s(auth)
+                        #             authid_s_filled.append(aurehal)
+                        #         except:
+                        #             authid_s_filled.append("")
+                        authid_s_filled =  doc["authIdHal_s"]
                         authors_count = len(authid_s_filled)
                         i = 0
                         for auth in authid_s_filled:
@@ -825,11 +828,11 @@ def collect_laboratories_data(self):
                         + "-laboratories-documents",
                     )
                     time.sleep(1)
-                doc_progress_recorder.set_progress(
-                    len(docs),
-                    len(docs),
-                    lab["acronym"] + " " + str(len(docs)) + " documents",
-                )
+                    doc_progress_recorder.set_progress(
+                        (indi +1 )* 50,
+                        len(docs),
+                        lab["acronym"] + " " + str(len(docs)) + " documents",
+                    )
             else:
                 doc_progress_recorder.set_progress(
                     0, 0, " pas de docs 2" + lab["halStructId"]
