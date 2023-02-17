@@ -378,7 +378,7 @@
                     {{ guidingKeywords | safe }}
                 </div>
 
-                <h4 class="text-xs font-semibold pb-2">Résumé des travaux :</h4>
+                <h4 class="text-xs font-semibold pb-2 mt-4">Résumé des travaux :</h4>
                 <div id="research_summary">
                     {{ research_summary | safe }}
                 </div>
@@ -417,12 +417,14 @@
                         [{'align': ['', 'center', 'right', 'justify']}],
                         [{list: 'ordered'}, {list: 'bullet'}]
                     ];
-                    var quill0 = new Quill('#guidingKeywords', {
+
+                    var quill4 = new Quill('#guidingKeywords', {
                         modules: {
-                            toolbar: []
+                            toolbar: options
                         },
                         theme: 'snow'
                     });
+
                     var quill1 = new Quill('#research_summary', {
                         modules: {
                             toolbar: options
