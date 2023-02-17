@@ -189,7 +189,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     return chercheur
 
 
-@shared_task(bind=True)
+#@shared_task(bind=True)
 def collecte_docs(chercheur, overwrite=False):  # self,
     """
     Collecte les documents d'un chercheur

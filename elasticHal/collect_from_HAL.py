@@ -60,9 +60,10 @@ def get_structid_list():
 
 
 @shared_task(bind=True)
-def collect_laboratories_data2(self, labo):
+def collect_laboratories_data2(self, labo, update = True):
     """
-    Collecte les données de laboratoires depuis HAL et les enregistre dans ElasticSearch
+    Collecte les données de laboratoires depuis HAL et les enregistre dans ElasticSearch.
+    Paramètre update non utilisé mais appelé dans une fonction admin
     """
     # Init laboratories
     laboratories_list = []
@@ -287,14 +288,14 @@ def collect_laboratories_data2(self, labo):
                             + "-laboratories-documents",
                         )
                         time.sleep(1)
-                    doc_progress_recorder.set_progress(
-                        len(docs),
-                        len(docs),
-                        lab["acronym"] + " " + str(len(docs)) + " documents",
-                    )
+                        doc_progress_recorder.set_progress(
+                            (indi+1)*50,
+                            len(docs),
+                            lab["acronym"] + " " + str(len(docs)) + " documents",
+                        )
             else:
                 doc_progress_recorder.set_progress(
-                    0, 0, lab["acronym"] + " " + " Pas de documents"
+                    0, nblab, lab["acronym"] + " " + " Pas de documents"
                 )
         # progress_recorder.set_progress(nblab, count, lab['acronym'] + " labo traité")
 
@@ -720,6 +721,7 @@ def collect_laboratories_data(self):
                         authid_s_filled =  doc["authIdHal_s"]
                         authors_count = len(authid_s_filled)
                         i = 0
+                        # Heu çà marche pas çà. Cf. comment ligne 160 par là
                         for auth in authid_s_filled:
                             i += 1
                             if i == 1 and auth != "":
