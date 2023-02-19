@@ -217,17 +217,17 @@ def create_researchers_index(pg):
             # print(row["aurehalId"])
             # row['aurehalId'] = str(row['aurehalId']).strip()  # supprime les '\r' empêchant une erreur venant de SPARQL
             try:
-                archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(
-                    int(row["aurehalId"])
-                )
+                    archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(
+                        int(row["aurehalId"])
+                    )
             except:
-                archives_ouvertes_data = dict()
-                archives_ouvertes_data["concepts"] = []
-                row["aurehalId"] = -1
-                print(
-                    f"erreur archives_ouvertes_data, {row['halId_s']}:{row['aurehalId']}"
-                )
-            time.sleep(1)
+                    archives_ouvertes_data = dict()
+                    archives_ouvertes_data["concepts"] = []
+                    row["aurehalId"] = -1
+                    print(
+                        f"erreur archives_ouvertes_data, {row['halId_s']}:{row['aurehalId']}"
+                    )
+                #time.sleep(1)
 
             if (
                 "guidingKeywords" not in row

@@ -419,7 +419,7 @@ def check(request):
             date_from,
             date_to,
         )
-        print(ref_param)
+        # print(ref_param)
 
         if i_type == "rsr":
             count = es.count(
@@ -450,25 +450,46 @@ def check(request):
         for ref in references["hits"]["hits"]:
             references_cleaned.append(ref["_source"])
         # /
-
-        return render(
-            request,
-            "check.html",
-            {
-                "struct": struct,
-                "data": data,
-                "type": i_type,
-                "id": p_id,
-                "from": date_from,
-                "to": date_to,
-                "validation": validation,
-                "entity": entity,
-                "hasToConfirm": hastoconfirm,
-                "references": references_cleaned,
-                "startDate": start_date,
-                "timeRange": f"from:'{date_from}',to:'{date_to}'",
-            },
-        )
+        if "taches" in  request.GET:
+            taches = request.GET ["taches"]
+            return render(
+                request,
+                "check.html",
+                {
+                    "struct": struct,
+                    "data": data,
+                    "type": i_type,
+                    "id": p_id,
+                    "from": date_from,
+                    "to": date_to,
+                    "validation": validation,
+                    "taches" : taches,
+                    "entity": entity,
+                    "hasToConfirm": hastoconfirm,
+                    "references": references_cleaned,
+                    "startDate": start_date,
+                    "timeRange": f"from:'{date_from}',to:'{date_to}'",
+                },
+            )
+        else:
+            return render(
+                request,
+                "check.html",
+                {
+                    "struct": struct,
+                    "data": data,
+                    "type": i_type,
+                    "id": p_id,
+                    "from": date_from,
+                    "to": date_to,
+                    "validation": validation,
+                    "entity": entity,
+                    "hasToConfirm": hastoconfirm,
+                    "references": references_cleaned,
+                    "startDate": start_date,
+                    "timeRange": f"from:'{date_from}',to:'{date_to}'",
+                },
+            )
 
     else:
         return redirect("unknown")

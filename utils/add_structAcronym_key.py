@@ -36,4 +36,5 @@ if count > 0:
                         f"le champ structAcronym: {structAcronym} a été rajouté a {doc['_index']}"
                     )
         else:
-            print(f"le champ structAcronym existe dans {doc['_index']}")
+            pass
+            #print(f"le champ structAcronym existe dans {doc['_index']}")

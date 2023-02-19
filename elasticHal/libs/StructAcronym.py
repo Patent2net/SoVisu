@@ -52,7 +52,8 @@ def return_struct():
                             body={"doc": {"structAcronym": "Warning"}},
                         )
             else:
-                print(f"le champ structAcronym existe dans {labo['_index']}")
+                pass
+                #print(f"le champ structAcronym existe dans {labo['_index']}")
 
 
 def return_struct_from_index(index):

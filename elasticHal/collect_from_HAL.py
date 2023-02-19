@@ -160,40 +160,39 @@ def collect_laboratories_data2(self, labo, update = True):
 
                         doc["authorship"] = []
 
-                        authid_s_filled = []
-                        if "authId_i" in doc:
-                            for auth in doc["authId_i"]:
-                                if len(auth.strip()) >0:
-                                    try:
-                                        aurehal = archivesOuvertes.get_halid_s(auth) # pourquoi on va chercher l'auréhal de chaque auteur ???
-                                        authid_s_filled.append(aurehal)
-                                    except:
-                                        authid_s_filled.append("")
-                        else:
-                            print("des docs sans auteurs ?????")
-                        authors_count = len(authid_s_filled)
-                        i = 0
-                        for auth in authid_s_filled: # d'autant que pour chaque auteur qui a pas d'aurehal çà va foirer la numérotation (passer en 1er auteur si aucun aurehal avant).
-                            i += 1
-                            if i == 1 and auth != "":
-                                doc["authorship"].append(
-                                    {
-                                        "authorship": "firstAuthor",
-                                        "authFullName_s": auth,
-                                    }
-                                )
-                            elif i == authors_count and auth != "":
-                                doc["authorship"].append(
-                                    {"authorship": "lastAuthor", "authFullName_s": auth}
-                                )
+                        #MISE EN COMMENTAIRE
+                        #l'autorat se définit : est-ce que l'un des membres du labo est 1er auteur --> first
+                        #                      ou  est-ce que l'un des membres du labo est dernier auteur --> last
+                        # je ne pense pas que ce puisse être calculé ici mais seulement lorsque tous les membres du lab on collecté et calculé leur autorat
+                        #
+                        # authid_s_filled = []
+                        # if "authId_i" in doc:
+                        #     for auth in doc["authId_i"]:
+                        #         if len(auth.strip()) >0:
+                        #             try:
+                        #                 aurehal = archivesOuvertes.get_halid_s(auth) # pourquoi on va chercher l'auréhal de chaque auteur ???
+                        #                 authid_s_filled.append(aurehal)
+                        #             except:
+                        #                 authid_s_filled.append("")
+                        # else:
+                        #     print("des docs sans auteurs ?????")
+                        # authors_count = len(authid_s_filled)
+                        # i = 0
+                        # for auth in authid_s_filled: # d'autant que pour chaque auteur qui a pas d'aurehal çà va foirer la numérotation (passer en 1er auteur si aucun aurehal avant).
+                        #     i += 1
+                        #     if i == 1 and auth != "":
+                        #         doc["authorship"].append(
+                        #             {
+                        #                 "authorship": "firstAuthor",
+                        #                 "authFullName_s": auth,
+                        #             }
+                        #         )
+                        #     elif i == authors_count and auth != "":
+                        #         doc["authorship"].append(
+                        #             {"authorship": "lastAuthor", "authFullName_s": auth}
+                        #         )
 
-                        # d'autant que j'aurais fait comme çà :  et l'autorat sur une notice de labo on calcule çà comment ???
-                        # je collabore avec X du labo, je suis premier auteur, X dernier, pour chacune de nos notices.
-                        # vu du labo first ou last ?
-                        # Position = { 0 : "firstAuthor", len(doc["authId_i"])-1 :"lastAuthor"  }
-                        # posi = doc["authId_i"] . index(auteurencours)
-                        # doc["authorship"] = Position []
-
+                        # d'autant que j'aurais fait comme çà :  cf.
                         harvet_history.append(
                             {"docid": doc["docid"], "from": lab["halStructId"]}
                         )
@@ -320,11 +319,11 @@ def collect_researchers_data(self, struct):
         index=struct + "*-researchers", body=scope_param, request_timeout=50
     )["count"]
     if count > 0:
-        print(
-            "\u00A0 \u21D2 ",
-            count,
-            " researchers found in ES, checking es_researchers list",
-        )
+        # print(
+        #     "\u00A0 \u21D2 ",
+        #     count,
+        #     " researchers found in ES, checking es_researchers list",
+        # )
         res = es.search(
             index=struct + "*-researchers",
             body=scope_param,
@@ -344,7 +343,7 @@ def collect_researchers_data(self, struct):
             if researcher["halId_s"] != "" and researcher.pop("id")
         ]  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
         if len(researchers_list) >0:
-            print("checking DjangoDb laboratory list:")
+            #print("checking DjangoDb laboratory list:")
             for searcher in django_researchers:
                 if any(
                     dictlist["halId_s"] == searcher["halId_s"]
@@ -458,19 +457,19 @@ def collect_researchers_data(self, struct):
 
                         doc["authorship"] = []
 
-                        if "authIdHal_s" in doc:
-                            authors_count = len(doc["authIdHal_s"])
-                            i = 0
-                            for auth in doc["authIdHal_s"]:
-                                i += 1
-                                if i == 1:
-                                    doc["authorship"].append(
-                                        {"authorship": "firstAuthor", "halId_s": auth}
-                                    )
-                                elif i == authors_count:
-                                    doc["authorship"].append(
-                                        {"authorship": "lastAuthor", "halId_s": auth}
-                                    )
+                        # if "authIdHal_s" in doc:
+                        #     authors_count = len(doc["authIdHal_s"])
+                        #     i = 0
+                        #     for auth in doc["authIdHal_s"]:
+                        #         i += 1
+                        #         if i == 1:
+                        #             doc["authorship"].append(
+                        #                 {"authorship": "firstAuthor", "halId_s": auth}
+                        #             )
+                        #         elif i == authors_count:
+                        #             doc["authorship"].append(
+                        #                 {"authorship": "lastAuthor", "halId_s": auth}
+                        #             )
                         if "Created" not in doc:
                             doc["Created"] = datetime.datetime.now().isoformat()
 
@@ -718,23 +717,23 @@ def collect_laboratories_data(self):
                         #             authid_s_filled.append(aurehal)
                         #         except:
                         #             authid_s_filled.append("")
-                        authid_s_filled =  doc["authIdHal_s"]
-                        authors_count = len(authid_s_filled)
-                        i = 0
-                        # Heu çà marche pas çà. Cf. comment ligne 160 par là
-                        for auth in authid_s_filled:
-                            i += 1
-                            if i == 1 and auth != "":
-                                doc["authorship"].append(
-                                    {
-                                        "authorship": "firstAuthor",
-                                        "authFullName_s": auth,
-                                    }
-                                )
-                            elif i == authors_count and auth != "":
-                                doc["authorship"].append(
-                                    {"authorship": "lastAuthor", "authFullName_s": auth}
-                                )
+                        # authid_s_filled =  doc["authIdHal_s"]
+                        # authors_count = len(authid_s_filled)
+                        # i = 0
+                        # # Heu çà marche pas çà. Cf. comment ligne 160 par là
+                        # for auth in authid_s_filled:
+                        #     i += 1
+                        #     if i == 1 and auth != "":
+                        #         doc["authorship"].append(
+                        #             {
+                        #                 "authorship": "firstAuthor",
+                        #                 "authFullName_s": auth,
+                        #             }
+                        #         )
+                        #     elif i == authors_count and auth != "":
+                        #         doc["authorship"].append(
+                        #             {"authorship": "lastAuthor", "authFullName_s": auth}
+                        #         )
 
                         harvet_history.append(
                             {"docid": doc["docid"], "from": lab["halStructId"]}
@@ -848,6 +847,7 @@ def collect_laboratories_data(self):
 def collect_researchers_data2(self, struct, idx):
     """
     Collecte les données des chercheurs appartenant à un laboratoire et crée les index pour les chercheurs s'ils n'existent pas dans elasticsearch.
+    Pourquoi ce n'est pas le collecte_docs qui est derrière le bouton "mettre à jour" ?
     """
     doc_progress_recorder = ProgressRecorder(self)
 
@@ -857,11 +857,11 @@ def collect_researchers_data2(self, struct, idx):
     idxCher = idx.replace("laboratories", "researchers")
     count = es.count(index=idxCher, body=scope_param, request_timeout=50)["count"]
     if count > 0:
-        print(
-            "\u00A0 \u21D2 ",
-            count,
-            " researchers found in ES, checking es_researchers list",
-        )
+        # print(
+        #     "\u00A0 \u21D2 ",
+        #     count,
+        #     " researchers found in ES, checking es_researchers list",
+        # )
         res = es.search(index=idxCher, body=scope_param, size=count, request_timeout=50)
 
         es_researchers = res["hits"]["hits"]
@@ -969,20 +969,40 @@ def collect_researchers_data2(self, struct, idx):
                         doc["harvested_from_label"].append("non-labo")
 
                     doc["authorship"] = []
+                    #Pourquoi j'ai l'impression que c'est la 4e fois ce passage ???????
+                    try:
+                        lstAut = [aut .title() for aut in doc['authFirstName_s']]
+                        if lstAut.index(searcher['lastName'].title()) == 0:
+                            doc["authorship"] = [{"authorship": "firstAuthor", "authIdHal_s": searcher[
+                                "halId_s"]}]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+                        elif lstAut.index(searcher['lastName'].title()) == len(doc['authLastName_s']) - 1:
+                            doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": searcher["halId_s"]}]
+                        else:
+                            doc["authorship"] = []
+                    except: # inversion nom prénom cf. docId 1252617
+                        lstAut = [aut .title() for aut in doc['authLastName_s']]
+                        if lstAut.index(searcher['lastName'].title()) == 0:
+                            doc["authorship"] = [{"authorship": "firstAuthor", "authIdHal_s": searcher[
+                                "halId_s"]}]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+                        elif lstAut.index(searcher['lastName'].title()) == len(doc['authLastName_s']) - 1:
+                            doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": searcher["halId_s"]}]
+                        else:
+                            doc["authorship"] = []
 
-                    if "authIdHal_s" in doc:
-                        authors_count = len(doc["authIdHal_s"])
-                        i = 0
-                        for auth in doc["authIdHal_s"]:
-                            i += 1
-                            if i == 1:
-                                doc["authorship"].append(
-                                    {"authorship": "firstAuthor", "halId_s": auth}
-                                )
-                            elif i == authors_count:
-                                doc["authorship"].append(
-                                    {"authorship": "lastAuthor", "halId_s": auth}
-                                )
+
+                    # if "authIdHal_s" in doc:
+                    #     authors_count = len(doc["authIdHal_s"])
+                    #     i = 0
+                    #     for auth in doc["authIdHal_s"]:
+                    #         i += 1
+                    #         if i == 1:
+                    #             doc["authorship"].append(
+                    #                 {"authorship": "firstAuthor", "halId_s": auth}
+                    #             )
+                    #         elif i == authors_count:
+                    #             doc["authorship"].append(
+                    #                 {"authorship": "lastAuthor", "halId_s": auth}
+                    #             )
                     if "Created" not in doc:
                         doc["Created"] = datetime.datetime.now().isoformat()
 
@@ -1123,10 +1143,10 @@ def collect_researchers_data2(self, struct, idx):
                         len(docs),
                         " documents traités et indexés " + searcher["halId_s"],
                     )
-        else:
-            doc_progress_recorder.set_progress(
-                0, 0, " Pas de docs (pb hal ?) " + searcher["halId_s"]
-            )
+            else:
+                doc_progress_recorder.set_progress(
+                    0, 0, " Pas de docs (pb hal ?) " + searcher["halId_s"]
+                )
             # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
         doc_progress_recorder.set_progress(
@@ -1137,6 +1157,7 @@ def collect_researchers_data2(self, struct, idx):
             doc_progress_recorder.set_progress(
                 sommeDocs, sommeDocs, " documents traités et indexés" + str(searcher)
             )
+
         else:
             pass
             # doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['halId_s'])
@@ -1148,9 +1169,7 @@ def collect_researchers_data2(self, struct, idx):
             count,
             " researchers found in ES, checking es_researchers list",
         )
-    doc_progress_recorder.set_progress(
-        sommeDocs, sommeDocs, " documents traités  au total"
-    )
+
     return "fini !"
 
 
