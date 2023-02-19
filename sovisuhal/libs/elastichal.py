@@ -189,16 +189,16 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     return chercheur
 
 
-#@shared_task(bind=True)
-def collecte_docs(chercheur, overwrite=False):  # self,
+@shared_task(bind=True)
+def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
     Collecte les documents d'un chercheur
     """
     init = overwrite  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
 
-    #  progress_recorder = ProgressRecorder(self)
-    #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
+    progress_recorder = ProgressRecorder(self)
+    progress_recorder.set_progress(0, len(docs), description='récupération des données HAL')
     # Insert documents collection
     for num, doc in enumerate(docs):
         doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
@@ -236,39 +236,45 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         # except:
         #     doc["harvested_from_label"].append("non-
 
-        doc["authorship"] = []
 
-        authhalid_s_filled = []
-        # replace authId_i per authIdHal_i after test
-        print(f"document reference: {doc['halId_s']}")
-        if "authIdHal_i" in doc:
-            print(f"authIdHal_i is in doc")
-            for auth in doc["authIdHal_i"]:
-                try:
-                    aurehal = archivesOuvertes.get_halid_s(auth)
-                    authhalid_s_filled.append(aurehal)
-                except:
-                    print(f"Collecte_docs: authIdHal_i Exception case")
-                    authhalid_s_filled.append("")
+
+        # authhalid_s_filled = []
+        # # replace authId_i per authIdHal_i after test
+        # print(f"document reference: {doc['halId_s']}")
+        # if "authIdHal_i" in doc:
+        #     print(f"authIdHal_i is in doc")
+        #     for auth in doc["authIdHal_i"]:
+        #         try:
+        #             aurehal = archivesOuvertes.get_halid_s(auth)
+        #             authhalid_s_filled.append(aurehal)
+        #         except:
+        #             print(f"Collecte_docs: authIdHal_i Exception case")
+        #             authhalid_s_filled.append("")
+        # else:
+        #     print(f"no authIdHal_i found in doc")
+        #
+        # authors_count = len(authhalid_s_filled)
+        # print(f"{authors_count} authors found in document")
+        # i = 0
+        # print(f"list of authors found: {authhalid_s_filled}")
+        # for auth in authhalid_s_filled:
+        #     i += 1
+        #     if i == 1 and auth != "":
+        #         doc["authorship"].append(
+        #             {"authorship": "firstAuthor", "authIdHal_s": auth}
+        #         )
+        #     elif i == authors_count and auth != "":
+        #         doc["authorship"].append(
+        #             {"authorship": "lastAuthor", "authIdHal_s": auth}
+        #         )
+
+        if doc ['authLastName_s'] .index(chercheur ['lastName'].title()) == 0:
+            doc["authorship"] = [{"authorship":"firstAuthor", "authIdHal_s": chercheur["halId_s"]}] # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+        elif doc ['authLastName_s'] .index(chercheur ['lastName'].title()) == len(doc ['authLastName_s'])-1:
+            doc["authorship"] = [{"authorship" : "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
         else:
-            print(f"no authIdHal_i found in doc")
-
-        authors_count = len(authhalid_s_filled)
-        print(f"{authors_count} authors found in document")
-        i = 0
-        print(f"list of authors found: {authhalid_s_filled}")
-        for auth in authhalid_s_filled:
-            i += 1
-            if i == 1 and auth != "":
-                doc["authorship"].append(
-                    {"authorship": "firstAuthor", "authIdHal_s": auth}
-                )
-            elif i == authors_count and auth != "":
-                doc["authorship"].append(
-                    {"authorship": "lastAuthor", "authIdHal_s": auth}
-                )
-
-        print(doc["authorship"])
+            doc["authorship"] = []
+        # print(doc["authorship"], doc ['authLastName_s'])
         doc["harvested_from_ids"].append(chercheur["halId_s"])
 
         # historique d'appartenance du docId
@@ -341,7 +347,8 @@ def collecte_docs(chercheur, overwrite=False):  # self,
 
             else:
                 doc["validated"] = True
-
+        progress_recorder.set_progress(num, len(docs), description='notices')
+    progress_recorder.set_progress(num, len(docs), description='indexation')
     helpers.bulk(
         es,
         docs,

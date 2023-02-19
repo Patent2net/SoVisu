@@ -395,13 +395,15 @@ def validate_expertise(request):
                 id=entity["ldapId"],
                 body={"doc": {"concepts": entity["concepts"]}},
             )
+            # g oublié le labo hier...
+            # Faut discuter de la fonction util, je sais pas l'appeler à priori.
 
-            es.update(
-                index=lab_index,
-                refresh="wait_for",
-                id=entity["labHalId"],
-                body={"doc": {"concepts": lab_tree}},
-            )
+            # es.update(
+            #     index=lab_index,
+            #     refresh="wait_for",
+            #     id=entity["labHalId"],
+            #     body={"doc": {"concepts": lab_tree}},
+            # )
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
@@ -687,11 +689,20 @@ def force_update_references(request):
         except:
             return redirect("unknown")
 
-        collecte_docs(entity, True)
-
-    return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data=references&validation=1"
-    )
+        result = collecte_docs .delay(entity, True)
+        taches = result.task_id
+        return redirect(
+            f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&taches={taches}&data=references&validation=1"
+        )
+    if "taches" in request.GET:
+        taches = request.GET["taches"]
+        return redirect(
+            f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&taches={taches}&data=references&validation=1"
+        )
+    else:
+        return redirect(
+            f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data=references&validation=1"
+        )
 
 
 def update_members(request):
@@ -1099,6 +1110,7 @@ def idhal_checkout(idhal):
 def vizualisation_url():
     """
     Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
+    Obsolète
     """
     print("mode: ")
     print(mode)
