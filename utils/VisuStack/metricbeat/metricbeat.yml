@@ -33,8 +33,6 @@ logging.to_files: false
 #output.console:
   # Boolean flag to enable or disable the output module.
  #enabled: true
-  
+
 
 xpack.monitoring.enabled: false
-
- 

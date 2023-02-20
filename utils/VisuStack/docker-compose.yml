@@ -218,7 +218,7 @@ services:
       #ELASTICSEARCH_HOST_PORT: "http://elasticsovisu:9200"
     networks:
       - elk
-     
+
   nginx:
     restart: always
     container_name: nginx_server
@@ -301,4 +301,3 @@ volumes:
 networks:
   elk:
     driver: bridge
-    

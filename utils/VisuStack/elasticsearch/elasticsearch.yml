@@ -28,6 +28,4 @@ xpack.security.transport.ssl.enabled: false
   # anonymous:
     # username: anonymous
     # roles: anonym
-    # authz_exception: true 
-
-
+    # authz_exception: true
