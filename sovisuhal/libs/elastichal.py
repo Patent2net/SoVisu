@@ -347,8 +347,8 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
 
             else:
                 doc["validated"] = True
-        progress_recorder.set_progress(num, len(docs), description='notices')
-    progress_recorder.set_progress(num, len(docs), description='indexation')
+        progress_recorder.set_progress(num, len(docs), description='(récolte)')
+    progress_recorder.set_progress(num, len(docs), description='(indexation)')
     helpers.bulk(
         es,
         docs,

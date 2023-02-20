@@ -563,33 +563,28 @@
                         {% endif %}
                     </div>
 
-                    <div class="dt-buttons-rplc flex items-center text-xs">
+                    <div class="dt-buttons-rplc flex mb-2 items-center text-xs flex-col relative">
                         {% if type == "rsr" %}
-                            <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b-2 border-blue-300 pb-1 whitespace-nowrap text-blue-700
-                        text-gray-600 flex"
+                            <div class="flex">
+                            <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
+                        text-gray-600 flex mr-2 border-b-2 border-blue-300"
                                href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
                             > Collecter HAL
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                                </svg></a>
+                            </a>
+                            <div class="flex">
+                                    <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
+
+                                        <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px">
+                                        </div>
+                                                                                     <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression  de collecte</div>
+                                    </div>
+                                    <div id="celery-result" class=""></div>
+                                </div>
+                            </div>
 {#                                Collecter (ou mettre à jour) de nouvelles références</a>#}
 
-                                <style>.progress-bar {
-                                              background-color: deepskyblue;
-                                              height: 30px;
-                                              width: 0px;
-                                            }</style>
-                                <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
-
-                                <div class="text-center" style="font-size: 10px"></div>
-                                    <div id="progress-bar-message">Progression  de collecte</div>
-
-                                    <div class='progress-wrapper' style="padding-top: 10px;">
-                                        <div id='progress-bar' class='progress-bar progress-bar-striped' role='progressbar' style="height:10px; width: 0%; border-radius: 5px">&nbsp;</div>
-                                    </div>
-                                    <div id="celery-result"></div>
-
                         {% endif %}
+                                <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
                     </div>
                 </div>
 
