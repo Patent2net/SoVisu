@@ -76,9 +76,7 @@ def sort_references(articles, halstructid):
                         has_phd_candidate = True
 
                     if "axis" in res["hits"]["hits"][0]["_source"]:
-                        axis = res["hits"]["hits"][0]["_source"]["axis"].replace(
-                            "axis", ""
-                        )
+                        axis = res["hits"]["hits"][0]["_source"]["axis"].replace("axis", "")
                         article["team"] = article["team"] + axis + " ; "
 
             if len(article["team"]) > 2:
@@ -97,7 +95,7 @@ def sort_references(articles, halstructid):
                 try:
                     halid_s = authorship["authFullName_s"]
 
-                except:
+                except IndexError:
                     halid_s = authorship["halId_s"]
 
                 doc_param = {
@@ -128,9 +126,7 @@ def sort_references(articles, halstructid):
 
         if "serie_s" in article:
             if "issue_s" in article:
-                article["volFull_s"] = (
-                    article["serie_s"][0] + " " + article["issue_s"][0]
-                )
+                article["volFull_s"] = article["serie_s"][0] + " " + article["issue_s"][0]
             else:
                 article["volFull_s"] = article["serie_s"][0]
 
@@ -138,10 +134,7 @@ def sort_references(articles, halstructid):
             article["journalTitle_s"] = ""
 
         if "openAccess_bool" in article:
-            if (
-                article["openAccess_bool"] == "true"
-                or article["openAccess_bool"] == True
-            ):
+            if article["openAccess_bool"] == "true" or article["openAccess_bool"] is True:
                 article["openAccess_bool_s"] = "O"
             else:
                 article["openAccess_bool_s"] = "N"
@@ -164,15 +157,11 @@ def sort_references(articles, halstructid):
                     + tmp_end[0]
                 )
             else:
-                article["conferenceDate_s"] = (
-                    tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
-                )
+                article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
         else:
             if "conferenceEndDate_tdate" in article:
                 tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
-                article["conferenceDate_s"] = (
-                    tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
-                )
+                article["conferenceDate_s"] = tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
 
         if "defenseDate_tdate" in article:
             article["defenseDate_tdate_s"] = article["defenseDate_tdate"][0:9]
@@ -202,10 +191,7 @@ def sort_references(articles, halstructid):
             if "authIdHal_s" in article:
                 if common_data(utln_rsr, article["authIdHal_s"]):
                     # colloque et posters
-                    if (
-                        article["docType_s"] == "COMM"
-                        or article["docType_s"] == "POSTER"
-                    ):
+                    if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
                         hceres_conf.append(article)
                     # art
                     if article["docType_s"] == "ART":

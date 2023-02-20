@@ -1,23 +1,34 @@
 # from libs import hal, utils, unpaywall, scanR
-from django.shortcuts import redirect
-from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
-from elasticHal.libs import (
-    utils,
-    hal,
-    archivesOuvertes,
-    location_docs,
-    doi_enrichissement,
-    keyword_enrichissement,
-)
-from elasticsearch import helpers
-import json
 import datetime
+import json
+
+from celery import shared_task
+from celery_progress.backend import ProgressRecorder
+from decouple import config
+from django.shortcuts import redirect
+from elasticsearch import helpers
+from ldap3 import ALL, Connection, Server
+
+from elasticHal.libs import (
+    doi_enrichissement,
+    hal,
+    keyword_enrichissement,
+    location_docs,
+    utils,
+)
+from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 
 from . import esActions
 
+# from uniauth.decorators import login_required
+
+
+mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+
+"""
 try:
     from decouple import config
-    from ldap3 import Server, Connection, ALL
+    from ldap3 import ALL, Connection, Server
     from uniauth.decorators import login_required
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -27,12 +38,7 @@ except:
 
     mode = "Dev"
     structId = "198307662"  # UTLN
-
-from celery import shared_task
-from celery_progress.backend import ProgressRecorder
-
-# from SPARQLWrapper import SPARQLWrapper, JSON
-# import requests
+"""
 
 # Connect to DB
 es = esActions.es_connector()
@@ -157,7 +163,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         aurehal = get_aurehalId(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else:  # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
+    else:  # sécurité, le code n'est pas censé être lancé par create car vérification du champ idhal
         return redirect("unknown")
         # retourne sur check() ?
 
@@ -182,9 +188,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers",
         id=chercheur["ldapId"],
         body=json.dumps(chercheur),
-    )  # ,
-    # timestamp=datetime.datetime.now().isoformat()) #pour le suvi modification de ingest plutôt cf. https://kb.objectrocket.com/elasticsearch/how-to-create-a-timestamp-field-for-an-elasticsearch-index-275
-    # progress_recorder.set_progress(10, 10)
+    )
     print("statut de la création d'index: ", res["result"])
     return chercheur
 
@@ -198,7 +202,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
 
     progress_recorder = ProgressRecorder(self)
-    progress_recorder.set_progress(0, len(docs), description='récupération des données HAL')
+    progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
     # Insert documents collection
     for num, doc in enumerate(docs):
         doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
@@ -236,8 +240,6 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         # except:
         #     doc["harvested_from_label"].append("non-
 
-
-
         # authhalid_s_filled = []
         # # replace authId_i per authIdHal_i after test
         # print(f"document reference: {doc['halId_s']}")
@@ -247,7 +249,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         #         try:
         #             aurehal = archivesOuvertes.get_halid_s(auth)
         #             authhalid_s_filled.append(aurehal)
-        #         except:
+        #         except IndexError:
         #             print(f"Collecte_docs: authIdHal_i Exception case")
         #             authhalid_s_filled.append("")
         # else:
@@ -268,10 +270,15 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         #             {"authorship": "lastAuthor", "authIdHal_s": auth}
         #         )
 
-        if doc ['authLastName_s'] .index(chercheur ['lastName'].title()) == 0:
-            doc["authorship"] = [{"authorship":"firstAuthor", "authIdHal_s": chercheur["halId_s"]}] # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
-        elif doc ['authLastName_s'] .index(chercheur ['lastName'].title()) == len(doc ['authLastName_s'])-1:
-            doc["authorship"] = [{"authorship" : "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+        if doc["authLastName_s"].index(chercheur["lastName"].title()) == 0:
+            doc["authorship"] = [
+                {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+            ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+        elif (
+            doc["authLastName_s"].index(chercheur["lastName"].title())
+            == len(doc["authLastName_s"]) - 1
+        ):
+            doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
         else:
             doc["authorship"] = []
         # print(doc["authorship"], doc ['authLastName_s'])
@@ -301,7 +308,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                 doc["isOaExtra"] = True
             elif should_be_open == -1:
                 doc["isOaExtra"] = False
-        except:
+        except IndexError:
             print("publicationDate_tdate error ?")
         doc["Created"] = datetime.datetime.now().isoformat()
 
@@ -347,8 +354,8 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
 
             else:
                 doc["validated"] = True
-        progress_recorder.set_progress(num, len(docs), description='(récolte)')
-    progress_recorder.set_progress(num, len(docs), description='(indexation)')
+        progress_recorder.set_progress(num, len(docs), description="(récolte)")
+    progress_recorder.set_progress(num, len(docs), description="(indexation)")
     helpers.bulk(
         es,
         docs,
