@@ -849,8 +849,8 @@ def collect_researchers_data2(self, struct, idx):
     Collecte les données des chercheurs appartenant à un laboratoire et crée les index pour les chercheurs s'ils n'existent pas dans elasticsearch.
     Pourquoi ce n'est pas le collecte_docs qui est derrière le bouton "mettre à jour" ?
     """
-    doc_progress_recorder = ProgressRecorder(self)
-
+    ch_progress_recorder = ProgressRecorder(self)
+    #docs_progress_recorder = ProgressRecorder(self)
     # Init researchers
     researchers_list = []
     labos, dico_acronym = init_labo()
@@ -872,8 +872,8 @@ def collect_researchers_data2(self, struct, idx):
     # print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
     sommeDocs = 0
-    for searcher in researchers_list:
-        # progress_recorder.set_progress(j, count, " chercheurs traités ")
+    for num, searcher in enumerate(researchers_list):
+        ch_progress_recorder.set_progress(num, count, " chercheurs traités ")
         # print ("hooo", searcher .keys(), researchers_list, idxCher)
         # if searcher["structSirene"] == struct:  # seulement les chercheurs de la structure
         # print(f"\u00A0 \u21D2 Processing : {searcher['halId_s']}")
@@ -923,9 +923,7 @@ def collect_researchers_data2(self, struct, idx):
             if len(docs) > 1:
                 for num, doc in enumerate(docs):
                     k += 1
-                    doc_progress_recorder.set_progress(
-                        num, len(docs), " documents traités " + searcher["halId_s"]
-                    )
+                    #docs_progress_recorder.set_progress(num, len(docs), " documents traités " + searcher["halId_s"])
                     doc[
                         "country_colaboration"
                     ] = location_docs.generate_countrys_fields(doc)
@@ -1118,10 +1116,9 @@ def collect_researchers_data2(self, struct, idx):
                             doc["validated"] = True
 
         else:
-            doc_progress_recorder.set_progress(
-                0, 0, " pas de docs 3" + searcher["halId_s"]
-            )
-            print("pas de docs 4 : " + searcher["halId_s"])
+            pass
+
+            #print("pas de docs 4 : " + searcher["halId_s"])
         if isinstance(docs, list):
             if len(docs) > 0:
                 for indi in range(int(len(docs) // 50) + 1):
@@ -1138,37 +1135,34 @@ def collect_researchers_data2(self, struct, idx):
                         # -researchers" + searcher["ldapId"] + "-documents
                     )
                     # time.sleep(1)
-                    doc_progress_recorder.set_progress(
-                        (indi * 50) + 50,
-                        len(docs),
-                        " documents traités et indexés " + searcher["halId_s"],
-                    )
+
             else:
-                doc_progress_recorder.set_progress(
-                    0, 0, " Pas de docs (pb hal ?) " + searcher["halId_s"]
+                pass
+                ch_progress_recorder.set_progress(
+                    num, count, " Pas de docs (pb hal ?) " + searcher["halId_s"]
                 )
             # impossible d'être là
         #    print(f"\u00A0 \u21D2 chercheur hors structure, {searcher['ldapId']}, structure : {searcher['structSirene']}")
-        doc_progress_recorder.set_progress(
-            sommeDocs, sommeDocs, " documents traités et indexés " + searcher["halId_s"]
-        )
-    if len(researchers_list) > 0:
-        if isinstance(docs, list):
-            doc_progress_recorder.set_progress(
-                sommeDocs, sommeDocs, " documents traités et indexés" + str(searcher)
-            )
-
-        else:
-            pass
-            # doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['halId_s'])
-    else:
-        # doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités")
-        print(f"\u00A0 \u21D2 researchers_list content = {researchers_list}")
-        print(
-            "\u00A0 \u21D2 ",
-            count,
-            " researchers found in ES, checking es_researchers list",
-        )
+        # docs_progress_recorder.set_progress(
+        #     sommeDocs, sommeDocs, " documents traités et indexés " + searcher["halId_s"]
+        # )
+    # if len(researchers_list) > 0:
+    #     if isinstance(docs, list):
+    #         docs_progress_recorder.set_progress(
+    #             sommeDocs, sommeDocs, " documents traités et indexés" + str(searcher)
+    #         )
+    #
+    #     else:
+    #         pass
+    #         # doc_progress_recorder.set_progress(0, sommeDocs, " documents traités " + searcher['halId_s'])
+    # else:
+    #     # doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités")
+    #     print(f"\u00A0 \u21D2 researchers_list content = {researchers_list}")
+    #     print(
+    #         "\u00A0 \u21D2 ",
+    #         count,
+    #         " researchers found in ES, checking es_researchers list",
+    #     )
 
     return "fini !"
 

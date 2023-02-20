@@ -576,7 +576,7 @@
 
                                         <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px">
                                         </div>
-                                                                                     <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression  de collecte</div>
+                                        <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression de collecte</div>
                                     </div>
                                     <div id="celery-result" class=""></div>
                                 </div>
@@ -584,7 +584,7 @@
 {#                                Collecter (ou mettre à jour) de nouvelles références</a>#}
 
                         {% endif %}
-                                <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+
                     </div>
                 </div>
 
@@ -710,8 +710,7 @@
 
 </div>
 
-
-<script>
+<script type="text/javascript">
 
     {% if data == "guiding-domains" %}
 
@@ -963,31 +962,18 @@
         /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
         {% if validation == "1" and  type == "rsr" and data == "references" %}
- {%  if taches %}
+            {%  if taches %}
+                var progressUrl = "{% url 'celery_progress:task_status' taches %}";
 
-            var progressUrl = "{% url 'celery_progress:task_status' taches %}";
+                $(function () {
+      CeleryProgressBar.initProgressBar(progressUrl, {
+        onResult: customResult,
+        onProgress: customProgress,
+        onSuccess: customSuccess,
+      })
+    });
+            {%  endif %}
 
-            function customResult(resultElement, result) {
-                progressBarElement.style.width = progress.percent + "%";
-			    var description = "<p>" + progress.description || "En attente du démarrage1..." + "</p>" ;
-			    progressBarMessageElement.innerHTML = description;
-                  $( resultElement ).append(
-                    $('<p>').text('documents collectés ' + result)
-                  );
-
-                }
-            function customSuccess(resultElement, result) {
-                progressBarElement.style.width = 100 + "%";
-                progressBarElement.style.backgroundColor = "green";
-			    progressBarMessageElement.textContent = "Succès! " + result;
-                }
-            $(function () {
-                        CeleryProgressBar.initProgressBar(progressUrl, {
-                        onResult: customResult,
-                        onSucess: customSuccess,
-                    })
-                });
-{%  endif %}
             var references = JSON.parse(document.querySelector(".references-json").textContent)
 
             var getObjectByValue = function (array, key, value) {

@@ -101,14 +101,35 @@
 
     <script type="text/javascript">
             // Progress Bar (JQuery)
-        {% for truc in taches %}
-             {%if truc.1%}
-                 function processProgress(progressBarElement, progressBarMessageElement, progress) {
+        function customResult(resultElement, result) {
+                progressBarElement.style.width = progress.percent + "%";
+			    var description = "<p>" + progress.description || "En attente du démarrage..." + "</p>" ;
+			    progressBarMessageElement.innerHTML = description;
+                  $( resultElement ).append(
+                    $('<p>').text('documents collectés ' + result)
+                  );
+
+                }
+        function customProgress(progressBarElement, progressBarMessageElement, progress) {
+            progressBarElement.style.backgroundColor = this.barColors.progress;
+            progressBarElement.style.width = progress.percent + "%";
+            var description = progress.description || "";
+            if (progress.current == 0) {
+                if (progress.pending === true) {
+                    progressBarMessageElement.textContent = this.messages.waiting;
+                } else {
+                    progressBarMessageElement.textContent = this.messages.started;
+                }
+            } else {
+                progressBarMessageElement.textContent = progress.current + ' de ' + progress.total + ' notices traitées.' ;
+            }
+    }
+    function processProgress(progressBarElement, progressBarMessageElement, progress) {
                                 progressBarElement.style.width = progress.percent + "%";
-                                var description = progress.description || "Starting download";
+                                var description = progress.description || "Démarrage";
                                 progressBarMessageElement.innerHTML = description;
                             }
-                 function processResult(resultElement, result) {
+    function processResult(resultElement, result) {
                             if (result.includes("successful")) {
                                 $( resultElement ).append(
                                     $('<br>')
@@ -118,7 +139,8 @@
                                 );
                             }
                         }
-
+        {% for truc in taches %}
+             {%if truc.1%}
                         // Progress Bar (JQuery)
                  $(function () {
                             var progressUrl = "{% url 'celery_progress:task_status' truc.1 %}";
@@ -132,27 +154,12 @@
                         });
              {% endif %}
              {%if truc.2%}
-                 function processProgress2(progressBarElement, progressBarMessageElement, progress) {
-                                progressBarElement.style.width = progress.percent + "%";
-                                var description = progress.description || "Starting download";
-                                progressBarMessageElement.innerHTML = description;
-                            }
-                 function processResult1(resultElement, result) {
-                            if (result.includes("successful")) {
-                                $( resultElement ).append(
-                                    $('<br>')
-                                );
-                                $( resultElement ).append(
-                                    $('<p class="text-center">').text(result)
-                                );
-                            }
-                        }
                         // Progress Bar (JQuery)
                  $(function () {
                             var progressUrl = "{% url 'celery_progress:task_status' truc.2 %}";
                             CeleryProgressBar.initProgressBar(progressUrl, {
-                                "onProgress": processProgress2,
-                                "onResult": processResult1,
+                                "onProgress": customProgress,
+                                "onResult": processResult,
                                 "progressBarId": "progress-bar2{{ truc.0 }}",
                                 "progressBarMessageId": "progress-bar-message2{{ truc.0 }}",
                                 "resultElementId": 'celery-result2{{ truc.0 }}'
