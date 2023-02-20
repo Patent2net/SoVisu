@@ -1,9 +1,9 @@
-import requests
 import grobid_tei_xml
-from elasticHal.libs import utils
-
+import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+
+from elasticHal.libs import utils
 
 retry_strategy = Retry(
     total=3,
