@@ -1,7 +1,8 @@
-from SPARQLWrapper import SPARQLWrapper, JSON
+import time
+
 import networkx as nx
 import requests
-import time
+from SPARQLWrapper import JSON, SPARQLWrapper
 
 # lets go
 sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
@@ -133,14 +134,12 @@ def extrait_sujets_domaines(data):
 
     # topics = [top for top in topics if 'xml:lang' in top['o']]
 
-    langues = list(set([top["o"]["xml:lang"] for top in topics]))
+    langues = list({top["o"]["xml:lang"] for top in topics})
     # filtres par langues
     dico_top = dict()
 
     for lang in langues:
-        dico_top[lang] = [
-            top["o"]["value"] for top in topics if top["o"]["xml:lang"] == lang
-        ]
+        dico_top[lang] = [top["o"]["value"] for top in topics if top["o"]["xml:lang"] == lang]
 
     return dico_top, list(set(sujets))
 
@@ -248,12 +247,8 @@ def get_concepts_and_keywords(aurehalid):
                     subchildren["state"] = "invalidated"
                     if "children" in subchildren:
                         for subsubchildren in subchildren["children"]:
-                            subsubchildren["label_en"] = get_label(
-                                subsubchildren["id"], "en"
-                            )
-                            subsubchildren["label_fr"] = get_label(
-                                subsubchildren["id"], "fr"
-                            )
+                            subsubchildren["label_en"] = get_label(subsubchildren["id"], "en")
+                            subsubchildren["label_fr"] = get_label(subsubchildren["id"], "fr")
                             subsubchildren["state"] = "invalidated"
 
         for lang in sujets.keys():
@@ -267,8 +262,7 @@ def get_concepts_and_keywords(aurehalid):
             #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
         concepts_and_keywords = {"concepts": concepts, "keywords": keywords}
         return concepts_and_keywords
-
-    except:
+    except IndexError:
         concepts_and_keywords = {"concepts": [], "keywords": []}
         return concepts_and_keywords
 
@@ -287,7 +281,7 @@ def get_aurehalId(authIdHal_s):
 
     res_status = False
     while res_status is False:
-        #print(f"{authIdHal_s}")
+        # print(f"{authIdHal_s}")
         req = requests.request("GET", url)
         data = req.json()
         print(f"{data}")
@@ -306,7 +300,5 @@ def get_aurehalId(authIdHal_s):
                 curr += 1
                 if auth.split("_FacetSep_")[-1] == authIdHal_s:
                     break
-            aurehalId = sample["authFullNamePersonIDIDHal_fs"][curr - 1].split(
-                "_FacetSep_"
-            )[1]
+            aurehalId = sample["authFullNamePersonIDIDHal_fs"][curr - 1].split("_FacetSep_")[1]
             return aurehalId

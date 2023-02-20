@@ -1,7 +1,7 @@
-from elasticsearch import Elasticsearch
-from datetime import datetime
 import time
+from datetime import datetime
 
+from elasticsearch import Elasticsearch
 
 """
 Ce script permet de supprimer les doublons de chercheurs. Le script récupère dans un premier
@@ -13,9 +13,7 @@ sont supprimés
 print(time.strftime("%H:%M:%S", time.localtime()), end=" : ")
 print("process start")
 
-es = Elasticsearch(
-    [{"host": "localhost", "port": 9200}]
-)  # Creation d'un instance ElasticSeach
+es = Elasticsearch([{"host": "localhost", "port": 9200}])  # Creation d'un instance ElasticSeach
 structId = "198307662"  # UTLN Struct ID de l'université de Toulon
 
 scope_param = {"query": {"match_all": {}}}
@@ -35,13 +33,10 @@ for index, researcher in enumerate(researchers):
 
 count_deleted = 0
 for key in texting_dict:
-    # on parcourt le dictionnaire précédemment créé pour vérifier si un chercheur est enregistré plusieurs fois
     if len(texting_dict[key]) > 1:
-        # si le chercheur est enregistré plusieurs fois
         list_of_date = list()
 
         for index in texting_dict[key]:
-            # pour chaque enregistrement stock sous forme de liste la date de création du profil ainsi que son index
             list_of_date.append(
                 [
                     datetime.strptime(
@@ -52,22 +47,15 @@ for key in texting_dict:
             )
 
         while len(list_of_date) != 1:
-            # tant qu'il ne reste pas 1 seule date dans list_of_date supprime les plus vieux comptes
             index = researchers[min(list_of_date)[1]]["_index"]
             id = researchers[min(list_of_date)[1]]["_id"]
             query = {
                 "query": {
-                    "match_phrase": {
-                        "_id": "" + researchers[min(list_of_date)[1]]["_id"] + ""
-                    }
+                    "match_phrase": {"_id": "" + researchers[min(list_of_date)[1]]["_id"] + ""}
                 }
             }
-            es.delete_by_query(
-                index=researchers[min(list_of_date)[1]]["_index"], body=query
-            )  # suppression du chercheur
-            es.indices.delete(
-                index=index + "-" + id + "-documents"
-            )  # suppression des documents associer
+            es.delete_by_query(index=researchers[min(list_of_date)[1]]["_index"], body=query)
+            es.indices.delete(index=index + "-" + id + "-documents")
             count_deleted = count_deleted + 1
             list_of_date.remove(min(list_of_date))
 

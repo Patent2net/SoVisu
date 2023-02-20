@@ -1,10 +1,11 @@
-from nested_lookup import nested_lookup
-import re
-import dateutil.parser
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from PyPDF2 import PdfFileReader, PdfFileWriter
 import io
+import re
+from datetime import datetime
+
+import dateutil.parser
+from dateutil.relativedelta import relativedelta
+from nested_lookup import nested_lookup
+from PyPDF2 import PdfFileReader, PdfFileWriter
 
 
 def remove_page(pdf_file, pages):
@@ -38,7 +39,7 @@ def should_be_open(doc):
                 return 1
             if doc["journalSherpaPostPrint_s"] == "restricted":
                 matches = re.finditer(
-                    "(\S+\s+){2}(?=embargo)",
+                    r"(\S+\s+){2}(?=embargo)",
                     doc["journalSherpaPostRest_s"].replace("[", " "),
                 )
                 maxi = 0
@@ -50,9 +51,7 @@ def should_be_open(doc):
                         if int(c) > maxi:
                             maxi = int(c)
 
-                p_date = dateutil.parser.parse(doc["publicationDate_tdate"]).replace(
-                    tzinfo=None
-                )
+                p_date = dateutil.parser.parse(doc["publicationDate_tdate"]).replace(tzinfo=None)
                 curr_date = datetime.now()
                 diff = relativedelta(curr_date, p_date)
 
@@ -179,10 +178,7 @@ def append_to_tree(scope, rsr, tree, state):
         for child in tree["children"]:
             if sid[0] == child["id"] and "children" in child:
                 for child1 in child["children"]:
-                    if (
-                        sid[0] + "." + sid[1] == child1["id"]
-                        and "researchers" in child1
-                    ):
+                    if sid[0] + "." + sid[1] == child1["id"] and "researchers" in child1:
                         for rsr in child1["researchers"]:
                             rsr_exists = False
                             if rsr["ldapId"] == rsr_id:
