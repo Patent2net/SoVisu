@@ -1,6 +1,6 @@
-from sovisuhal.libs import esActions
 import json
 
+from sovisuhal.libs import esActions
 
 es = esActions.es_connector()
 
