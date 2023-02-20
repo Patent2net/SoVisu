@@ -76,5 +76,3 @@ Constituées principalement pour intégrer des tableaux de bord Kibana, les form
     :width: 800px
     :align: center
     :alt: principes d'enrichissement des données
-
-
