@@ -22,7 +22,7 @@ POST 198307662-numLabo-researchers/_delete_by_query
 # le champ halStructId est aussi le numlabo
 # il est mis à jour ci-dessous
 POST /198307662-numLabo-laboratories/_update/numLabo
-{"script" : 
+{"script" :
   {"source" : "ctx._source.halStructId = params.halStructId",
     "lang": "painless",
     "params" : {

@@ -4,9 +4,7 @@ es = esActions.es_connector()
 
 scope_param = esActions.scope_all()
 
-StructCount = es.count(index="*-structures", body=scope_param, request_timeout=50)[
-    "count"
-]
+StructCount = es.count(index="*-structures", body=scope_param, request_timeout=50)["count"]
 if StructCount > 0:
     Struct = es.search(index="*-structures", body=scope_param, size=StructCount)
     Struct = Struct["hits"]["hits"]
@@ -20,10 +18,7 @@ if count > 0:
         print(doc["_source"]["structSirene"])
         if "structAcronym" not in doc["_source"]:
             for doc_struct in Struct:
-                if (
-                    doc_struct["_source"]["structSirene"]
-                    == doc["_source"]["structSirene"]
-                ):
+                if doc_struct["_source"]["structSirene"] == doc["_source"]["structSirene"]:
                     structAcronym = doc_struct["_source"]["acronym"]
                     print(doc["_index"])
                     es.update(
@@ -37,4 +32,4 @@ if count > 0:
                     )
         else:
             pass
-            #print(f"le champ structAcronym existe dans {doc['_index']}")
+            # print(f"le champ structAcronym existe dans {doc['_index']}")
