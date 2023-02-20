@@ -369,6 +369,15 @@ def validate_expertise(request):
             for concept in to_invalidate:
                 for d in entity["concepts"]["children"]:
                     d.update(("state", validate) for k, v in d.items() if v == concept)
+                    if "children" in d:
+                        for d1 in d["children"]:
+                            d1.update(("state", validate) for k, v in d1.items() if v == concept)
+                            if "children" in d1:
+                                for d2 in d1["children"]:
+                                    d2.update(
+                                        ("state", validate) for k, v in d2.items() if v == concept
+                                    )
+
             # for conceptid in to_invalidate:
             #     sid = conceptid.split(".")
             #     for children in entity["concepts"]["children"]:
