@@ -778,7 +778,7 @@ def collect_researchers_data2(self, struct, idx):
     for searcher in researchers_list:
         k = 0
         if len(searcher["halId_s"].strip()) < 3:
-            print("hou un halid tout mini :", searcher["halId_s"] + 1)
+            print("hou un halid tout mini :", searcher["halId_s"])
         docs = hal.find_publications(searcher["halId_s"], "authIdHal_s")
         # Enrichissements des documents récoltés
         # print ("2e " + str(type (docs)))
