@@ -1,12 +1,12 @@
 
 
-function customResult(resultElement, result) {
-                progressBarElement.style.width = progress.percent + "%";
-			    var description = "<p>" + progress.description || "En attente du démarrage..." + "</p>" ;
+function customResult(progressBarElement, progressBarMessageElement, resultElement, result) {
+                progressBarElement.style.width = 100 + "%";
+			    var description = "<p>" || "En attente du démarrage..." + "</p>" ;
 			    progressBarMessageElement.innerHTML = description;
-                  $( resultElement ).append(
-                    $('<p>').text('documents collectés ' + result)
-                  );
+                  // $( resultElement ).append(
+                  //   $('<p>').text('documents collectés ' + result)
+                  // );
 
                 }
 function customProgress(progressBarElement, progressBarMessageElement, progress) {
@@ -20,12 +20,15 @@ function customProgress(progressBarElement, progressBarMessageElement, progress)
                 progressBarMessageElement.textContent = this.messages.started;
             }
         } else {
-            progressBarMessageElement.textContent = progress.current + ' de ' + progress.total + ' notices traitées.' ;
+            progressBarMessageElement.textContent = progress.current + ' sur ' + progress.total + ' notices traitées.' ;
         }
     }
-function customSuccess(resultElement, result) {
+function customSuccess(progressBarElement,  progressBarMessageElement, resultElement, result) {
                 progressBarElement.style.width = 100 + "%";
                 progressBarElement.style.backgroundColor = "green";
 			    progressBarMessageElement.textContent = "Succès! " + result;
                 }
-
+defaultMessages = {
+            waiting: '',
+            started: 'Collecte',
+        }
