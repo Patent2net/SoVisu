@@ -134,7 +134,10 @@ def sort_references(articles, halstructid):
             article["journalTitle_s"] = ""
 
         if "openAccess_bool" in article:
-            if article["openAccess_bool"] == "true" or article["openAccess_bool"] is True:
+            if (
+                article["openAccess_bool"] == "true"
+                or article["openAccess_bool"] == True
+            ):
                 article["openAccess_bool_s"] = "O"
             else:
                 article["openAccess_bool_s"] = "N"

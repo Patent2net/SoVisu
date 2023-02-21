@@ -1537,7 +1537,9 @@ def default_checker(request, basereverse, default_data=None):
         p_id = request.user.get_username()  # check si l'utilisateur est log
     # p_id = p_id.replace(viewsActions.patternCas, '').lower()
 
-    if p_id == "adminlab":  # si p_id adminlab on considère que son i_type par défaut est lab
+    if (
+        p_id == "adminlab"
+    ):  # si p_id adminlab on considère que son i_type par défaut est lab
         indexcat = "lab"
         base_url = reverse("index")
         query_string = urlencode({"indexcat": indexcat, "indexstruct": "198307662"})

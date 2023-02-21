@@ -191,9 +191,12 @@ def ref_p_filter(
                         },
                         {
                             "bool": {
-                                "must_not": [
-                                    {"exists": {"field": "fileMain_s"}},
-                                    {"exists": {"field": "*_abstract_s"}},
+                                "must": [
+                                    {"range": {
+      "MDS": {
+        "lt": 70
+      }
+    }},
                                 ]
                             }
                         },
@@ -234,8 +237,11 @@ def ref_p_filter(
                         {
                             "bool": {
                                 "must": [
-                                    {"exists": {"field": "fileMain_s"}},
-                                    {"exists": {"field": "*_abstract_s"}},
+                                    {"range": {
+      "MDS": {
+        "gte": 100
+      }
+    }},
                                 ]
                             }
                         },
