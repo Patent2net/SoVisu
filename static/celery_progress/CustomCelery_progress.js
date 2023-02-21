@@ -1,4 +1,7 @@
-
+/*
+https://eeinte.ch/stream/progress-bar-django-using-celery/
+https://github.com/czue/celery-progress#customization
+*/
 
 function customResult(progressBarElement, progressBarMessageElement, resultElement, result) {
                 progressBarElement.style.width = 100 + "%";
@@ -26,7 +29,7 @@ function customProgress(progressBarElement, progressBarMessageElement, progress)
 function customSuccess(progressBarElement,  progressBarMessageElement, resultElement, result) {
                 progressBarElement.style.width = 100 + "%";
                 progressBarElement.style.backgroundColor = "green";
-			    progressBarMessageElement.textContent = "Succès! " + result;
+			    progressBarMessageElement.textContent = "Succès! " ;
                 }
 defaultMessages = {
             waiting: '',
