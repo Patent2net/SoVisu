@@ -1,58 +1,21 @@
-from elasticsearch import Elasticsearch
 from datetime import datetime
 
-
-# Custom libs
-# from sovisuhal.libs import esActions
-# from elasticHal.libs import archivesOuvertes, utils
-
+from sovisuhal.libs import esActions
 
 # Connect to DB
-
-
-def es_connector(mode=True):
-    if mode == "Prod":
-        # secret = config('ELASTIC_PASSWORD')
-        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch(
-            "localhost",
-            http_auth=("elastic", secret),
-            scheme="http",
-            port=9200,
-            # ssl_context=context,
-            timeout=10,
-        )
-    else:
-        es = Elasticsearch([{"host": "localhost", "port": 9200, "timeout": 150}])
-    return es
-
-
-def scope_all():
-    scope = {"query": {"match_all": {}}}
-    return scope
-
-
-# Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
-def scope_p(scope_field, scope_value):
-    scope = {"query": {"match": {scope_field: scope_value}}}
-    return scope
-
-
-es = es_connector()
+es = esActions.es_connector()
 
 # Memo des pbs.
 # Choix fait de se poser sur le ldapid --> pas de gestion des doublons type ex-doctorants
 # si deux meme ldapid dans des index chercheurs différents alors
 # memo du plus recent created seulement
-scope_param = scope_all()
+scope_param = esActions.scope_all()
 count = es.count(index="*-researchers", body=scope_param)["count"]
 res = es.search(index="*-researchers", body=scope_param, size=count)
 chercheurs = res["hits"]["hits"]
 
 ldapList = [cher["_source"]["ldapId"] for cher in chercheurs]
-doublons = [
-    cher for cher in chercheurs if ldapList.count(cher["_source"]["ldapId"]) > 1
-]
+doublons = [cher for cher in chercheurs if ldapList.count(cher["_source"]["ldapId"]) > 1]
 cpt = 0
 Vus, lstRetenus = [], []
 for ind, doudou in enumerate(doublons):
@@ -104,14 +67,8 @@ for cher in doublons:
         )
         try:
             es.indices.delete(index=cher["_index"] + "-" + cher["_id"] + "-documents")
-        except:
+        except IndexError:
             print("ok, pas besoin")
 
         # es.indices.delete(index=cher ['_source'])
         # es.indices.delete(index=cher['_source'] + "-documents")
-
-# Pour vérifier que ce sont les bons
-# for cher in lstRetenus:
-#     response = OSclient.index(index=cher['_index'], body=cher['_source'], id=cher['_id'], refresh=True)
-#
-#     print(cher['_id'] + " " + cher['_source']['ldapId'] + " " + response['result'] + ' indexé et dédoubloné (enfin je crois)')

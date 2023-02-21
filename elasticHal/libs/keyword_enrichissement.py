@@ -1,6 +1,7 @@
 from spacy.lang.fr.stop_words import STOP_WORDS
 import spacy
 import requests
+import spacy
 
 nlp_fr = spacy.load("fr_core_news_md")  # chargement du modèle dans Spacy
 
@@ -58,7 +59,8 @@ def keyword_from_teeft(txt, lang):
 
 def return_entities(txt, lang):
     """
-    Enrichissement des documents avec les entités trouvées dans les résumés à partir de la terminologie de loterre
+    Enrichissement des documents
+    avec les entités trouvées dans les résumés à partir de la terminologie de loterre
     """
     entities_fr, entities_en = [], []
     # for index, doc in enumerate(docs):
@@ -71,10 +73,12 @@ def return_entities(txt, lang):
             for token in nlp_.ents
             if not token.text.isdigit() and not token.text in nlp_fr.Defaults.stop_words
         ]
-        # if not token.is_punct and not token .like_num and not token .isdigit() and token not in nlp_fr .Defaults.stop_words]
+        # if not token.is_punct and not token .like_num and \
+        # not token .isdigit() and token not in nlp_fr .Defaults.stop_words]
 
         return entities_fr
-        # vérifier les entités avec loterre et ne garder que celles qui matchent avec le complément d'info
+        # vérifier les entités avec loterre,
+        # ne garder que celles qui matchent avec le complément d'info
         # curl -X 'POST' \
         #   'https://loterre-resolvers.services.inist.fr/v1/9SD/identify?indent=true' \
         #   -H 'accept: application/json' \
@@ -97,7 +101,7 @@ def return_entities(txt, lang):
         entities_en = [
             token.text
             for token in nlp_.ents
-            if not token.text.isdigit() and not token.text in nlp_fr.Defaults.stop_words
+            if not token.text.isdigit() and token.text not in nlp_fr.Defaults.stop_words
         ]
         # print("taille du texte " + str(len(txt)))
         return entities_en

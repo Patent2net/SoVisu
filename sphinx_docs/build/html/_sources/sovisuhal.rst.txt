@@ -36,4 +36,3 @@ sovisuhal.viewsActions
    :members:
    :undoc-members:
    :show-inheritance:
-

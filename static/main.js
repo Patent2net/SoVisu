@@ -87,10 +87,10 @@ $(function() {
 		iFrameEle.onload = function() {
         iFrameEle.contentDocument.getElementById('kbnPresentationToolbar__solutionToolbar').style.display='none';
     }}{};
-	});
+    });
 });
 
-    
+
 
 
 

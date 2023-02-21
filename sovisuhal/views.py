@@ -1,16 +1,15 @@
 import json
-from datetime import datetime
 import time
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.views.decorators.clickjacking import xframe_options_exempt
-from . import forms, viewsActions
-
+from datetime import datetime
 from urllib.parse import urlencode
+
+from django.contrib import messages
+from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views.decorators.clickjacking import xframe_options_exempt
 
-from .libs import halConcepts, esActions
-
+from . import forms, viewsActions
+from .libs import esActions, halConcepts
 
 # Connect to DB
 es = esActions.es_connector()
@@ -26,7 +25,7 @@ def unknown(request):
 
 def create(request):
     """
-    Gestion de la page affichant le formulaire de création d'un nouveau profil à un utilisateur non reconnu
+    Gestion de la page "Création de profil"
     """
     ldapid = request.GET["ldapid"]  # ldapid
     id_halerror = False
@@ -52,11 +51,10 @@ def create(request):
 
 def check(request):
     """
-    Gestion de la page gérant l'affichage des données utilisateur ainsi que la vérification des données récupérées sur HAL afin d'affiner les résultats affichés par SoVisu
+    Gestion de la page gérant "vérification des données"
     """
     if request.user.is_authenticated and (
-        request.user.get_username() == "visiteur"
-        or request.user.get_username() == "guestUtln"
+        request.user.get_username() == "visiteur" or request.user.get_username() == "guestUtln"
     ):
         return redirect("unknown")
 
@@ -74,7 +72,7 @@ def check(request):
         default_data = "credentials"
         return default_checker(request, basereverse, default_data)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+    else:
         return redirect("unknown")
 
     if "data" in request.GET:
@@ -102,7 +100,7 @@ def check(request):
 
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
     # /
 
@@ -117,7 +115,7 @@ def check(request):
                 body=start_date_param,
             )
             start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
-        except:
+        except IndexError:
             start_date = "2000"
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity["halStructId"])
@@ -128,7 +126,7 @@ def check(request):
                 body=start_date_param,
             )
             start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
-        except:
+        except IndexError:
             start_date = "2000"
     else:
         return redirect("unknown")
@@ -144,8 +142,6 @@ def check(request):
         field = "authIdHal_s"
         hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
 
-        # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if i_type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" + entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
     elif i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
@@ -154,8 +150,6 @@ def check(request):
         return redirect("unknown")
 
     if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
-        # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
         hastoconfirm = True
 
     print(f"hastoconfirm = {hastoconfirm}")
@@ -336,14 +330,12 @@ def check(request):
                                 print(children1)
                         if "children" in children1:
                             for children2 in children1["children"]:
-                                if (
-                                    "state" in children2.keys()
-                                    and children2["state"] == validate
-                                ):
+                                if "state" in children2.keys() and children2["state"] == validate:
                                     concepts.append(
                                         {
                                             "id": children2["id"],
-                                            "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- "
+                                            "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;\
+                                            &nbsp;&nbsp;&nbsp;&nbsp;- "
                                             + children2["label_fr"],
                                             "state": validate,
                                         }
@@ -419,7 +411,7 @@ def check(request):
             date_from,
             date_to,
         )
-        print(ref_param)
+        # print(ref_param)
 
         if i_type == "rsr":
             count = es.count(
@@ -450,25 +442,46 @@ def check(request):
         for ref in references["hits"]["hits"]:
             references_cleaned.append(ref["_source"])
         # /
-
-        return render(
-            request,
-            "check.html",
-            {
-                "struct": struct,
-                "data": data,
-                "type": i_type,
-                "id": p_id,
-                "from": date_from,
-                "to": date_to,
-                "validation": validation,
-                "entity": entity,
-                "hasToConfirm": hastoconfirm,
-                "references": references_cleaned,
-                "startDate": start_date,
-                "timeRange": f"from:'{date_from}',to:'{date_to}'",
-            },
-        )
+        if "taches" in request.GET:
+            taches = request.GET["taches"]
+            return render(
+                request,
+                "check.html",
+                {
+                    "struct": struct,
+                    "data": data,
+                    "type": i_type,
+                    "id": p_id,
+                    "from": date_from,
+                    "to": date_to,
+                    "validation": validation,
+                    "taches": taches,
+                    "entity": entity,
+                    "hasToConfirm": hastoconfirm,
+                    "references": references_cleaned,
+                    "startDate": start_date,
+                    "timeRange": f"from:'{date_from}',to:'{date_to}'",
+                },
+            )
+        else:
+            return render(
+                request,
+                "check.html",
+                {
+                    "struct": struct,
+                    "data": data,
+                    "type": i_type,
+                    "id": p_id,
+                    "from": date_from,
+                    "to": date_to,
+                    "validation": validation,
+                    "entity": entity,
+                    "hasToConfirm": hastoconfirm,
+                    "references": references_cleaned,
+                    "startDate": start_date,
+                    "timeRange": f"from:'{date_from}',to:'{date_to}'",
+                },
+            )
 
     else:
         return redirect("unknown")
@@ -489,9 +502,7 @@ def dashboard(request):
     else:
         ldapid = None
 
-    if (
-        "type" in request.GET and "id" in request.GET
-    ):  # réutilisation de l'ancien système
+    if "type" in request.GET and "id" in request.GET:  # réutilisation de l'ancien système
         i_type = request.GET["type"]
         p_id = request.GET["id"]
 
@@ -499,7 +510,7 @@ def dashboard(request):
         basereverse = "dashboard"
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+    else:
         return redirect("unknown")
     # /
 
@@ -510,7 +521,7 @@ def dashboard(request):
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
     # /
 
@@ -521,33 +532,25 @@ def dashboard(request):
         field = "authIdHal_s"
         hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
 
-        # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if i_type == "rsr": : es.count(index=struct  + "-" + entity['halStructId']+"-"researchers-" +
-        #  entity["ldapId"] +"-documents", body=hastoconfirm_param)['count'] > 0:
     elif i_type == "lab":
         field = "labStructId_i"
         hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
     else:
         return redirect("unknown")
 
-    if (
-        es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0
-    ):  # devrait être scindé en deux ex.count qui diffèrent selon lab ou rsr dans les if précédent
-        #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+    if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
     dash = ""
     start_date_param = ""
     if i_type == "rsr":
-        indexsearch = (
-            f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
-        )
+        indexsearch = f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
         try:
             start_date_param = esActions.date_all()
             res = es.search(index=indexsearch, body=start_date_param)
 
-        except:
+        except IndexError:
             start_date_param.pop("sort")
             res = es.search(index=indexsearch, body=start_date_param)
 
@@ -561,9 +564,7 @@ def dashboard(request):
             dash = request.GET["dash"]
         else:
             dash = "membres"
-        res = es.search(
-            index=f"{struct}-{p_id}-laboratories-documents", body=start_date_param
-        )
+        res = es.search(index=f"{struct}-{p_id}-laboratories-documents", body=start_date_param)
         filtrechercheur = ""
         filtre_lab_a = f'harvested_from_ids: "{p_id}"'
         filtre_lab_b = f'labHalId.keyword: "{p_id}"'
@@ -572,7 +573,7 @@ def dashboard(request):
 
     try:  # çà devrait pas être un min de date sur les résultats plutôt que le premier ?.???
         start_date = res["hits"]["hits"][0]["_source"]["producedDate_tdate"]
-    except:
+    except IndexError:
         start_date = "2000"
     # /
 
@@ -624,9 +625,7 @@ def references(request):
     else:
         ldapid = None
 
-    if (
-        "type" in request.GET and "id" in request.GET
-    ):  # réutilisation de l'ancien système
+    if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
         p_id = request.GET["id"]
 
@@ -634,7 +633,7 @@ def references(request):
         basereverse = "references"
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+    else:
         return redirect("unknown")
 
     if "filter" in request.GET:
@@ -652,7 +651,7 @@ def references(request):
 
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
     # /
 
@@ -669,9 +668,7 @@ def references(request):
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity["halStructId"])
 
-        res = es.search(
-            index=f"{struct}-{p_id}-laboratories-documents", body=start_date_param
-        )
+        res = es.search(index=f"{struct}-{p_id}-laboratories-documents", body=start_date_param)
 
     start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
     # /
@@ -785,9 +782,7 @@ def terminology(request):
     else:
         ldapid = None
 
-    if (
-        "type" in request.GET and "id" in request.GET
-    ):  # réutilisation de l'ancien système
+    if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
         p_id = request.GET["id"]
 
@@ -795,7 +790,7 @@ def terminology(request):
         basereverse = "terminology"
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+    else:
         return redirect("unknown")
 
     if "export" in request.GET:
@@ -811,7 +806,7 @@ def terminology(request):
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
     # /
 
@@ -943,7 +938,7 @@ def terminology(request):
 
 def wordcloud(request):
     """
-    Gestion de la page affichant sous forme de wordcloud les mots clés représentant le domaine de recherche du profil sélectionné (sous Kibana)
+    Gestion de la page "lexiques extraits"
     """
     # Get parameters
     if "struct" in request.GET:
@@ -955,11 +950,14 @@ def wordcloud(request):
         "ALL",
         "FR",
         "EN",
-    ]  # Permet la création des onglets dans l'affichage de Sovisu. À remplacer plus tard par une création dynamique, mais les dashboards doivent être modifiés en conséquence également
+    ]  # Permet la création des onglets dans l'affichage de Sovisu.
+    # À remplacer plus tard par une création dynamique,
+    # mais les dashboards doivent être modifiés en conséquence également
     lang = "ALL"
     if (
         "lang" in request.GET
-    ):  # Permet de limiter le choix de langue afin que Sovisu affiche toujours quelque chose. Dans le cas ou la langue demandée n'est pas dans les options initiales => le paramètre renvoyé est all.
+    ):  # Permet de limiter le choix de langue afin que Sovisu affiche toujours quelque chose.
+        # si langue demandée n'est pas dans les options initiales => le paramètre renvoyé est all.
         temp_lang = str(request.GET["lang"])
         if temp_lang in lang_options:
             lang = temp_lang
@@ -969,9 +967,7 @@ def wordcloud(request):
     else:
         ldapid = None
 
-    if (
-        "type" in request.GET and "id" in request.GET
-    ):  # réutilisation de l'ancien système
+    if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
         p_id = request.GET["id"]
 
@@ -979,7 +975,7 @@ def wordcloud(request):
         basereverse = "wordcloud"
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+    else:
         return redirect("unknown")
     # /
 
@@ -992,7 +988,7 @@ def wordcloud(request):
 
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
     # /
 
@@ -1015,9 +1011,7 @@ def wordcloud(request):
 
     if i_type == "rsr":
         start_date_param = esActions.date_p(field, entity["halId_s"])
-        indexsearch = (
-            f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
-        )
+        indexsearch = f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
         filtrechercheur = f'_index: "{indexsearch}"'
         filtrelab = ""
 
@@ -1066,7 +1060,8 @@ def wordcloud(request):
 
 def tools(request):
     """
-    Gestion de la page "Outils", proposant des fonctionnalités pour les profils laboratoires. (Export HCERES, Cohésion des données)
+    Gestion de la page "Outils", proposant des fonctionnalités pour les profils laboratoires.
+    (Export HCERES, Cohésion des données)
     """
     start_time = datetime.now()
     # Get parameters
@@ -1080,9 +1075,7 @@ def tools(request):
     else:
         ldapid = None
 
-    if (
-        "type" in request.GET and "id" in request.GET
-    ):  # réutilisation de l'ancien système
+    if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
         p_id = request.GET["id"]
 
@@ -1090,7 +1083,7 @@ def tools(request):
         basereverse = "dashboard"
         return default_checker(request, basereverse)
 
-    else:  # retour à l'ancien système et redirect unknown s'il n'est pas identifié et les i_type et p_id ne sont pas connu
+    else:
         return redirect("unknown")
     # /
 
@@ -1103,7 +1096,7 @@ def tools(request):
 
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
     # /
 
@@ -1116,10 +1109,7 @@ def tools(request):
     else:
         return redirect("unknown")
 
-    if (
-        es.count(index="*-documents", body=hastoconfirm_param)["count"] > 0
-    ):  # devrait être scindé en deux ex.count qui diffèrent selon "lab" ou rsr dans les if précédent
-        #  par ex pour == if i_type == "lab": : es.count(index=struct  + "-" + entity['halStructId']+"-documents", body=hastoconfirm_param)['count'] > 0:
+    if es.count(index="*-documents", body=hastoconfirm_param)["count"] > 0:
         hastoconfirm = True
 
     # Get first submittedDate_tdate date
@@ -1127,13 +1117,11 @@ def tools(request):
         field = "harvested_from_ids"
         start_date_param = esActions.date_p(field, entity["halStructId"])
 
-        res = es.search(
-            index=f"{struct}-{p_id}-laboratories-documents", body=start_date_param
-        )
+        res = es.search(index=f"{struct}-{p_id}-laboratories-documents", body=start_date_param)
 
     try:
         start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
-    except:
+    except IndexError:
         start_date = "2000"
     # /
 
@@ -1194,7 +1182,7 @@ def tools(request):
             name = rsrs_cleaned[x]["name"]
             validated = rsrs_cleaned[x]["validated"]
 
-            # nombre de documents avec le nom de l'auteur coté lab par ex : (authIdHal_s : david-reymond)
+            # nombre de documents de l'auteur coté lab
             ref_lab = esActions.ref_p(
                 scope_bool_type,
                 "authIdHal_s",
@@ -1316,7 +1304,7 @@ def index(request):
                 "to": date_to,
             },
         )
-    else:  # L'i_type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté en amont.
+    else:  # L'i_type et l'id sont renvoyés dans la requète : persistence du profil choisi/connecté
         return render(
             request,
             "index.html",
@@ -1345,9 +1333,9 @@ def search(request):  # Revoir la fonction
         }
     }
 
-    min_date = es.search(index="*-documents", body=date_param, size=0)["aggregations"][
-        "min_date"
-    ]["value_as_string"]
+    min_date = es.search(index="*-documents", body=date_param, size=0)["aggregations"]["min_date"][
+        "value_as_string"
+    ]
 
     # Get parameters
     struct, i_type, p_id, ldapid = regular_get_parameters(request)
@@ -1395,9 +1383,7 @@ def search(request):  # Revoir la fonction
         messages.add_message(
             request,
             messages.INFO,
-            'Résultats de la recherche "{}" dans la collection "{}"'.format(
-                search, index
-            ),
+            f'Résultats de la recherche "{search}" dans la collection "{index}"',
         )
 
         url = (
@@ -1547,7 +1533,7 @@ def default_checker(request, basereverse, default_data=None):
 
     try:
         p_id = request.user.get_display_id()  # cas log ?
-    except:
+    except IndexError:
         p_id = request.user.get_username()  # check si l'utilisateur est log
     # p_id = p_id.replace(viewsActions.patternCas, '').lower()
 
@@ -1557,14 +1543,14 @@ def default_checker(request, basereverse, default_data=None):
         indexcat = "lab"
         base_url = reverse("index")
         query_string = urlencode({"indexcat": indexcat, "indexstruct": "198307662"})
-        url = "{}?{}".format(base_url, query_string)
+        url = f"{base_url}?{query_string}"
         return redirect(url)
 
     if p_id == "invitamu":
         indexcat = "rsr"
         base_url = reverse("index")
         query_string = urlencode({"indexcat": indexcat, "indexstruct": "130015332"})
-        url = "{}?{}".format(base_url, query_string)
+        url = f"{base_url}?{query_string}"
         return redirect(url)
 
     elif (
@@ -1584,10 +1570,10 @@ def default_checker(request, basereverse, default_data=None):
             query_string = urlencode({"type": i_type, "id": p_id, "data": default_data})
         else:
             query_string = urlencode({"type": i_type, "id": p_id})
-        url = "{}?{}".format(base_url, query_string)
+        url = f"{base_url}?{query_string}"
         return redirect(url)
 
-    else:  # sinon il est inconnu et doit aller dans l'index pour faire ses choix, car on ne peut pas le suivre
+    else:
         return redirect("unknown")
 
 
@@ -1645,7 +1631,6 @@ def get_scope_data(i_type, p_id):
     ext_key = "harvested_from_ids"
 
     scope_param = esActions.scope_p(field, p_id)
-    # la partie es.search n'est pas prise dans cette fonction, car la durée de la fonction principale passe de 2 à 4 s dans ce cas.
 
     return key, search_id, index_pattern, ext_key, scope_param
 

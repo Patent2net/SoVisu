@@ -9,16 +9,12 @@ def return_struct():
 
     scope_param = esActions.scope_all()
 
-    StructCount = es.count(index="*-structures", body=scope_param, request_timeout=50)[
-        "count"
-    ]
+    StructCount = es.count(index="*-structures", body=scope_param, request_timeout=50)["count"]
     if StructCount > 0:
         Struct = es.search(index="*-structures", body=scope_param, size=StructCount)
         Struct = Struct["hits"]["hits"]
 
-    count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)[
-        "count"
-    ]
+    count = es.count(index="*-laboratories", body=scope_param, request_timeout=50)["count"]
     if count > 0:
         Labos = es.search(index="*-laboratories", body=scope_param, size=count)
         Labos = Labos["hits"]["hits"]
@@ -26,10 +22,7 @@ def return_struct():
             if "structAcronym" not in labo["_source"]:
                 print(labo["_source"]["acronym"])
                 for doc_struct in Struct:
-                    if (
-                        doc_struct["_source"]["structSirene"]
-                        == labo["_source"]["structSirene"]
-                    ):
+                    if doc_struct["_source"]["structSirene"] == labo["_source"]["structSirene"]:
                         structAcronym = doc_struct["_source"]["acronym"]
                         print(labo["_index"])
                         es.update(
@@ -39,7 +32,8 @@ def return_struct():
                             body={"doc": {"structAcronym": structAcronym}},
                         )
                         print(
-                            f"le champ structAcronym: {structAcronym} a été rajouté a {labo['_index']}"
+                            f"le champ structAcronym: {structAcronym} "
+                            + f"a été rajouté a {labo['_index']}"
                         )
 
                     else:
@@ -52,21 +46,20 @@ def return_struct():
                             body={"doc": {"structAcronym": "Warning"}},
                         )
             else:
-                print(f"le champ structAcronym existe dans {labo['_index']}")
+                pass
+                # print(f"le champ structAcronym existe dans {labo['_index']}")
 
 
 def return_struct_from_index(index):
     """
-    Enrichi les index laboratoires en entrée avec le champ structAcronym à partir des index de structures
+    Enrichi les index laboratoires avec le champ structAcronym à partir des index de structures
     """
     # Cette fonction enregistre le struct Acronym d'un laboratoire en fonctions d'un index
     es = esActions.es_connector()
 
     scope_param = esActions.scope_all()
 
-    StructCount = es.count(index="*-structures", body=scope_param, request_timeout=50)[
-        "count"
-    ]
+    StructCount = es.count(index="*-structures", body=scope_param, request_timeout=50)["count"]
     if StructCount > 0:
         Struct = es.search(index="*-structures", body=scope_param, size=StructCount)
         Struct = Struct["hits"]["hits"]
@@ -78,10 +71,7 @@ def return_struct_from_index(index):
         if "structAcronym" not in labo["_source"]:
             print(labo["_source"]["acronym"])
             for doc_struct in Struct:
-                if (
-                    doc_struct["_source"]["structSirene"]
-                    == labo["_source"]["structSirene"]
-                ):
+                if doc_struct["_source"]["structSirene"] == labo["_source"]["structSirene"]:
                     structAcronym = doc_struct["_source"]["acronym"]
                     print(labo["_index"])
                     es.update(

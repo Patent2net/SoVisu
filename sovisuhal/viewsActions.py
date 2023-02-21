@@ -5,29 +5,38 @@ from urllib.request import urlopen
 
 import pandas as pd
 from bs4 import BeautifulSoup
+from decouple import config
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from uniauth.decorators import login_required
 
 from elasticHal.libs import utils
-from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
-from sovisuhal.libs.elastichal import indexe_chercheur, collecte_docs
+from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
+from sovisuhal.libs.elastichal import collecte_docs, indexe_chercheur
+
 from . import settings
 from .libs import esActions
 
+mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
+
+"""
 try:
     from decouple import config
     from ldap3 import Server, Connection, ALL
     from uniauth.decorators import login_required
-
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
     patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
 
 except:
+
     from django.contrib.auth.decorators import login_required
 
     mode = "Dev"
     patternCas = ""  # motif à enlever aux identifiants CAS
+    print("case 2")
+"""
 
 # Connect to DB
 es = esActions.es_connector()
@@ -39,7 +48,7 @@ def admin_access_login(request):
     Fonction gérant les accès à SoVisu
     """
     if not request.user.is_authenticated:
-        return redirect("%s?next=%s" % (settings.LOGIN_URL, "/"))
+        return redirect("{}?next={}".format(settings.LOGIN_URL, "/"))
     else:
         auth_user = request.user.get_username().lower()
 
@@ -75,7 +84,7 @@ def admin_access_login(request):
 
 def create_credentials(request):
     """
-    Fonction gérant la création du nouveau profil d'un chercheur à partir des données renseignées dans le formulaire CreateCredentials
+    Gere la création du nouveau profil à partir des données du formulaire CreateCredentials
     """
     ldapid = request.GET["ldapid"]
     idref = request.POST.get("f_IdRef")
@@ -96,7 +105,8 @@ def create_credentials(request):
     if idhal_test == 0:
         print("idhal not found")
         return redirect(
-            f"/create/?ldapid={ldapid}&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
+            f"/create/?ldapid={ldapid}"
+            + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
         )
 
     else:
@@ -117,7 +127,8 @@ def create_credentials(request):
         # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
         date_to = datetime.today().strftime("%Y-%m-%d")
         return redirect(
-            f"/check/?struct={struct}&type=rsr&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
+            f"/check/?struct={struct}&type=rsr"
+            + f"&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
         )
 
 
@@ -174,8 +185,7 @@ def validate_references(request):
         res = es.search(index=f"{struct}-*-researchers", body=scope_param)
         try:
             entity = res["hits"]["hits"][0]["_source"]
-        except Exception as e:
-            print(e)
+        except IndexError:
             return redirect("unknown")
 
         if request.method == "POST":
@@ -205,7 +215,7 @@ def validate_references(request):
         res = es.search(index=f"{struct}-*-laboratories", body=scope_param)
         try:
             entity = res["hits"]["hits"][0]["_source"]
-        except:
+        except IndexError:
             return redirect("unknown")
 
         if request.method == "POST":
@@ -219,7 +229,8 @@ def validate_references(request):
                 )
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
+        f"/check/?struct={struct}&type={i_type}"
+        + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
 
 
@@ -263,7 +274,7 @@ def validate_guiding_domains(request):
             res = es.search(index=f"{struct}-*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
-            except:
+            except IndexError:
                 return redirect("unknown")
 
             es.update(
@@ -336,52 +347,68 @@ def validate_expertise(request):
         res = es.search(index=f"{struct}-*-researchers", body=scope_param)
         try:
             entity = res["hits"]["hits"][0]["_source"]
-        except:
+        except IndexError:
             return redirect("unknown")
 
         index = f"{struct}-{entity['labHalId']}-researchers"
-        lab_index = f"{struct}-{entity['labHalId']}-laboratories"
+        # lab_index = f"{struct}-{entity['labHalId']}-laboratories"
 
         # get tree from lab
-        lab_scope_param = esActions.scope_p("_id", entity["labHalId"])
+        # lab_scope_param = esActions.scope_p("_id", entity["labHalId"])
 
-        res = es.search(index=f"{struct}*-laboratories", body=lab_scope_param)
-        entity_lab = res["hits"]["hits"][0]["_source"]
+        # res = es.search(index=f"{struct}*-laboratories", body=lab_scope_param)
+        # entity_lab = res["hits"]["hits"][0]["_source"]
 
-        lab_tree = entity_lab["concepts"]
+        # lab_tree = entity_lab["concepts"]
 
         if request.method == "POST":
             to_invalidate = request.POST.get("toInvalidate", "").split(",")
+            # Si validate == 0 ou 1 les concepts sont respectivement à valider ou à invalider.
+            # to_invalidate contient la liste des concepts embarqués dans le dico entity [concepts]
+            # to_invalidate =
+            # ['shs.info.bibl', 'shs.info.conf', 'shs.info.gest', 'shs.info.hype', 'shs.info.orga']
 
-            for conceptid in to_invalidate:
-                sid = conceptid.split(".")
-                for children in entity["concepts"]["children"]:
-                    if len(sid) >= 1 and sid[0] == children["id"]:
-                        lab_tree = utils.append_to_tree(
-                            children, entity, lab_tree, validate
-                        )
-                        children["state"] = validate
-
-                    if "children" in children:
-                        for children1 in children["children"]:
-                            if len(sid) >= 2:
-                                if sid[0] + "." + sid[1] == children1["id"]:
-                                    lab_tree = utils.append_to_tree(
-                                        children1, entity, lab_tree, validate
+            for concept in to_invalidate:
+                for d in entity["concepts"]["children"]:
+                    d.update(("state", validate) for k, v in d.items() if v == concept)
+                    if "children" in d:
+                        for d1 in d["children"]:
+                            d1.update(("state", validate) for k, v in d1.items() if v == concept)
+                            if "children" in d1:
+                                for d2 in d1["children"]:
+                                    d2.update(
+                                        ("state", validate) for k, v in d2.items() if v == concept
                                     )
-                                    children1["state"] = validate
 
-                            if "children" in children1:
-                                for children2 in children1["children"]:
-                                    if len(sid) >= 3:
-                                        if (
-                                            sid[0] + "." + sid[1] + "." + sid[2]
-                                            == children2["id"]
-                                        ):
-                                            lab_tree = utils.append_to_tree(
-                                                children2, entity, lab_tree, validate
-                                            )
-                                            children2["state"] = validate
+            # for conceptid in to_invalidate:
+            #     sid = conceptid.split(".")
+            #     for children in entity["concepts"]["children"]:
+            #         if len(sid) >= 1 and sid[0] == children["id"]:
+            #             lab_tree = utils.append_to_tree(
+            #                 children, entity, lab_tree, validate
+            #             )
+            #             children["state"] = validate
+            #
+            #         if "children" in children:
+            #             for children1 in children["children"]:
+            #                 if len(sid) >= 2:
+            #                     if sid[0] + "." + sid[1] == children1["id"]:
+            #                         lab_tree = utils.append_to_tree(
+            #                             children1, entity, lab_tree, validate
+            #                         )
+            #                         children1["state"] = validate
+            #
+            #                 if "children" in children1:
+            #                     for children2 in children1["children"]:
+            #                         if len(sid) >= 3:
+            #                             if (
+            #                                 sid[0] + "." + sid[1] + "." + sid[2]
+            #                                 == children2["id"]
+            #                             ):
+            #                                 lab_tree = utils.append_to_tree(
+            #                                     children2, entity, lab_tree, validate
+            #                                 )
+            #                                 children2["state"] = validate
 
             es.update(
                 index=index,
@@ -389,16 +416,19 @@ def validate_expertise(request):
                 id=entity["ldapId"],
                 body={"doc": {"concepts": entity["concepts"]}},
             )
+            # g oublié le labo hier...
+            # Faut discuter de la fonction util, je sais pas l'appeler à priori.
 
-            es.update(
-                index=lab_index,
-                refresh="wait_for",
-                id=entity["labHalId"],
-                body={"doc": {"concepts": lab_tree}},
-            )
+            # es.update(
+            #     index=lab_index,
+            #     refresh="wait_for",
+            #     id=entity["labHalId"],
+            #     body={"doc": {"concepts": lab_tree}},
+            # )
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
+        f"/check/?struct={struct}&type={i_type}"
+        + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
 
 
@@ -445,7 +475,7 @@ def validate_credentials(request):
             try:
                 entity = res["hits"]["hits"][0]["_source"]
                 print(f"entity = {entity}")
-            except:
+            except IndexError:
                 return redirect("unknown")
 
             print(f"{struct}-{entity['labHalId']}-researchers")
@@ -524,12 +554,8 @@ def validate_research_description(request):
     if request.method == "POST":
         guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
         research_summary = request.POST.get("f_research_summary")
-        research_projects_in_progress = request.POST.get(
-            "f_research_projectsInProgress"
-        )
-        research_projects_and_fundings = request.POST.get(
-            "f_research_projectsAndFundings"
-        )
+        research_projects_in_progress = request.POST.get("f_research_projectsInProgress")
+        research_projects_and_fundings = request.POST.get("f_research_projectsAndFundings")
 
         soup = BeautifulSoup(research_summary, "html.parser")
         research_summary_raw = soup.getText().replace("\n", " ")
@@ -546,7 +572,7 @@ def validate_research_description(request):
             res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
-            except:
+            except IndexError:
                 return redirect("unknown")
 
             es.update(
@@ -616,16 +642,14 @@ def refresh_aurehal_id(request):
     res = es.search(index=f"{struct}*-researchers", body=scope_param)
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
 
     aurehal_id = get_aurehalId(entity["halId_s"])
     concepts = []
     if aurehal_id != -1:
         archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)
-        concepts = utils.filter_concepts(
-            archives_ouvertes_data["concepts"], validated_ids=[]
-        )
+        concepts = utils.filter_concepts(archives_ouvertes_data["concepts"], validated_ids=[])
 
     es.update(
         index=f"{struct}-{entity['labHalId']}-researchers",
@@ -678,14 +702,26 @@ def force_update_references(request):
         res = es.search(index=f"{struct}*-researchers", body=scope_param)
         try:
             entity = res["hits"]["hits"][0]["_source"]
-        except:
+        except IndexError:
             return redirect("unknown")
 
-        collecte_docs(entity)
-
-    return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data=references&validation=1"
-    )
+        result = collecte_docs.delay(entity, True)
+        taches = result.task_id
+        return redirect(
+            f"/check/?struct={struct}&type={i_type}&id={p_id}"
+            + f"&from={date_from}&to={date_to}&taches={taches}&data=references&validation=1"
+        )
+    if "taches" in request.GET:
+        taches = request.GET["taches"]
+        return redirect(
+            f"/check/?struct={struct}&type={i_type}&id={p_id}"
+            + f"&from={date_from}&to={date_to}&taches={taches}&data=references&validation=1"
+        )
+    else:
+        return redirect(
+            f"/check/?struct={struct}&type={i_type}&id={p_id}"
+            + f"&from={date_from}&to={date_to}&data=references&validation=1"
+        )
 
 
 def update_members(request):
@@ -730,9 +766,10 @@ def update_members(request):
             res = es.search(index="*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
-            except:
+            except IndexError:
                 return redirect(
-                    f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+                    f"/check/?struct={struct}"
+                    + f"&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
                 )
             es.update(
                 index=res["hits"]["hits"][0]["_index"],
@@ -782,7 +819,7 @@ def update_authorship(request):
     res = es.search(index=f"{struct}-*-researchers", body=scope_param)
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
 
     try:
@@ -819,9 +856,7 @@ def update_authorship(request):
                         }
                     ]
             else:
-                authorship = [
-                    {"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}
-                ]
+                authorship = [{"authorship": doc["authorship"], "authIdHal_s": entity["halId_s"]}]
 
             es.update(
                 index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
@@ -876,13 +911,14 @@ def update_authorship(request):
                     id=doc["docid"],
                     body={"doc": {"authorship": authorship}},
                 )
-            except:
+            except IndexError:
                 print(f"docid {str(doc['docid'])} non trouvé dans l'index des labs...")
-    except:
+    except IndexError:
         pass
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation=1"
+        f"/check/?struct={struct}"
+        + f"&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation=1"
     )
 
 
@@ -896,8 +932,7 @@ def export_hceres_xls(request):
     else:
         return redirect("unknown")
 
-    if "type" in request.GET and "id" in request.GET:
-        i_type = request.GET["type"]
+    if "id" in request.GET:
         p_id = request.GET["id"]
     else:
         return redirect("unknown")
@@ -910,7 +945,7 @@ def export_hceres_xls(request):
     res = es.search(index=f"{struct}-{p_id}-laboratories", body=scope_param)
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except:
+    except IndexError:
         return redirect("unknown")
 
     # Acquisition des chercheurs à traiter
@@ -919,7 +954,8 @@ def export_hceres_xls(request):
     # toProcess_extra = request.POST.get("toProcess_extra", "").splitlines()
     # for line in toProcess_extra:
     #     values = line.split(";")
-    #     toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1], "function": values[2], "scope": values[3]})
+    #     toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1],
+    #     "function": values[2], "scope": values[3]})
     #
     # toProcess.extend(toProcess_extra_cleaned)
     scope_bool_type = "filter"
@@ -1052,9 +1088,7 @@ def export_hceres_xls(request):
     else:
         conf_df.to_excel(writer, "CONF", index=False)
     if len(hdr_df.index) > 0:
-        hdr_df[["authfullName_s", "defenseDateY_i", "team"]].to_excel(
-            writer, "HDR", index=False
-        )
+        hdr_df[["authfullName_s", "defenseDateY_i", "team"]].to_excel(writer, "HDR", index=False)
     else:
         hdr_df.to_excel(writer, "HDR", index=False)
     writer.close()
@@ -1093,6 +1127,7 @@ def idhal_checkout(idhal):
 def vizualisation_url():
     """
     Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
+    Obsolète
     """
     print("mode: ")
     print(mode)

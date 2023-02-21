@@ -1,62 +1,15 @@
-from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
-from datetime import datetime
-import json
-
-
-# Custom libs
-# from sovisuhal.libs import esActions
-# from elasticHal.libs import archivesOuvertes, utils
+from sovisuhal.libs import esActions
 
 # Connect to DB
-
-
-def es_connector(mode=True):
-    if mode == "Prod":
-        # secret = config('ELASTIC_PASSWORD')
-        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch(
-            "localhost",
-            http_auth=("elastic", secret),
-            scheme="http",
-            port=9200,
-            # ssl_context=context,
-            timeout=10,
-        )
-    else:
-        # es = Elasticsearch([{'host': 'localhost', scheme:"http", 'port': 9200}])
-        # es = Elasticsearch('http://localhost:9200')
-        es = Elasticsearch(
-            hosts=[
-                "http://localhost:9200",
-                "http://elastichal2:9200",
-                "http://elastichal3:9200",
-                "http://elastichal1:9200",
-            ]
-        )
-        es.options(request_timeout=100, retry_on_timeout=True, max_retries=3)
-    return es
-
-
-def scope_all():
-    scope = {"query": {"match_all": {}}}
-    return scope
-
-
-# Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
-def scope_p(scope_field, scope_value):
-    scope = {"query": {"match": {scope_field: scope_value}}}
-    return scope
-
-
-es = es_connector()
+es = esActions.es_connector()
 
 # Memo des pbs.
 # Choix fait de se poser sur le ldapid --> pas de gestion des doublons type ex-doctorants
 # si deux meme ldapid dans des index chercheurs différents alors
 # memo du plus recent created seulement
-scope_param = scope_all()
+scope_param = esActions.scope_all()
 count = es.count(index="*-researchers", body=scope_param)["count"]
 res = es.search(index="*-researchers", body=scope_param, size=count)
 chercheurs = res["hits"]["hits"]
@@ -137,7 +90,7 @@ for ind, doudou in enumerate(chercheurs):
                 " index ",
                 doudou["_index"],
             )
-    except:
+    except IndexError:
         print("erreur pour : ", idxDocs)
 
 print("Traitement des collections labo")

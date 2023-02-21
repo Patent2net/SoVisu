@@ -207,7 +207,7 @@ services:
       #ELASTICSEARCH_HOST_PORT: "http://elastichal:9200"
     networks:
       - elk
-     
+
 volumes:
   es-data1:
      driver: local
@@ -247,4 +247,3 @@ volumes:
 networks:
   elk:
     driver: bridge
-    

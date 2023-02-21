@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+
 from sovisuhal.libs import esActions
 
 path = "backup"
@@ -36,5 +37,6 @@ es.snapshot.create(
 print("Snapshot created")
 
 print(
-    f"snapshot get: \n {es.snapshot.get(repository=path, snapshot='_all', filter_path='snapshots.snapshot')}"
+    "snapshot get:"
+    + f" \n {es.snapshot.get(repository=path, snapshot='_all', filter_path='snapshots.snapshot')}"
 )

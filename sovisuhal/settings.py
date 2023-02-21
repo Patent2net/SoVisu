@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from decouple import config
 
 mode = config("mode")
@@ -139,41 +140,12 @@ SECURE_REFERRER_POLICY = "origin"
 # test CSP
 # info : https://book.hacktricks.xyz/pentesting-web/content-security-policy-csp-bypass
 # djnago specs :
-Bibi = ["'self' 'unsafe-inline' 'unsafe-eval'"]
 Dns = [
     "http://localhost",
     "http://localhost:*",
     "http://127.0.0.1:*",
 ]
-# BibiSha =  ["'self' 'sha256-r5bInLZa0y6YxHFpmz7cjyYrndjwCeDLDu/1KeMikHA='"]
-# BibiScripts =  Bibi  + Dns
-# Scripts = [
-#     "https://cdn.datatables.net",
-#     "https://cdn.jsdelivr.net",
-#     "https://code.jquery.com",
-#     "https://cdnjs.cloudflare.com",
-#     "http://cdnjs.cloudflare.com",
-#     "https://d3js.org",
-#     "https://unpkg.com",]
-#
-# Styles = ["https://cdn.datatables.net","https://cdn.jsdelivr.net","https://rsms.me","https://unpkg.com",] + Dns
-# Polices = ["https://rsms.me",]
-# CSP_DEFAULT_SRC = Bibi + Dns
-# CSP_IMG_SRC = Bibi  + Dns
-# CSP_FRAME_SRC = BibiScripts  + Dns
-# CSP_STYLE_SRC = Bibi + Styles
-# CSP_SCRIPT_SRC = BibiScripts + Scripts
-# CSP_FONT_SRC = Bibi + Polices + Dns
-#
-# CSP_BASE_URI = Bibi
-# CSP_FRAME_ANCESTORS = Bibi + Dns
-# CSP_FORM_ACTION = Bibi
-# CSP_INCLUDE_NONCE_IN = ('script-src', ) #oblige a modifier tous les templates pour envoyer un nonce 'context processor" https://www.laac.dev/blog/content-security-policy-using-django/
-# CSP_MANIFEST_SRC = Bibi
-# CSP_WORKER_SRC = Bibi
-# CSP_MEDIA_SRC = Bibi
 
-# X_FRAME_OPTIONS = 'ALLOW-FROM ' + " " .join(Dns)
 X_FRAME_OPTIONS = "sameorigin"
 
 
@@ -255,22 +227,13 @@ if mode == "dev":
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, "static")  #'/data/SoVisu/staticfiles/
 """
-Permet de résoudre le soucis MIME sur les navigateurs. Le STATIC_ROOT est a paramétrer avec NGINX pour fonctionner
+Permet de résoudre le soucis MIME sur les navigateurs.
+Le STATIC_ROOT est à paramétrer avec NGINX pour fonctionner
 le STATICFILES_DIRS est une solution adaptée principalement pour le dev
 """
 
 
 # EMAIL Setup
-# https://docs.djangoproject.com/en/3.1/topics/email/
-
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.yourserver.com'
-# EMAIL_PORT = '<your-server-port>'
-# EMAIL_HOST_USER = 'your@djangoapp.com'
-# EMAIL_HOST_PASSWORD = 'your-email account-password'
-# EMAIL_USE_TLS = True
-# EMAIL_USE_SSL = False
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
@@ -291,7 +254,9 @@ ADMINS = (
 )
 
 MANAGERS = (("BU", "dreymond@univ-tln.fr"), ("BU_1", ""))  # changer l'adresse
-# Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés. Dans le cas où un seul admin est présent pour le système, merci de laisser le 2e profil sans adresse mail renseignée.
+# Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés.
+# Dans le cas où un seul admin est présent pour le système,
+# merci de laisser le 2e profil sans adresse mail renseignée.
 
 # Celery Settings
 CELERY_BROKER_URL = "redis://localhost:6379/0"

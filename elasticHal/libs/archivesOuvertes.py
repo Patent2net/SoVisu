@@ -1,7 +1,8 @@
-from SPARQLWrapper import SPARQLWrapper, JSON
+import time
+
 import networkx as nx
 import requests
-import time
+from SPARQLWrapper import JSON, SPARQLWrapper
 
 # lets go
 sparql = SPARQLWrapper("http://sparql.archives-ouvertes.fr/sparql")
@@ -133,14 +134,12 @@ def extrait_sujets_domaines(data):
 
     # topics = [top for top in topics if 'xml:lang' in top['o']]
 
-    langues = list(set([top["o"]["xml:lang"] for top in topics]))
+    langues = list({top["o"]["xml:lang"] for top in topics})
     # filtres par langues
     dico_top = dict()
 
     for lang in langues:
-        dico_top[lang] = [
-            top["o"]["value"] for top in topics if top["o"]["xml:lang"] == lang
-        ]
+        dico_top[lang] = [top["o"]["value"] for top in topics if top["o"]["xml:lang"] == lang]
 
     return dico_top, list(set(sujets))
 
@@ -211,72 +210,72 @@ def get_concepts_and_keywords(aurehalid):
     domains = []
 
     # print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
-    try:
-        tree = ""
-        for dom in domaines:
-            domains.append(explain_domains(dom))
+    #try:
+    tree = ""
+    for dom in domaines:
+        domains.append(explain_domains(dom))
 
-            # réseau json hiérarchiques
-            #
-            tree = nx.DiGraph()
+        # réseau json hiérarchiques
+        #
+        tree = nx.DiGraph()
 
-            tree.add_node("Concepts")
-            domains = [list(filter(lambda x: x is not None, truc)) for truc in domains]
+        tree.add_node("Concepts")
+        domains = [list(filter(lambda x: x is not None, truc)) for truc in domains]
 
-            for dom1 in domains:
-                tree.add_node(dom1[0][0])
-                tree.add_edge("Concepts", dom1[0][0])
-                if len(dom1) > 1:
-                    tree.add_node(dom1[1][0])
-                    tree.add_edge(dom1[0][0], dom1[1][0])
-                if len(dom1) > 2:
-                    tree.add_node(dom1[2][0])
-                    tree.add_edge(dom1[1][0], dom1[2][0])
-
-        concepts = nx.tree_data(tree, "Concepts")
-        # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
-        #     ficRes.write(str(nx.tree_data(tree, "Concepts")).replace("'", '"'))
-
-        for children in concepts["children"]:
-            children["label_en"] = get_label(children["id"], "en")
-            children["label_fr"] = get_label(children["id"], "fr")
-            children["state"] = "invalidated"
-            if "children" in children:
-                for subchildren in children["children"]:
-                    subchildren["label_en"] = get_label(subchildren["id"], "en")
-                    subchildren["label_fr"] = get_label(subchildren["id"], "fr")
-                    subchildren["state"] = "invalidated"
-                    if "children" in subchildren:
-                        for subsubchildren in subchildren["children"]:
-                            subsubchildren["label_en"] = get_label(
-                                subsubchildren["id"], "en"
-                            )
-                            subsubchildren["label_fr"] = get_label(
-                                subsubchildren["id"], "fr"
-                            )
-                            subsubchildren["state"] = "invalidated"
-
-        for lang in sujets.keys():
-            tree_words = nx.DiGraph()
-            tree_words.add_node(lang)
-            for kwd in sujets[lang]:
-                tree_words.add_node(kwd)
-                tree_words.add_edge(lang, kwd)
-            keywords.append({"lang": lang, "keywords": nx.tree_data(tree_words, lang)})
-            # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
-            #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
-        concepts_and_keywords = {"concepts": concepts, "keywords": keywords}
-        return concepts_and_keywords
-
-    except:
+        for dom1 in domains:
+            tree.add_node(dom1[0][0])
+            tree.add_edge("Concepts", dom1[0][0])
+            if len(dom1) > 1:
+                tree.add_node(dom1[1][0])
+                tree.add_edge(dom1[0][0], dom1[1][0])
+            if len(dom1) > 2:
+                tree.add_node(dom1[2][0])
+                tree.add_edge(dom1[1][0], dom1[2][0])
+    if len(tree) == 0: # çà s'est mal passé
         concepts_and_keywords = {"concepts": [], "keywords": []}
         return concepts_and_keywords
+    else:
+        concepts = nx.tree_data(tree, "Concepts")
+    # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
+    #     ficRes.write(str(nx.tree_data(tree, "Concepts")).replace("'", '"'))
+
+    for children in concepts["children"]:
+        children["label_en"] = get_label(children["id"], "en")
+        children["label_fr"] = get_label(children["id"], "fr")
+        children["state"] = "invalidated"
+        if "children" in children:
+            for subchildren in children["children"]:
+                subchildren["label_en"] = get_label(subchildren["id"], "en")
+                subchildren["label_fr"] = get_label(subchildren["id"], "fr")
+                subchildren["state"] = "invalidated"
+                if "children" in subchildren:
+                    for subsubchildren in subchildren["children"]:
+                        subsubchildren["label_en"] = get_label(subsubchildren["id"], "en")
+                        subsubchildren["label_fr"] = get_label(subsubchildren["id"], "fr")
+                        subsubchildren["state"] = "invalidated"
+
+    for lang in sujets.keys():
+        tree_words = nx.DiGraph()
+        tree_words.add_node(lang)
+        for kwd in sujets[lang]:
+            tree_words.add_node(kwd)
+            tree_words.add_edge(lang, kwd)
+        keywords.append({"lang": lang, "keywords": nx.tree_data(tree_words, lang)})
+        # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
+        #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
+    concepts_and_keywords = {"concepts": concepts, "keywords": keywords}
+    return concepts_and_keywords
+    # except IndexError:
+    #     concepts_and_keywords = {"concepts": [], "keywords": []}
+    #     return concepts_and_keywords
 
 
 def get_aurehalId(authIdHal_s):
     """
     get the aurehalId (authIdHal_i) of the searcher with authIdHal_s (halId_s)
     """
+    if len(authIdHal_s) == 0:
+        return 0
     url = (
         "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:"
         + authIdHal_s
@@ -285,7 +284,7 @@ def get_aurehalId(authIdHal_s):
 
     res_status = False
     while res_status is False:
-        print(f"{authIdHal_s}")
+        # print(f"{authIdHal_s}")
         req = requests.request("GET", url)
         data = req.json()
         print(f"{data}")
@@ -304,7 +303,5 @@ def get_aurehalId(authIdHal_s):
                 curr += 1
                 if auth.split("_FacetSep_")[-1] == authIdHal_s:
                     break
-            aurehalId = sample["authFullNamePersonIDIDHal_fs"][curr - 1].split(
-                "_FacetSep_"
-            )[1]
+            aurehalId = sample["authFullNamePersonIDIDHal_fs"][curr - 1].split("_FacetSep_")[1]
             return aurehalId

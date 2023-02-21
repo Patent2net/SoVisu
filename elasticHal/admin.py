@@ -9,7 +9,7 @@ from .models import Structure, Laboratory, Researcher
 from django.contrib.auth.models import User, Group
 
 from .insert_entities import create_index
-from .collect_from_HAL import (
+from elasticHal.collect_from_HAL import (
     collect_data,
     collect_laboratories_data2,
     collect_researchers_data2,
@@ -59,6 +59,7 @@ class ElasticActions:
     """
 
     @staticmethod
+    #@shared_task(bind=True)
     def export_to_elastic(request):
         """
         Initialise la création des index Elasticsearch et collecte les données correspondantes via l'API HAL
@@ -142,80 +143,98 @@ class ElasticActions:
                     collectionLabo = False
                 collection = form.cleaned_data["f_index"]
                 # print('uuuu ', collection)
-
+                indexes = get_index_list()
+                structures = []
+                for ind, lab in enumerate(indexes):
+                    structures.append(lab[0].split("-")[0])
+                structures = list(set(structures))
                 if "TOUT" in request.POST.keys():
-                    tachesChercheur, tachesLabo = [], []
-                    indexes = get_index_list()
 
                     for ind, lab in enumerate(indexes):
                         laboratoire = lab[0].split("-")[1]
                         structure = lab[0].split("-")[0]
-                        result1 = collect_laboratories_data2.delay(laboratoire)
+                        result1 = collect_laboratories_data2.delay(laboratoire) # on ferait pas la collecte deux fois pour les labs partagés ?
                         result2 = collect_researchers_data2.delay(
                             struct=structure, idx=lab[0]
                         )
-                        taches.append([ind, result1.task_id, result2.task_id])
+                        taches.append([ind, result1.task_id, result2.task_id]) #numero; tacheLab, TacheChercheurs
 
-                elif collectionLabo is True:
-                    if chercheurs is True:
+                elif collectionLabo == True:
+                    if chercheurs == True:
                         laboratoire = collection.split("-")[1]
                         structure = collection.split("-")[0]
                         result1 = collect_laboratories_data2.delay(laboratoire)
-                        task_id1 = result1.task_id
+                        #task_id1 = result1.task_id
                         result2 = collect_researchers_data2.delay(
-                            struct=structure, idx=collection
+                            struct=structure, idx=""
                         )
-                        task_id2 = result2.task_id
-
+                        #task_id2 = result2.task_id  # task_id1=tacheLab, task_id2 = TacheChercheurs
+                        taches.append([0, result1.task_id, result2.task_id])
                     else:
                         result1 = collect_laboratories_data2.delay(
                             collectionLabo, False
                         )
-                        task_id1 = result1.task_id
-                        task_id2 = None
+                        #task_id1 = result1.task_id
+                        #task_id2 = None   # task_id1=tacheLab, task_id2 = None
+                        taches.append([0, result1.task_id, None])
+                elif chercheurs == True: # boucle sur les structures
+                    taches = []
 
-                # elif chercheurs == True:
-                #     result2 = collect_researchers_data2 .delay(struct=structure, idx=collection)
-                #     task_id2 = result2.task_id
-                #     task_id1 = None
+                    for ind, struct in enumerate(structures):
+                        result2 = collect_researchers_data2 .delay(struct=struct, idx=collection)
+                        taches.append([ind, None, result2.task_id])  # numero;  TacheChercheurs
+                    #task_id2 = result2.task_id
+                    #task_id1 = None   # task_id1=None, task_id2 = TacheChercheurs
+                else:
+                    pass # on devrait pas être là
 
             else:
                 pass  # pas sûr
             if len(taches) > 0:
-                print(taches)
+                #print(taches)
                 return render(
                     request,
-                    "admin/elasticHal/export_to_elasticLabs.html",
+                    "admin/elasticHal/export_to_elasticLabs2.html",
                     context={"form": form, "taches": taches},
                 )
-            elif task_id1 in locals():
-                if task_id2 in locals():
-                    return render(
-                        request,
-                        "admin/elasticHal/export_to_elasticLabs.html",
-                        context={
-                            "form": form,
-                            "task_id1": task_id1,
-                            "task_id2": task_id2,
-                        },
-                    )
-                else:
-                    return render(
-                        request,
-                        "admin/elasticHal/export_to_elasticLabs.html",
-                        context={"form": form, "task_id1": task_id1},
-                    )
+            # elif "task_id1" in locals():
+            #     if "task_id2" in locals():
+            #         return render(
+            #             request,
+            #             "admin/elasticHal/export_to_elasticLabs.html",
+            #             context={
+            #                 "form": form,
+            #                 "task_id1": task_id1,
+            #                 "task_id2": task_id2,
+            #             },
+            #         )
+            #     else:
+            #         return render(
+            #             request,
+            #             "admin/elasticHal/export_to_elasticLabs.html",
+            #             context={"form": form, "task_id1": task_id1},
+            #         )
+            # elif "task_id2" in locals():
+            #     return render(
+            #         request,
+            #         "admin/elasticHal/export_to_elasticLabs.html",
+            #         context={
+            #             "form": form,
+            #             "task_id1": task_id1,
+            #             "task_id2": task_id2,
+            #         },
+            #     )
             else:
                 return render(
                     request,
-                    "admin/elasticHal/export_to_elasticLabs.html",
+                    "admin/elasticHal/export_to_elasticLabs2.html",
                     context={"form": form},
                 )
         else:
             form = PopulateLab()
 
         data = {"form": form}
-        return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
+        return render(request, "admin/elasticHal/export_to_elasticLabs2.html", data)
 
 
 # Models are under that line

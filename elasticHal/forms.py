@@ -1,4 +1,5 @@
 from django import forms
+
 from .views import get_index_list
 
 
@@ -17,7 +18,7 @@ class PopulateLab(forms.Form):
 
     def __init__(self, *args, **kwargs):
         indexes = get_index_list()
-        super(PopulateLab, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields["f_index"] = forms.ChoiceField(
             widget=forms.RadioSelect,
@@ -25,16 +26,15 @@ class PopulateLab(forms.Form):
             choices=indexes,
             required=False,
         )  # self.fields[''] permet de rendre dynamique les champs du formulaire
-        self.fields["collectionLabo"] = forms.BooleanField(
-            initial=False, required=False
-        )
+        self.fields["collectionLabo"] = forms.BooleanField(initial=False, required=False)
         self.fields["chercheurs"] = forms.BooleanField(initial=False, required=False)
         self.fields["TOUT"] = forms.BooleanField(initial=True, required=False)
 
 
 class ExportToElasticForm(forms.Form):
     """
-    Formulaire pour créer les index dans Elasticsearch à partir des données de Django et rechercher les documents dans l'API HAL
+    Formulaire pour créer les index dans Elasticsearch.
+    Se base sur les données de Django et recherche les documents dans l'API HAL
     """
 
     Structures = forms.BooleanField(initial=True, required=False)

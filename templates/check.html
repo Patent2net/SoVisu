@@ -56,7 +56,7 @@
                         <a class="px-2 pb-1
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                            href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
-                        >Expertise identifiée</a>
+                        >Expertises identifiées</a>
                     {% endif %}
 {#                    <a class="px-2 pb-1#}
 {#                        {% if data == "guiding-keywords" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"#}
@@ -65,7 +65,7 @@
                     <a class="px-2 pb-1
                         {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
-                    >Domaines expertise</a>
+                    >Domaines d'expertise</a>
                     {% if type == "rsr" %}
                         <a class="px-2 pb-1
                         {% if data == "research-description" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
@@ -378,7 +378,7 @@
                     {{ guidingKeywords | safe }}
                 </div>
 
-                <h4 class="text-xs font-semibold pb-2">Résumé des travaux :</h4>
+                <h4 class="text-xs font-semibold pb-2 mt-4">Résumé des travaux :</h4>
                 <div id="research_summary">
                     {{ research_summary | safe }}
                 </div>
@@ -417,12 +417,14 @@
                         [{'align': ['', 'center', 'right', 'justify']}],
                         [{list: 'ordered'}, {list: 'bullet'}]
                     ];
-                    var quill0 = new Quill('#guidingKeywords', {
+
+                    var quill4 = new Quill('#guidingKeywords', {
                         modules: {
-                            toolbar: []
+                            toolbar: options
                         },
                         theme: 'snow'
                     });
+
                     var quill1 = new Quill('#research_summary', {
                         modules: {
                             toolbar: options
@@ -561,16 +563,25 @@
                         {% endif %}
                     </div>
 
-                    <div class="dt-buttons-rplc flex items-center text-xs">
+                    <div class="dt-buttons-rplc flex mb-2 items-center text-xs flex-col relative">
                         {% if type == "rsr" %}
-                            <a class="px-2 pb-1 font-semibold text-xs mb-2 border-b-2 border-blue-300 pb-1 whitespace-nowrap text-blue-700
-                        text-gray-600 flex"
+                            <div class="flex">
+                            <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
+                        text-gray-600 flex mr-2 border-b-2 border-blue-300"
                                href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-</svg>
-                                Collecter (ou mettre à jour) de nouvelles références</a>
+                            > Collecter HAL
+                            </a>
+                            <div class="flex">
+                                    <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
+
+                                        <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px">
+                                        </div>
+                                        <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression de collecte</div>
+                                    </div>
+                                    <div id="celery-result" class=""></div>
+                                </div>
+                            </div>
+{#                                Collecter (ou mettre à jour) de nouvelles références</a>#}
 
                         {% endif %}
 
@@ -625,6 +636,8 @@
                 </div>
 
                 {% if validation == "1" and type == "rsr" %}
+                            {% comment %} POURQUOI RIEN DANS CE CAS ???? {% endcomment %}
+
 
                 {% endif %}
 
@@ -697,8 +710,7 @@
 
 </div>
 
-
-<script>
+<script type="text/javascript">
 
     {% if data == "guiding-domains" %}
 
@@ -950,6 +962,17 @@
         /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
         {% if validation == "1" and  type == "rsr" and data == "references" %}
+            {%  if taches %}
+                var progressUrl = "{% url 'celery_progress:task_status' taches %}";
+
+                $(function () {
+      CeleryProgressBar.initProgressBar(progressUrl, {
+        onResult: customResult,
+        onProgress: customProgress,
+        onSuccess: customSuccess,
+      })
+    });
+            {%  endif %}
 
             var references = JSON.parse(document.querySelector(".references-json").textContent)
 
@@ -1096,7 +1119,7 @@
             var table2 = $('#concepts').DataTable(
                 {
                     language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json',
                     },
                     dom: 'Bfrtip',
                     select: true,
@@ -1131,6 +1154,7 @@
                 $('.dataTables_scrollHeadInner').css('padding-right', 0);
                 $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
 
+                $('.dataTables_empty').text('Aucune expertise validée, pensez à regarder l\'onglet "Expertises retirées"');
 
                 $('.dataTables_filter').addClass('flex items-center');
                 $('.dt-buttons').addClass('mr-2');

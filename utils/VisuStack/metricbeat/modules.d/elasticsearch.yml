@@ -16,4 +16,3 @@
   #index_recovery.active_only: true
   xpack.enabled: false
   #scope: node
- 

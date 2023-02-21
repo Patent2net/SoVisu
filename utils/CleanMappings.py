@@ -1,63 +1,17 @@
-from elasticsearch import Elasticsearch
+import random
+import time
+
 from elasticsearch import helpers
 
-from datetime import datetime
-import json
-import time
-import random
+from sovisuhal.libs import esActions
 
-
-def es_connector(mode=True):
-    if mode == "Prod":
-        # secret = config('ELASTIC_PASSWORD')
-        # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
-        es = Elasticsearch(
-            "localhost",
-            http_auth=("elastic", secret),
-            scheme="http",
-            port=9200,
-            # ssl_context=context,
-            timeout=10,
-        )
-    else:
-        # es = Elasticsearch([{'host': 'localhost', scheme:"http", 'port': 9200}])
-        es = Elasticsearch(
-            "http://localhost:9200",
-            http_compress=True,
-            connections_per_node=50,
-            request_timeout=200,
-            retry_on_timeout=True,
-        )
-        # es = Elasticsearch(hosts = ['http://localhost:9200', 'http://elastichal2:9200', 'http://elastichal3:9200',                 'http://elastichal1:9200'])
-        es.options(
-            request_timeout=100, retry_on_timeout=True, max_retries=5
-        ).cluster.health(
-            wait_for_no_initializing_shards=True,
-            wait_for_no_relocating_shards=True,
-            wait_for_status="green",  # yellow doit pas forcément marcher si pas un cluster !
-        )
-
-    return es
-
-
-def scope_all():
-    scope = {"query": {"match_all": {}}}
-    return scope
-
-
-# Use that base code in other files to use scope_p function: variable_name = esActions.scope_p(scope_field, scope_value)
-def scope_p(scope_field, scope_value):
-    scope = {"query": {"match": {scope_field: scope_value}}}
-    return scope
-
-
-es = es_connector()
+# Connect to DB
+es = esActions.es_connector()
 
 # Memo des pbs.
 # Choix fait de se poser sur le ldapid --> pas de gestion des doublons type ex-doctorants
 # si deux meme ldapid dans des index chercheurs différents alors
 # memo du plus recent created seulement
-scope_param = scope_all()
 count = es.count(index="*-researchers")["count"]
 res = es.search(index="*-researchers", size=count)
 chercheurs = res["hits"]["hits"]
@@ -66,10 +20,6 @@ docmap = {
     "properties": {
         "docid": {
             "type": "long",
-            "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
-        },
-        "en_keyword_s": {
-            "type": "text",
             "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
         },
         "en_keyword_s": {
@@ -125,30 +75,17 @@ for ind, doudou in enumerate(chercheurs):
         # time.sleep(int(random.random() * 10))
         compte = es.count(index=idxDocs)["count"]
         docs = es.search(index=idxDocs, size=compte)
-        doIt = sum(
-            [
-                not isinstance(doc["_source"]["docid"], int)
-                for doc in docs["hits"]["hits"]
-            ]
-        )
+        doIt = sum([not isinstance(doc["_source"]["docid"], int) for doc in docs["hits"]["hits"]])
         if (
             len(mapping.body[idxDocs]["mappings"]) > 0
             and "docid" in mapping.body[idxDocs]["mappings"]["properties"].keys()
         ):
-            if (
-                mapping.body[idxDocs]["mappings"]["properties"]["docid"]["type"]
-                == "long"
-            ):
+            if mapping.body[idxDocs]["mappings"]["properties"]["docid"]["type"] == "long":
                 doIt = True
-            elif (
-                "fields"
-                in mapping.body[idxDocs]["mappings"]["properties"]["docid"].keys()
-            ):
+            elif "fields" in mapping.body[idxDocs]["mappings"]["properties"]["docid"].keys():
                 if (
                     "keyword"
-                    not in mapping.body[idxDocs]["mappings"]["properties"]["docid"][
-                        "fields"
-                    ]
+                    not in mapping.body[idxDocs]["mappings"]["properties"]["docid"]["fields"]
                 ):
                     doIt = True
                 else:
@@ -180,9 +117,9 @@ for ind, doudou in enumerate(chercheurs):
             else:
                 for doc in docu:
                     doc["_source"]["docid"] = int(doc["_source"]["docid"])
-                    es.options(
-                        request_timeout=200, retry_on_timeout=True, max_retries=5
-                    ).index(index=idxDocs, id=doc["_id"], document=doc["_source"])
+                    es.options(request_timeout=200, retry_on_timeout=True, max_retries=5).index(
+                        index=idxDocs, id=doc["_id"], document=doc["_source"]
+                    )
             resp = es.indices.refresh(index=idxDocs)
             print(es.cluster.health())
 
@@ -214,30 +151,17 @@ for ind, lab in enumerate(labos):
         # time.sleep(int(random.random() * 10))
         compte = es.count(index=idxDocs)["count"]
         docs = es.search(index=idxDocs, size=compte)
-        doIt = sum(
-            [
-                not isinstance(doc["_source"]["docid"], int)
-                for doc in docs["hits"]["hits"]
-            ]
-        )
+        doIt = sum([not isinstance(doc["_source"]["docid"], int) for doc in docs["hits"]["hits"]])
         if (
             len(mapping.body[idxDocs]["mappings"]) > 0
             and "docid" in mapping.body[idxDocs]["mappings"]["properties"].keys()
         ):
-            if (
-                mapping.body[idxDocs]["mappings"]["properties"]["docid"]["type"]
-                == "long"
-            ):
+            if mapping.body[idxDocs]["mappings"]["properties"]["docid"]["type"] == "long":
                 doIt = True
-            elif (
-                "fields"
-                in mapping.body[idxDocs]["mappings"]["properties"]["docid"].keys()
-            ):
+            elif "fields" in mapping.body[idxDocs]["mappings"]["properties"]["docid"].keys():
                 if (
                     "keyword"
-                    not in mapping.body[idxDocs]["mappings"]["properties"]["docid"][
-                        "fields"
-                    ]
+                    not in mapping.body[idxDocs]["mappings"]["properties"]["docid"]["fields"]
                 ):
                     doIt = True
                 else:

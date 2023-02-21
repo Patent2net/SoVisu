@@ -1,25 +1,34 @@
 # from libs import hal, utils, unpaywall, scanR
-from django.shortcuts import redirect
-from elasticHal.libs.archivesOuvertes import get_concepts_and_keywords, get_aurehalId
-from elasticHal.libs import (
-    utils,
-    hal,
-    archivesOuvertes,
-    location_docs,
-    doi_enrichissement,
-    keyword_enrichissement,
-)
-from elasticsearch import helpers
-import json
 import datetime
-# Celery
+import json
+
 from celery import shared_task
+from celery_progress.backend import ProgressRecorder
+from decouple import config
+from django.shortcuts import redirect
+from elasticsearch import helpers
+from ldap3 import ALL, Connection, Server
+
+from elasticHal.libs import (
+    doi_enrichissement,
+    hal,
+    keyword_enrichissement,
+    location_docs,
+    utils,
+)
+from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 
 from . import esActions
 
+# from uniauth.decorators import login_required
+
+
+mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+
+"""
 try:
     from decouple import config
-    from ldap3 import Server, Connection, ALL
+    from ldap3 import ALL, Connection, Server
     from uniauth.decorators import login_required
 
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
@@ -29,9 +38,7 @@ except:
 
     mode = "Dev"
     structId = "198307662"  # UTLN
-
-# from celery import shared_task
-# from celery_progress.backend import ProgressRecorder
+"""
 
 # Connect to DB
 es = esActions.es_connector()
@@ -156,7 +163,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         aurehal = get_aurehalId(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else:  # sécurité, le code n'est pas censé pouvoir être lancé par create car vérification du champ idhal
+    else:  # sécurité, le code n'est pas censé être lancé par create car vérification du champ idhal
         return redirect("unknown")
         # retourne sur check() ?
 
@@ -181,23 +188,21 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers",
         id=chercheur["ldapId"],
         body=json.dumps(chercheur),
-    )  # ,
-    # timestamp=datetime.datetime.now().isoformat()) #pour le suvi modification de ingest plutôt cf. https://kb.objectrocket.com/elasticsearch/how-to-create-a-timestamp-field-for-an-elasticsearch-index-275
-    # progress_recorder.set_progress(10, 10)
+    )
     print("statut de la création d'index: ", res["result"])
     return chercheur
 
 
-# @shared_task(bind=True)
-def collecte_docs(chercheur):  # self,
+@shared_task(bind=True)
+def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
-    collecte les documents d'un chercheur
+    Collecte les documents d'un chercheur
     """
-    init = True  # If True, data persistence is lost when references are updated
+    init = overwrite  # If True, data persistence is lost when references are updated
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
 
-    #  progress_recorder = ProgressRecorder(self)
-    #  progress_recorder.set_progress(0, 10, description='récupération des données HAL')
+    progress_recorder = ProgressRecorder(self)
+    progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
     # Insert documents collection
     for num, doc in enumerate(docs):
         doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
@@ -235,38 +240,48 @@ def collecte_docs(chercheur):  # self,
         # except:
         #     doc["harvested_from_label"].append("non-
 
-        doc["authorship"] = []
+        # authhalid_s_filled = []
+        # # replace authId_i per authIdHal_i after test
+        # print(f"document reference: {doc['halId_s']}")
+        # if "authIdHal_i" in doc:
+        #     print(f"authIdHal_i is in doc")
+        #     for auth in doc["authIdHal_i"]:
+        #         try:
+        #             aurehal = archivesOuvertes.get_halid_s(auth)
+        #             authhalid_s_filled.append(aurehal)
+        #         except IndexError:
+        #             print(f"Collecte_docs: authIdHal_i Exception case")
+        #             authhalid_s_filled.append("")
+        # else:
+        #     print(f"no authIdHal_i found in doc")
+        #
+        # authors_count = len(authhalid_s_filled)
+        # print(f"{authors_count} authors found in document")
+        # i = 0
+        # print(f"list of authors found: {authhalid_s_filled}")
+        # for auth in authhalid_s_filled:
+        #     i += 1
+        #     if i == 1 and auth != "":
+        #         doc["authorship"].append(
+        #             {"authorship": "firstAuthor", "authIdHal_s": auth}
+        #         )
+        #     elif i == authors_count and auth != "":
+        #         doc["authorship"].append(
+        #             {"authorship": "lastAuthor", "authIdHal_s": auth}
+        #         )
 
-        authhalid_s_filled = []
-        # replace authId_i per authIdHal_i after test
-        if "authIdHal_i" in doc:
-            print(f"authIdHal_i is in doc")
-            for auth in doc["authIdHal_i"]:
-                try:
-                    aurehal = archivesOuvertes.get_halid_s(auth)
-                    authhalid_s_filled.append(aurehal)
-                except:
-                    print(f"Collecte_docs: authIdHal_i Exception case")
-                    authhalid_s_filled.append("")
+        if doc["authLastName_s"].index(chercheur["lastName"].title()) == 0:
+            doc["authorship"] = [
+                {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+            ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+        elif (
+            doc["authLastName_s"].index(chercheur["lastName"].title())
+            == len(doc["authLastName_s"]) - 1
+        ):
+            doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
         else:
-            print(f"no authIdHal_i found in doc")
-
-        authors_count = len(authhalid_s_filled)
-        print(f"{authors_count} authors found in document")
-        i = 0
-        print(f"list of authors found: {authhalid_s_filled}")
-        for auth in authhalid_s_filled:
-            i += 1
-            if i == 1 and auth != "":
-                doc["authorship"].append(
-                    {"authorship": "firstAuthor", "authIdHal_s": auth}
-                )
-            elif i == authors_count and auth != "":
-                doc["authorship"].append(
-                    {"authorship": "lastAuthor", "authIdHal_s": auth}
-                )
-
-        print(doc["authorship"])
+            doc["authorship"] = []
+        # print(doc["authorship"], doc ['authLastName_s'])
         doc["harvested_from_ids"].append(chercheur["halId_s"])
 
         # historique d'appartenance du docId
@@ -293,7 +308,7 @@ def collecte_docs(chercheur):  # self,
                 doc["isOaExtra"] = True
             elif should_be_open == -1:
                 doc["isOaExtra"] = False
-        except:
+        except IndexError:
             print("publicationDate_tdate error ?")
         doc["Created"] = datetime.datetime.now().isoformat()
 
@@ -339,7 +354,8 @@ def collecte_docs(chercheur):  # self,
 
             else:
                 doc["validated"] = True
-
+        progress_recorder.set_progress(num, len(docs), description="(récolte)")
+    progress_recorder.set_progress(num, len(docs), description="(indexation)")
     helpers.bulk(
         es,
         docs,

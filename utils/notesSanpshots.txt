@@ -18,7 +18,7 @@ HACK
 	c. renommer les snap*.dat meta*.dat pour écraser les homonymes correspondant au snap du point 3 par ceux issus de la décompression
 	d. remplacer les uuid et cluster_id dans le fichier index_0 par ceux sauvegardés au point a
 4. restaurer seulement les index non associés à kibana. Sous shell kibana:
-curl --user elastic:MonMdp  -H 'Content-Type: application/json' -XPOST kibanahal:5601/api/snapshot_restore/restore/backup/snapshot_001 -H "kbn-version: 7.16.2" -H "Sec-Fetch-Mode: cors" -H "Sec-Fetch-Site: same-origin" -H "DNT: 1" -H "Sec-GPC: 1" -H "Pragma: no-cache" -H "Cache-Control: no-cache" -d '{"indices":["198307662-108098-laboratories","198307662-108098-researchers","198307662-14768-laboratories","198307662-14768-researchers","198307662-156602-laboratories","198307662-156602-researchers","198307662-179898-laboratories","198307662-179898-researchers","198307662-191652-laboratories","198307662-191652-researchers","198307662-199402-laboratories","198307662-199402-researchers","198307662-199957-laboratories","198307662-199957-researchers","198307662-217754-laboratories","198307662-217754-researchers","198307662-22032-laboratories","198307662-22032-researchers","198307662-460236-laboratories","198307662-460236-researchers","198307662-527028-laboratories","198307662-527028-researchers","198307662-527033-laboratories","198307662-527033-researchers","198307662-54812-laboratories","198307662-54812-researchers","198307662-558924-laboratories","198307662-558924-researchers","198307662-6198-laboratories","198307662-6198-researchers","198307662-68760-researchers","198307662-84790-laboratories","198307662-84790-researchers","198307662-88816-laboratories","198307662-88816-researchers","198307662-structures"]}'  
+curl --user elastic:MonMdp  -H 'Content-Type: application/json' -XPOST kibanahal:5601/api/snapshot_restore/restore/backup/snapshot_001 -H "kbn-version: 7.16.2" -H "Sec-Fetch-Mode: cors" -H "Sec-Fetch-Site: same-origin" -H "DNT: 1" -H "Sec-GPC: 1" -H "Pragma: no-cache" -H "Cache-Control: no-cache" -d '{"indices":["198307662-108098-laboratories","198307662-108098-researchers","198307662-14768-laboratories","198307662-14768-researchers","198307662-156602-laboratories","198307662-156602-researchers","198307662-179898-laboratories","198307662-179898-researchers","198307662-191652-laboratories","198307662-191652-researchers","198307662-199402-laboratories","198307662-199402-researchers","198307662-199957-laboratories","198307662-199957-researchers","198307662-217754-laboratories","198307662-217754-researchers","198307662-22032-laboratories","198307662-22032-researchers","198307662-460236-laboratories","198307662-460236-researchers","198307662-527028-laboratories","198307662-527028-researchers","198307662-527033-laboratories","198307662-527033-researchers","198307662-54812-laboratories","198307662-54812-researchers","198307662-558924-laboratories","198307662-558924-researchers","198307662-6198-laboratories","198307662-6198-researchers","198307662-68760-researchers","198307662-84790-laboratories","198307662-84790-researchers","198307662-88816-laboratories","198307662-88816-researchers","198307662-structures"]}'
 
 (si je n'en ai pas oublié)
 
@@ -32,10 +32,3 @@ PUT /_snapshot/backup/snapshot_gen?wait_for_completion=true
   "ignore_unavailable": true,
   "include_global_state": false
 }
-
-
-
-
-
-
-

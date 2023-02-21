@@ -13,23 +13,31 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include, re_path
-from django.shortcuts import redirect
-from . import views, viewsActions, settings
+from decouple import config
+
 # from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.shortcuts import redirect
+from django.urls import include, path, re_path
+
+from . import views, viewsActions
+
+mode = config("mode")
+
+if mode == "dev":
+    root_document = settings.STATICFILES_DIRS
+else:
+    root_document = settings.STATIC_ROOT
 
 
 urlpatterns = [
     path(
         "admin/logout/", lambda request: redirect("/accounts/logout/", permanent=False)
-    ),  # need to be placed before admin.site.urls to overide default redirect. return to uniauth logout instead default admin/logout page
+    ),  # is before admin.site.urls to override. Return to uniauth logout instead default redirect.
     path("admin/", admin.site.urls),
-    re_path(
-        r"^celery-progress/", include("celery_progress.urls")
-    ),  # the endpoint is configurable
+    re_path(r"^celery-progress/", include("celery_progress.urls")),  # the endpoint is configurable
     path("", viewsActions.admin_access_login, name="login"),
     path("create/", views.create, name="creation"),
     path("check/", views.check, name="check"),
@@ -54,9 +62,7 @@ urlpatterns = [
         viewsActions.refresh_aurehal_id,
         name="refresh-aurehal-id",
     ),
-    path(
-        "update_authorship/", viewsActions.update_authorship, name="update_authorship"
-    ),
+    path("update_authorship/", viewsActions.update_authorship, name="update_authorship"),
     path("update_members/", viewsActions.update_members, name="update_members"),
     path(
         "validate_references/",
@@ -73,7 +79,6 @@ urlpatterns = [
         viewsActions.validate_guiding_domains,
         name="validate_guiding-domains",
     ),
-    # path('validate_guiding-keywords/', viewsActions.validate_guiding_keywords, name='validate_guiding-keywords'),
     path(
         "validate_research-description/",
         viewsActions.validate_research_description,
@@ -84,9 +89,7 @@ urlpatterns = [
         viewsActions.force_update_references,
         name="force-update_references",
     ),
-    path(
-        "export_hceres_xls/", viewsActions.export_hceres_xls, name="export_hceres_xls"
-    ),
+    path("export_hceres_xls/", viewsActions.export_hceres_xls, name="export_hceres_xls"),
     path("presentation/", views.presentation, name="presentation"),
     path("unknown/", views.unknown, name="unknown"),
     path("accounts/", include("uniauth.urls", namespace="uniauth")),

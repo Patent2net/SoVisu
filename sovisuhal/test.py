@@ -3,7 +3,7 @@ from decouple import config
 
 
 Mode = config("mode")
-
+secret = config("ELASTIC_PASSWORD")
 struct = "198307662"
 
 
@@ -21,6 +21,7 @@ def es_connector(mode=Mode):
         es = Elasticsearch(
             "http://localhost:9200",
             basic_auth=("elastic", secret),
+            scheme="http",
             http_compress=True,
             connections_per_node=5,
             request_timeout=200,
@@ -28,7 +29,14 @@ def es_connector(mode=Mode):
         )
     else:
         print("Niet !!!")
-        es = Elasticsearch([{"host": "localhost", "port": 9200}])
+        es = Elasticsearch(
+            "http://localhost:9200",
+            basic_auth=("elastic", secret),
+            http_compress=True,
+            connections_per_node=5,
+            request_timeout=200,
+            retry_on_timeout=True,
+        )
 
     return es
 
@@ -54,15 +62,21 @@ res = es.search(
     # -researchers" + searcher["ldapId"] + "-documents
 )
 
-query_param = {"match_all": {}}
+query_param =  {
+        "match_all": {}
+    }
 
-count = es.count(index=struct + "*-researchers", query=query_param)["count"]
-query_param = {"match": {"labHalId": "108098"}}
+count = es.count(index=struct + "*-researchers", query=query_param)['count']
+query_param =  {
+        "match": {
+            "labHalId": "108098"
+        }
+    }
 
 print(count)
 res = es.search(index=struct + "*-researchers", query=query_param, size=count)
-entities = res["hits"]["hits"]
+entities = res['hits']['hits']
 
-print(Mode)
+print (Mode)
 
 print(entities)

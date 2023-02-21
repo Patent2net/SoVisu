@@ -9,5 +9,3 @@ metricbeat.modules:
 
   # Path to server status. Default nginx_status
   server_status_path: "etat"
-  
- 

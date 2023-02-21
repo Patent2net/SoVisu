@@ -1,7 +1,7 @@
 # Docker-Compose SoVisu
 
-## Généralités 
-Suite de services indispensables ou pas pour l'application SoVisu. 
+## Généralités
+Suite de services indispensables ou pas pour l'application SoVisu.
 Le docker-compose met en œuvre :
 ### Services indispensables
 - Elasticsearch (port 9200). Composant d'indexation. Mode Cluster dans cette version.
@@ -22,7 +22,7 @@ Non fait : nginx ; grafa et cerebro
 
 ## Notes d'installation
 ### Arborescence
-Chacun des services dispose de son répertoire qui contient : 
+Chacun des services dispose de son répertoire qui contient :
 
 - les fichiers de configurations de chacun (*.yaml, .ini* ou.*conf*)
 - les fichiers de sécurité (*.keystore*) sont dans le dossier "*secret*" pour *beat* et dans leurs dossiers respectifs pour *elasticsearch* et *kibana*.
@@ -44,23 +44,23 @@ En l'état : `docker-compose up -d`
 La machine actuelle ne redémarre actuellement QUE le service *nginx* (et je sais même plus comment j'ai fait).
 
 ### Premier lancement
-- modifier le compose en supprimant les liens vers les keystores. 
+- modifier le compose en supprimant les liens vers les keystores.
 - démarrez Elastic pour lancer l'utilitaire de [création de mots de passe](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-passwords.html)
 - démarrez-les *filebeat, metricbeat* pour générer leur keystore (avec les mdp précédents) et les stocker 'hors container' (docker cp container:/usr/share/data/keystore /secret/service) (par ex.). Modifiez aussi le fichier .env en conséquence.
 - adaptez les clés SSL de la machine pour les rendre disponible à nginx (dossier secret/ssl).
-- croisez les doigts 
+- croisez les doigts
 
 Note : le shell est accessible sur un container via :
 docker exec -ti container /bin/bash
 
 
 ### Tableaux de bord kibana
-L'accès à la zone monitoring de Kibana ou de grafana permettra de suivre : 
+L'accès à la zone monitoring de Kibana ou de grafana permettra de suivre :
 - la consommation de ressources (CPU, mémoire, réseau, disque) ;
 - l'activité des différentes machines (services ci-dessus)
 - le trafic web
 
-Il faudra probablement installer les différents tableaux de bord filebeat et metricbeat. filebeat setup --dashboards 
+Il faudra probablement installer les différents tableaux de bord filebeat et metricbeat. filebeat setup --dashboards
 
 ## Compléments
 
@@ -69,5 +69,3 @@ Il faudra probablement installer les différents tableaux de bord filebeat et me
 2. metricbeat intègre les flux de logs dockers et les métriques système
 
 Note : déport des logs sur loki (docker plugin install grafana/loki-docker-driver :latest --alias loki --grant-all-permissions)... alors que non utilisé. Il parait que ce serait moins gourmand en ressources que filebeat et metricbeat.
-
-
