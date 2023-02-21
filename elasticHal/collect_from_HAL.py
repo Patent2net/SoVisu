@@ -1,6 +1,6 @@
 import datetime
 import time
-
+from decouple import config
 # Celery
 from celery import shared_task
 
@@ -25,15 +25,15 @@ structIdlist = None
 
 # if True, check all the existing data in ES index
 # to compare with those gathered to keep part of totality of data persistence
-check_existing_docs = False
+check_existing_docs = config("VerifieExistant")
 
 # if True, overwrite the doc['validated'] status
 # to True for all the docs existing in ES (work only if Check_existing_docs = True)
-force_doc_validated = False
+force_doc_validated = config("ForceValidation")
 
 # if True, overwrite the doc["authorship"] status
 # for all the docs existing in ES (work only if Check_existing_docs = True)
-force_doc_authorship = False
+force_doc_authorship = config("ForceAutorat")
 
 
 # If djangodb_open = True script will use django Db to generate index for ES.
@@ -1008,7 +1008,7 @@ def collect_researchers_data2(self, struct, idx):
     #         " researchers found in ES, checking es_researchers list",
     #     )
     doc_progress_recorder.set_progress(
-        k, count,
+        count, count,
         str(sommeDocs) + " documents indexés pour " + str(count) + " chercheurs au total "
     )
     return "fini !"
