@@ -1124,15 +1124,8 @@ def idhal_checkout(idhal):
 
 def vizualisation_url():
     """
-    Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
-    Obsolète
+    Permet d'ajuster l'affichage des visualisations Kibana
+    À intégrer dans les consts
     """
-    print("mode: ")
-    print(mode)
-    if mode == "dev":
-        url = "http://127.0.0.1:5601/kibana"
-        # url = "/kibana"
-    else:
-        url = "/kibana"
-
+    url = "/kibana"
     return url
