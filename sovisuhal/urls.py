@@ -94,4 +94,4 @@ urlpatterns = [
     path("unknown/", views.unknown, name="unknown"),
     path("accounts/", include("uniauth.urls", namespace="uniauth")),
     path("tinymce/", include("tinymce.urls")),
-] + static(settings.STATIC_URL, document_root=root_document)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

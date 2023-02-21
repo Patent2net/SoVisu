@@ -23,10 +23,12 @@ patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CA
 """
 try:
     from decouple import config
+    from ldap3 import Server, Connection, ALL
     from uniauth.decorators import login_required
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+
     patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
-    print("case 1")
+
 except:
 
     from django.contrib.auth.decorators import login_required

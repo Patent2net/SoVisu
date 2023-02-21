@@ -330,9 +330,9 @@ def collect_researchers_data(self, struct):
             researcher
             for researcher in django_researchers
             if researcher["halId_s"] != "" and researcher.pop("id")
-        ]  # keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
-        if len(researchers_list) > 0:
-            # print("checking DjangoDb laboratory list:")
+        ]  # Only keep researchers with known 'halId_s' and remove the 'id' value created by Django_DB
+        if len(researchers_list) >0:
+            print("checking DjangoDb laboratory list:")
             for searcher in django_researchers:
                 if any(dictlist["halId_s"] != searcher["halId_s"] for dictlist in researchers_list):
                     researchers_list.append(searcher)
@@ -535,7 +535,7 @@ def collect_researchers_data(self, struct):
                             # -researchers" + searcher["ldapId"] + "-documents
                         )
                         print(str(len(boutdeDoc)) + " indexés " + searcher["ldapId"])
-            #                        time.sleep(1)
+#                        time.sleep(1)
 
             else:
                 doc_progress_recorder.set_progress(0, 0, " pas de docs 1" + searcher["halId_s"])
@@ -777,6 +777,8 @@ def collect_researchers_data2(self, struct, idx):
     count = len(researchers_list)
     for searcher in researchers_list:
         k = 0
+        if len(searcher["halId_s"].strip()) < 3:
+            print("hou un halid tout mini :", searcher["halId_s"] + 1)
         docs = hal.find_publications(searcher["halId_s"], "authIdHal_s")
         # Enrichissements des documents récoltés
         # print ("2e " + str(type (docs)))
