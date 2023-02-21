@@ -224,14 +224,14 @@ class ElasticActions:
             else:
                 return render(
                     request,
-                    "admin/elasticHal/export_to_elasticLabs.html",
+                    "admin/elasticHal/export_to_elasticLabs2.html",
                     context={"form": form},
                 )
         else:
             form = PopulateLab()
 
         data = {"form": form}
-        return render(request, "admin/elasticHal/export_to_elasticLabs.html", data)
+        return render(request, "admin/elasticHal/export_to_elasticLabs2.html", data)
 
 
 # Models are under that line

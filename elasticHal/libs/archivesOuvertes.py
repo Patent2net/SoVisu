@@ -210,61 +210,64 @@ def get_concepts_and_keywords(aurehalid):
     domains = []
 
     # print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
-    try:
-        tree = ""
-        for dom in domaines:
-            domains.append(explain_domains(dom))
+    #try:
+    tree = ""
+    for dom in domaines:
+        domains.append(explain_domains(dom))
 
-            # réseau json hiérarchiques
-            #
-            tree = nx.DiGraph()
+        # réseau json hiérarchiques
+        #
+        tree = nx.DiGraph()
 
-            tree.add_node("Concepts")
-            domains = [list(filter(lambda x: x is not None, truc)) for truc in domains]
+        tree.add_node("Concepts")
+        domains = [list(filter(lambda x: x is not None, truc)) for truc in domains]
 
-            for dom1 in domains:
-                tree.add_node(dom1[0][0])
-                tree.add_edge("Concepts", dom1[0][0])
-                if len(dom1) > 1:
-                    tree.add_node(dom1[1][0])
-                    tree.add_edge(dom1[0][0], dom1[1][0])
-                if len(dom1) > 2:
-                    tree.add_node(dom1[2][0])
-                    tree.add_edge(dom1[1][0], dom1[2][0])
-
-        concepts = nx.tree_data(tree, "Concepts")
-        # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
-        #     ficRes.write(str(nx.tree_data(tree, "Concepts")).replace("'", '"'))
-
-        for children in concepts["children"]:
-            children["label_en"] = get_label(children["id"], "en")
-            children["label_fr"] = get_label(children["id"], "fr")
-            children["state"] = "invalidated"
-            if "children" in children:
-                for subchildren in children["children"]:
-                    subchildren["label_en"] = get_label(subchildren["id"], "en")
-                    subchildren["label_fr"] = get_label(subchildren["id"], "fr")
-                    subchildren["state"] = "invalidated"
-                    if "children" in subchildren:
-                        for subsubchildren in subchildren["children"]:
-                            subsubchildren["label_en"] = get_label(subsubchildren["id"], "en")
-                            subsubchildren["label_fr"] = get_label(subsubchildren["id"], "fr")
-                            subsubchildren["state"] = "invalidated"
-
-        for lang in sujets.keys():
-            tree_words = nx.DiGraph()
-            tree_words.add_node(lang)
-            for kwd in sujets[lang]:
-                tree_words.add_node(kwd)
-                tree_words.add_edge(lang, kwd)
-            keywords.append({"lang": lang, "keywords": nx.tree_data(tree_words, lang)})
-            # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
-            #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
-        concepts_and_keywords = {"concepts": concepts, "keywords": keywords}
-        return concepts_and_keywords
-    except IndexError:
+        for dom1 in domains:
+            tree.add_node(dom1[0][0])
+            tree.add_edge("Concepts", dom1[0][0])
+            if len(dom1) > 1:
+                tree.add_node(dom1[1][0])
+                tree.add_edge(dom1[0][0], dom1[1][0])
+            if len(dom1) > 2:
+                tree.add_node(dom1[2][0])
+                tree.add_edge(dom1[1][0], dom1[2][0])
+    if len(tree) == 0: # çà s'est mal passé
         concepts_and_keywords = {"concepts": [], "keywords": []}
         return concepts_and_keywords
+    else:
+        concepts = nx.tree_data(tree, "Concepts")
+    # with open(lang + "-concepts.json", "w", encoding='utf8') as ficRes:
+    #     ficRes.write(str(nx.tree_data(tree, "Concepts")).replace("'", '"'))
+
+    for children in concepts["children"]:
+        children["label_en"] = get_label(children["id"], "en")
+        children["label_fr"] = get_label(children["id"], "fr")
+        children["state"] = "invalidated"
+        if "children" in children:
+            for subchildren in children["children"]:
+                subchildren["label_en"] = get_label(subchildren["id"], "en")
+                subchildren["label_fr"] = get_label(subchildren["id"], "fr")
+                subchildren["state"] = "invalidated"
+                if "children" in subchildren:
+                    for subsubchildren in subchildren["children"]:
+                        subsubchildren["label_en"] = get_label(subsubchildren["id"], "en")
+                        subsubchildren["label_fr"] = get_label(subsubchildren["id"], "fr")
+                        subsubchildren["state"] = "invalidated"
+
+    for lang in sujets.keys():
+        tree_words = nx.DiGraph()
+        tree_words.add_node(lang)
+        for kwd in sujets[lang]:
+            tree_words.add_node(kwd)
+            tree_words.add_edge(lang, kwd)
+        keywords.append({"lang": lang, "keywords": nx.tree_data(tree_words, lang)})
+        # with open(lang + "-words.json", "w", encoding='utf8') as ficRes:
+        #    ficRes.write(str(nx.tree_data(treeWords, lang)).replace("'", '"'))
+    concepts_and_keywords = {"concepts": concepts, "keywords": keywords}
+    return concepts_and_keywords
+    # except IndexError:
+    #     concepts_and_keywords = {"concepts": [], "keywords": []}
+    #     return concepts_and_keywords
 
 
 def get_aurehalId(authIdHal_s):
