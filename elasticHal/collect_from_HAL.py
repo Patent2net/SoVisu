@@ -546,7 +546,7 @@ def collect_researchers_data(self, struct):
             )
 
     doc_progress_recorder.set_progress(100, 100, " fin traitements. ")
-    progress_recorder.set_progress(count, count, " chercheurs traités " + searcher["ldapId"])
+    progress_recorder.set_progress(count, count, " chercheurs traités ")
     return "finished"
 
 
@@ -732,6 +732,23 @@ def collect_laboratories_data(self):
     return "finished"
 
 
+def TrouveChercheurs(struct):
+    # Init researchers
+    researchers_list = []
+    labos, dico_acronym = init_labo()
+    count = 0
+    es_researchers = []
+    for lab in dico_acronym.keys():
+        indexes = struct +"-"+ lab + "-researchers"
+        if es.indices.exists(index=indexes):
+            count += es.count(index=indexes, body=scope_param, request_timeout=50)["count"]
+            if count > 0:
+                res = es.search(index=indexes, body=scope_param, size=count, request_timeout=50)
+                es_researchers .extend(res["hits"]["hits"])
+    for searcher in es_researchers:
+        researchers_list.append(searcher["_source"])
+    return researchers_list
+
 @shared_task(bind=True)
 def collect_researchers_data2(self, struct, idx):
     """
@@ -739,36 +756,34 @@ def collect_researchers_data2(self, struct, idx):
     crée les index pour les chercheurs s'ils n'existent pas dans elasticsearch.
     """
     doc_progress_recorder = ProgressRecorder(self)
-
-    # Init researchers
-    researchers_list = []
     labos, dico_acronym = init_labo()
-    idxCher = idx.replace("laboratories", "researchers")
-    count = es.count(index=idxCher, body=scope_param, request_timeout=50)["count"]
-    if count > 0:
-        # print(
-        #     "\u00A0 \u21D2 ",
-        #     count,
-        #     " researchers found in ES, checking es_researchers list",
-        # )
-        res = es.search(index=idxCher, body=scope_param, size=count, request_timeout=50)
+    if idx =="":
+        researchers_list = TrouveChercheurs(struct) # appelé sans index, collecte trouve trous les chercheurs de la structure
+    else:
+        idxCher = idx.replace("laboratories", "researchers")
+        researchers_list = []
+        if es.indices.exists(index=idxCher):
+            count = es.count(index=idxCher, body=scope_param, request_timeout=50)["count"]
+            if count > 0:
+                res = es.search(index=idxCher, body=scope_param, size=count, request_timeout=50)
+                es_researchers  = res["hits"]["hits"]
+                for searcher in es_researchers:
+                  researchers_list.append(searcher["_source"])
+            else:
+                pass
 
-        es_researchers = res["hits"]["hits"]
-
-        for searcher in es_researchers:
-            researchers_list.append(searcher["_source"])
-            # print (searcher['_source'])
-    # print(f'\u00A0 \u21D2 researchers_list content = {researchers_list}')
     # Process researchers
     sommeDocs = 0
+    count = len(researchers_list)
     for searcher in researchers_list:
         k = 0
-        if len(searcher["halId_s"].strip()) < 3:
-            print("hou un halid tout mini :", searcher["halId_s"] + 1)
         docs = hal.find_publications(searcher["halId_s"], "authIdHal_s")
         # Enrichissements des documents récoltés
         # print ("2e " + str(type (docs)))
-
+        k += 1
+        doc_progress_recorder.set_progress(
+            k, count, " chercheur traité (" + searcher["halId_s"] +")"
+        )
         # Insert documents collection
         if isinstance(docs, list):
             # doc_progress_recorder.set_progress(k, len(docs),
@@ -776,10 +791,6 @@ def collect_researchers_data2(self, struct, idx):
             sommeDocs += len(docs)
             if len(docs) > 1:
                 for num, doc in enumerate(docs):
-                    k += 1
-                    doc_progress_recorder.set_progress(
-                        num, len(docs), " documents traités " + searcher["halId_s"]
-                    )
                     doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
                     doc = doi_enrichissement.docs_enrichissement_doi(doc)
                     if "fr_abstract_s" in doc.keys():
@@ -816,8 +827,15 @@ def collect_researchers_data2(self, struct, idx):
 
                     doc["authorship"] = []
                     # Pourquoi j'ai l'impression que c'est la 4e fois ce passage ???????
-                    try:
+                    lstAut = [aut.title() for aut in doc["authLastName_s"]]
+                    trouve = None
+                    if searcher["lastName"].title() in lstAut:
+                        trouve = searcher["lastName"].title()
+                    else:
                         lstAut = [aut.title() for aut in doc["authFirstName_s"]]
+                        if searcher["lastName"].title() in lstAut:
+                            trouve = searcher["lastName"].title()
+                    if trouve:
                         if lstAut.index(searcher["lastName"].title()) == 0:
                             doc["authorship"] = [
                                 {"authorship": "firstAuthor", "authIdHal_s": searcher["halId_s"]}
@@ -830,24 +848,8 @@ def collect_researchers_data2(self, struct, idx):
                             doc["authorship"] = [
                                 {"authorship": "lastAuthor", "authIdHal_s": searcher["halId_s"]}
                             ]
-                        else:
-                            doc["authorship"] = []
-                    except IndexError:  # inversion nom prénom cf. docId 1252617
-                        lstAut = [aut.title() for aut in doc["authLastName_s"]]
-                        if lstAut.index(searcher["lastName"].title()) == 0:
-                            doc["authorship"] = [
-                                {"authorship": "firstAuthor", "authIdHal_s": searcher["halId_s"]}
-                            ]  # pas voulu casser le modele de données ici
-                            # mais first, last ou rien suffirait non ?
-                        elif (
-                            lstAut.index(searcher["lastName"].title())
-                            == len(doc["authLastName_s"]) - 1
-                        ):
-                            doc["authorship"] = [
-                                {"authorship": "lastAuthor", "authIdHal_s": searcher["halId_s"]}
-                            ]
-                        else:
-                            doc["authorship"] = []
+                    else:
+                        doc["authorship"] = []
 
                     # if "authIdHal_s" in doc:
                     #     authors_count = len(doc["authIdHal_s"])
@@ -962,8 +964,8 @@ def collect_researchers_data2(self, struct, idx):
                             doc["validated"] = True
 
         else:
-            doc_progress_recorder.set_progress(0, 0, " pas de docs 3" + searcher["halId_s"])
-            print("pas de docs 4 : " + searcher["halId_s"])
+            doc_progress_recorder.set_progress(k, count, " pas de docs : " + searcher["halId_s"] +")")
+            #print("pas de docs 4 : " + searcher["halId_s"])
         if isinstance(docs, list):
             if len(docs) > 0:
                 for indi in range(int(len(docs) // 50) + 1):
@@ -980,37 +982,33 @@ def collect_researchers_data2(self, struct, idx):
                         # -researchers" + searcher["ldapId"] + "-documents
                     )
                     # time.sleep(1)
-                    doc_progress_recorder.set_progress(
-                        (indi * 50) + 50,
-                        len(docs),
-                        " documents traités et indexés " + searcher["halId_s"],
-                    )
-            else:
                 doc_progress_recorder.set_progress(
-                    0, 0, " Pas de docs (pb hal ?) " + searcher["halId_s"]
-                )
-        doc_progress_recorder.set_progress(
-            sommeDocs, sommeDocs, " documents traités et indexés " + searcher["halId_s"]
-        )
-    if len(researchers_list) > 0:
-        if isinstance(docs, list):
-            doc_progress_recorder.set_progress(
-                sommeDocs, sommeDocs, " documents traités et indexés" + str(searcher)
-            )
+                        k, count,
+                        str (len(docs)) + " documents indexés " + searcher["halId_s"]
+                    )
 
-        else:
-            pass
-            # doc_progress_recorder.set_progress
-            # (0, sommeDocs, " documents traités " + searcher['halId_s'])
-    else:
-        # doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités")
-        print(f"\u00A0 \u21D2 researchers_list content = {researchers_list}")
-        print(
-            "\u00A0 \u21D2 ",
-            count,
-            " researchers found in ES, checking es_researchers list",
-        )
-
+    # if len(researchers_list) > 0:
+    #     if isinstance(docs, list):
+    #         doc_progress_recorder.set_progress(
+    #             sommeDocs, sommeDocs, " documents traités et indexés" + str(searcher)
+    #         )
+    #
+    #     else:
+    #         pass
+    #         # doc_progress_recorder.set_progress
+    #         # (0, sommeDocs, " documents traités " + searcher['halId_s'])
+    # else:
+    #     # doc_progress_recorder.set_progress(sommeDocs, sommeDocs, " documents traités")
+    #     print(f"\u00A0 \u21D2 researchers_list content = {researchers_list}")
+    #     print(
+    #         "\u00A0 \u21D2 ",
+    #         count,
+    #         " researchers found in ES, checking es_researchers list",
+    #     )
+    doc_progress_recorder.set_progress(
+        k, count,
+        str(sommeDocs) + " documents indexés pour " + str(count) + " chercheurs au total "
+    )
     return "fini !"
 
 

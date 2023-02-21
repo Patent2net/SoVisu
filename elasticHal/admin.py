@@ -163,7 +163,7 @@ class ElasticActions:
                         result1 = collect_laboratories_data2.delay(laboratoire)
                         #task_id1 = result1.task_id
                         result2 = collect_researchers_data2.delay(
-                            struct=structure, idx=collection
+                            struct=structure, idx=""
                         )
                         #task_id2 = result2.task_id  # task_id1=tacheLab, task_id2 = TacheChercheurs
                         taches.append([0, result1.task_id, result2.task_id])
