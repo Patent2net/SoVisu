@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
-
+STATIC_URL = '/static/'
 if mode == "Prod":
     SECRET_KEY = config("DjangoKey")
     DEBUG = eval(config("DJANGO_DEBUG"))
@@ -73,9 +73,12 @@ if mode == "Prod":
             },
         },
     }
+    STATIC_ROOT = os.path.join('/data/SoVisu/staticfiles/')  # '/data/SoVisu/staticfiles/
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'staticfiles'),)
 else:
     SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
     DEBUG = "False"  #'True'
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -217,21 +220,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = "/static/"
-if mode == "dev":
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
-else:
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")  #'/data/SoVisu/staticfiles/
-"""
-Permet de résoudre le soucis MIME sur les navigateurs.
-Le STATIC_ROOT est à paramétrer avec NGINX pour fonctionner
-le STATICFILES_DIRS est une solution adaptée principalement pour le dev
-"""
-
 
 # EMAIL Setup
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

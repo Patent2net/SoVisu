@@ -12,7 +12,7 @@
 
 .badge-primary {
     background-color: #039cfd;
-    colore: #FFFFFF;
+    color: #FFFFFF;
 }
 
 .btn-action {
@@ -75,7 +75,7 @@
 }
 
 div.hr-line-dashed.only-cas-login {
-    margin-top
+    margin-top: auto;
 }
 
 button.icon-btn {

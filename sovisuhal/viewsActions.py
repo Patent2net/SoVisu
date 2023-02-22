@@ -102,20 +102,24 @@ def create_credentials(request):
 
     idhal_test = idhal_checkout(idhal)
 
-    if idhal_test == 0:
-        print("idhal not found")
-        return redirect(
-            f"/create/?ldapid={ldapid}"
-            + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
-        )
-
-    else:
+    if idhal_test > 0:
         print("idhal found")
         # création de l'entrée pour le chercheur dans Elastic
-        chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
+        indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
+        # chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
         # récupération de la documentation de l'utilisateur
-        collecte_docs(chercheur)
+        # collecte_docs(chercheur)
+        """
+        result = collecte_docs(chercheur)
+        taches = result.task_id
+        return redirect(f"/create/?ldapid={ldapid}&taches={taches}" +
+                        "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
+    if "taches" in request.GET:
+        taches = request.GET["taches"]
+        return redirect(f"/create/?ldapid={ldapid}&taches={taches}" +
+                        "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
+        """
         # récupération du struct du nouveau profil pour la redirection
         field = "halId_s"
         scope_param = esActions.scope_p(field, idhal)
@@ -130,9 +134,12 @@ def create_credentials(request):
             f"/check/?struct={struct}&type=rsr"
             + f"&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
         )
-
-
-# Redirects
+    else:
+        print("idhal not found")
+        return redirect(
+            f"/create/?ldapid={ldapid}"
+            + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
+        )
 
 
 def validate_references(request):

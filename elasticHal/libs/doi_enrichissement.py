@@ -1,5 +1,5 @@
 import requests
-from requests.adapters import HTTPAdapter
+from requests.adapters import HTTPAdapter, MaxRetryError
 from requests.packages.urllib3.util.retry import Retry
 
 from elasticHal.libs import dimensions
@@ -32,7 +32,8 @@ def check_doi(doi):
             return False
     except TimeoutError:
         return False
-
+    except MaxRetryError:
+        return False
 
 def docs_enrichissement_doi(doc):
     """
