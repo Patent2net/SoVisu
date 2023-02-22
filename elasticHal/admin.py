@@ -85,14 +85,17 @@ class ElasticActions:
                     researcher=chercheurs,
                     django_enabler=True,
                 )
-                if result2[0] is not None:
-                    task_id2 = result2[0].task_id
-                else:
-                    task_id2 = None
-                if result2[1] is not None:
-                    task_id3 = result2[1].task_id
-                else:
-                    task_id3 = None
+                taches =[]
+                for tac in result2:
+                    taches.append(tac.task_id)
+                # if result2[0] is not None:
+                #     task_id2 = result2[0].task_id
+                # else:
+                #     task_id2 = None
+                # if result2[1] is not None:
+                #     task_id3 = result2[1].task_id
+                # else:
+                #     task_id3 = None
 
                 # créée dynamiquement le contexte de la collecte demandé lors de la validation du formulaire
                 context = {
@@ -160,19 +163,29 @@ class ElasticActions:
                         taches.append([ind, result1.task_id, result2.task_id]) #numero; tacheLab, TacheChercheurs
 
                 elif collectionLabo == True:
-                    if chercheurs == True:
+                    if collection == "": # comme si c'était "TOUT"
+                        for ind, lab in enumerate(indexes):
+                            laboratoire = lab[0].split("-")[1]
+                            structure = lab[0].split("-")[0]
+                            result1 = collect_laboratories_data2.delay(
+                                laboratoire, True)  # on ferait pas la collecte deux fois pour les labs partagés ?
+                            result2 = collect_researchers_data2.delay(
+                                struct=structure, idx=lab[0]
+                            )
+                            taches.append([ind, result1.task_id, result2.task_id])
+                    elif chercheurs == True:
                         laboratoire = collection.split("-")[1]
                         structure = collection.split("-")[0]
-                        result1 = collect_laboratories_data2.delay(laboratoire)
+                        result1 = collect_laboratories_data2.delay(laboratoire, True)
                         #task_id1 = result1.task_id
                         result2 = collect_researchers_data2.delay(
-                            struct=structure, idx=""
+                            struct=structure, idx=collection
                         )
                         #task_id2 = result2.task_id  # task_id1=tacheLab, task_id2 = TacheChercheurs
                         taches.append([0, result1.task_id, result2.task_id])
                     else:
                         result1 = collect_laboratories_data2.delay(
-                            collectionLabo, False
+                            collectionLabo, True
                         )
                         #task_id1 = result1.task_id
                         #task_id2 = None   # task_id1=tacheLab, task_id2 = None
@@ -181,7 +194,7 @@ class ElasticActions:
                     taches = []
 
                     for ind, struct in enumerate(structures):
-                        result2 = collect_researchers_data2 .delay(struct=struct, idx=collection)
+                        result2 = collect_researchers_data2 .delay(struct=struct, idx='')
                         taches.append([ind, None, result2.task_id])  # numero;  TacheChercheurs
                     #task_id2 = result2.task_id
                     #task_id1 = None   # task_id1=None, task_id2 = TacheChercheurs
