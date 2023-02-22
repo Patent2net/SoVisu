@@ -866,53 +866,54 @@ def update_authorship(request):
             )
 
             # update in laboratory's collection
-            field = "_id"
-            doc_param = esActions.scope_p(field, doc["docid"])
-
-            res = es.search(
-                index=f"{struct}-{entity['labHalId']}-laboratories-documents",
-                body=doc_param,
-            )
-
-            try:
-                if len(res["hits"]["hits"]) > 0:
-                    if "autorship" in res["hits"]["hits"][0]["_source"]:
-                        authorship = res["hits"]["hits"][0]["_source"]["authorship"]
-                        exists = False
-                        for author in authorship:
-                            if author["authIdHal_s"] == entity["halId_s"]:
-                                exists = True
-                                author["authorship"] = doc["authorship"]
-                        if not exists:
-                            authorship.append(
-                                {
-                                    "authorship": doc["authorship"],
-                                    "authIdHal_s": entity["halId_s"],
-                                }
-                            )
-                    else:
-                        authorship = [
-                            {
-                                "authorship": doc["authorship"],
-                                "authIdHal_s": entity["halId_s"],
-                            }
-                        ]
-                else:
-                    authorship = [
-                        {
-                            "authorship": doc["authorship"],
-                            "authIdHal_s": entity["halId_s"],
-                        }
-                    ]
-
-                es.update(
-                    index=f"{struct}-{entity['labHalId']}-laboratories-documents",
-                    refresh="wait_for",
-                    id=doc["docid"],
-                    body={"doc": {"authorship": authorship}},
-                )
-            except IndexError:
-                print(f"docid {str(doc['docid'])} non trouvé dans l'index des labs...")
+            # On n'a pas à faire çà
+            # field = "_id"
+            # doc_param = esActions.scope_p(field, doc["docid"])
+            #
+            # res = es.search(
+            #     index=f"{struct}-{entity['labHalId']}-laboratories-documents",
+            #     body=doc_param,
+            # )
+            #
+            # try:
+            #     if len(res["hits"]["hits"]) > 0:
+            #         if "autorship" in res["hits"]["hits"][0]["_source"]:
+            #             authorship = res["hits"]["hits"][0]["_source"]["authorship"]
+            #             exists = False
+            #             for author in authorship:
+            #                 if author["authIdHal_s"] == entity["halId_s"]:
+            #                     exists = True
+            #                     author["authorship"] = doc["authorship"]
+            #             if not exists:
+            #                 authorship.append(
+            #                     {
+            #                         "authorship": doc["authorship"],
+            #                         "authIdHal_s": entity["halId_s"],
+            #                     }
+            #                 )
+            #         else:
+            #             authorship = [
+            #                 {
+            #                     "authorship": doc["authorship"],
+            #                     "authIdHal_s": entity["halId_s"],
+            #                 }
+            #             ]
+            #     else:
+            #         authorship = [
+            #             {
+            #                 "authorship": doc["authorship"],
+            #                 "authIdHal_s": entity["halId_s"],
+            #             }
+            #         ]
+            #
+            #     es.update(
+            #         index=f"{struct}-{entity['labHalId']}-laboratories-documents",
+            #         refresh="wait_for",
+            #         id=doc["docid"],
+            #         body={"doc": {"authorship": authorship}},
+            #     )
+            # except IndexError:
+            #     print(f"docid {str(doc['docid'])} non trouvé dans l'index des labs...")
     except IndexError:
         pass
 
