@@ -31,7 +31,7 @@ SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
 
 if mode == "Prod":
     SECRET_KEY = config("DjangoKey")
-    DEBUG = config("DJANGO_DEBUG")
+    DEBUG = eval(config("DJANGO_DEBUG"))
     # Settings used by Uniauth
     LOGIN_URL = "/accounts/login/"
     # PASSWORD_RESET_TIMEOUT_DAYS = 3
