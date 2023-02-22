@@ -74,7 +74,7 @@ if mode == "Prod":
         },
     }
     STATIC_ROOT = os.path.join('/data/SoVisu/staticfiles/')  # '/data/SoVisu/staticfiles/
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'staticfiles'),)
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
     BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
     CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
 else:
