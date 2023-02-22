@@ -194,7 +194,7 @@ class ElasticActions:
                     taches = []
 
                     for ind, struct in enumerate(structures):
-                        result2 = collect_researchers_data2 .delay(struct=struct, idx='')
+                        result2 = collect_researchers_data2 .delay(struct=struct, idx="")
                         taches.append([ind, None, result2.task_id])  # numero;  TacheChercheurs
                     #task_id2 = result2.task_id
                     #task_id1 = None   # task_id1=None, task_id2 = TacheChercheurs

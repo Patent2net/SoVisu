@@ -83,7 +83,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 		<!-- Celery Progress -->
     <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
-
+    <script type="text/javascript" src="{% static 'celery_progress/CustomCelery_progress.js' %}"></script>
 {% if task_id1 or task_id2 or task_id3%}
 <script type="text/javascript">
 	function processProgress1(progressBarElement, progressBarMessageElement, progress) {
