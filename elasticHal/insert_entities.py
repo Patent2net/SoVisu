@@ -52,7 +52,8 @@ def get_structid_list():
 
     # get structId for structures in django db and compare with structIdlist
     if djangodb_open:
-        for structure in Structure.objects.all():
+        django_struct = Structure.objects.all()
+        for structure in django_struct:
             if structure.structSirene not in structIdlist:
                 structIdlist.append(structure.structSirene)
             else:
