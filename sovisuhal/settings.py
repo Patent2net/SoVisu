@@ -75,11 +75,15 @@ if mode == "Prod":
     }
     STATIC_ROOT = os.path.join('/data/SoVisu/staticfiles/')  # '/data/SoVisu/staticfiles/
     STATICFILES_DIRS = (os.path.join(BASE_DIR, 'staticfiles'),)
+    BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
+    CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
 else:
     SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
-    DEBUG = "False"  #'True'
+    DEBUG = True
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
-
+    # Celery Settings
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # Application definition
@@ -246,6 +250,4 @@ MANAGERS = (("BU", "dreymond@univ-tln.fr"), ("BU_1", ""))  # changer l'adresse
 # Dans le cas où un seul admin est présent pour le système,
 # merci de laisser le 2e profil sans adresse mail renseignée.
 
-# Celery Settings
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
