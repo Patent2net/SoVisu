@@ -130,12 +130,12 @@ def collect_laboratories_data2(self, labo, update=True):
                         doc["country_origin"] = location_docs.generate_countrys_fields(doc)
                         doc = doi_enrichissement.docs_enrichissement_doi(doc)
 
-                        lstResum = [cle for cle in doc.keys() if "abstract" in cle]
-                        for cle in lstResum: # est-ce utile ?????
-                            if isinstance(doc[cle], list):
-                                doc[cle] = " ".join(doc[cle])
-                            else:
-                                pass
+                        # lstResum = [cle for cle in doc.keys() if "abstract" in cle]
+                        # for cle in lstResum: # est-ce utile ?????
+                        #     if isinstance(doc[cle], list):
+                        #         doc[cle] = " ".join(doc[cle])
+                        #     else:
+                        #         pass
                         if "fr_abstract_s" in doc.keys():
                             if isinstance(doc["fr_abstract_s"], list):
                                 doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
