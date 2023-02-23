@@ -195,12 +195,7 @@ def check(request):
             function = 0
             if "function" in entity:
                 function = entity["function"]
-            if "aurehalId" in entity:
-                aurehal = get_aurehalId(entity["halId_s"])
-                if aurehal != entity["aurehalId"]:
-                    archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-                    entity["aurehalId"] = aurehal
-                    entity["concepts"] = archives_ouvertes_data["concepts"]
+
                 # integration contenus
 
             return render(
