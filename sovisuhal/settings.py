@@ -73,9 +73,9 @@ if mode == "Prod":
             },
         },
     }
-    STATIC_ROOT = os.path.join('/data/SoVisu/staticfiles/')  # '/data/SoVisu/staticfiles/
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-    BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
+    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+    CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
     CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
 else:
     SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
