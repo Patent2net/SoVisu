@@ -10,7 +10,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
-from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
+
 # Connect to DB
 es = esActions.es_connector()
 
@@ -150,9 +150,9 @@ def check(request):
         return redirect("unknown")
 
     if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
-        hastoconfirm = True # Ce paramètre donne vrai si l'une des prod n'est pas validée.
+        hastoconfirm = True  # Ce paramètre donne vrai si l'une des prod n'est pas validée.
 
-    #print(f"hastoconfirm = {hastoconfirm}")
+    # print(f"hastoconfirm = {hastoconfirm}")
 
     if data == "state":
         field = "labHalId"
@@ -166,7 +166,7 @@ def check(request):
 
         for result in rsrs["hits"]["hits"]:
             rsrs_cleaned.append(result["_source"])
-        #print(rsrs_cleaned)
+        # print(rsrs_cleaned)
         return render(
             request,
             "check.html",
@@ -195,7 +195,6 @@ def check(request):
             function = 0
             if "function" in entity:
                 function = entity["function"]
-
                 # integration contenus
 
             return render(

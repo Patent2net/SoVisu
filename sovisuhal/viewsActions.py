@@ -481,26 +481,21 @@ def validate_credentials(request):
             res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
-                #print(f"entity = {entity}")
             except IndexError:
                 return redirect("unknown")
 
-            #print(f"{struct}-{entity['labHalId']}-researchers")
+            aurehalId = ""
             if "aurehalId" in entity:
-                aurehal = get_aurehalId(entity["halId_s"])
-                if aurehal != entity["aurehalId"] :
-                    #archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-                    entity["aurehalId"] = aurehal
+                aurehalId = entity["aurehalId"]
 
-            if entity["aurehalId"] != "":
-                #print("initialize concept and keywords gathering")
+            aurehalId_get = get_aurehalId(entity["halId_s"])
+            if aurehalId != aurehalId_get:
+                aurehalId = aurehalId_get
+
+            archives_ouvertes_data = ""
+            if aurehalId != "":
                 archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])
                 archives_ouvertes_data = archives_ouvertes_data["concepts"]
-                #print(f"concepts: {archives_ouvertes_data}")
-            else:
-
-                #print("no aurehalid available to gather")
-                archives_ouvertes_data = ""
 
             es.update(
                 index=f"{struct}-{entity['labHalId']}-researchers",
@@ -508,6 +503,7 @@ def validate_credentials(request):
                 id=p_id,
                 body={
                     "doc": {
+                        "aurehalId": aurehalId,
                         "idRef": idref,
                         "orcId": orcid,
                         "validated": True,
