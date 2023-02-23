@@ -152,11 +152,15 @@ class ElasticActions:
                     structures.append(lab[0].split("-")[0])
                 structures = list(set(structures))
                 if "TOUT" in request.POST.keys():
-
+                    dejaVus = []
                     for ind, lab in enumerate(indexes):
                         laboratoire = lab[0].split("-")[1]
                         structure = lab[0].split("-")[0]
-                        result1 = collect_laboratories_data2.delay(laboratoire) # on ferait pas la collecte deux fois pour les labs partagés ?
+                        if laboratoire not in dejaVus:
+                            result1 = collect_laboratories_data2.delay(laboratoire) # on ferait pas la collecte deux fois pour les labs partagés ?
+                            dejaVus .append(laboratoire)
+                        else:
+                            result1.task_id = None
                         result2 = collect_researchers_data2.delay(
                             struct=structure, idx=lab[0]
                         )
@@ -164,11 +168,16 @@ class ElasticActions:
 
                 elif collectionLabo == True:
                     if collection == "": # comme si c'était "TOUT"
+                        dejaVus = []
                         for ind, lab in enumerate(indexes):
                             laboratoire = lab[0].split("-")[1]
                             structure = lab[0].split("-")[0]
-                            result1 = collect_laboratories_data2.delay(
-                                laboratoire, True)  # on ferait pas la collecte deux fois pour les labs partagés ?
+                            if laboratoire not in dejaVus:
+                                result1 = collect_laboratories_data2.delay(
+                                    laboratoire)  # on ferait pas la collecte deux fois pour les labs partagés ?
+                                dejaVus.append(laboratoire)
+                            else:
+                                result1.task_id = None #
                             result2 = collect_researchers_data2.delay(
                                 struct=structure, idx=lab[0]
                             )

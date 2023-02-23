@@ -106,7 +106,7 @@
 
                  $(function () {
                             var progressUrl = "{% url 'celery_progress:task_status' truc.1 %}";
-                            description = "Collectes chercheurs";
+                            description = "Collectes labos";
                             CeleryProgressBar.initProgressBar(progressUrl, {
                                 "onProgress": processProgress,
                                 "onResult": customResult,
@@ -122,7 +122,7 @@
 
                  $(function () {
                             var progressUrl = "{% url 'celery_progress:task_status' truc.2 %}";
-                            description = "Collectes labos";
+                            description = "Collectes chercheurs";
                             CeleryProgressBar.initProgressBar(progressUrl, {
                                 "onProgress": processProgress,
                                 "onResult": customResult,
@@ -142,72 +142,3 @@
 {% endblock progress_bar_js  %}
 
 {% endblock %}
-
-{#{% if task_id1 or task_id2%}#}
-{#    <script type="text/javascript">#}
-{##}
-{##}
-{#	function processProgress1(progressBarElement, progressBarMessageElement, progress) {#}
-{#            console.log("progress1", progress);#}
-{#			progressBarElement.style.width = progress.percent + "%";#}
-{#            //progressBarElement.innerHTML = Array(parseInt(progress.percent)).join("|");#}
-{#			var description = progress.current + " " + progress.description || "En attente du démarrage1...";#}
-{#			progressBarMessageElement.innerHTML = description;#}
-{#		}#}
-{##}
-{#	function processProgress2(progressBarElement, progressBarMessageElement, progress) {#}
-{#            console.log("progress2", progress);#}
-{#			progressBarElement.style.width = progress.percent + "%";#}
-{#            //progressBarElement.innerHTML = Array(parseInt(progress.percent)).join("|");#}
-{#			var description2 = progress.current + " " + progress.description  || "En attente du démarrage2...";#}
-{#			progressBarMessageElement.innerHTML = description2 ;#}
-{#		}#}
-{##}
-{#	function processResult(resultElement, result) {#}
-{#        if (result.includes("document")) {#}
-{#            $(resultElement).append($('toto'));#}
-{#            console.log(result);#}
-{#            }#}
-{#        if (result.includes("finished")) {#}
-{#                //$(resultElement).append($('<br>'));#}
-{#                $(resultElement).append(#}
-{#                    $('<p class="text-center">').text(result)#}
-{#                );#}
-{#            }#}
-{##}
-{#    }#}
-{#</script>#}
-{#{% endif %}#}
-
-
-{##}
-{#{% if task_id1 %}#}
-{#    <script type="text/javascript">#}
-{#	// Progress Bar (JQuery)#}
-{#	$(function () {#}
-{#		var progressUrl1 = "{% url 'celery_progress:task_status' task_id1 %}";#}
-{#        //console.log(progressUrl1)#}
-{#		CeleryProgressBar.initProgressBar(progressUrl1, {#}
-{#			"onProgress": processProgress,#}
-{#            "progressBarId": "progress-bar1",#}
-{#            "progressBarMessageId": "progress-bar-message1",#}
-{#            "resultElementId": 'celery-result1'#}
-{#		})#}
-{#    });#}
-{#    </script>#}
-{#{% endif %}#}
-{#{% if task_id2 %}#}
-{#    <script type="text/javascript">#}
-{#    $(function () {#}
-{#        var progressUrl2 = "{% url 'celery_progress:task_status' task_id2 %}";#}
-{#        //console.log(progressUrl2)#}
-{#        CeleryProgressBar.initProgressBar(progressUrl2, {#}
-{#			"onProgress": processProgress,#}
-{#            "onResult": processResult,#}
-{#            "progressBarId": "progress-bar2",#}
-{#            "progressBarMessageId": "progress-bar-message2",#}
-{#            "resultElementId": 'celery-result2'#}
-{#		})#}
-{#	})#}
-{#</script>#}
-{#{% endif %}#}

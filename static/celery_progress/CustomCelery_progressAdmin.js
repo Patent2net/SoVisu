@@ -30,12 +30,13 @@ function processProgress(progressBarElement, progressBarMessageElement, progress
         var description = progress.description || 'En attente';
         if (progress.current == 0) {
             if (progress.pending === true) {
-                progressBarMessageElement.textContent = this.messages.waiting;
+                progressBarMessageElement.textContent = '';
             } else {
-                progressBarMessageElement.textContent = this.messages.started;
+                progressBarMessageElement.textContent = description;
             }
         } else {
             progressBarMessageElement.textContent = progress.current + ' sur ' + progress.total + ' traités.' ;
+            progressBarMessageElement.innerHTML = description;
         }
     }
 function customSuccess(progressBarElement,  progressBarMessageElement, resultElement, result) {

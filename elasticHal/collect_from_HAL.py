@@ -114,9 +114,6 @@ def collect_laboratories_data2(self, labo, update=True):
         if len(lab["halStructId"]) >0:
             docs = hal.find_publications(lab["halStructId"], "labStructId_i")
 
-            docs = keyword_enrichissement.keyword_from_teeft(docs)
-            docs = keyword_enrichissement.return_entities(docs)
-
             # Insert documents collection
             if isinstance(docs, list):
                 if len(docs) > 1:
@@ -129,15 +126,38 @@ def collect_laboratories_data2(self, labo, update=True):
                             + " en cours. docid : "
                             + str(doc["docid"]),
                         )
-                        # Enrichssements des documents récoltées
+                        # Enrichissements des documents récoltés
                         doc["country_origin"] = location_docs.generate_countrys_fields(doc)
                         doc = doi_enrichissement.docs_enrichissement_doi(doc)
-                        lstResum = [cle for cle in doc.keys() if "abstract" in cle]
-                        for cle in lstResum:
-                            if isinstance(doc[cle], list):
-                                doc[cle] = " ".join(doc[cle])
-                            else:
-                                pass
+
+                        # lstResum = [cle for cle in doc.keys() if "abstract" in cle]
+                        # for cle in lstResum: # est-ce utile ?????
+                        #     if isinstance(doc[cle], list):
+                        #         doc[cle] = " ".join(doc[cle])
+                        #     else:
+                        #         pass
+                        if "fr_abstract_s" in doc.keys():
+                            if isinstance(doc["fr_abstract_s"], list):
+                                doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
+                            if len(doc["fr_abstract_s"]) > 100:
+                                doc["fr_entites"] = keyword_enrichissement.return_entities(
+                                    doc["fr_abstract_s"], "fr"
+                                )
+                                doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
+                                    doc["fr_abstract_s"], "fr"
+                                )
+                        if "en_abstract_s" in doc.keys():
+                            if isinstance(doc["en_abstract_s"], list):
+                                doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
+                            if len(doc["en_abstract_s"]) > 100:
+                                doc["en_entites"] = keyword_enrichissement.return_entities(
+                                    doc["en_abstract_s"], "en"
+                                )
+                                doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
+                                    doc["en_abstract_s"], "en"
+                                )
+
+
                         doc["_id"] = doc["docid"]
                         doc["validated"] = True
                         doc["harvested_from"] = "lab"
