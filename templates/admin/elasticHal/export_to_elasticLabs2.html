@@ -106,7 +106,7 @@
 
                  $(function () {
                             var progressUrl = "{% url 'celery_progress:task_status' truc.1 %}";
-                            description = "Collectes chercheurs";
+                            description = "Collectes labos";
                             CeleryProgressBar.initProgressBar(progressUrl, {
                                 "onProgress": processProgress,
                                 "onResult": customResult,
@@ -122,7 +122,7 @@
 
                  $(function () {
                             var progressUrl = "{% url 'celery_progress:task_status' truc.2 %}";
-                            description = "Collectes labos";
+                            description = "Collectes chercheurs";
                             CeleryProgressBar.initProgressBar(progressUrl, {
                                 "onProgress": processProgress,
                                 "onResult": customResult,
