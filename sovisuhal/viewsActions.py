@@ -481,19 +481,25 @@ def validate_credentials(request):
             res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
-                print(f"entity = {entity}")
+                #print(f"entity = {entity}")
             except IndexError:
                 return redirect("unknown")
 
-            print(f"{struct}-{entity['labHalId']}-researchers")
+            #print(f"{struct}-{entity['labHalId']}-researchers")
+            if "aurehalId" in entity:
+                aurehal = get_aurehalId(entity["halId_s"])
+                if aurehal != entity["aurehalId"] :
+                    #archives_ouvertes_data = get_concepts_and_keywords(aurehal)
+                    entity["aurehalId"] = aurehal
 
             if entity["aurehalId"] != "":
-                print("initialize concept and keywords gathering")
+                #print("initialize concept and keywords gathering")
                 archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])
                 archives_ouvertes_data = archives_ouvertes_data["concepts"]
-                print(f"concepts: {archives_ouvertes_data}")
+                #print(f"concepts: {archives_ouvertes_data}")
             else:
-                print("no aurehalid available to gather")
+
+                #print("no aurehalid available to gather")
                 archives_ouvertes_data = ""
 
             es.update(
@@ -778,6 +784,7 @@ def update_members(request):
                     f"/check/?struct={struct}"
                     + f"&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
                 )
+
             es.update(
                 index=res["hits"]["hits"][0]["_index"],
                 refresh="wait_for",

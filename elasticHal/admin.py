@@ -78,7 +78,7 @@ class ElasticActions:
                     researcher=chercheurs,
                     django_enabler=True,
                 )
-                task_id1 = result1.task_id
+                #task_id1 = result1.task_id
 
                 result2 = collect_data(
                     laboratories=laboratoires,
