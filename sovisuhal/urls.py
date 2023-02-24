@@ -50,7 +50,6 @@ urlpatterns = [
     path("search/", views.search, name="search"),
     path("faq/", views.faq, name="faq"),
     path("ressources/", views.ressources, name="ressources"),
-    path("useful_links/", views.useful_links, name="useful_links"),
     path("CreateCredentials/", viewsActions.create_credentials, name="credentials"),
     path(
         "validate_credentials/",

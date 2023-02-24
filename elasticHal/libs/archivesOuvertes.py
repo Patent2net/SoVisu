@@ -210,7 +210,7 @@ def get_concepts_and_keywords(aurehalid):
     domains = []
 
     # print(f"sujets:\n {sujets}\n domaines:\n {domaines}")
-    #try:
+    # try:
     tree = ""
     for dom in domaines:
         domains.append(explain_domains(dom))
@@ -231,7 +231,7 @@ def get_concepts_and_keywords(aurehalid):
             if len(dom1) > 2:
                 tree.add_node(dom1[2][0])
                 tree.add_edge(dom1[1][0], dom1[2][0])
-    if len(tree) == 0: # çà s'est mal passé
+    if len(tree) == 0:  # ça s'est mal passé
         concepts_and_keywords = {"concepts": [], "keywords": []}
         return concepts_and_keywords
     else:
@@ -287,17 +287,13 @@ def get_aurehalId(authIdHal_s):
         # print(f"{authIdHal_s}")
         req = requests.request("GET", url)
         data = req.json()
-        print(f"{data}")
         if "error" in data.keys():
-            print("Error: ", end=":")
-            print(data["error"])
             time.sleep(5)
 
         if "response" in data.keys():
             res_status = True
 
             sample = data["response"]["docs"][0]
-            print(f"sample = {sample}")
             curr = 0
             for auth in sample["authFullNamePersonIDIDHal_fs"]:
                 curr += 1
