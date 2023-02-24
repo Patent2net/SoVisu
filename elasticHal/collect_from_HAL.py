@@ -25,15 +25,15 @@ structIdlist = None
 
 # if True, check all the existing data in ES index
 # to compare with those gathered to keep part of totality of data persistence
-check_existing_docs = config("VerifieExistant")
+check_existing_docs = eval(config("VerifieExistant"))
 
 # if True, overwrite the doc['validated'] status
 # to True for all the docs existing in ES (work only if Check_existing_docs = True)
-force_doc_validated = config("ForceValidation")
+force_doc_validated = eval(config("ForceValidation"))
 
 # if True, overwrite the doc["authorship"] status
 # for all the docs existing in ES (work only if Check_existing_docs = True)
-force_doc_authorship = config("ForceAutorat")
+force_doc_authorship =eval(config("ForceAutorat"))
 
 
 # If djangodb_open = True script will use django Db to generate index for ES.
