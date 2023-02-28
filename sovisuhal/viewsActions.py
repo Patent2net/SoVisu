@@ -438,7 +438,7 @@ def validate_expertise(request):
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
 
-
+@login_required()
 def validate_credentials(request):
     """
     Validation des identifiants
