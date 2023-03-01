@@ -2,6 +2,7 @@ from spacy.lang.fr.stop_words import STOP_WORDS
 import spacy
 import requests
 import spacy
+import re
 
 nlp_fr = spacy.load("fr_core_news_md")  # chargement du modèle dans Spacy
 
@@ -96,12 +97,16 @@ def return_entities(txt, lang):
         #     "id": 3,
         #     "value": "Sao Paulo"
         #   }
+        #   }
+
     if lang == "en":
         nlp_ = nlp_en(txt)
         entities_en = [
             token.text
             for token in nlp_.ents
-            if not token.text.isdigit() and token.text not in nlp_fr.Defaults.stop_words
+            if not token.text.isdigit() and token.text not in nlp_en.Defaults.stop_words
         ]
-        # print("taille du texte " + str(len(txt)))
+        entities_en = [re.sub(r"[0-9]", "", mot) for mot in entities_en]
+        entities_en = [re.sub(r"[%$£€]", "", mot) for mot in entities_en]
+        entities_en = [mot for mot in entities_en if len(mot.replace(' ','')) >2]
         return entities_en
