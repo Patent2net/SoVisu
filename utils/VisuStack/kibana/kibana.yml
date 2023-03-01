@@ -56,4 +56,7 @@ server.ssl.enabled: false
 xpack.reporting.kibanaServer.protocol: http
 
 #explorer in dashboard
-xpack.discoverEnhanced.actions.exploreDataInChart.enabled: true
+#explorer in dashboard
+xpack.discoverEnhanced.actions.exploreDataInChart.enabled: false
+xpack.discoverEnhanced.actions.exploreDataInContextMenu.enabled: false
+
