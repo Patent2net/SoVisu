@@ -80,6 +80,8 @@ $(function() {
     });
 
 	$(document).ready(function () {
+        window.onbeforeunload = null;
+
     $('.loading-div').fadeOut(150);
     $(window).off('beforeunload');
 	if (document.querySelector('#ifram')) {
