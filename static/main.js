@@ -83,7 +83,7 @@ $(function() {
         window.onbeforeunload = null;
         $('#dashkib').on("load", function() {
             let head = $("#dashkib").contents().find("head");
-            let css = "<style>#kbnPresentationToolbar__solutionToolbar {display: none;};</style>";
+            let css = "<style>#kbnPresentationToolbar__solutionToolbar {display: none;} .euiContextMenuPanel > div a {display: none;}</style>";
             $(head).append(css);
         });
     $('.loading-div').fadeOut(150);
