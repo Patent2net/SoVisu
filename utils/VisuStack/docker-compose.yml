@@ -2,6 +2,7 @@
 version: "3.8"
 services:
   redis:
+    restart: always
     image: "redis:alpine"
 
     command: redis-server #--requirepass MonMdp
@@ -233,14 +234,14 @@ services:
       - elasticsovisu3
       - kibanasovisu
 
-
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
-      #- "0.0.0.0:6379:6389"
+
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./log/nginx:/var/log/nginx
+      - Static:/home/www-data/static
       #- ./certs/:/etc/nginx/certs
     networks:
       - elk
@@ -263,6 +264,13 @@ services:
 #      - elk
 
 volumes:
+  Static:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /../../static  #dossier static de Django
+
   es-data1:
      driver: local
      driver_opts:

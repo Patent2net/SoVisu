@@ -1,3 +1,5 @@
+from spacy.lang.fr.stop_words import STOP_WORDS
+import spacy
 import requests
 import spacy
 
@@ -69,7 +71,7 @@ def return_entities(txt, lang):
         entities_fr = [
             token.text
             for token in nlp_.ents
-            if not token.text.isdigit() and token.text not in nlp_fr.Defaults.stop_words
+            if not token.text.isdigit() and not token.text in nlp_fr.Defaults.stop_words
         ]
         # if not token.is_punct and not token .like_num and \
         # not token .isdigit() and token not in nlp_fr .Defaults.stop_words]

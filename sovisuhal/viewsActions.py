@@ -23,10 +23,12 @@ patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CA
 """
 try:
     from decouple import config
+    from ldap3 import Server, Connection, ALL
     from uniauth.decorators import login_required
     mode = config("mode")  # Prod --> mode = 'Prod' en env Var
+
     patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
-    print("case 1")
+
 except:
 
     from django.contrib.auth.decorators import login_required
@@ -100,20 +102,24 @@ def create_credentials(request):
 
     idhal_test = idhal_checkout(idhal)
 
-    if idhal_test == 0:
-        print("idhal not found")
-        return redirect(
-            f"/create/?ldapid={ldapid}"
-            + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
-        )
-
-    else:
+    if idhal_test > 0:
         print("idhal found")
         # création de l'entrée pour le chercheur dans Elastic
-        chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
+        indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
 
+        # chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
         # récupération de la documentation de l'utilisateur
-        collecte_docs(chercheur)
+        # collecte_docs(chercheur)
+        """
+        result = collecte_docs(chercheur)
+        taches = result.task_id
+        return redirect(f"/create/?ldapid={ldapid}&taches={taches}" +
+                        "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
+    if "taches" in request.GET:
+        taches = request.GET["taches"]
+        return redirect(f"/create/?ldapid={ldapid}&taches={taches}" +
+                        "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
+        """
         # récupération du struct du nouveau profil pour la redirection
         field = "halId_s"
         scope_param = esActions.scope_p(field, idhal)
@@ -128,9 +134,12 @@ def create_credentials(request):
             f"/check/?struct={struct}&type=rsr"
             + f"&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
         )
-
-
-# Redirects
+    else:
+        print("idhal not found")
+        return redirect(
+            f"/create/?ldapid={ldapid}"
+            + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
+        )
 
 
 def validate_references(request):
@@ -429,7 +438,7 @@ def validate_expertise(request):
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
 
-
+@login_required()
 def validate_credentials(request):
     """
     Validation des identifiants
@@ -472,20 +481,21 @@ def validate_credentials(request):
             res = es.search(index=f"{struct}*-researchers", body=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
-                print(f"entity = {entity}")
             except IndexError:
                 return redirect("unknown")
 
-            print(f"{struct}-{entity['labHalId']}-researchers")
+            aurehalId = ""
+            if "aurehalId" in entity:
+                aurehalId = entity["aurehalId"]
 
-            if entity["aurehalId"] != "":
-                print("initialize concept and keywords gathering")
+            aurehalId_get = get_aurehalId(entity["halId_s"])
+            if aurehalId != aurehalId_get:
+                aurehalId = aurehalId_get
+
+            archives_ouvertes_data = ""
+            if aurehalId != "":
                 archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])
                 archives_ouvertes_data = archives_ouvertes_data["concepts"]
-                print(f"concepts: {archives_ouvertes_data}")
-            else:
-                print("no aurehalid available to gather")
-                archives_ouvertes_data = ""
 
             es.update(
                 index=f"{struct}-{entity['labHalId']}-researchers",
@@ -493,6 +503,7 @@ def validate_credentials(request):
                 id=p_id,
                 body={
                     "doc": {
+                        "aurehalId": aurehalId,
                         "idRef": idref,
                         "orcId": orcid,
                         "validated": True,
@@ -769,6 +780,7 @@ def update_members(request):
                     f"/check/?struct={struct}"
                     + f"&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
                 )
+
             es.update(
                 index=res["hits"]["hits"][0]["_index"],
                 refresh="wait_for",
@@ -864,53 +876,54 @@ def update_authorship(request):
             )
 
             # update in laboratory's collection
-            field = "_id"
-            doc_param = esActions.scope_p(field, doc["docid"])
-
-            res = es.search(
-                index=f"{struct}-{entity['labHalId']}-laboratories-documents",
-                body=doc_param,
-            )
-
-            try:
-                if len(res["hits"]["hits"]) > 0:
-                    if "autorship" in res["hits"]["hits"][0]["_source"]:
-                        authorship = res["hits"]["hits"][0]["_source"]["authorship"]
-                        exists = False
-                        for author in authorship:
-                            if author["authIdHal_s"] == entity["halId_s"]:
-                                exists = True
-                                author["authorship"] = doc["authorship"]
-                        if not exists:
-                            authorship.append(
-                                {
-                                    "authorship": doc["authorship"],
-                                    "authIdHal_s": entity["halId_s"],
-                                }
-                            )
-                    else:
-                        authorship = [
-                            {
-                                "authorship": doc["authorship"],
-                                "authIdHal_s": entity["halId_s"],
-                            }
-                        ]
-                else:
-                    authorship = [
-                        {
-                            "authorship": doc["authorship"],
-                            "authIdHal_s": entity["halId_s"],
-                        }
-                    ]
-
-                es.update(
-                    index=f"{struct}-{entity['labHalId']}-laboratories-documents",
-                    refresh="wait_for",
-                    id=doc["docid"],
-                    body={"doc": {"authorship": authorship}},
-                )
-            except IndexError:
-                print(f"docid {str(doc['docid'])} non trouvé dans l'index des labs...")
+            # On n'a pas à faire çà
+            # field = "_id"
+            # doc_param = esActions.scope_p(field, doc["docid"])
+            #
+            # res = es.search(
+            #     index=f"{struct}-{entity['labHalId']}-laboratories-documents",
+            #     body=doc_param,
+            # )
+            #
+            # try:
+            #     if len(res["hits"]["hits"]) > 0:
+            #         if "autorship" in res["hits"]["hits"][0]["_source"]:
+            #             authorship = res["hits"]["hits"][0]["_source"]["authorship"]
+            #             exists = False
+            #             for author in authorship:
+            #                 if author["authIdHal_s"] == entity["halId_s"]:
+            #                     exists = True
+            #                     author["authorship"] = doc["authorship"]
+            #             if not exists:
+            #                 authorship.append(
+            #                     {
+            #                         "authorship": doc["authorship"],
+            #                         "authIdHal_s": entity["halId_s"],
+            #                     }
+            #                 )
+            #         else:
+            #             authorship = [
+            #                 {
+            #                     "authorship": doc["authorship"],
+            #                     "authIdHal_s": entity["halId_s"],
+            #                 }
+            #             ]
+            #     else:
+            #         authorship = [
+            #             {
+            #                 "authorship": doc["authorship"],
+            #                 "authIdHal_s": entity["halId_s"],
+            #             }
+            #         ]
+            #
+            #     es.update(
+            #         index=f"{struct}-{entity['labHalId']}-laboratories-documents",
+            #         refresh="wait_for",
+            #         id=doc["docid"],
+            #         body={"doc": {"authorship": authorship}},
+            #     )
+            # except IndexError:
+            #     print(f"docid {str(doc['docid'])} non trouvé dans l'index des labs...")
     except IndexError:
         pass
 
@@ -1124,15 +1137,8 @@ def idhal_checkout(idhal):
 
 def vizualisation_url():
     """
-    Permet d'ajuster l'affichage des visualisations Kibana entre la version Dev et la version Prod
-    Obsolète
+    Permet d'ajuster l'affichage des visualisations Kibana
+    À intégrer dans les consts
     """
-    print("mode: ")
-    print(mode)
-    if mode == "dev":
-        url = "http://127.0.0.1:5601/kibana"
-        # url = "/kibana"
-    else:
-        url = "/kibana"
-
+    url = "/kibana"
     return url

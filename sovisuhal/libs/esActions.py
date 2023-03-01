@@ -86,7 +86,7 @@ def date_all():
     """
     start_date_param = {
         "size": 1,
-        "sort": [{"submittedDate_tdate": {"order": "asc"}}],
+        "sort": [{"producedDate_tdate": {"order": "asc"}}], # champ de date de production. Non Vide sur HAL.
         "query": {"match_all": {}},
     }
     return start_date_param
@@ -100,7 +100,7 @@ def date_p(scope_field, scope_value):
     """
     start_date_param = {
         "size": 1,
-        "sort": [{"submittedDate_tdate": {"order": "asc"}}],
+        "sort": [{"producedDate_tdate": {"order": "asc"}}],
         "query": {"match_phrase": {scope_field: scope_value}},
     }
     return start_date_param
@@ -180,7 +180,7 @@ def ref_p_filter(
                                     },
                                     {
                                         "range": {
-                                            "submittedDate_tdate": {
+                                            "producedDate_tdate": {
                                                 "gte": scope_date_from,
                                                 "lt": scope_date_to,
                                             }
@@ -225,7 +225,7 @@ def ref_p_filter(
                                     },
                                     {
                                         "range": {
-                                            "submittedDate_tdate": {
+                                            "producedDate_tdate": {
                                                 "gte": scope_date_from,
                                                 "lt": scope_date_to,
                                             }

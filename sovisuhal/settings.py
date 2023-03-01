@@ -28,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
-
+STATIC_URL = '/static/'
 if mode == "Prod":
     SECRET_KEY = config("DjangoKey")
-    DEBUG = config("DJANGO_DEBUG")
+    DEBUG = eval(config("DJANGO_DEBUG"))
     # Settings used by Uniauth
     LOGIN_URL = "/accounts/login/"
     # PASSWORD_RESET_TIMEOUT_DAYS = 3
@@ -73,10 +73,17 @@ if mode == "Prod":
             },
         },
     }
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
+    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+    CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
+    CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
 else:
     SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
-    DEBUG = "False"  #'True'
-
+    DEBUG = True
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
+    # Celery Settings
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # Application definition
@@ -129,22 +136,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "194.214.84.14", "sovisu.univ-tln.fr"
 CSRF_TRUSTED_ORIGINS = ["https://194.214.84.14", "https://localhost"]
 
 CORS_ALLOW_CREDENTIALS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "https://sovisu.univ-tln.fr",
-    "https://sovisu.univ-tln.fr:9200",
-    "https://sovisu.univ-tln.fr:5601",
-    "https://sovisu.univ-tln.fr:6379",
-    "http://localhost",
-    "http://localhost:9200",
-    "http://localhost:5601",
-    "http://localhost:6379",
-    "http://127.0.0.1",
-    "http://127.0.0.1:9200",
-    "http://127.0.0.1:5601",
-    "http://127.0.0.1:6379",
-]
-
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
@@ -234,21 +225,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = "/static/"
-if mode == "dev":
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
-else:
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")  #'/data/SoVisu/staticfiles/
-"""
-Permet de résoudre le soucis MIME sur les navigateurs.
-Le STATIC_ROOT est à paramétrer avec NGINX pour fonctionner
-le STATICFILES_DIRS est une solution adaptée principalement pour le dev
-"""
-
-
 # EMAIL Setup
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -274,6 +250,4 @@ MANAGERS = (("BU", "dreymond@univ-tln.fr"), ("BU_1", ""))  # changer l'adresse
 # Dans le cas où un seul admin est présent pour le système,
 # merci de laisser le 2e profil sans adresse mail renseignée.
 
-# Celery Settings
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+

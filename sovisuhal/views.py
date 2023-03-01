@@ -150,9 +150,9 @@ def check(request):
         return redirect("unknown")
 
     if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
-        hastoconfirm = True
+        hastoconfirm = True  # Ce paramètre donne vrai si l'une des prod n'est pas validée.
 
-    print(f"hastoconfirm = {hastoconfirm}")
+    # print(f"hastoconfirm = {hastoconfirm}")
 
     if data == "state":
         field = "labHalId"
@@ -166,7 +166,7 @@ def check(request):
 
         for result in rsrs["hits"]["hits"]:
             rsrs_cleaned.append(result["_source"])
-        print(rsrs_cleaned)
+        # print(rsrs_cleaned)
         return render(
             request,
             "check.html",
@@ -195,6 +195,7 @@ def check(request):
             function = 0
             if "function" in entity:
                 function = entity["function"]
+                # integration contenus
 
             return render(
                 request,
@@ -1505,20 +1506,6 @@ def faq(request):
     )
 
 
-def useful_links(request):
-    """
-    Useful links page
-    """
-    # Get parameters
-    struct, i_type, p_id, ldapid = regular_get_parameters(request)
-    # /
-    return render(
-        request,
-        "useful_links.html",
-        {"struct": struct, "type": i_type, "id": p_id, "ldapid": ldapid},
-    )
-
-
 # /fonctions d'initialisation des pages
 
 
@@ -1552,11 +1539,11 @@ def default_checker(request, basereverse, default_data=None):
         return redirect(url)
 
     elif (
-        not p_id == "adminlab"
-        and not p_id == "visiteur"
-        and not p_id == "invitamu"
-        and not p_id == "guestUtln"
-        and not p_id == -1
+        p_id != "adminlab"
+        and p_id != "visiteur"
+        and p_id != "invitamu"
+        and p_id != "guestUtln"
+        and p_id != -1
     ):
         # si ce n'est pas adminlab ni un visiteur → c'est un chercheur
         i_type = "rsr"

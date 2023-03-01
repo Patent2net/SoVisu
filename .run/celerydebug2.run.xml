@@ -15,7 +15,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension"  enabled="false" sample_coverage="true" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="celery" />
-    <option name="PARAMETERS" value="-A elasticHal -A sovisuhal worker -P solo --loglevel=info -E" />
+    <option name="PARAMETERS" value="-A elasticHal -A sovisuhal worker -P solo --loglevel=info -E worker_cancel_long_running_tasks_on_connection_loss=True" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

@@ -1,5 +1,5 @@
 import requests
-from requests.adapters import HTTPAdapter
+from requests.adapters import HTTPAdapter, MaxRetryError
 from requests.packages.urllib3.util.retry import Retry
 
 from elasticHal.libs import dimensions
@@ -32,7 +32,8 @@ def check_doi(doi):
             return False
     except TimeoutError:
         return False
-
+    except MaxRetryError:
+        return False
 
 def docs_enrichissement_doi(doc):
     """
@@ -54,11 +55,13 @@ def docs_enrichissement_doi(doc):
             if "oa_status" in data.keys():
                 doc["oa_status"] = data["oa_status"]
             if "is_oa" in data.keys():
-                if data["is_oa"] is True:  # Test si le doi est en open access sur l'api Unpaywall
+                if (
+                    data["is_oa"] == True
+                ):  # Test si le doi est en open access sur l'api Unpaywall
                     doc["is_oa"] = "open access"
-                    if data["first_oa_location"]["oa_date"] is not None:
+                    if data["first_oa_location"]["oa_date"] != None:
                         doc["date_depot_oa"] = data["first_oa_location"]["oa_date"]
-                    elif data["first_oa_location"]["updated"] is not None:
+                    elif data["first_oa_location"]["updated"] != None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
                         pass  # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type

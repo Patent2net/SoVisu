@@ -44,7 +44,7 @@ except:
 es = esActions.es_connector()
 
 
-@shared_task(bind=True)
+# @shared_task(bind=True)
 def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
@@ -188,6 +188,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
         index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers",
         id=chercheur["ldapId"],
         body=json.dumps(chercheur),
+        refresh="wait_for",
     )
     print("statut de la création d'index: ", res["result"])
     return chercheur
