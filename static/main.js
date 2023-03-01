@@ -81,7 +81,11 @@ $(function() {
 
 	$(document).ready(function () {
         window.onbeforeunload = null;
-
+        $('#dashkib').on("load", function() {
+            let head = $("#dashkib").contents().find("head");
+            let css = "<style>#kbnPresentationToolbar__solutionToolbar {display: none;};</style>";
+            $(head).append(css);
+        });
     $('.loading-div').fadeOut(150);
     $(window).off('beforeunload');
 	if (document.querySelector('#ifram')) {
