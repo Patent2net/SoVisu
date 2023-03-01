@@ -22,7 +22,7 @@
                 {% endcomment %}
                 {% if type == "rsr" %}
                     <div class="w-full h-full">
-                        <iframe src="{{ url }}/app/dashboards#/view/2e1ef800-c1f2-11eb-b466-1b2443e30920?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%" title="Tableau de bord chercheur"></iframe>
+                        <iframe src="{{ url }}/app/dashboards#/view/2e1ef800-c1f2-11eb-b466-1b2443e30920?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),time:({{ timeRange }}))&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:view,fullScreenMode:!f,options:(hidePanelTitles:!t,autohideHeader:!t,syncColors:!t,useMargins:!t))" height="100%" width="100%" title="Tableau de bord chercheur"></iframe>
                     </div>
                 {% else %}
                     {% comment %}
@@ -39,7 +39,7 @@
                             <iframe id="ifram"  src="{{ url }}/app/dashboards#/view/4a37d8e0-a112-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')),viewMode:edit,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
                         {% endif %}
                         {% if dash == "projets" %}
-                            <iframe id="ifram" src="{{ url }}/app/dashboards#/view/13661560-a122-11ec-91a3-27eaa11a874e?embed=true&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')),viewMode:edit,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
+                            <iframe id="ifram" src="{{ url }}/app/dashboards#/view/13661560-a122-11ec-91a3-27eaa11a874e?embed=true&theme=dark&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&hide-filter-bar=false&_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,syncTooltips:!t,useMargins:!t),query:(query_string:(analyze_wildcard:!t,query:'{{ filterlabA }}')),viewMode:edit,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
                         {% endif %}
                     </div>
                 {% endif %}
