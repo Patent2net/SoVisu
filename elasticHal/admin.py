@@ -16,7 +16,7 @@ from elasticHal.collect_from_HAL import (
 
 from .forms import CsvImportForm, ExportToElasticForm, PopulateLab
 from .insert_entities import create_index
-from .models import Laboratory, Researcher, Structure
+from .models import Laboratory, Structure
 from .views import get_index_list
 
 # Celery
@@ -70,12 +70,10 @@ class ElasticActions:
             if form.is_valid():
                 structure = form.cleaned_data["Structures"]
                 laboratoires = form.cleaned_data["Laboratoires"]
-                chercheurs = form.cleaned_data["Chercheurs"]
 
                 result1 = create_index.delay(
                     structure=structure,
                     laboratories=laboratoires,
-                    researcher=chercheurs,
                     django_enabler=True,
                 )
 
@@ -321,83 +319,6 @@ class LaboratoryAdmin(admin.ModelAdmin, ExportCsv):
         return render(request, "admin/csv_upload.html", data)
 
 
-class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
-    """
-    Modèle de l'administration des chercheurs
-    """
-
-    list_display = ("ldapId", "name", "function", "lab")
-    list_filter = (
-        "structSirene",
-        "lab",
-        "function",
-    )
-    search_fields = ("name",)
-    actions = ["export_as_csv"]
-
-    def get_urls(self):
-        """
-        Initialise les urls du modèle ResearcherAdmin
-        """
-        urls = super().get_urls()
-        new_urls = [
-            path("upload-csv/", self.upload_csv),
-            path("update_elastic/", ElasticActions.update_elastic),
-            path("export-elastic/", ElasticActions.export_to_elastic),
-        ]
-        return new_urls + urls
-
-    @staticmethod
-    def upload_csv(request):
-        """
-        Permet de charger un fichier CSV dans la base de données du modèle Researcher
-        """
-        if request.method == "POST":
-            csv_file = request.FILES["importer_un_fichier"]
-
-            if not csv_file.name.endswith(".csv"):
-                messages.warning(request, "Le fichier importé n'est pas un .csv")
-                return HttpResponseRedirect(request.path_info)
-
-            file_data = csv_file.read().decode("utf-8")
-            csv_data = file_data.split("\n")  # sépare le fichier par ligne
-
-            csv_data.pop(0)  # supprime l'en-tête du csv
-
-            csv_data = list(
-                map(str.strip, csv_data)
-            )  # enlève les caractères spéciaux afin d'avoir le contenu exact des lignes
-
-            csv_data = list(filter(None, csv_data))  # supprime les lignes vides dans le fichier.
-
-            for x in csv_data:
-                fields = x.split(";")
-                Researcher.objects.update_or_create(
-                    structSirene=fields[0],
-                    ldapId=fields[1],
-                    name=fields[2],
-                    type=fields[3],
-                    function=fields[4],
-                    mail=fields[5],
-                    lab=fields[6],
-                    supannAffectation=fields[7],
-                    supannEntiteAffectationPrincipale=fields[8],
-                    halId_s=fields[9],
-                    labHalId=fields[10],
-                    idRef=fields[11],
-                    structDomain=fields[12],
-                    firstName=fields[13],
-                    lastName=fields[14],
-                )
-                # print(created)
-            url = reverse("admin:index")
-            return HttpResponseRedirect(url)
-
-        form = CsvImportForm()
-        data = {"form": form}
-        return render(request, "admin/csv_upload.html", data)
-
-
 # Unregister the default admin site
 # admin.site.unregister(User)
 # admin.site.unregister(Group)
@@ -406,4 +327,3 @@ class ResearcherAdmin(admin.ModelAdmin, ExportCsv):
 # Register your models here.
 admin.site.register(Structure, StructureAdmin)
 admin.site.register(Laboratory, LaboratoryAdmin)
-admin.site.register(Researcher, ResearcherAdmin)
