@@ -39,4 +39,3 @@ class ExportToElasticForm(forms.Form):
 
     Structures = forms.BooleanField(initial=True, required=False)
     Laboratoires = forms.BooleanField(initial=True, required=False)
-    Chercheurs = forms.BooleanField(initial=True, required=False)
