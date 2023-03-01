@@ -185,17 +185,16 @@
                                 href="https://doc.archives-ouvertes.fr/identifiant-auteur-idhal-cv/" class="underline"
                                 target="_blank">l'identifiant sur l'archive nationale Hal</a>. Ce dernier identifiant
                             permet de regrouper vos publications, produire votre cv automatiquement, mais aussi de gérer
-                            les différentes formes auteur. Les trois sont à relier via HAL. Vous avez une petite
+                            les différentes formes auteur. Les trois sont à gérer via HAL. Vous avez une petite
                             procédure réalisée par l'UMR 5206 <a href="http://triangle.ens-lyon.fr/spip.php?article8796"
                                                                  class="underline" target="_blank"> sur ce lien.</a>
                         </li>
-                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... les
-                            moissonneurs se chargeront de publier automatiquement vos notices sur ces médias si
-                            nécessaires (<i> ; </i>).
+                        <li> Si vous avez <strong>d'autres identifiants</strong> (Arxiv, Mendeley, Research Gate... leurs
+                            moissonneurs se chargeront de publier automatiquement vos notices sur HAL. (<i> ; </i>).
                         </li>
                         <li> Le champ autre (s'il apparait) est libre, mais la fonctionnalité n'est pas activée.</li>
                         <li><strong>merci de vérifier vos identifiants avant de les renseigner ; un mauvais identifiant
-                            pouvant faire apparaitre une erreur!</strong></li>
+                            pouvant faire apparaitre des dysfonctionnements !</strong></li>
                     </ul>
 
                 </div>
@@ -216,7 +215,7 @@
                         </div>
                     {% endfor %}
                     <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none"
-                           type="submit" value="Modifier ou valider les identifiants">
+                           type="submit" value="Valider les identifiants">
                 </form>
 
 
@@ -249,11 +248,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-
-                    <p>Cet onglet vous permet de valider des domaines à la marge de votre expertise. Les raccourcis de
+                    {% if validation == "1" %}
+                    <p>Cet onglet vous permet de revendiquer les domaines de votre expertise. Les raccourcis de
                         sélection Shift et CTRL fonctionnent.
-                        <br>Restent ici les expertises identifiées à travaux vos travaux qui proviennent d'erreurs ou de
-                        collaborations.</p>
+                    {% endif %}
+                        {% if validation == "0" %}
+                        <br>Restent ici les expertises qui proviennent d'erreurs, de
+                        collaborations, ou que vous considérez marginales.</p>
+                        {% endif %}
                 </div>
 
                 <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
@@ -265,7 +267,7 @@
                     <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                        href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
-                    >Expertises retirées</a>
+                    >Expertises annexes</a>
 
                 </div>
 
@@ -525,16 +527,21 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
+                    {% if validation == "1" %}
                     <p>Dans cet onglet, vous intégrez les références bibliographiques collectées à l'aide de vos
-                        identifiants aux index. Par votre validation ces notices seront incluses dans le processus de
-                        traitement qui les associera à votre profil (tableau de bord) et à votre laboratoire. Les
+                        identifiants aux index. Vous pouvez exclure des notices et ne pas les associer à votre profil. Cette opération est réversible. Les
                         raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.
-                        <br>Restent ici les publications "annexes" ou qui ne seraient pas de vous par erreur...
+
                         <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le
                         bouton "Mettre à jour les références" sert à les importer ici (Notez qu'Hal prend un délai
                         d'indexation de quelques heures et les nouvelles notices ne sont pas immédiatement
                         disponibles.). </p>
+                    {% endif %}
+                    {% if validation == "0" %} <p>
 
+                    <br>Restent ici les publications "annexes", pas forcément au c\oe ur de votre expertise ou qui ne seraient pas de vous par erreur...
+                    </p>
+                    {% endif %}
                 </div>
 
                 <div class="flex justify-between items-start">
@@ -559,7 +566,7 @@
                             <a class="px-2 pb-1
                         {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                                href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
-                            >Notices retirées</a>
+                            >Notices annexes</a>
                         {% endif %}
                     </div>
 
@@ -617,7 +624,7 @@
                                 {% if validation == "1" and type == "rsr" %}
                                     <td>
                                         <select class="border border-gray-300 author" name="authorship" id="authorship">
-                                            <option value="">Aucune information</option>
+                                            <option value="">---</option>
                                             <option value="firstAuthor">Premier auteur</option>
                                             <option value="lastAuthor">Dernier auteur</option>
                                             <option value="correspondingAuthor">Corresponding auteur</option>

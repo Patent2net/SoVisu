@@ -8,8 +8,8 @@ from celery import shared_task
 # Celery-progress
 from celery_progress.backend import ProgressRecorder
 
-from elasticHal.libs import StructAcronym, archivesOuvertes, utils
-from elasticHal.models import Laboratory, Researcher, Structure
+from elasticHal.libs import StructAcronym, utils
+from elasticHal.models import Laboratory, Structure
 
 # Custom libs
 from sovisuhal.libs import esActions
@@ -120,295 +120,6 @@ def create_structures_index(pg):
     else:
         print("No source enabled to add structure. Please check the parameters")
     pg.set_progress(33, 100, description="processing structure finished")
-
-
-def create_researchers_index(pg):
-    """
-    Crée les index de chercheurs dans Elasticsearch
-    """
-    # Process researchers
-    scope_param = esActions.scope_all()
-    percentage = 66.0
-    progress_description = "processing researchers"
-    pg.set_progress(int(percentage), 100, description=progress_description)
-    cleaned_es_researchers = []
-    for structid in structIdlist:
-        count = es.count(index=structid + "*-researchers", body=scope_param)["count"]
-        res = es.search(index=structid + "*-researchers", body=scope_param, size=count)
-        es_researchers = res["hits"]["hits"]
-        for row in es_researchers:
-            row = row["_source"]
-            cleaned_es_researchers.append(row)
-    progress_description = "processing " + str(len(cleaned_es_researchers)) + " researchers"
-    pg.set_progress(int(percentage), 100, description=progress_description)
-
-    if djangodb_open:
-        django_researchers = Researcher.objects.all().values()
-        django_researchers = list(
-            [
-                researcher
-                for researcher in django_researchers
-                if researcher["halId_s"] != "" and researcher.pop("id")
-            ]
-        )  # Only keep researchers with known 'halId_s' and remove the 'id' value from Django_DB
-        if cleaned_es_researchers:
-            for researcher in django_researchers:
-                if any(
-                    dictlist["halId_s"] == researcher["halId_s"]
-                    for dictlist in cleaned_es_researchers
-                ):
-                    print(
-                        "\u00A0 \u21D2 ",
-                        researcher["halId_s"] + " is already in cleaned_es_researchers",
-                    )
-                else:
-                    cleaned_es_researchers.append(researcher)
-        else:
-            cleaned_es_researchers = django_researchers
-    cpt = 0
-    docmap = {
-        "properties": {
-            "docid": {"type": "long"},
-            "en_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "fr_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "it_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "es_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "pt_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-        }
-    }
-    for row in cleaned_es_researchers:
-        cpt += 1
-        percentage = 66 + 33 * (cpt / len(cleaned_es_researchers))
-        pg.set_progress(int(percentage), 100, description=progress_description)
-        # rajouter la fonction idhalcheckout pour valider la ligne avant d'essayer de la traiter
-        if row["structSirene"] in structIdlist:
-            row["labHalId"] = row["labHalId"].strip()
-            if "validated" in row.keys():
-                if not row["validated"]:
-                    row["validated"] = False
-                else:
-                    row["validated"] = True
-            row["Created"] = datetime.datetime.now().isoformat()
-            if row["labHalId"] not in Labolist:
-                old_lab = row["labHalId"]
-                row["labHalId"] = "non-labo"
-                connait_lab = "non-labo"
-
-            else:
-                connait_lab = row["labHalId"]
-                old_lab = row["labHalId"]
-            if "--> En erreur contactez-nous" not in row["halId_s"]:
-                row["aurehalId"] = archivesOuvertes.get_aurehalId(row["halId_s"])
-            else:
-                pass  # on va chercher aurehalId sur une autre info ?
-            # print(row["aurehalId"])
-            # row['aurehalId'] = str(row['aurehalId']).strip()
-            # supprime les '\r' empêchant une erreur venant de SPARQL
-            try:
-                archives_ouvertes_data = archivesOuvertes.get_concepts_and_keywords(
-                    int(row["aurehalId"])
-                )
-            except IndexError:
-                archives_ouvertes_data = dict()
-                archives_ouvertes_data["concepts"] = []
-                row["aurehalId"] = -1
-                print(f"erreur archives_ouvertes_data, {row['halId_s']}:{row['aurehalId']}")
-            # time.sleep(1)
-
-            if (
-                "guidingKeywords" not in row
-            ):  # si le champ n'existe pas (ou vide) met la valeur à [],
-                # sinon persistance des données
-                row["guidingKeywords"] = []
-
-            if "orcId" not in row:  # si le champ n'existe pas (ou vide) met la valeur à "",
-                # sinon persistance des données
-                row["orcId"] = ""
-
-            if "validated" not in row:  # si le champ n'existe pas (ou vide) met la valeur à "",
-                # sinon persistance des données
-                row["validated"] = False
-
-            if (
-                "researchDescription" not in row
-            ):  # si le champ n'existe pas (ou vide) met la valeur à "",
-                # sinon persistance des données
-                row["researchDescription"] = ""
-
-            if "axis" not in row:
-                row["axis"] = row["lab"]
-
-            validated_ids = []
-            if "concepts" in row:  # si le champ existe :
-                # mise à jour des concepts existant avec persistance des données validées,
-                # sinon création des concepts.
-                if "children" in row["concepts"]:
-                    for children in row["concepts"]["children"]:
-                        if children["state"] == "validated":
-                            validated_ids.append(children["id"])
-                        if "children" in children:
-                            for children1 in children["children"]:
-                                if children1["state"] == "validated":
-                                    validated_ids.append(children1["id"])
-                                if "children" in children1:
-                                    for children2 in children1["children"]:
-                                        if children2["state"] == "validated":
-                                            validated_ids.append(children2["id"])
-            row["concepts"] = utils.filter_concepts(
-                archives_ouvertes_data["concepts"], validated_ids
-            )
-
-            # Insert researcher data
-            if init:
-                es.index(
-                    index=row["structSirene"] + "-" + connait_lab + "-researchers",
-                    id=row["ldapId"],
-                    body=json.dumps(row),
-                )
-            else:
-                if not es.indices.exists(
-                    index=row["structSirene"] + "-" + connait_lab + "-researchers"
-                ):
-                    es.indices.create(
-                        index=row["structSirene"] + "-" + connait_lab + "-researchers"
-                    )
-                    es.indices.create(
-                        index=row["structSirene"]
-                        + "-"
-                        + connait_lab
-                        + "-researchers-"
-                        + row["ldapId"]
-                        + "-documents"
-                    )  # -researchers" + row["ldapId"] + "-documents
-                    es.indices.put_mapping(
-                        index=row["structSirene"]
-                        + "-"
-                        + connait_lab
-                        + "-researchers-"
-                        + row["ldapId"]
-                        + "-documents",
-                        body=docmap,
-                    )
-                    es.index(
-                        index=row["structSirene"] + "-" + connait_lab + "-researchers",
-                        id=row["ldapId"],
-                        body=json.dumps(row),
-                    )
-                elif not es.indices.exists(
-                    index=row["structSirene"]
-                    + "-"
-                    + connait_lab
-                    + "-researchers-"
-                    + row["ldapId"]
-                    + "-documents"
-                ):
-                    es.indices.create(
-                        index=row["structSirene"]
-                        + "-"
-                        + connait_lab
-                        + "-researchers-"
-                        + row["ldapId"]
-                        + "-documents"
-                    )  # -researchers" + row["ldapId"] + "-documents" ?
-                    es.indices.put_mapping(
-                        index=row["structSirene"]
-                        + "-"
-                        + connait_lab
-                        + "-researchers-"
-                        + row["ldapId"]
-                        + "-documents",
-                        body=docmap,
-                    )
-                else:
-                    try:
-                        docu = dict()
-                        docu[
-                            "doc"
-                        ] = row  # MAIS : https://github.com/elastic/elasticsearch-py/issues/1698
-                        es.update(
-                            index=row["structSirene"] + "-" + connait_lab + "-researchers",
-                            id=row["ldapId"],
-                            body=json.dumps(docu),
-                        )
-                    except IndexError:
-                        try:
-                            es.index(
-                                index=row["structSirene"] + "-" + connait_lab + "-researchers",
-                                id=row["ldapId"],
-                                body=json.dumps(row),
-                            )
-                        except IndexError:
-                            print("boum 2 ???", connait_lab, row["ldapId"])
-                if connait_lab != old_lab:
-                    print(
-                        " détruire l'entrée ",
-                        row["structSirene"] + "-" + old_lab + "-researchers/" + row["ldapId"],
-                    )
-
-            if not es.indices.exists(
-                index=row["structSirene"]
-                + "-"
-                + connait_lab
-                + "-researchers-"
-                + row["ldapId"]
-                + "-documents"
-            ):
-                es.indices.create(
-                    index=row["structSirene"]
-                    + "-"
-                    + connait_lab
-                    + "-researchers-"
-                    + row["ldapId"]
-                    + "-documents"
-                )
-                es.indices.put_mapping(
-                    index=row["structSirene"]
-                    + "-"
-                    + connait_lab
-                    + "-researchers-"
-                    + row["ldapId"]
-                    + "-documents",
-                    body=docmap,
-                )
-
-            if not es.indices.exists(
-                index=row["structSirene"] + "-" + connait_lab + "-laboratories"
-            ):
-                es.indices.create(index=row["structSirene"] + "-" + connait_lab + "-laboratories")
-
-                es.indices.create(
-                    index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents"
-                )
-                es.indices.put_mapping(
-                    index=row["structSirene"] + "-" + connait_lab + "-laboratories-documents",
-                    body=docmap,
-                )
-            percentage += 33.0 / len(cleaned_es_researchers)
-            progress_description = row["ldapId"] + " updated"
-            pg.set_progress(int(percentage), 100, description=progress_description)
-        else:
-            #
-            print(
-                "\u00A0 \u21D2 chercheur hors structure ",
-                row["ldapId"],
-                ", structure : ",
-                row["structSirene"],
-            )
 
 
 def create_laboratories_index(pg):
@@ -589,10 +300,10 @@ def temp_laboratories(row):
 
 
 @shared_task(bind=True)
-def create_index(self, structure, researcher, laboratories, django_enabler=None):
+def create_index(self, structure, laboratories, django_enabler=None):
     """
     Initialise la création d'un index pour les catégories sélectionnées
-    (structure, researcher, laboratories)
+    (structure, laboratories)
     """
     global djangodb_open
     progress_recorder = ProgressRecorder(self)
@@ -622,18 +333,6 @@ def create_index(self, structure, researcher, laboratories, django_enabler=None)
             int(percentage),
             100,
             description="laboratories is disabled, skipping to next process",
-        )
-
-    if researcher:
-        progress_description = "processing create_researchers_index"
-        create_researchers_index(progress_recorder)
-        percentage = 99
-        progress_recorder.set_progress(int(percentage), 100, description=progress_description)
-    else:
-        progress_recorder.set_progress(
-            int(percentage),
-            100,
-            description="researcher is disabled, skipping to next process",
         )
 
     progress_description = "Index creation finished"

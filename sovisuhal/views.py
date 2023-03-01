@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
+from elasticsearch import BadRequestError
 
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
@@ -115,7 +116,7 @@ def check(request):
                 body=start_date_param,
             )
             start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
-        except IndexError:
+        except (IndexError, BadRequestError):
             start_date = "2000"
     elif i_type == "lab":
         start_date_param = esActions.date_p(field, entity["halStructId"])
@@ -126,7 +127,7 @@ def check(request):
                 body=start_date_param,
             )
             start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
-        except IndexError:
+        except (IndexError, BadRequestError):
             start_date = "2000"
     else:
         return redirect("unknown")
@@ -522,7 +523,7 @@ def dashboard(request):
     # on pointe sur index générique, car pas de LabHalId ?
     try:
         entity = res["hits"]["hits"][0]["_source"]
-    except IndexError:
+    except (IndexError, BadRequestError):
         return redirect("unknown")
     # /
 
@@ -574,7 +575,7 @@ def dashboard(request):
 
     try:  # çà devrait pas être un min de date sur les résultats plutôt que le premier ?.???
         start_date = res["hits"]["hits"][0]["_source"]["producedDate_tdate"]
-    except IndexError:
+    except (IndexError, BadRequestError):
         start_date = "2000"
     # /
 
@@ -1122,7 +1123,7 @@ def tools(request):
 
     try:
         start_date = res["hits"]["hits"][0]["_source"]["submittedDate_tdate"]
-    except IndexError:
+    except (IndexError, BadRequestError):
         start_date = "2000"
     # /
 
