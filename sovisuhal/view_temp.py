@@ -1,14 +1,14 @@
 from datetime import datetime
 
-# from django.shortcuts import redirect, render
+from django.shortcuts import redirect  # , render
 from django.views.generic import TemplateView
+
+from sovisuhal.views import get_scope_data
 
 # from . import forms, viewsActions
 from .libs import esActions  # , halConcepts
 
 # from uniauth.decorators import login_required
-
-# from sovisuhal.views import default_checker, get_date, get_scope_data
 
 
 es = esActions.es_connector()
@@ -77,6 +77,114 @@ class CommonContextMixin:
         return context
 
 
+class ReferencesView(CommonContextMixin, TemplateView):
+    template_name = "references.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if "filter" in self.request.GET:
+            context["filter"] = self.request.GET["filter"]
+        else:
+            context["filter"] = -1
+
+        entity, hastoconfirm, references_cleaned = self.get_elastic_data(
+            context["type"],
+            context["id"],
+            context["struct"],
+            context["filter"],
+            context["from"],
+            context["to"],
+        )
+
+        context["entity"] = entity
+        context["hastoconfirm"] = hastoconfirm
+        context["references"] = references_cleaned
+        return context
+
+    def get_elastic_data(self, i_type, p_id, struct, i_filter, date_from, date_to):
+        # Get scope data
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
+
+        try:
+            entity = res["hits"]["hits"][0]["_source"]
+        except IndexError:
+            return redirect("unknown")
+
+        hastoconfirm = False
+        field = "harvested_from_ids"
+        validate = False
+        if i_type == "rsr":
+            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
+
+            if (
+                es.count(
+                    index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
+                    body=hastoconfirm_param,
+                )["count"]
+                > 0
+            ):
+                hastoconfirm = True
+        if i_type == "lab":
+            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
+
+            if (
+                es.count(
+                    index=f"{struct}-{entity['halStructId']}-laboratories-documents",
+                    body=hastoconfirm_param,
+                )["count"]
+                > 0
+            ):
+                hastoconfirm = True
+
+        # Get references
+        scope_bool_type = "filter"
+        validate = True
+        date_range_type = "submittedDate_tdate"
+        ref_param = esActions.ref_p_filter(
+            i_filter,
+            scope_bool_type,
+            ext_key,
+            entity[key],
+            validate,
+            date_range_type,
+            date_from,
+            date_to,
+        )
+
+        if i_type == "rsr":
+            count = es.count(
+                index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
+                body=ref_param,
+            )["count"]
+            references = es.search(
+                index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
+                body=ref_param,
+                size=count,
+            )
+
+        elif i_type == "lab":
+            count = es.count(
+                index=f"{struct}-{entity['halStructId']}-laboratories-documents",
+                body=ref_param,
+            )["count"]
+            references = es.search(
+                index=f"{struct}-{entity['halStructId']}-laboratories-documents",
+                body=ref_param,
+                size=count,
+            )
+        else:
+            return redirect("unknown")
+
+        references_cleaned = []
+
+        for ref in references["hits"]["hits"]:
+            references_cleaned.append(ref["_source"])
+
+        return entity, hastoconfirm, references_cleaned
+
+
 class IndexView(CommonContextMixin, TemplateView):
     template_name = "index.html"
 
@@ -84,9 +192,26 @@ class IndexView(CommonContextMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Get parameters
-        indexcat = self.request.GET.get("indexcat")
-        indexstruct = self.request.GET.get("indexstruct")
+        context["indexcat"] = self.request.GET.get("indexcat")
+        context["indexstruct"] = self.request.GET.get("indexstruct")
 
+        entities, struct_tab = self.get_elastic_data(context["indexcat"], context["indexstruct"])
+
+        context["entities"] = entities
+        context["struct_tab"] = struct_tab
+
+        if context["type"] == -1 and context["id"] == -1:
+            del context["type"]
+            del context["id"]
+            del context["struct"]
+
+        return context
+
+    def get_elastic_data(
+        self,
+        indexcat,
+        indexstruct,
+    ):
         scope_param = esActions.scope_all()
         # création dynamique des tabs sur la page à partir de struct_tab
         struct_tab = es.search(
@@ -111,17 +236,7 @@ class IndexView(CommonContextMixin, TemplateView):
         elif indexcat == "rsr":
             cleaned_entities = sorted(cleaned_entities, key=lambda k: k["lastName"])
 
-        context["indexcat"] = indexcat
-        context["indexstruct"] = indexstruct
-        context["entities"] = cleaned_entities
-        context["struct_tab"] = struct_tab
-
-        if context["type"] == -1 and context["id"] == -1:
-            del context["type"]
-            del context["id"]
-            del context["struct"]
-
-        return context
+        return cleaned_entities, struct_tab
 
 
 class FAQView(CommonContextMixin, TemplateView):
