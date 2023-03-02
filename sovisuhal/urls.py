@@ -22,7 +22,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, re_path
 
-from . import views, viewsActions
+from . import view_temp, views, viewsActions
 
 mode = config("mode")
 
@@ -41,15 +41,22 @@ urlpatterns = [
     path("", viewsActions.admin_access_login, name="login"),
     path("create/", views.create, name="creation"),
     path("check/", views.check, name="check"),
-    path("index/", views.index, name="index"),
+    # path("index/", views.index, name="index"),
+    path("index/", view_temp.IndexView.as_view(), name="index"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("references/", views.references, name="references"),
     path("terminology/", views.terminology, name="terminology"),
     path("wordcloud/", views.wordcloud, name="wordcloud"),
     path("tools/", views.tools, name="tools"),
     path("search/", views.search, name="search"),
-    path("faq/", views.faq, name="faq"),
-    path("ressources/", views.ressources, name="ressources"),
+    # path("presentation/", views.presentation, name="presentation"),
+    path("presentation/", view_temp.PresentationView.as_view(), name="presentation"),
+    # path("faq/", views.faq, name="faq"),
+    path("faq/", view_temp.FAQView.as_view(), name="faq"),
+    # path("ressources/", views.ressources, name="ressources"),
+    path("ressources/", view_temp.RessourcesView.as_view(), name="ressources"),
+    # path("unknown/", views.unknown, name="unknown"),
+    path("unknown/", view_temp.UnknownView.as_view(), name="unknown"),
     path("CreateCredentials/", viewsActions.create_credentials, name="credentials"),
     path(
         "validate_credentials/",
@@ -89,8 +96,6 @@ urlpatterns = [
         name="force-update_references",
     ),
     path("export_hceres_xls/", viewsActions.export_hceres_xls, name="export_hceres_xls"),
-    path("presentation/", views.presentation, name="presentation"),
-    path("unknown/", views.unknown, name="unknown"),
     path("accounts/", include("uniauth.urls", namespace="uniauth")),
     path("tinymce/", include("tinymce.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
