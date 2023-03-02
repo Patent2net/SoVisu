@@ -236,53 +236,42 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
 
         doc["harvested_from_ids"] = []
         doc["harvested_from_label"] = []
-        # try:
-        #     doc["harvested_from_label"].append(dicoAcronym[row["labHalId"]])
-        # except:
-        #     doc["harvested_from_label"].append("non-
 
-        # authhalid_s_filled = []
-        # # replace authId_i per authIdHal_i after test
-        # print(f"document reference: {doc['halId_s']}")
-        # if "authIdHal_i" in doc:
-        #     print(f"authIdHal_i is in doc")
-        #     for auth in doc["authIdHal_i"]:
-        #         try:
-        #             aurehal = archivesOuvertes.get_halid_s(auth)
-        #             authhalid_s_filled.append(aurehal)
-        #         except IndexError:
-        #             print(f"Collecte_docs: authIdHal_i Exception case")
-        #             authhalid_s_filled.append("")
-        # else:
-        #     print(f"no authIdHal_i found in doc")
+
         #
-        # authors_count = len(authhalid_s_filled)
-        # print(f"{authors_count} authors found in document")
-        # i = 0
-        # print(f"list of authors found: {authhalid_s_filled}")
-        # for auth in authhalid_s_filled:
-        #     i += 1
-        #     if i == 1 and auth != "":
-        #         doc["authorship"].append(
-        #             {"authorship": "firstAuthor", "authIdHal_s": auth}
-        #         )
-        #     elif i == authors_count and auth != "":
-        #         doc["authorship"].append(
-        #             {"authorship": "lastAuthor", "authIdHal_s": auth}
-        #         )
+        #
+        # print(doc["authorship"], doc ['authLastName_s'])
 
-        if doc["authLastName_s"].index(chercheur["lastName"].title()) == 0:
-            doc["authorship"] = [
-                {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-            ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
-        elif (
-            doc["authLastName_s"].index(chercheur["lastName"].title())
-            == len(doc["authLastName_s"]) - 1
-        ):
-            doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+        # en espérant que doc["authIdHal_s"] présente la liste des idhal auteur avec "" si pas d'idhal (et donc
+        if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
+            print ("elastichal.py : test d'autorat no good")
+            # test sur le nom complet...
+            nom = [truc for truc in doc["authLastName_s"] if chercheur["lastName"].lower() in truc.lower()]  # pour les récemment mariés qui auraient un nom composé... Après si 'lun des co-auteur porte le même nom...
+            if len(nom)>0:
+                nom = nom[0] .title()
+                if doc["authLastName_s"].index(nom) == 0: # premier
+                    doc["authorship"] = [
+                        {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+                    ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+                elif (
+                    doc["authLastName_s"].index(nom)
+                    == len(doc["authLastName_s"]) - 1
+                ):  # dernier
+                    doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+            else:
+                doc["authorship"] = []
+        elif chercheur["halId_s"] in doc["authIdHal_s"]:
+            if doc["authIdHal_s"].index(chercheur["halId_s"])==0:
+                doc["authorship"] = [
+                                 {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+                            ]
+            elif (doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1):  # dernier
+                doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+            else:
+                doc["authorship"] = []
         else:
             doc["authorship"] = []
-        # print(doc["authorship"], doc ['authLastName_s'])
+
         doc["harvested_from_ids"].append(chercheur["halId_s"])
 
         # historique d'appartenance du docId
@@ -313,7 +302,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             print("publicationDate_tdate error ?")
         doc["Created"] = datetime.datetime.now().isoformat()
 
-        if not init:
+        if not init: # récupération de l'existant pour ne pas écraser
             field = "_id"
             doc_param = esActions.scope_p(field, doc["_id"])
 
