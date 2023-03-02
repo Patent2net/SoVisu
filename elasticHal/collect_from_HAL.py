@@ -378,13 +378,13 @@ def collect_researchers_data(self, struct):
                 if len(docs) > 1:
                     for num, doc in enumerate(docs):
                         if num > 1:
-                            doc_progress_recorder.set_progress(
+                            progress_recorder.set_progress(
                                 num,
                                 len(docs),
                                 " documents traités pour idhal :" + searcher["halId_s"],
                             )
                         else:
-                            doc_progress_recorder.set_progress(
+                            progress_recorder.set_progress(
                                 num,
                                 len(docs),
                                 " documents traités pour idhal : " + searcher["halId_s"],
@@ -557,14 +557,14 @@ def collect_researchers_data(self, struct):
 #                        time.sleep(1)
 
             else:
-                doc_progress_recorder.set_progress(0, 0, " pas de docs 1" + searcher["halId_s"])
+                progress_recorder.set_progress(0, 0, " pas de docs 1" + searcher["halId_s"])
         else:
             print(
                 "\u00A0 \u21D2 chercheur hors structure,"
                 + f" {searcher['ldapId']}, structure : {searcher['structSirene']}"
             )
 
-    doc_progress_recorder.set_progress(100, 100, " fin traitements. ")
+    progress_recorder.set_progress(100, 100, " fin traitements. ")
     progress_recorder.set_progress(count, count, " chercheurs traités ")
     return "finished"
 
@@ -738,7 +738,7 @@ def collect_laboratories_data(self):
                         + lab["halStructId"]
                         + "-laboratories-documents",
                     )
-                    time.sleep(1)
+                    #time.sleep(1)
                     doc_progress_recorder.set_progress(
                         (indi + 1) * 50,
                         len(docs),
