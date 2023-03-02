@@ -237,21 +237,41 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         doc["harvested_from_ids"] = []
         doc["harvested_from_label"] = []
 
-        nom = [truc for truc in doc["authLastName_s"] if chercheur["lastName"].lower() in truc.lower()] # pour les récémment mariés qui auraient un nom composé... Après si 'lun des co-auteur porte le même nom...
-        if len(nom)>0:
-            nom = nom[0] .title()
-            if doc["authLastName_s"].index(nom) == 0: # premier
+
+        #
+        #
+        # print(doc["authorship"], doc ['authLastName_s'])
+
+        # en espérant que doc["authIdHal_s"] présente la liste des idhal auteur avec "" si pas d'idhal (et donc
+        if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
+            print ("elastichal.py : test d'autorat no good")
+            # test sur le nom complet...
+            nom = [truc for truc in doc["authLastName_s"] if chercheur["lastName"].lower() in truc.lower()]  # pour les récemment mariés qui auraient un nom composé... Après si 'lun des co-auteur porte le même nom...
+            if len(nom)>0:
+                nom = nom[0] .title()
+                if doc["authLastName_s"].index(nom) == 0: # premier
+                    doc["authorship"] = [
+                        {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+                    ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+                elif (
+                    doc["authLastName_s"].index(nom)
+                    == len(doc["authLastName_s"]) - 1
+                ):  # dernier
+                    doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+            else:
+                doc["authorship"] = []
+        elif chercheur["halId_s"] in doc["authIdHal_s"]:
+            if doc["authIdHal_s"].index(chercheur["halId_s"])==0:
                 doc["authorship"] = [
-                    {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
-            elif (
-                doc["authLastName_s"].index(nom)
-                == len(doc["authLastName_s"]) - 1
-            ):  # dernier
+                                 {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+                            ]
+            elif (doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1):  # dernier
                 doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+            else:
+                doc["authorship"] = []
         else:
             doc["authorship"] = []
-        # print(doc["authorship"], doc ['authLastName_s'])
+
         doc["harvested_from_ids"].append(chercheur["halId_s"])
 
         # historique d'appartenance du docId
