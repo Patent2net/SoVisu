@@ -85,6 +85,8 @@ $(function() {
             let head = $("#dashkib").contents().find("head");
             let css = "<style>#kbnPresentationToolbar__solutionToolbar {display: none;} .euiContextMenuPanel > div a {display: none;}</style>";
             $(head).append(css);
+			let css2 = "<style>#kbnTopNavMenu__wrapper {display: none;} .euiHeaderLinks > div a {display: none;}</style>";
+            $(head).append(css2);
         });
     $('.loading-div').fadeOut(150);
     $(window).off('beforeunload');
