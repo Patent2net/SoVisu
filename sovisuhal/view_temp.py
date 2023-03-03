@@ -5,11 +5,8 @@ from django.views.generic import TemplateView
 
 from sovisuhal.views import get_scope_data
 
-# from . import forms, viewsActions
+from . import viewsActions
 from .libs import esActions  # , halConcepts
-
-# from uniauth.decorators import login_required
-
 
 es = esActions.es_connector()
 
@@ -183,6 +180,92 @@ class ReferencesView(CommonContextMixin, TemplateView):
             references_cleaned.append(ref["_source"])
 
         return entity, hastoconfirm, references_cleaned
+
+
+class WordcloudView(CommonContextMixin, TemplateView):
+    template_name = "wordcloud.html"
+
+    lang_options = ["ALL", "FR", "EN"]  # langues supportées, créé dynamiquement les onglets
+    lang = "ALL"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if "lang" in self.request.GET:
+            temp_lang = str(self.request.GET["lang"])
+            if temp_lang in self.lang_options:
+                langue = temp_lang
+            else:
+                langue = self.lang
+        else:
+            langue = self.lang
+
+        entity, hastoconfirm, filtrechercheur, filtrelab, url = self.get_elastic_data(
+            context["type"], context["id"], context["struct"]
+        )
+
+        context["entity"] = entity
+        context["hastoconfirm"] = hastoconfirm
+        context["filterRsr"] = filtrechercheur
+        context["filterLab"] = filtrelab
+        context["url"] = url
+
+        context["lang_options"] = self.lang_options
+        context["lang"] = langue
+
+        return context
+
+    def get_elastic_data(
+        self,
+        i_type,
+        p_id,
+        struct,
+    ):
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
+        res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
+        # on pointe sur index générique, car pas de LabHalId ?
+
+        try:
+            entity = res["hits"]["hits"][0]["_source"]
+        except IndexError:
+            return redirect("unknown")
+        # /
+
+        hastoconfirm = False
+
+        field = "harvested_from_ids"
+        validate = False
+        if i_type == "rsr":
+            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
+        elif i_type == "lab":
+            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
+        else:
+            return redirect("unknown")
+
+        if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
+            hastoconfirm = True
+
+        # Get first submittedDate_tdate date
+        field = "harvested_from_ids"
+
+        if i_type == "rsr":
+            indexsearch = f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
+            filtrechercheur = f'_index: "{indexsearch}"'
+            filtrelab = ""
+
+        elif i_type == "lab":
+            indexsearch = f"{struct}-{entity['halStructId']}-laboratories-documents"
+            filtrechercheur = ""
+            filtrelab = f'_index: "{indexsearch}"'
+        else:
+            return redirect("unknown")
+
+        url = (
+            viewsActions.vizualisation_url()
+        )  # permet d'ajuster l'url des visualisations en fonction du build
+
+        return entity, hastoconfirm, filtrechercheur, filtrelab, url
 
 
 class IndexView(CommonContextMixin, TemplateView):
