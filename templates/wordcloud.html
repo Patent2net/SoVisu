@@ -34,7 +34,7 @@
                                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
 
-                        <p>Ci dessous le lexique et sa distribution temporelle extraits des mots-clés auteur issus des productions validées associées à votre profil. Le bouton de filtrage permet de pointer spécifiquement des éventuelles erreurs ou des manques.</p>
+                        <p>Ci dessous le lexique (FR) et sa distribution temporelle extraits des mots-clés auteur issus des productions validées associées à votre profil. Les onglets FR et EN permettent de pointer spécifiquement des éventuelles erreurs ou des manques et fournissent les liens pour les corriger.</p>
 
                     </div>
                 {% if type == "lab" %}
@@ -62,9 +62,9 @@
                                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
 
-                        <p>Ci dessous le lexique des notices marquées en langue française. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
-                            Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
-                         Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
+                        <p>Ci dessous le lexique des notices marquées en langue française. Les mots auteurs (haut gauche), les entités nommées (bas gauche) et les termes saillants extraits des résumés.
+                            Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec leur lien sur Hal (veillez à être connecté(e) pour modifier).
+                         Une fois les données modifiées sur Hal il suffit de <strong><a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a></strong>.
                     </div>
 
                     <div class="w-full h-full">
@@ -81,8 +81,8 @@
                         </svg>
 
                         <p>Ci dessous le lexique des notices marquées en langue anglaise. Les mots auteurs, les entités nommées et les termes saillants extraits des résumés.
-                            Les manquants sont soulignés, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
-                                Une fois les données modifiées sur Hal il suffit de <a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a>.
+                        Pour les manquants, un clic sur un terme met à jour la liste des notices avec le lien pour éventuellement modifier les données sur Hal (veillez à être connecté(e)).
+                        Une fois les données modifiées sur Hal il suffit de <strong><a href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}">cliquer ici pour rafraîchir les références</a></strong>.
                     </div>
                 {% if type == "lab" %}
                     <div class="w-full h-full">
