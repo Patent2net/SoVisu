@@ -22,13 +22,13 @@
         <div class="w-full h-full">
         {% if type == "lab" %}
 
-            <iframe src="{{ url }}/app/dashboards#/view/774156f0-fc65-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtreLab }}')))" height="100%" width="100%"></iframe>
+            <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/774156f0-fc65-11ec-8b3e-b123ba76fd27?embed=true&_g=(filters:!((meta:(alias:'validés',key:validated,params:(query:!t),type:phrase),query:(match_phrase:(validated:!t)))),refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtreLab }}')))" height="100%" width="100%"></iframe>
 
 
 
         {%  else %}
 
-            <iframe src="{{ url }}/app/dashboards#/view/5f27d2d0-fc63-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
+            <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/5f27d2d0-fc63-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:({{ timeRange }}))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')))" height="100%" width="100%"></iframe>
 
 
         {%  endif %}
