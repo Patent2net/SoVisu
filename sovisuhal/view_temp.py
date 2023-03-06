@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django.shortcuts import redirect  # , render
@@ -257,6 +258,113 @@ class ReferencesView(CommonContextMixin, TemplateView):
             references_cleaned.append(ref["_source"])
 
         return entity, hastoconfirm, references_cleaned
+
+
+class TerminologyView(CommonContextMixin, TemplateView):
+    template_name = "terminology.html"
+
+    def get_template_names(self):
+        # Override initial template name if the page is called by the iframe link from outside.
+        template_names = [self.template_name]
+
+        if self.request.GET.get("export") == "True":
+            template_names.insert(0, "terminology_ext.html")
+
+        return template_names
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        entity, hastoconfirm = self.get_elastic_data(
+            context["type"], context["id"], context["struct"]
+        )
+
+        context["entity"] = entity
+        context["hasToConfirm"] = hastoconfirm
+
+        return context
+
+    def get_elastic_data(self, i_type, p_id, struct):
+        # Get scope data
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
+        res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
+        # on pointe sur index générique, car pas de LabHalId ?
+        try:
+            entity = res["hits"]["hits"][0]["_source"]
+        except IndexError:
+            return redirect("unknown")
+        # /
+
+        hastoconfirm = False
+
+        validate = False
+        field = "harvested_from_ids"
+
+        if i_type == "rsr":
+            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
+
+        elif i_type == "lab":
+            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
+        else:
+            return redirect("unknown")
+
+        if es.count(index="*-documents", body=hastoconfirm_param)["count"] > 0:
+            hastoconfirm = True
+
+        if i_type == "lab":
+            entity["concepts"] = json.dumps(entity["concepts"])
+
+        if i_type == "rsr":
+            entity["concepts"] = json.dumps(entity["concepts"])
+
+        entity["concepts"] = json.loads(entity["concepts"])
+
+        if i_type == "rsr" and "children" in entity["concepts"]:
+            for children in list(entity["concepts"]["children"]):
+                if children["state"] == "invalidated":
+                    entity["concepts"]["children"].remove(children)
+
+                if "children" in children:
+                    for children1 in list(children["children"]):
+                        if children1["state"] == "invalidated":
+                            children["children"].remove(children1)
+
+                        if "children" in children1:
+                            for children2 in list(children1["children"]):
+                                if children2["state"] == "invalidated":
+                                    children1["children"].remove(children2)
+
+        if i_type == "lab" and "children" in entity["concepts"]:
+            for children in list(entity["concepts"]["children"]):
+                state = "invalidated"
+                if "researchers" in children:
+                    for rsr in children["researchers"]:
+                        if rsr["state"] == "validated":
+                            state = "validated"
+                    if state == "invalidated":
+                        entity["concepts"]["children"].remove(children)
+
+                if "children" in children:
+                    for children1 in list(children["children"]):
+                        state = "invalidated"
+                        if "researchers" in children1:
+                            for rsr in children1["researchers"]:
+                                if rsr["state"] == "validated":
+                                    state = "validated"
+                            if state == "invalidated":
+                                children["children"].remove(children1)
+
+                        if "children" in children1:
+                            for children2 in list(children1["children"]):
+                                state = "invalidated"
+                                if "researchers" in children2:
+                                    for rsr in children2["researchers"]:
+                                        if rsr["state"] == "validated":
+                                            state = "validated"
+                                    if state == "invalidated":
+                                        children1["children"].remove(children2)
+        return entity, hastoconfirm
 
 
 class WordcloudView(CommonContextMixin, TemplateView):
