@@ -2,8 +2,11 @@ import json
 from datetime import datetime
 
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import TemplateView
 from elasticsearch import BadRequestError
+from uniauth.decorators import login_required
 
 from sovisuhal.views import get_scope_data
 
@@ -76,6 +79,7 @@ class CommonContextMixin:
         return context
 
 
+@method_decorator(login_required, name="dispatch")
 class CheckView(CommonContextMixin, TemplateView):
     template_name = "check.html"
 
@@ -549,6 +553,7 @@ class ReferencesView(CommonContextMixin, TemplateView):
         return entity, hastoconfirm, references_cleaned
 
 
+@method_decorator(xframe_options_exempt, name="dispatch")
 class TerminologyView(CommonContextMixin, TemplateView):
     template_name = "terminology.html"
 
@@ -738,6 +743,7 @@ class WordcloudView(CommonContextMixin, TemplateView):
         return entity, hastoconfirm, filtrechercheur, filtrelab, url
 
 
+@method_decorator(login_required, name="dispatch")
 class ToolsView(CommonContextMixin, TemplateView):
     template_name = "tools.html"
 
