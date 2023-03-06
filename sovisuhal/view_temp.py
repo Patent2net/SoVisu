@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.shortcuts import redirect  # , render
 from django.views.generic import TemplateView
+from elasticsearch import BadRequestError
 
 from sovisuhal.views import get_scope_data
 
@@ -72,6 +73,82 @@ class CommonContextMixin:
         context["from"], context["to"] = self.get_date(self.request)
 
         return context
+
+
+class DashboardView(CommonContextMixin, TemplateView):
+    template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        (
+            entity,
+            hastoconfirm,
+            filtrechercheur,
+            filtre_lab_a,
+            filtre_lab_b,
+            url,
+            dash,
+        ) = self.get_elastic_data(context["type"], context["id"], context["struct"])
+
+        context["dash"] = dash
+        context["entity"] = entity
+        context["hastoconfirm"] = hastoconfirm
+        context["filterRsr"] = filtrechercheur
+        context["filterlabA"] = filtre_lab_a
+        context["filterlabB"] = filtre_lab_b
+        context["url"] = url
+
+        return context
+
+    def get_elastic_data(self, i_type, p_id, struct):
+        # Get scope data
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
+        res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
+        # on pointe sur index générique, car pas de LabHalId ?
+        try:
+            entity = res["hits"]["hits"][0]["_source"]
+        except (IndexError, BadRequestError):
+            return redirect("unknown")
+        # /
+
+        hastoconfirm = False
+
+        validate = False
+        if i_type == "rsr":
+            field = "authIdHal_s"
+            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
+
+        elif i_type == "lab":
+            field = "labStructId_i"
+            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
+        else:
+            return redirect("unknown")
+
+        if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
+            hastoconfirm = True
+
+        dash = ""
+        if i_type == "rsr":
+            indexsearch = f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
+            filtrechercheur = f'_index: "{indexsearch}"'
+            filtre_lab_a = ""
+            filtre_lab_b = ""
+        elif i_type == "lab":
+            if "dash" in self.request.GET:
+                dash = self.request.GET["dash"]
+            else:
+                dash = "membres"
+            filtrechercheur = ""
+            filtre_lab_a = f'harvested_from_ids: "{p_id}"'
+            filtre_lab_b = f'labHalId.keyword: "{p_id}"'
+        else:
+            return redirect("unknown")
+
+        url = viewsActions.vizualisation_url()
+
+        return entity, hastoconfirm, filtrechercheur, filtre_lab_a, filtre_lab_b, url, dash
 
 
 class ReferencesView(CommonContextMixin, TemplateView):
@@ -215,12 +292,8 @@ class WordcloudView(CommonContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(
-        self,
-        i_type,
-        p_id,
-        struct,
-    ):
+    def get_elastic_data(self, i_type, p_id, struct):
+        # Get scope data
         key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
@@ -290,11 +363,7 @@ class IndexView(CommonContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(
-        self,
-        indexcat,
-        indexstruct,
-    ):
+    def get_elastic_data(self, indexcat, indexstruct):
         scope_param = esActions.scope_all()
         # création dynamique des tabs sur la page à partir de struct_tab
         struct_tab = es.search(
