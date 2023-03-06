@@ -1,14 +1,14 @@
 import json
 from datetime import datetime
 
-from django.shortcuts import redirect  # , render
+from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from elasticsearch import BadRequestError
 
 from sovisuhal.views import get_scope_data
 
-from . import viewsActions
-from .libs import esActions  # , halConcepts
+from . import forms, viewsActions
+from .libs import esActions, halConcepts
 
 es = esActions.es_connector()
 
@@ -74,6 +74,295 @@ class CommonContextMixin:
         context["from"], context["to"] = self.get_date(self.request)
 
         return context
+
+
+class CheckView(CommonContextMixin, TemplateView):
+    template_name = "check.html"
+
+    data_check_options = [
+        "credentials",
+        "references",
+        "expertise",
+        "guiding-domains",
+        "state",
+        "research-description",
+    ]
+    data_check_default = "credentials"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if "data" in self.request.GET:
+            temp_data = self.request.GET["data"]
+            if temp_data in self.data_check_options:
+                context["data"] = temp_data
+            else:
+                context["data"] = self.data_check_default
+        else:
+            context["data"] = self.data_check_default
+
+        context["entity"] = self.get_entity_data(context["struct"], context["type"], context["id"])
+
+        if context["data"] == "state":
+            researchers = self.get_state_case(context["id"])
+            context["researchers"] = researchers
+
+        if context["data"] == "credentials":
+            context["form"] = self.get_credential_case(context["type"], context["entity"])
+
+        if context["data"] == "research-description":
+            (
+                guidingKeywords,
+                research_summary,
+                research_projects_in_progress,
+                research_projects_and_fundings,
+                form,
+            ) = self.get_rsr_description_case(context["entity"])
+
+            context["guidingKeywords"] = guidingKeywords
+            context["research_summary"] = research_summary
+            context["research_projects_in_progress"] = research_projects_in_progress
+            context["research_projects_and_fundings"] = research_projects_and_fundings
+            context["form"] = form
+
+        if context["data"] == "expertise":
+            validation, concepts = self.get_expertise_case(context["entity"])
+            context["validation"] = validation
+            context["concepts"] = concepts
+
+        if context["data"] == "guiding-domains":
+            domains, guiding_domains = self.get_guiding_domains_case(context["entity"])
+            context["domains"] = domains
+            context["guidingDomains"] = guiding_domains
+
+        if context["data"] == "references":
+            validation, references = self.get_references_case(
+                context["struct"],
+                context["type"],
+                context["id"],
+                context["entity"],
+                context["from"],
+                context["to"],
+            )
+            context["validation"] = validation
+            context["references"] = references
+            if "taches" in self.request.GET:
+                context["taches"] = self.request.GET["taches"]
+
+        return context
+
+    def get_entity_data(self, struct, i_type, p_id):
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
+
+        entity = res["hits"]["hits"][0]["_source"]
+
+        return entity
+
+    def get_state_case(self, p_id):
+        field = "labHalId"
+        rsr_param = esActions.scope_p(field, p_id)
+
+        count = es.count(index="*-researchers", body=rsr_param)["count"]
+
+        rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
+
+        rsrs_cleaned = []
+
+        for result in rsrs["hits"]["hits"]:
+            rsrs_cleaned.append(result["_source"])
+
+        return rsrs_cleaned
+
+    def get_credential_case(self, i_type, entity):
+        form = ""
+        if i_type == "rsr":
+            orcid = ""
+            if "orcId" in entity:
+                orcid = entity["orcId"]
+
+            rsr_function = 0
+            if "function" in entity:
+                rsr_function = entity["function"]
+
+            # integration contenus
+            # "extIds": ["a", "b", "c"],
+            form = forms.ValidCredentials(
+                halId_s=entity["halId_s"],
+                aurehalId=entity["aurehalId"],
+                idRef=entity["idRef"],
+                orcId=orcid,
+                function=rsr_function,
+            )
+
+        if i_type == "lab":
+            form = forms.ValidLabCredentials(
+                halStructId=entity["halStructId"],
+                rsnr=entity["rsnr"],
+                idRef=entity["idRef"],
+            )
+
+        return form
+
+    def get_rsr_description_case(self, entity):
+        if "research_summary" not in entity:
+            research_summary = ""
+        else:
+            research_summary = entity["research_summary"]
+
+        if "research_projectsAndFundings" not in entity:
+            research_projects_and_fundings = ""
+        else:
+            research_projects_and_fundings = entity["research_projectsAndFundings"]
+
+        if "research_projectsInProgress" not in entity:
+            research_projects_in_progress = ""
+        else:
+            research_projects_in_progress = entity["research_projectsInProgress"]
+
+        if "guidingKeywords" not in entity:
+            guidingKeywords = ""
+        else:
+            guidingKeywords = ";".join(entity["guidingKeywords"])
+
+        # "extIds": ["a", "b", "c"],
+        form = (
+            forms.SetResearchDescription(
+                guidingKeywords=guidingKeywords,
+                research_summary=research_summary,
+                research_projectsInProgress=research_projects_in_progress,
+                research_projectsAndFundings=research_projects_and_fundings,
+            ),
+        )
+        #  "hasToConfirm": hastoconfirm,
+
+        return (
+            guidingKeywords,
+            research_summary,
+            research_projects_in_progress,
+            research_projects_and_fundings,
+            form,
+        )
+
+    def get_expertise_case(self, entity):
+        if "validation" in self.request.GET:
+            validation = self.request.GET["validation"]
+
+            if validation == "1":
+                validate = "validated"
+            elif validation == "0":
+                validate = "invalidated"
+            else:
+                return redirect("unknown")
+        else:
+            return redirect("unknown")
+
+        concepts = []
+        if "children" in entity["concepts"]:
+            for children in entity["concepts"]["children"]:
+                if "state" in children.keys() and children["state"] == validate:
+                    concepts.append(
+                        {
+                            "id": children["id"],
+                            "label_fr": children["label_fr"],
+                            "state": validate,
+                        }
+                    )
+                if "children" in children:
+                    for children1 in children["children"]:
+                        if "state" in children1.keys():
+                            if children1["state"] == validate:
+                                concepts.append(
+                                    {
+                                        "id": children1["id"],
+                                        "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;&bull; "
+                                        + children1["label_fr"],
+                                        "state": validate,
+                                    }
+                                )
+                            else:
+                                print(children1)
+                        if "children" in children1:
+                            for children2 in children1["children"]:
+                                if "state" in children2.keys() and children2["state"] == validate:
+                                    concepts.append(
+                                        {
+                                            "id": children2["id"],
+                                            "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;\
+                                            &nbsp;&nbsp;&nbsp;&nbsp;- "
+                                            + children2["label_fr"],
+                                            "state": validate,
+                                        }
+                                    )
+        return validation, concepts
+
+    def get_guiding_domains_case(self, entity):
+        domains = halConcepts.concepts()
+
+        guiding_domains = []
+
+        if "guidingDomains" in entity:
+            guiding_domains = entity["guidingDomains"]
+
+        return domains, guiding_domains
+
+    def get_references_case(self, struct, i_type, p_id, entity, date_from, date_to):
+        if "validation" in self.request.GET:
+            validation = self.request.GET["validation"]
+            if validation == "1":
+                validate = True
+            elif validation == "0":
+                validate = False
+            else:
+                return redirect("unknown")
+        else:
+            return redirect("unknown")
+
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
+        date_range_type = "submittedDate_tdate"
+        scope_bool_type = "must"
+        ref_param = esActions.ref_p(
+            scope_bool_type,
+            ext_key,
+            entity[key],
+            validate,
+            date_range_type,
+            date_from,
+            date_to,
+        )
+        # print(ref_param)
+
+        if i_type == "rsr":
+            count = es.count(
+                index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
+                body=ref_param,
+            )["count"]
+            references = es.search(
+                index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
+                body=ref_param,
+                size=count,
+            )
+
+        elif i_type == "lab":
+            count = es.count(
+                index=f"{struct}-{entity['halStructId']}-laboratories-documents",
+                body=ref_param,
+            )["count"]
+            references = es.search(
+                index=f"{struct}-{entity['halStructId']}-laboratories-documents",
+                body=ref_param,
+                size=count,
+            )
+        else:
+            return redirect("unknown")
+
+        references_cleaned = []
+
+        for ref in references["hits"]["hits"]:
+            references_cleaned.append(ref["_source"])
+        # /
+        return validation, references_cleaned
 
 
 class DashboardView(CommonContextMixin, TemplateView):

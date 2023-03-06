@@ -40,7 +40,8 @@ urlpatterns = [
     re_path(r"^celery-progress/", include("celery_progress.urls")),  # the endpoint is configurable
     path("", viewsActions.admin_access_login, name="login"),
     path("create/", views.create, name="creation"),
-    path("check/", views.check, name="check"),
+    # path("check/", views.check, name="check"),
+    path("check/", view_temp.CheckView.as_view(), name="check"),
     # path("index/", views.index, name="index"),
     path("index/", view_temp.IndexView.as_view(), name="index"),
     # path("dashboard/", views.dashboard, name="dashboard"),
