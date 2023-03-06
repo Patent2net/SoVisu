@@ -391,6 +391,10 @@ class IndexView(CommonContextMixin, TemplateView):
         return cleaned_entities, struct_tab
 
 
+class SearchView(CommonContextMixin, TemplateView):
+    template_name = "search2.html"
+
+
 class FAQView(CommonContextMixin, TemplateView):
     template_name = "faq.html"
 
