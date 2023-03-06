@@ -93,7 +93,7 @@ class DashboardView(CommonContextMixin, TemplateView):
 
         context["dash"] = dash
         context["entity"] = entity
-        context["hastoconfirm"] = hastoconfirm
+        context["hasToConfirm"] = hastoconfirm
         context["filterRsr"] = filtrechercheur
         context["filterlabA"] = filtre_lab_a
         context["filterlabB"] = filtre_lab_b
@@ -172,7 +172,7 @@ class ReferencesView(CommonContextMixin, TemplateView):
         )
 
         context["entity"] = entity
-        context["hastoconfirm"] = hastoconfirm
+        context["hasToConfirm"] = hastoconfirm
         context["references"] = references_cleaned
         return context
 
@@ -282,7 +282,7 @@ class WordcloudView(CommonContextMixin, TemplateView):
         )
 
         context["entity"] = entity
-        context["hastoconfirm"] = hastoconfirm
+        context["hasToConfirm"] = hastoconfirm
         context["filterRsr"] = filtrechercheur
         context["filterLab"] = filtrelab
         context["url"] = url
@@ -339,6 +339,112 @@ class WordcloudView(CommonContextMixin, TemplateView):
         )  # permet d'ajuster l'url des visualisations en fonction du build
 
         return entity, hastoconfirm, filtrechercheur, filtrelab, url
+
+
+class ToolsView(CommonContextMixin, TemplateView):
+    template_name = "tools.html"
+
+    data_tools_options = ["hceres", "consistency"]
+    data_tool_default = "hceres"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if "data" in self.request.GET:
+            temp_data = self.request.GET["data"]
+            if temp_data in self.data_tools_options:
+                context["data"] = temp_data
+            else:
+                context["data"] = self.data_tool_default
+        else:
+            context["data"] = self.data_tool_default
+
+        context["entity"] = self.get_entity_data(context["struct"], context["type"], context["id"])
+
+        if context["data"] == "consistency":
+            context["consistency"] = self.get_consistency_data(
+                context["id"], context["from"], context["to"]
+            )
+
+        return context
+
+    def get_consistency_data(self, p_id, date_from, date_to):
+        # parametres fixes pour la recherche dans les bases Elastic
+        scope_bool_type = "filter"
+        scope_field = "harvested_from_ids"
+        validate = True
+        date_range_type = "submittedDate_tdate"
+
+        # récupere les infos sur les chercheurs attachés au laboratoire
+        field = "labHalId"
+        rsr_param = esActions.scope_p(field, p_id)
+
+        count = es.count(index="*-researchers", body=rsr_param)["count"]
+
+        rsrs = es.search(index="*-researchers", body=rsr_param, size=count)
+        rsrs_cleaned = []
+
+        for result in rsrs["hits"]["hits"]:
+            rsrs_cleaned.append(result["_source"])
+
+        consistencyvalues = []
+
+        for x in range(len(rsrs_cleaned)):
+            ldapid = rsrs_cleaned[x]["ldapId"]
+            hal_id_s = rsrs_cleaned[x]["halId_s"]
+            struct = rsrs_cleaned[x]["structSirene"]
+            name = rsrs_cleaned[x]["name"]
+            validated = rsrs_cleaned[x]["validated"]
+
+            # nombre de documents de l'auteur coté lab
+            ref_lab = esActions.ref_p(
+                scope_bool_type,
+                "authIdHal_s",
+                hal_id_s,
+                validate,
+                date_range_type,
+                date_from,
+                date_to,
+            )
+            raw_lab_doc_count = es.count(
+                index=f"{struct}-{p_id}-laboratories-documents", body=ref_lab
+            )["count"]
+
+            # nombre de documents de l'auteur dans son index
+            ref_param = esActions.ref_p(
+                scope_bool_type,
+                scope_field,
+                hal_id_s,
+                validate,
+                date_range_type,
+                date_from,
+                date_to,
+            )
+            raw_searcher_doc_count = es.count(
+                index=f"{struct}-{p_id}-researchers-{ldapid}-documents", body=ref_param
+            )["count"]
+
+            # création du dict à rajouter dans la liste
+            profiledict = {
+                "name": name,
+                "ldapId": ldapid,
+                "validated": validated,
+                "labcount": raw_lab_doc_count,
+                "searchercount": raw_searcher_doc_count,
+            }
+
+            # rajout à la liste
+            consistencyvalues.append(profiledict)
+
+            return consistencyvalues
+
+    def get_entity_data(self, struct, i_type, p_id):
+        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
+
+        entity = res["hits"]["hits"][0]["_source"]
+
+        return entity
 
 
 class IndexView(CommonContextMixin, TemplateView):
