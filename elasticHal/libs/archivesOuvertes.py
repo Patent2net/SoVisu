@@ -204,6 +204,7 @@ def get_concepts_and_keywords(aurehalid):
     keywords = []
 
     # extraction des sujets d'intérêt et domaines d'un chercheur
+
     data = recup_individu(aurehalid)
 
     sujets, domaines = extrait_sujets_domaines(data)

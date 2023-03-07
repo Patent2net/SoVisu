@@ -491,7 +491,7 @@ def validate_credentials(request):
             aurehalId_get = get_aurehalId(entity["halId_s"])
             if aurehalId != aurehalId_get:
                 aurehalId = aurehalId_get
-
+                entity["aurehalId"] = aurehalId
             archives_ouvertes_data = ""
             if aurehalId != "":
                 archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])

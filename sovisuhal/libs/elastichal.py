@@ -244,7 +244,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
 
         # en espérant que doc["authIdHal_s"] présente la liste des idhal auteur avec "" si pas d'idhal (et donc
         if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
-            print ("elastichal.py : test d'autorat no good")
+            #print ("elastichal.py : test d'autorat no good")
             # test sur le nom complet...
             nom = [truc for truc in doc["authLastName_s"] if chercheur["lastName"].lower() in truc.lower()]  # pour les récemment mariés qui auraient un nom composé... Après si 'lun des co-auteur porte le même nom...
             if len(nom)>0:
