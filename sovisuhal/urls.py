@@ -22,7 +22,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, re_path
 
-from . import view_temp, viewsActions
+from . import view_cbv, viewsActions
 
 mode = config("mode")
 
@@ -55,19 +55,19 @@ urlpatterns = [
     # path("ressources/", views.ressources, name="ressources"),
     # path("unknown/", views.unknown, name="unknown"),
     # path("CreateCredentials/", viewsActions.create_credentials, name="credentials"),
-    path("create/", view_temp.CreateView.as_view(), name="create"),
-    path("check/", view_temp.CheckView.as_view(), name="check"),
-    path("index/", view_temp.IndexView.as_view(), name="index"),
-    path("dashboard/", view_temp.DashboardView.as_view(), name="dashboard"),
-    path("references/", view_temp.ReferencesView.as_view(), name="references"),
-    path("terminology/", view_temp.TerminologyView.as_view(), name="terminology"),
-    path("lexicon/", view_temp.LexiconView.as_view(), name="lexicon"),
-    path("tools/", view_temp.ToolsView.as_view(), name="tools"),
-    path("search/", view_temp.SearchView.as_view(), name="search"),
-    path("presentation/", view_temp.PresentationView.as_view(), name="presentation"),
-    path("faq/", view_temp.FAQView.as_view(), name="faq"),
-    path("ressources/", view_temp.RessourcesView.as_view(), name="ressources"),
-    path("unknown/", view_temp.UnknownView.as_view(), name="unknown"),
+    path("create/", view_cbv.CreateView.as_view(), name="create"),
+    path("check/", view_cbv.CheckView.as_view(), name="check"),
+    path("index/", view_cbv.IndexView.as_view(), name="index"),
+    path("dashboard/", view_cbv.DashboardView.as_view(), name="dashboard"),
+    path("references/", view_cbv.ReferencesView.as_view(), name="references"),
+    path("terminology/", view_cbv.TerminologyView.as_view(), name="terminology"),
+    path("lexicon/", view_cbv.LexiconView.as_view(), name="lexicon"),
+    path("tools/", view_cbv.ToolsView.as_view(), name="tools"),
+    path("search/", view_cbv.SearchView.as_view(), name="search"),
+    path("presentation/", view_cbv.PresentationView.as_view(), name="presentation"),
+    path("faq/", view_cbv.FAQView.as_view(), name="faq"),
+    path("ressources/", view_cbv.RessourcesView.as_view(), name="ressources"),
+    path("unknown/", view_cbv.UnknownView.as_view(), name="unknown"),
     path(
         "validate_credentials/",
         viewsActions.validate_credentials,

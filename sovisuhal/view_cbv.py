@@ -18,7 +18,9 @@ es = esActions.es_connector()
 
 class CommonContextMixin:
     """
-    Mixin to provide common context variables to all views
+    Gestion des fonctions communes à l'ensemble des vues d'un profil enregistré.
+    Assure la récupération des éléments de contexte communs,
+    et du renvoi vers la page après exécution de la fonction.
     """
 
     def setup(self, request, *args, **kwargs):
@@ -80,6 +82,10 @@ class CommonContextMixin:
 
 
 class ElasticContextMixin:
+    """
+    Gestion des fonctions communes aux vues utilisant elastic
+    """
+
     def get_scope_data(self, i_type, p_id):
         """
         Retourne des valeurs de variable en fonction du profil (chercheur,labo)
@@ -132,6 +138,10 @@ class ElasticContextMixin:
 
 
 class CreateView(TemplateView):
+    """
+    Gestion de la page "Création de profil"
+    """
+
     template_name = "create.html"
     form_class = forms.CreateCredentials
 
@@ -191,6 +201,10 @@ class CreateView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    """
+    Gestion de la page gérant "vérification des données"
+    """
+
     template_name = "check.html"
 
     data_check_options = [
@@ -483,6 +497,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 
 class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    """
+    Gestion de la page affichant les tableaux de bord sous Kibana
+    """
+
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -541,6 +559,10 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 
 class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    """
+    Gestion de la page affichant les références du profil sélectionné
+    """
+
     template_name = "references.html"
 
     def get_context_data(self, **kwargs):
@@ -623,6 +645,10 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 @method_decorator(xframe_options_exempt, name="dispatch")
 class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    """
+    Gestion de la page affichant les domaines d'expertise du profil sélectionné
+    """
+
     template_name = "terminology.html"
 
     def get_template_names(self):
@@ -711,6 +737,10 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 
 class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    """
+    Gestion de la page "lexiques extraits"
+    """
+
     template_name = "lexicon.html"
 
     lang_options = ["ALL", "FR", "EN"]  # langues supportées, créé dynamiquement les onglets
@@ -774,6 +804,11 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    """
+    Gestion de la page "Outils", proposant des fonctionnalités pour les profils laboratoires.
+    (Export HCERES, Cohésion des données)
+    """
+
     template_name = "tools.html"
 
     data_tools_options = ["hceres", "consistency"]
@@ -880,6 +915,10 @@ class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 
 class IndexView(CommonContextMixin, TemplateView):
+    """
+    Gestion des pages d'indexation des profils chercheurs et laboratoires
+    """
+
     template_name = "index.html"
 
     def get_context_data(self, **kwargs):
@@ -930,20 +969,40 @@ class IndexView(CommonContextMixin, TemplateView):
 
 
 class SearchView(CommonContextMixin, TemplateView):
+    """
+    Gestion de la page de recherche à partir de mots clés
+    """
+
     template_name = "search2.html"
 
 
 class FAQView(CommonContextMixin, TemplateView):
+    """
+    Gestion de la page des questions fréquentes
+    """
+
     template_name = "faq.html"
 
 
 class RessourcesView(CommonContextMixin, TemplateView):
+    """
+    Gestion de la page des ressources à destination des chercheurs
+    """
+
     template_name = "ressources.html"
 
 
 class PresentationView(CommonContextMixin, TemplateView):
+    """
+    Gestion de la page de présentation du projet
+    """
+
     template_name = "presentation.html"
 
 
 class UnknownView(TemplateView):
+    """
+    Gestion de l'affichage de la page d'erreur si l'url est inconnue
+    """
+
     template_name = "404.html"
