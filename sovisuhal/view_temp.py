@@ -107,6 +107,29 @@ class ElasticContextMixin:
 
         return key, search_id, index_pattern, ext_key, scope_param
 
+    def validated_notices_state(self, struct, i_type, entity):
+        """
+        Check if at least one notice is in the state setup of the "validate" variable.
+        If not, a ping gonna appear next to check in the menu.
+        """
+        hastoconfirm = False
+
+        validate = True
+        if i_type == "rsr":
+            field = "authIdHal_s"
+            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
+
+        elif i_type == "lab":
+            field = "labStructId_i"
+            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
+        else:
+            return redirect("unknown")
+
+        if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] == 0:
+            hastoconfirm = True
+
+        return hastoconfirm
+
 
 class CreateView(TemplateView):
     template_name = "create.html"
@@ -193,6 +216,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["data"] = self.data_check_default
 
         context["entity"] = self.get_entity_data(context["struct"], context["type"], context["id"])
+
+        context["hasToConfirm"] = self.validated_notices_state(
+            context["struct"], context["type"], context["entity"]
+        )
 
         if context["data"] == "state":
             researchers = self.get_state_case(context["id"])
@@ -325,7 +352,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 research_projectsAndFundings=research_projects_and_fundings,
             ),
         )
-        #  "hasToConfirm": hastoconfirm,
 
         return (
             guidingKeywords,
@@ -464,7 +490,6 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         (
             entity,
-            hastoconfirm,
             filtrechercheur,
             filtre_lab_a,
             filtre_lab_b,
@@ -474,7 +499,6 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         context["dash"] = dash
         context["entity"] = entity
-        context["hasToConfirm"] = hastoconfirm
         context["filterRsr"] = filtrechercheur
         context["filterlabA"] = filtre_lab_a
         context["filterlabB"] = filtre_lab_b
@@ -493,22 +517,6 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
         except (IndexError, BadRequestError):
             return redirect("unknown")
         # /
-
-        hastoconfirm = False
-
-        validate = False
-        if i_type == "rsr":
-            field = "authIdHal_s"
-            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
-
-        elif i_type == "lab":
-            field = "labStructId_i"
-            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
-        else:
-            return redirect("unknown")
-
-        if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
-            hastoconfirm = True
 
         dash = ""
         if i_type == "rsr":
@@ -529,7 +537,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         url = viewsActions.vizualisation_url()
 
-        return entity, hastoconfirm, filtrechercheur, filtre_lab_a, filtre_lab_b, url, dash
+        return entity, filtrechercheur, filtre_lab_a, filtre_lab_b, url, dash
 
 
 class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
@@ -543,7 +551,7 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         else:
             context["filter"] = -1
 
-        entity, hastoconfirm, references_cleaned = self.get_elastic_data(
+        entity, references_cleaned = self.get_elastic_data(
             context["type"],
             context["id"],
             context["struct"],
@@ -553,7 +561,6 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         )
 
         context["entity"] = entity
-        context["hasToConfirm"] = hastoconfirm
         context["references"] = references_cleaned
         return context
 
@@ -566,32 +573,6 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
             entity = res["hits"]["hits"][0]["_source"]
         except IndexError:
             return redirect("unknown")
-
-        hastoconfirm = False
-        field = "harvested_from_ids"
-        validate = False
-        if i_type == "rsr":
-            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
-
-            if (
-                es.count(
-                    index=f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents",
-                    body=hastoconfirm_param,
-                )["count"]
-                > 0
-            ):
-                hastoconfirm = True
-        if i_type == "lab":
-            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
-
-            if (
-                es.count(
-                    index=f"{struct}-{entity['halStructId']}-laboratories-documents",
-                    body=hastoconfirm_param,
-                )["count"]
-                > 0
-            ):
-                hastoconfirm = True
 
         # Get references
         scope_bool_type = "filter"
@@ -637,7 +618,7 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         for ref in references["hits"]["hits"]:
             references_cleaned.append(ref["_source"])
 
-        return entity, hastoconfirm, references_cleaned
+        return entity, references_cleaned
 
 
 @method_decorator(xframe_options_exempt, name="dispatch")
@@ -656,12 +637,9 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        entity, hastoconfirm = self.get_elastic_data(
-            context["type"], context["id"], context["struct"]
-        )
+        entity = self.get_elastic_data(context["type"], context["id"], context["struct"])
 
         context["entity"] = entity
-        context["hasToConfirm"] = hastoconfirm
 
         return context
 
@@ -676,22 +654,6 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
         except IndexError:
             return redirect("unknown")
         # /
-
-        hastoconfirm = False
-
-        validate = False
-        field = "harvested_from_ids"
-
-        if i_type == "rsr":
-            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
-
-        elif i_type == "lab":
-            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
-        else:
-            return redirect("unknown")
-
-        if es.count(index="*-documents", body=hastoconfirm_param)["count"] > 0:
-            hastoconfirm = True
 
         if i_type == "lab":
             entity["concepts"] = json.dumps(entity["concepts"])
@@ -745,11 +707,11 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
                                             state = "validated"
                                     if state == "invalidated":
                                         children1["children"].remove(children2)
-        return entity, hastoconfirm
+        return entity
 
 
-class WordcloudView(CommonContextMixin, ElasticContextMixin, TemplateView):
-    template_name = "wordcloud.html"
+class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
+    template_name = "lexicon.html"
 
     lang_options = ["ALL", "FR", "EN"]  # langues supportées, créé dynamiquement les onglets
     lang = "ALL"
@@ -766,12 +728,11 @@ class WordcloudView(CommonContextMixin, ElasticContextMixin, TemplateView):
         else:
             langue = self.lang
 
-        entity, hastoconfirm, filtrechercheur, filtrelab, url = self.get_elastic_data(
+        entity, filtrechercheur, filtrelab, url = self.get_elastic_data(
             context["type"], context["id"], context["struct"]
         )
 
         context["entity"] = entity
-        context["hasToConfirm"] = hastoconfirm
         context["filterRsr"] = filtrechercheur
         context["filterLab"] = filtrelab
         context["url"] = url
@@ -786,31 +747,12 @@ class WordcloudView(CommonContextMixin, ElasticContextMixin, TemplateView):
         key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
-        # on pointe sur index générique, car pas de LabHalId ?
 
         try:
             entity = res["hits"]["hits"][0]["_source"]
         except IndexError:
             return redirect("unknown")
         # /
-
-        hastoconfirm = False
-
-        field = "harvested_from_ids"
-        validate = False
-        if i_type == "rsr":
-            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
-        elif i_type == "lab":
-            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
-        else:
-            return redirect("unknown")
-
-        if es.count(index=f"{struct}*-documents", body=hastoconfirm_param)["count"] > 0:
-            hastoconfirm = True
-
-        # Get first submittedDate_tdate date
-        field = "harvested_from_ids"
-
         if i_type == "rsr":
             indexsearch = f"{struct}-{entity['labHalId']}-researchers-{entity['ldapId']}-documents"
             filtrechercheur = f'_index: "{indexsearch}"'
@@ -827,7 +769,7 @@ class WordcloudView(CommonContextMixin, ElasticContextMixin, TemplateView):
             viewsActions.vizualisation_url()
         )  # permet d'ajuster l'url des visualisations en fonction du build
 
-        return entity, hastoconfirm, filtrechercheur, filtrelab, url
+        return entity, filtrechercheur, filtrelab, url
 
 
 @method_decorator(login_required, name="dispatch")

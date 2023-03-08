@@ -73,10 +73,7 @@
 
               {% endif %}
 
-                <form action="{% url 'create' %}?&ldapid={{ ldapid }}&data={{ data }}" method="post">
-{% comment %}
-                <form action="/CreateCredentials/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
-{% endcomment %}
+                <form action="/create/?&ldapid={{ ldapid }}&data={{ data }}" method="post">
                     {% csrf_token %}
                     {% for field in form.visible_fields %}
                         {% if field.auto_id == "id_f_role" %}
