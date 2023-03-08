@@ -10,6 +10,8 @@ from uniauth.decorators import login_required
 
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
+from .libs.elastichal import indexe_chercheur
+from .viewsActions import idhal_checkout
 
 es = esActions.es_connector()
 
@@ -104,6 +106,64 @@ class ElasticContextMixin:
         scope_param = esActions.scope_p(field, p_id)
 
         return key, search_id, index_pattern, ext_key, scope_param
+
+
+class CreateView(TemplateView):
+    template_name = "create.html"
+    form_class = forms.CreateCredentials
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ldapid"] = self.request.GET.get("ldapid")
+        context["id_halerror"] = self.request.GET.get("iDhalerror", False)
+        context["data"] = "create"
+        context["halId_s"] = "nullNone"
+        context["idRef"] = "nullNone"
+        context["orcId"] = "nullNone"
+        context["autres"] = "nullNone"
+        context["form"] = self.form_class()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            ldapid = self.request.GET.get("ldapid")
+            idref = form.cleaned_data["f_IdRef"]
+            idhal = form.cleaned_data["f_halId_s"]
+            orcid = form.cleaned_data["f_orcId"]
+            tempo_lab = form.cleaned_data["f_labo"]
+            tempo_lab = tempo_lab.replace("'", "")
+            tempo_lab = tempo_lab.replace("(", "")
+            tempo_lab = tempo_lab.replace(")", "")
+            tempo_lab = tempo_lab.split(",")
+            labo = tempo_lab[0].strip()
+            accro_lab = tempo_lab[1].strip()
+
+            idhal_test = idhal_checkout(idhal)
+
+            if idhal_test > 0:
+                indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
+                field = "halId_s"
+                scope_param = esActions.scope_p(field, idhal)
+                count = es.count(index="*-researchers", body=scope_param)["count"]
+                res = es.search(index="*-researchers", body=scope_param, size=count)
+                entity = res["hits"]["hits"][0]["_source"]
+                struct = entity["structSirene"]
+                date_to = datetime.today().strftime("%Y-%m-%d")
+                return redirect(
+                    f"/check/?struct={struct}&type=rsr"
+                    + f"&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
+                )
+            else:
+                return redirect(
+                    f"/create/?ldapid={ldapid}"
+                    + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
+                )
+
+        # form is not valid, render the template again with the errors
+        context = self.get_context_data(**kwargs)
+        context["form"] = form
+        return self.render_to_response(context)
 
 
 @method_decorator(login_required, name="dispatch")

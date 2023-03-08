@@ -22,7 +22,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, re_path
 
-from . import view_temp, views, viewsActions
+from . import view_temp, viewsActions
 
 mode = config("mode")
 
@@ -39,7 +39,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     re_path(r"^celery-progress/", include("celery_progress.urls")),  # the endpoint is configurable
     path("", viewsActions.admin_access_login, name="login"),
-    path("create/", views.create, name="creation"),
+    # path("create/", views.create, name="creation"),
+    path("create/", view_temp.CreateView.as_view(), name="create"),
     # path("check/", views.check, name="check"),
     path("check/", view_temp.CheckView.as_view(), name="check"),
     # path("index/", views.index, name="index"),
@@ -64,7 +65,6 @@ urlpatterns = [
     path("ressources/", view_temp.RessourcesView.as_view(), name="ressources"),
     # path("unknown/", views.unknown, name="unknown"),
     path("unknown/", view_temp.UnknownView.as_view(), name="unknown"),
-    path("CreateCredentials/", viewsActions.create_credentials, name="credentials"),
     path(
         "validate_credentials/",
         viewsActions.validate_credentials,

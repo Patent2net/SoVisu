@@ -12,7 +12,7 @@ from uniauth.decorators import login_required
 
 from elasticHal.libs import utils
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
-from sovisuhal.libs.elastichal import collecte_docs, indexe_chercheur
+from sovisuhal.libs.elastichal import collecte_docs
 
 from . import settings
 from .libs import esActions
@@ -20,23 +20,6 @@ from .libs import esActions
 mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
 
-"""
-try:
-    from decouple import config
-    from ldap3 import Server, Connection, ALL
-    from uniauth.decorators import login_required
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-
-    patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
-
-except:
-
-    from django.contrib.auth.decorators import login_required
-
-    mode = "Dev"
-    patternCas = ""  # motif à enlever aux identifiants CAS
-    print("case 2")
-"""
 
 # Connect to DB
 es = esActions.es_connector()
@@ -80,66 +63,6 @@ def admin_access_login(request):
                 return redirect(
                     f"create/?ldapid={auth_user}&halId_s=nullNone&orcId=nullNone&idRef=nullNone"
                 )
-
-
-def create_credentials(request):
-    """
-    Gere la création du nouveau profil à partir des données du formulaire CreateCredentials
-    """
-    ldapid = request.GET["ldapid"]
-    idref = request.POST.get("f_IdRef")
-    idhal = request.POST.get("f_halId_s")
-    orcid = request.POST.get("f_orcId")
-
-    tempo_lab = request.POST.get("f_labo")  # chaine de caractère
-    tempo_lab = tempo_lab.replace("'", "")
-    tempo_lab = tempo_lab.replace("(", "")
-    tempo_lab = tempo_lab.replace(")", "")
-    tempo_lab = tempo_lab.split(",")
-    labo = tempo_lab[0].strip()  # halid
-    accro_lab = tempo_lab[1].strip()
-    # resultat
-
-    idhal_test = idhal_checkout(idhal)
-
-    if idhal_test > 0:
-        print("idhal found")
-        # création de l'entrée pour le chercheur dans Elastic
-        indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
-
-        # chercheur = indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
-        # récupération de la documentation de l'utilisateur
-        # collecte_docs(chercheur)
-        """
-        result = collecte_docs(chercheur)
-        taches = result.task_id
-        return redirect(f"/create/?ldapid={ldapid}&taches={taches}" +
-                        "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
-    if "taches" in request.GET:
-        taches = request.GET["taches"]
-        return redirect(f"/create/?ldapid={ldapid}&taches={taches}" +
-                        "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True")
-        """
-        # récupération du struct du nouveau profil pour la redirection
-        field = "halId_s"
-        scope_param = esActions.scope_p(field, idhal)
-        count = es.count(index="*-researchers", body=scope_param)["count"]
-        res = es.search(index="*-researchers", body=scope_param, size=count)
-        entity = res["hits"]["hits"][0]["_source"]
-        struct = entity["structSirene"]
-        # /
-        # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-        date_to = datetime.today().strftime("%Y-%m-%d")
-        return redirect(
-            f"/check/?struct={struct}&type=rsr"
-            + f"&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
-        )
-    else:
-        print("idhal not found")
-        return redirect(
-            f"/create/?ldapid={ldapid}"
-            + "&halId_s=nullNone&orcId=nullNone&idRef=nullNone&iDhalerror=True"
-        )
 
 
 def validate_references(request):
@@ -437,6 +360,7 @@ def validate_expertise(request):
         f"/check/?struct={struct}&type={i_type}"
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
+
 
 @login_required()
 def validate_credentials(request):
