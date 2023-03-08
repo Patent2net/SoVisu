@@ -8,8 +8,6 @@ from django.views.generic import TemplateView
 from elasticsearch import BadRequestError
 from uniauth.decorators import login_required
 
-from sovisuhal.views import get_scope_data
-
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
 
@@ -79,8 +77,37 @@ class CommonContextMixin:
         return context
 
 
+class ElasticContextMixin:
+    def get_scope_data(self, i_type, p_id):
+        """
+        Retourne des valeurs de variable en fonction du profil (chercheur,labo)
+        """
+        # utiliser cette fonction pour call get_scope_data
+        # key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+
+        if i_type == "rsr":
+            field = "_id"
+            key = "halId_s"
+            search_id = "*"
+            index_pattern = "-researchers"
+
+        elif i_type == "lab":
+            field = "halStructId"
+            key = "halStructId"
+            search_id = p_id
+            index_pattern = "-laboratories"
+        else:
+            return redirect("unknown")
+
+        ext_key = "harvested_from_ids"
+
+        scope_param = esActions.scope_p(field, p_id)
+
+        return key, search_id, index_pattern, ext_key, scope_param
+
+
 @method_decorator(login_required, name="dispatch")
-class CheckView(CommonContextMixin, TemplateView):
+class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
     template_name = "check.html"
 
     data_check_options = [
@@ -156,7 +183,7 @@ class CheckView(CommonContextMixin, TemplateView):
         return context
 
     def get_entity_data(self, struct, i_type, p_id):
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
 
         entity = res["hits"]["hits"][0]["_source"]
@@ -322,7 +349,7 @@ class CheckView(CommonContextMixin, TemplateView):
         else:
             return redirect("unknown")
 
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
         date_range_type = "submittedDate_tdate"
         scope_bool_type = "must"
@@ -369,7 +396,7 @@ class CheckView(CommonContextMixin, TemplateView):
         return validation, references_cleaned
 
 
-class DashboardView(CommonContextMixin, TemplateView):
+class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -397,7 +424,7 @@ class DashboardView(CommonContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id, struct):
         # Get scope data
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
         # on pointe sur index générique, car pas de LabHalId ?
@@ -445,7 +472,7 @@ class DashboardView(CommonContextMixin, TemplateView):
         return entity, hastoconfirm, filtrechercheur, filtre_lab_a, filtre_lab_b, url, dash
 
 
-class ReferencesView(CommonContextMixin, TemplateView):
+class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
     template_name = "references.html"
 
     def get_context_data(self, **kwargs):
@@ -472,7 +499,7 @@ class ReferencesView(CommonContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id, struct, i_filter, date_from, date_to):
         # Get scope data
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
 
         try:
@@ -554,7 +581,7 @@ class ReferencesView(CommonContextMixin, TemplateView):
 
 
 @method_decorator(xframe_options_exempt, name="dispatch")
-class TerminologyView(CommonContextMixin, TemplateView):
+class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
     template_name = "terminology.html"
 
     def get_template_names(self):
@@ -580,7 +607,7 @@ class TerminologyView(CommonContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id, struct):
         # Get scope data
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
         # on pointe sur index générique, car pas de LabHalId ?
@@ -661,7 +688,7 @@ class TerminologyView(CommonContextMixin, TemplateView):
         return entity, hastoconfirm
 
 
-class WordcloudView(CommonContextMixin, TemplateView):
+class WordcloudView(CommonContextMixin, ElasticContextMixin, TemplateView):
     template_name = "wordcloud.html"
 
     lang_options = ["ALL", "FR", "EN"]  # langues supportées, créé dynamiquement les onglets
@@ -696,7 +723,7 @@ class WordcloudView(CommonContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id, struct):
         # Get scope data
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
         # on pointe sur index générique, car pas de LabHalId ?
@@ -744,7 +771,7 @@ class WordcloudView(CommonContextMixin, TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ToolsView(CommonContextMixin, TemplateView):
+class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
     template_name = "tools.html"
 
     data_tools_options = ["hceres", "consistency"]
@@ -842,7 +869,7 @@ class ToolsView(CommonContextMixin, TemplateView):
             return consistencyvalues
 
     def get_entity_data(self, struct, i_type, p_id):
-        key, search_id, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", body=scope_param)
 
         entity = res["hits"]["hits"][0]["_source"]
