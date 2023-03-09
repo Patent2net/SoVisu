@@ -46,10 +46,7 @@ class CommonContextMixin:
         else:
             p_id = -1
 
-        if "ldapid" in request.GET:
-            ldapid = request.GET["ldapid"]
-        else:
-            ldapid = None
+        ldapid = request.GET.get("ldapid")
 
         return struct, i_type, p_id, ldapid
 
