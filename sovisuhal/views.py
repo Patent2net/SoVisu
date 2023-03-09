@@ -1039,7 +1039,7 @@ def wordcloud(request):
 
     return render(
         request,
-        "wordcloud.html",
+        "lexicon.html",
         {
             "ldapid": ldapid,
             "struct": struct,
