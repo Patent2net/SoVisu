@@ -319,9 +319,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             form = forms.ValidCredentials(
                 halId_s=entity["halId_s"],
                 aurehalId=entity["aurehalId"],
+                laboratory=entity["lab"],
+                function=rsr_function,
                 idRef=entity["idRef"],
                 orcId=orcid,
-                function=rsr_function,
             )
 
         if i_type == "lab":
