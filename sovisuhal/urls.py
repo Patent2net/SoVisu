@@ -100,11 +100,6 @@ urlpatterns = [
         viewsActions.validate_research_description,
         name="validate_research-description",
     ),
-    path(
-        "force-update_references/",
-        viewsActions.force_update_references,
-        name="force-update_references",
-    ),
     path("export_hceres_xls/", viewsActions.export_hceres_xls, name="export_hceres_xls"),
     path("accounts/", include("uniauth.urls", namespace="uniauth")),
     path("tinymce/", include("tinymce.urls")),

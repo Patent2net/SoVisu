@@ -12,7 +12,6 @@ from uniauth.decorators import login_required
 
 from elasticHal.libs import utils
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
-from sovisuhal.libs.elastichal import collecte_docs
 
 from . import settings
 from .libs import esActions
@@ -594,67 +593,6 @@ def refresh_aurehal_id(request):
     return redirect(
         f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
     )
-
-
-def force_update_references(request):
-    """
-    Force la mise à jour des références
-    """
-    # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
-
-    if "type" in request.GET:
-        i_type = request.GET["type"]
-    else:
-        return redirect("unknown")
-
-    if "id" in request.GET:
-        p_id = request.GET["id"]
-    else:
-        return redirect("unknown")
-
-    if "from" in request.GET:
-        date_from = request.GET["from"]
-    else:
-        date_from = "2000-01-01"
-
-    if "to" in request.GET:
-        date_to = request.GET["to"]
-    else:
-        date_to = datetime.today().strftime("%Y-%m-%d")
-
-    # if request.method == 'POST':
-    # comprend pas pourquoi cette ligne d'autant qu'on récupère les paramètres sur GET....
-
-    if i_type == "rsr":
-        scope_param = esActions.scope_p("_id", p_id)
-
-        res = es.search(index=f"{struct}*-researchers", body=scope_param)
-        try:
-            entity = res["hits"]["hits"][0]["_source"]
-        except IndexError:
-            return redirect("unknown")
-
-        result = collecte_docs.delay(entity, True)
-        taches = result.task_id
-        return redirect(
-            f"/check/?struct={struct}&type={i_type}&id={p_id}"
-            + f"&from={date_from}&to={date_to}&taches={taches}&data=references&validation=1"
-        )
-    if "taches" in request.GET:
-        taches = request.GET["taches"]
-        return redirect(
-            f"/check/?struct={struct}&type={i_type}&id={p_id}"
-            + f"&from={date_from}&to={date_to}&taches={taches}&data=references&validation=1"
-        )
-    else:
-        return redirect(
-            f"/check/?struct={struct}&type={i_type}&id={p_id}"
-            + f"&from={date_from}&to={date_to}&data=references&validation=1"
-        )
 
 
 def update_members(request):
