@@ -519,23 +519,70 @@
                     <div class="dt-buttons-rplc flex mb-2 items-center text-xs flex-col relative">
                         {% if type == "rsr" %}
                             <div class="flex">
+                                                        {% comment %}
                             <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
                         text-gray-600 flex mr-2 border-b-2 border-blue-300"
                                href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
                             > Collecter HAL
                             </a>
-                            <div class="flex">
-                                    <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
+                            {% endcomment %}
+                            <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
+                            text-gray-600 flex mr-2 border-b-2 border-blue-300"
+                            href="#" id="myLink"> Collecter HAL</a>
 
-                                        <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px">
-                                        </div>
-                                        <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression de collecte</div>
+                            <div class="flex">
+                                <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
+                                    <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px; width:0%;">
                                     </div>
-                                    <div id="celery-result" class=""></div>
+                                    <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression de collecte</div>
+                                </div>
+                                <div id="progress-bar-container"></div>
+                                <div id="celery-result" class=""></div>
                                 </div>
                             </div>
+
+
 {#                                Collecter (ou mettre à jour) de nouvelles références</a>#}
 
+                            <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+                                <!-- Celery Progress -->
+                           <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+                           <script type="text/javascript" src="{% static 'celery_progress/CustomCelery_progress.js' %}"></script>
+
+                            <script type="text/javascript">
+                                $(function() {
+                                    $("#myLink").click(function() {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'check' %}",
+                                            data: {
+                                                'update_reference': 'True',
+                                                'struct': '{{ struct }}',
+                                                'type': '{{ type }}',
+                                                'id': '{{ id }}',
+                                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                            },
+                                            beforeSend: function() {
+                                                $("#progress-bar-container").html("");
+                                            },
+                                            success: function (data) {
+                                                var task_id = data.task_id;
+                                                var progressUrl = "{% url 'celery_progress:task_status' 0 %}".replace("0", task_id);
+
+
+                                                 CeleryProgressBar.initProgressBar(progressUrl, {
+                                                    onResult: customResult,
+                                                    onProgress: customProgress,
+                                                    onSuccess: function() {
+                                                        // Custom success code
+                                                        location.reload();
+                                                    },
+                                                  });
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
                         {% endif %}
 
                     </div>
@@ -587,12 +634,6 @@
                     </table>
 
                 </div>
-
-                {% if validation == "1" and type == "rsr" %}
-                            {% comment %} POURQUOI RIEN DANS CE CAS ???? {% endcomment %}
-
-
-                {% endif %}
 
                 <div class="hidden references-json">{{ references|json_script:"references" }}</div>
                 <div class="hidden halId_s">{{ entity.halId_s|safe }}</div>
@@ -915,17 +956,6 @@
         /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
         {% if validation == "1" and  type == "rsr" and data == "references" %}
-            {%  if taches %}
-                var progressUrl = "{% url 'celery_progress:task_status' taches %}";
-
-                $(function () {
-      CeleryProgressBar.initProgressBar(progressUrl, {
-        onResult: customResult,
-        onProgress: customProgress,
-        onSuccess: customSuccess,
-      })
-    });
-            {%  endif %}
 
             var references = JSON.parse(document.querySelector(".references-json").textContent)
 
