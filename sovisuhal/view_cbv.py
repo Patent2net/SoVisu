@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -10,7 +11,7 @@ from uniauth.decorators import login_required
 
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
-from .libs.elastichal import indexe_chercheur
+from .libs.elastichal import collecte_docs, indexe_chercheur
 from .viewsActions import idhal_checkout
 
 es = esActions.es_connector()
@@ -214,6 +215,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
     ]
     data_check_default = "credentials"
 
+    def get_xframe_options_value(self):
+        return "ALLOW-FROM http://localhost:8000/"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -319,9 +323,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             form = forms.ValidCredentials(
                 halId_s=entity["halId_s"],
                 aurehalId=entity["aurehalId"],
+                laboratory=entity["lab"],
+                function=rsr_function,
                 idRef=entity["idRef"],
                 orcId=orcid,
-                function=rsr_function,
             )
 
         if i_type == "lab":
@@ -491,6 +496,34 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             references_cleaned.append(ref["_source"])
         # /
         return validation, references_cleaned
+
+    def post(self, request, *args, **kwargs):
+        if "update_reference" in request.POST:
+            struct = request.POST.get("struct")
+            i_type = request.POST.get("type")
+            p_id = request.POST.get("id")
+            taches = self.update_references(struct, i_type, p_id)
+            response_data = {"task_id": taches}
+            print(response_data)
+            response = JsonResponse(response_data)
+            response["X-Frame-Options"] = self.get_xframe_options_value()
+            return response
+
+    def update_references(self, struct, i_type, p_id):
+        if i_type == "rsr":
+            scope_param = esActions.scope_p("_id", p_id)
+
+            res = es.search(index=f"{struct}*-researchers", body=scope_param)
+            try:
+                entity = res["hits"]["hits"][0]["_source"]
+            except IndexError:
+                return redirect("unknown")
+
+            result = collecte_docs.delay(entity, True)
+            taches = result.task_id
+            return taches
+        else:
+            return ""
 
 
 class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):

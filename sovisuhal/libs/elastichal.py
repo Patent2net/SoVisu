@@ -25,21 +25,6 @@ from . import esActions
 
 mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
-"""
-try:
-    from decouple import config
-    from ldap3 import ALL, Connection, Server
-    from uniauth.decorators import login_required
-
-    mode = config("mode")  # Prod --> mode = 'Prod' en env Var
-
-except:
-    from django.contrib.auth.decorators import login_required
-
-    mode = "Dev"
-    structId = "198307662"  # UTLN
-"""
-
 # Connect to DB
 es = esActions.es_connector()
 
@@ -237,39 +222,47 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         doc["harvested_from_ids"] = []
         doc["harvested_from_label"] = []
 
-
         #
         #
         # print(doc["authorship"], doc ['authLastName_s'])
 
-        # en espérant que doc["authIdHal_s"] présente la liste des idhal auteur avec "" si pas d'idhal (et donc
         if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
-            #print ("elastichal.py : test d'autorat no good")
+            # print ("elastichal.py : test d'autorat no good")
             # test sur le nom complet...
-            nom = [truc for truc in doc["authLastName_s"] if chercheur["lastName"].lower() in truc.lower()]  # pour les récemment mariés qui auraient un nom composé... Après si 'lun des co-auteur porte le même nom...
-            if len(nom)>0:
-                nom = nom[0] .title()
+            nom = [
+                truc
+                for truc in doc["authLastName_s"]
+                if chercheur["lastName"].lower() in truc.lower()
+            ]  # pour les récemment mariés qui auraient un nom composé...
+            # Après si 'lun des co-auteur porte le même nom...
+            if len(nom) > 0:
+                nom = nom[0].title()
                 try:
-                    if doc["authLastName_s"].index(nom) == 0: # premier
+                    if doc["authLastName_s"].index(nom) == 0:  # premier
                         doc["authorship"] = [
                             {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                        ]  # pas voulu casser le modele de données ici mais first, last ou rien suffirait non ?
+                        ]
                     elif (
-                        doc["authLastName_s"].index(nom)
-                        == len(doc["authLastName_s"]) - 1
+                        doc["authLastName_s"].index(nom) == len(doc["authLastName_s"]) - 1
                     ):  # dernier
-                        doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
-                except:
+                        doc["authorship"] = [
+                            {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
+                        ]
+                except ValueError:
                     doc["authorship"] = []
             else:
                 doc["authorship"] = []
         elif chercheur["halId_s"] in doc["authIdHal_s"]:
-            if doc["authIdHal_s"].index(chercheur["halId_s"])==0:
+            if doc["authIdHal_s"].index(chercheur["halId_s"]) == 0:
                 doc["authorship"] = [
-                                 {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                            ]
-            elif (doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1):  # dernier
-                doc["authorship"] = [{"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}]
+                    {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+                ]
+            elif (
+                doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1
+            ):  # dernier
+                doc["authorship"] = [
+                    {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
+                ]
             else:
                 doc["authorship"] = []
         else:
@@ -305,7 +298,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             print("publicationDate_tdate error ?")
         doc["Created"] = datetime.datetime.now().isoformat()
 
-        if not init: # récupération de l'existant pour ne pas écraser
+        if not init:  # récupération de l'existant pour ne pas écraser
             field = "_id"
             doc_param = esActions.scope_p(field, doc["_id"])
 
@@ -357,8 +350,8 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         + chercheur["labHalId"]
         + "-researchers-"
         + chercheur["ldapId"]
-        + "-documents"
-        # -researchers" + row["ldapId"] + "-documents
+        + "-documents",
+        refresh="wait_for",
     )
 
     return chercheur  # au cas où
