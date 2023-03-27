@@ -32,7 +32,7 @@ def should_be_open(doc):
     # 1 oui
     # 0 no se
     # 2 déjà open
-    print(doc)
+    # print(doc)
     if "fileMain_s" not in doc:
         if "journalSherpaPostPrint_s" in doc:
             if doc["journalSherpaPostPrint_s"] == "can":
