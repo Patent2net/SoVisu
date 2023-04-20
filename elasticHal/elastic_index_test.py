@@ -14,9 +14,7 @@ from elasticHal.libs import (
     location_docs,
     utils,
 )
-from elasticHal.libs.archivesOuvertes import (
-    get_aurehalId,  # , get_concepts_and_keywords
-)
+from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 from sovisuhal.libs import esActions
 from sovisuhal.viewsActions import idhal_checkout
 
@@ -35,6 +33,11 @@ def create_test_context():
         if not es.indices.exists(index=f"test_{index}"):
             es.indices.create(index=f"test_{index}")
 
+    # remplissage index test_chercheur
+    idhal_test = idhal_checkout(idhal)
+    if idhal_test > 0:
+        indexe_chercheur(idhal)
+
     # remplissage index test_laboratoire
     labo_message = get_labo_from_csv()
     print(labo_message)
@@ -46,11 +49,6 @@ def create_test_context():
     # remplissage index test_concepts
     concepts_message = get_expertises()
     print(concepts_message)
-
-    # remplissage index test_chercheur
-    idhal_test = idhal_checkout(idhal)
-    if idhal_test > 0:
-        indexe_chercheur(idhal)
 
     # remplissage index test_publications
     scope_param = scope_p("_id", researcher_id)
@@ -142,14 +140,14 @@ def indexe_chercheur(idhal):  # self,
     if idhal != "":
         aurehal = get_aurehalId(idhal)
         # integration contenus
-        # archives_ouvertes_data = get_concepts_and_keywords(aurehal)
+        archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     else:
         pass
 
     chercheur["halId_s"] = idhal
     chercheur["validated"] = False
     chercheur["aurehalId"] = aurehal  # heu ?
-    # chercheur["concepts"] = archives_ouvertes_data["concepts"]
+    chercheur["concepts"] = archives_ouvertes_data["concepts"]
     chercheur["guidingKeywords"] = []
     chercheur["idRef"] = idref
     chercheur["axis"] = labo_accro
@@ -331,48 +329,48 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         doc["harvested_from_ids"] = []
         doc["harvested_from_label"] = []
 
-        if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
-            # print ("elastichal.py : test d'autorat no good")
-            # test sur le nom complet...
-            nom = [
-                truc
-                for truc in doc["authLastName_s"]
-                if chercheur["lastName"].lower() in truc.lower()
-            ]  # pour les récemment mariés qui auraient un nom composé...
-            # Après si 'lun des co-auteur porte le même nom...
-            if len(nom) > 0:
-                nom = nom[0].title()
-                try:
-                    if doc["authLastName_s"].index(nom) == 0:  # premier
-                        doc["authorship"] = [
-                            {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                        ]
-                    elif (
-                        doc["authLastName_s"].index(nom) == len(doc["authLastName_s"]) - 1
-                    ):  # dernier
-                        doc["authorship"] = [
-                            {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
-                        ]
-                except ValueError:
-                    doc["authorship"] = []
-            else:
-                doc["authorship"] = []
-
-        elif chercheur["halId_s"] in doc["authIdHal_s"]:
-            if doc["authIdHal_s"].index(chercheur["halId_s"]) == 0:
-                doc["authorship"] = [
-                    {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                ]
-            elif (
-                doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1
-            ):  # dernier
-                doc["authorship"] = [
-                    {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
-                ]
-            else:
-                doc["authorship"] = []
-        else:
-            doc["authorship"] = []
+        # if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
+        #     # print ("elastichal.py : test d'autorat no good")
+        #     # test sur le nom complet...
+        #     nom = [
+        #         truc
+        #         for truc in doc["authLastName_s"]
+        #         if chercheur["lastName"].lower() in truc.lower()
+        #     ]  # pour les récemment mariés qui auraient un nom composé...
+        #     # Après si 'lun des co-auteur porte le même nom...
+        #     if len(nom) > 0:
+        #         nom = nom[0].title()
+        #         try:
+        #             if doc["authLastName_s"].index(nom) == 0:  # premier
+        #                 doc["authorship"] = [
+        #                     {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+        #                 ]
+        #             elif (
+        #                 doc["authLastName_s"].index(nom) == len(doc["authLastName_s"]) - 1
+        #             ):  # dernier
+        #                 doc["authorship"] = [
+        #                     {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
+        #                 ]
+        #         except ValueError:
+        #             doc["authorship"] = []
+        #     else:
+        #         doc["authorship"] = []
+        #
+        # elif chercheur["halId_s"] in doc["authIdHal_s"]:
+        #     if doc["authIdHal_s"].index(chercheur["halId_s"]) == 0:
+        #         doc["authorship"] = [
+        #             {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
+        #         ]
+        #     elif (
+        #         doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1
+        #     ):  # dernier
+        #         doc["authorship"] = [
+        #             {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
+        #         ]
+        #     else:
+        #         doc["authorship"] = []
+        # else:
+        #     doc["authorship"] = []
 
         doc["harvested_from_ids"].append(chercheur["halId_s"])
 
@@ -390,12 +388,19 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
         for idhal in doc["authIdHal_s"]:
+            authorship = ""
+            if doc["authIdHal_s"].index(idhal) == 0:
+                authorship = "firstAuthor"
+
+            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                authorship = "lastAuthor"
+
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
                     "validated_concepts": "test",
                     "validated": True,
-                    "authorship": "test",
+                    "authorship": authorship,
                 }
             )
 
