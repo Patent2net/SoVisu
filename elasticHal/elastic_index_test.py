@@ -325,7 +325,6 @@ def collecte_docs(chercheur, overwrite=False):  # self,
                 )
 
         doc["_id"] = doc["docid"]
-        doc["validated"] = True
 
         doc["harvested_from"] = "researcher"
 
@@ -399,15 +398,6 @@ def collecte_docs(chercheur, overwrite=False):  # self,
                     "authorship": "test",
                 }
             )
-
-        # doc["SearcherProfile"] = [
-        #     {
-        #         "halId_s": chercheur["halId_s"],
-        #         "validated_concepts": "test",
-        #         "validated": True,
-        #         "authorship": "test",
-        #     }
-        # ]
 
         if not overwrite:  # récupération de l'existant pour ne pas écraser
             field = "_id"
