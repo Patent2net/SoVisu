@@ -268,7 +268,6 @@ def get_institution_from_csv(add_csv=True):
 
 def get_expertises():
     concept_list = concepts()
-    print(concept_list)
     for row in concept_list:
         # add a category to make differentiation in text_* index pattern
         row["category"] = "expertise"
@@ -388,18 +387,26 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
         for idhal in doc["authIdHal_s"]:
+            # check validated state depending if searcher is registered
+            doc_param = scope_p("SearcherProfile.halId_s", idhal)
+            current_state = es.count(index="test_researchers", query=doc_param)
+            if current_state["count"] > 0:
+                validated = "True"
+            else:
+                validated = "unassigned"
+            # check authorship
             authorship = ""
             if doc["authIdHal_s"].index(idhal) == 0:
                 authorship = "firstAuthor"
-
-            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
-                authorship = "lastAuthor"
+            else:
+                if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                    authorship = "lastAuthor"
 
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
                     "validated_concepts": "test",
-                    "validated": True,
+                    "validated": validated,
                     "authorship": authorship,
                 }
             )
