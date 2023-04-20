@@ -14,7 +14,9 @@ from elasticHal.libs import (
     location_docs,
     utils,
 )
-from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
+from elasticHal.libs.archivesOuvertes import (
+    get_aurehalId,  # , get_concepts_and_keywords
+)
 from sovisuhal.libs import esActions
 from sovisuhal.viewsActions import idhal_checkout
 
@@ -140,14 +142,14 @@ def indexe_chercheur(idhal):  # self,
     if idhal != "":
         aurehal = get_aurehalId(idhal)
         # integration contenus
-        archives_ouvertes_data = get_concepts_and_keywords(aurehal)
+        # archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     else:
         pass
 
     chercheur["halId_s"] = idhal
     chercheur["validated"] = False
     chercheur["aurehalId"] = aurehal  # heu ?
-    chercheur["concepts"] = archives_ouvertes_data["concepts"]
+    # chercheur["concepts"] = archives_ouvertes_data["concepts"]
     chercheur["guidingKeywords"] = []
     chercheur["idRef"] = idref
     chercheur["axis"] = labo_accro
@@ -227,6 +229,9 @@ def get_labo_from_csv(add_csv=True):
         # add a category to make differenciation in text_* index pattern
         row["category"] = "laboratory"
 
+        # add a common SearcherProfile Key who should serve has common key between index
+        row["SearcherProfile"] = []
+
         es.index(
             index="test_laboratories",
             id=row["halStructId"],
@@ -249,7 +254,10 @@ def get_institution_from_csv(add_csv=True):
 
         # add a category to make differenciation in text_* index pattern
         row["category"] = "institution"
-        print(row)
+
+        # add a common SearcherProfile Key who should serve has common key between index
+        row["SearcherProfile"] = []
+
         es.index(
             index="test_institutions",
             id=row["structSirene"],
@@ -266,6 +274,10 @@ def get_expertises():
     for row in concept_list:
         # add a category to make differentiation in text_* index pattern
         row["category"] = "expertise"
+
+        # add a common SearcherProfile Key who should serve has common key between index
+        row["SearcherProfile"] = []
+
         for children in row["children"]:
             # nécessaire?
             children["category"] = "concept"
@@ -377,14 +389,25 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         doc["category"] = "Notice"
 
         # add a common SearcherProfile Key who should serve has common key between index
-        doc["SearcherProfile"] = [
-            {
-                "halId_s": chercheur["halId_s"],
-                "validated_concepts": "test",
-                "validated": True,
-                "authorship": "test",
-            }
-        ]
+        doc["SearcherProfile"] = []
+        for idhal in doc["authIdHal_s"]:
+            doc["SearcherProfile"].append(
+                {
+                    "halId_s": idhal,
+                    "validated_concepts": "test",
+                    "validated": True,
+                    "authorship": "test",
+                }
+            )
+
+        # doc["SearcherProfile"] = [
+        #     {
+        #         "halId_s": chercheur["halId_s"],
+        #         "validated_concepts": "test",
+        #         "validated": True,
+        #         "authorship": "test",
+        #     }
+        # ]
 
         if not overwrite:  # récupération de l'existant pour ne pas écraser
             field = "_id"
