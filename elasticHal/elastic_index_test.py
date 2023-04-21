@@ -156,7 +156,7 @@ def indexe_chercheur(idhal):  # self,
     chercheur["category"] = "searcher"
 
     # add a common SearcherProfile Key who should serve has common key between index
-    chercheur["SearcherProfile"] = [{"halId_s": chercheur["halId_s"], "validated_concepts": "test"}]
+    chercheur["SearcherProfile"] = [{"halId_s": chercheur["halId_s"], "validated_concepts": ""}]
 
     res = es.index(
         index="test_researchers",
@@ -387,13 +387,18 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
         for idhal in doc["authIdHal_s"]:
+            validated_concepts = ""
+            validated = "unassigned"
+
             # check validated state depending if searcher is registered
             doc_param = scope_p("SearcherProfile.halId_s", idhal)
             current_state = es.count(index="test_researchers", query=doc_param)
             if current_state["count"] > 0:
                 validated = "True"
-            else:
-                validated = "unassigned"
+                searcher_data = es.search(index="test_researchers", query=doc_param)
+                searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
+                validated_concepts = searcher_data["validated_concepts"]
+
             # check authorship
             authorship = ""
             if doc["authIdHal_s"].index(idhal) == 0:
@@ -405,7 +410,7 @@ def collecte_docs(chercheur, overwrite=False):  # self,
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
-                    "validated_concepts": "test",
+                    "validated_concepts": validated_concepts,
                     "validated": validated,
                     "authorship": authorship,
                 }
