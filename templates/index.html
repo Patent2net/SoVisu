@@ -31,13 +31,14 @@
 
             <div class="flex flex-col justify-between items-start">
 
-
-                {% if indexcat == "lab" %}
-                    <h1 class="font-semibold text-xs">Laboratoires référencés</h1>
-                {%  endif %}
-                {% if indexcat == "rsr" %}
-                    <h1 class="font-semibold text-xs">Chercheurs référencés</h1>
-                {%  endif %}
+                    <h1 class="font-semibold text-xs">
+                        {% if indexcat == "lab" %}
+                            Laboratoires référencés
+                        {%  endif %}
+                        {% if indexcat == "rsr" %}
+                            Chercheurs référencés
+                        {%  endif %}
+                    </h1>
 
             </div>
                 <div class="flex justify-between items-start">
@@ -63,23 +64,24 @@
 
                 <ul class="pt-2 index-list">
                     {% for entity in entities %}
-                        <li class="leading-4 w-full bg-gray-50 py-1 px-2">
-                            <a class="text-blue-700 text-sm"
-                                    {% if entity.ldapId %}
-                                        href="/dashboard/?struct={{ indexstruct }}&type=rsr&id={{ entity.ldapId }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
-                                    {%  endif %}
-                                    {% if entity.halStructId %}
-                                        href="/dashboard/?struct={{ indexstruct }}&type=lab&id={{ entity.halStructId }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
-                                    {%  endif %}
-                            >
-                                {% if entity.ldapId %}
-                                    <span class="">{{ entity.firstName|make_list|first }}. {{ entity.lastName }}</span>
-                                {%  endif %}
-                                {% if entity.halStructId %}
-                                    <span class="">{{ entity.acronym }}</span>
-                                {%  endif %}
-                            </a>
-                        </li>
+                        {% if entity.structSirene == indexstruct %}
+                            <li class="leading-4 w-full bg-gray-50 py-1 px-2">
+                                <a class="text-blue-700 text-sm"
+                                   href="/dashboard/?struct={{ indexstruct }}&type={% if entity.ldapId %}rsr&id={{ entity.ldapId }}{%  endif %}{% if entity.halStructId %}lab&id={{ entity.halStructId }}{%  endif %}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
+                                >
+                                    <span class="">
+                                        {% if entity.ldapId %}
+                                            {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
+                                        {%  endif %}
+                                        {% if entity.halStructId %}
+                                            {{ entity.acronym }}
+                                        {%  endif %}
+                                    </span>
+
+                                </a>
+                            </li>
+                        {% endif %}
+
                     {% endfor %}
                 </ul>
 
