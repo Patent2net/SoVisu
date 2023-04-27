@@ -49,9 +49,9 @@ def admin_access_login(request):
 
             field = "_id"
             scope_param = esActions.scope_p(field, auth_user)
-            count = es.count(index="*-researchers", body=scope_param)["count"]
+            count = es.count(index="test_researchers", body=scope_param)["count"]
             if count > 0:
-                res = es.search(index="*-researchers", body=scope_param, size=count)
+                res = es.search(index="test_researchers", body=scope_param, size=count)
                 entity = res["hits"]["hits"][0]["_source"]
                 struct = entity["structSirene"]
                 date_to = datetime.today().strftime("%Y-%m-%d")
