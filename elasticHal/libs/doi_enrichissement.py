@@ -1,6 +1,7 @@
 import requests
 from requests.adapters import HTTPAdapter, MaxRetryError
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.exceptions import ReadTimeoutError
+from urllib3.util.retry import Retry
 
 from elasticHal.libs import dimensions
 
@@ -18,26 +19,40 @@ http.mount("http://", adapter)
 
 def check_doi(doi):
     """
+    La fonction plancte avec une erreur sur certains URL qui n'est pas attrapée par le try except//
     Vérifie si le doi renseigné existe dans la base de données de doi.org
     """
     # Cette fonction permet de tester un DOI au travers d'une requête.
-    # Renvoie si False si le DOI est invalide renvoi True si le DOI exist
-    url = "https://doi.org/" + doi
-    try:
-        res = http.get(url, timeout=50)
+    # Renvoie si True si le DOI est invalide renvoi True sinon
 
-        if str(res) == "<Response [200]>":
-            return True
-        else:
-            return False
+    if not doi.startswith("http"):
+        url = "https://doi.org/" + doi
+    else:
+        url = doi
+    connect_timeout = 6
+    read_timeout = 10
+    try:
+        res = requests.get(
+            url, timeout=(connect_timeout, read_timeout), verify=False
+        )  # TRES MAUVAIS CHOIX ICI...
     except TimeoutError:
-        return False
+        return True
     except MaxRetryError:
-        return False
+        return True
+    except ReadTimeoutError as e:
+        print(url, e)
+        return True
+    else:
+        if str(res) == "<Response [200]>":
+            return False
+        else:
+            return True
+
 
 def docs_enrichissement_doi(doc):
     """
     Enrichissement des documents avec les informations provenant du DOI
+
     """
     # for index, doc in enumerate(docs):
     if "doiId_s" in doc.keys():  # Si Le Doi est renseigné dans le document pris en paramètre
@@ -55,21 +70,22 @@ def docs_enrichissement_doi(doc):
             if "oa_status" in data.keys():
                 doc["oa_status"] = data["oa_status"]
             if "is_oa" in data.keys():
-                if (
-                    data["is_oa"] == True
-                ):  # Test si le doi est en open access sur l'api Unpaywall
+                if data["is_oa"] is True:  # Test si le doi est en open access sur l'api Unpaywall
                     doc["is_oa"] = "open access"
-                    if data["first_oa_location"]["oa_date"] != None:
+                    if data["first_oa_location"]["oa_date"] is not None:
                         doc["date_depot_oa"] = data["first_oa_location"]["oa_date"]
-                    elif data["first_oa_location"]["updated"] != None:
+                    elif data["first_oa_location"]["updated"] is not None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
                         pass  # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type
                 else:
                     doc["is_oa"] = "closed access"
 
-        else:
-            doc["doiId_sPasCorrect"] = check_doi(doc["doiId_s"])
+        elif (
+            "doiId_sPasCorrect" in doc.keys()
+        ):  # Faudra Virer çà un jour ou remettre en route la collecte
+            doc.pop("doiId_sPasCorrect", None)
+            # doc["doiId_sPasCorrect"] = check_doi(doc["doiId_s"])
 
         if "publisher" not in data:
             doc["oa_host_type"] = "open archive"
