@@ -504,10 +504,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             struct = request.POST.get("struct")
             i_type = request.POST.get("type")
             p_id = request.POST.get("id")
-            print(f"struct: {struct}, i_type: {i_type}, p_id: {p_id}")
+            #print(f"struct: {struct}, i_type: {i_type}, p_id: {p_id}")
             taches = self.update_references(struct, i_type, p_id)
             response_data = {"task_id": taches}
-            print(response_data)
+            #print(response_data)
             response = JsonResponse(response_data)
             response["X-Frame-Options"] = self.get_xframe_options_value()
             return response
