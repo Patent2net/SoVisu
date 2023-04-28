@@ -45,6 +45,9 @@ if mode == "Prod":
     UNIAUTH_LOGOUT_REDIRECT_URL = None
     UNIAUTH_MAX_LINKED_EMAILS = 20
     UNIAUTH_PERFORM_RECURSIVE_MERGING = True
+    LOGPATH=config("LOGPATH")
+    IP=config("IP")
+    DNS=config("DNS")
     LOGGING = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -62,14 +65,14 @@ if mode == "Prod":
             "filedeb": {
                 "level": "DEBUG",
                 "class": "logging.FileHandler",
-                "filename": "./logs/debug.log",
-                'formatter': 'verbose'
+                "filename": LOGPATH + "debug.log",
+                "formatter":"verbose"
             },
             "fileinf": {
                 "level": "INFO",
                 "class": "logging.FileHandler",
-                "filename": "./logs/debuginf.log",
-                'formatter': 'simple'
+                "filename": LOGPATH + "debuginf.log",
+                "formatter" : "simple"
             },
         },
         "loggers": {
@@ -128,11 +131,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://sovisu.univ-tln.fr",
-    "https://sovisu.univ-tln.fr:9200",
-    "https://sovisu.univ-tln.fr:5601",
-    "https://sovisu.univ-tln.fr:6379",
-    "http://194.214.84.14:*",
+    "http://"+DNS,
+    "http://"+DNS+":9200",
+    "http://"+DNS+":5601",
+    "http://"+DNS+":6379",
+    "http://"+IP+":*",
     "http://localhost:*",
     "http://localhost:9200",
     "http://localhost:5601",
@@ -144,8 +147,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "194.214.84.14", "sovisu.univ-tln.fr"]
-CSRF_TRUSTED_ORIGINS = ["https://194.214.84.14", "https://localhost"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", IP, DNS]
+CSRF_TRUSTED_ORIGINS = ["http://"+IP, "https://localhost"]
 
 CORS_ALLOW_CREDENTIALS = True
 
