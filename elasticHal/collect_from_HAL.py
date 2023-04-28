@@ -106,7 +106,11 @@ def collect_laboratories_data2(self, labo, update=True):
     # print(f'laboratories_list values = {laboratories_list}')
     # Process laboratories
     nblab = 0
-    for lab in laboratories_list:
+    collections_set = set([lab["halStructId"] for lab in laboratories_list])
+
+    for col in collections_set:
+        labor =  [lab for lab in laboratories_list if lab["halStructId"] == col]
+        lab = labor[0]
         # print(f"\u00A0 \u21D2 Processing : {lab['acronym']}")
         # progress_recorder.set_progress( nblab, count, lab['acronym'] + " labo en cours")
         nblab += 1
@@ -212,11 +216,8 @@ def collect_laboratories_data2(self, labo, update=True):
                         #         )
 
                         # d'autant que j'aurais fait comme çà : cf.
-                        harvet_history.append({"docid": doc["docid"], "from": lab["halStructId"]})
 
-                        for h in harvet_history:
-                            if h["docid"] == doc["docid"]:
-                                doc["harvested_from_ids"].append(h["from"])
+                        doc["harvested_from_ids"] = [labo]
 
                         doc["MDS"] = utils.calculate_mds(doc)
                         doc["records"] = []
@@ -235,74 +236,75 @@ def collect_laboratories_data2(self, labo, update=True):
                         except IndexError:
                             print("publicationDate_tdate error ?")
 
+                    for lab in labor:
                         if check_existing_docs:
-                            doc_param = esActions.scope_p("_id", doc["_id"])
-
-                            if not es.indices.exists(
-                                index=lab["structSirene"]
-                                + "-"
-                                + lab["halStructId"]
-                                + "-laboratories-documents"
-                            ):
-                                es.indices.create(
+                            for doc in docs:
+                                doc_param = esActions.scope_p("_id", doc["_id"])
+                                if not es.indices.exists(
                                     index=lab["structSirene"]
                                     + "-"
                                     + lab["halStructId"]
                                     + "-laboratories-documents"
+                                ):
+                                    es.indices.create(
+                                        index=lab["structSirene"]
+                                        + "-"
+                                        + lab["halStructId"]
+                                        + "-laboratories-documents"
+                                    )
+                                    res = es.search(
+                                        index=lab["structSirene"]
+                                        + "-"
+                                        + lab["halStructId"]
+                                        + "-laboratories-documents",
+                                        body=doc_param,
+                                        request_timeout=50,
                                 )
-                            res = es.search(
+
+                                if len(res["hits"]["hits"]) > 0:
+                                    if (
+                                        "authorship" in res["hits"]["hits"][0]["_source"]
+                                        and not force_doc_authorship
+                                    ):
+                                        doc["authorship"] = res["hits"]["hits"][0]["_source"][
+                                            "authorship"
+                                        ]
+                                    if "validated" in res["hits"]["hits"][0]["_source"]:
+                                        doc["validated"] = res["hits"]["hits"][0]["_source"][
+                                            "validated"
+                                        ]
+                                    if force_doc_validated:
+                                        doc["validated"] = True
+
+                                    if "modifiedDate_tdate" in res["hits"]["hits"][0]["_source"].keys():
+                                        if res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]!= doc["modifiedDate_tdate"]:
+                                            doc["records"].append(
+                                                {
+                                                    "beforeModifiedDate_tdate": doc["modifiedDate_tdate"],
+                                                    "MDS": res["hits"]["hits"][0]["_source"]["MDS"],
+                                                }
+                                            )
+                                    else:
+                                        pass #
+                                else:
+                                    doc["validated"] = True
+
+                        for indi in range(int(len(docs) // 50) + 1):
+                            boutdeDoc = docs[indi * 50 : indi * 50 + 50]
+                            helpers.bulk(
+                                es,
+                                boutdeDoc,
                                 index=lab["structSirene"]
                                 + "-"
                                 + lab["halStructId"]
                                 + "-laboratories-documents",
-                                body=doc_param,
-                                request_timeout=50,
                             )
-
-                            if len(res["hits"]["hits"]) > 0:
-                                if (
-                                    "authorship" in res["hits"]["hits"][0]["_source"]
-                                    and not force_doc_authorship
-                                ):
-                                    doc["authorship"] = res["hits"]["hits"][0]["_source"][
-                                        "authorship"
-                                    ]
-                                if "validated" in res["hits"]["hits"][0]["_source"]:
-                                    doc["validated"] = res["hits"]["hits"][0]["_source"][
-                                        "validated"
-                                    ]
-                                if force_doc_validated:
-                                    doc["validated"] = True
-
-                                if (
-                                    res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                                    != doc["modifiedDate_tdate"]
-                                ):
-                                    doc["records"].append(
-                                        {
-                                            "beforeModifiedDate_tdate": doc["modifiedDate_tdate"],
-                                            "MDS": res["hits"]["hits"][0]["_source"]["MDS"],
-                                        }
-                                    )
-                            else:
-                                doc["validated"] = True
-
-                    for indi in range(int(len(docs) // 50) + 1):
-                        boutdeDoc = docs[indi * 50 : indi * 50 + 50]
-                        helpers.bulk(
-                            es,
-                            boutdeDoc,
-                            index=lab["structSirene"]
-                            + "-"
-                            + lab["halStructId"]
-                            + "-laboratories-documents",
-                        )
-                        time.sleep(1)
-                        doc_progress_recorder.set_progress(
-                            (indi + 1) * 50,
-                            len(docs),
-                            lab["acronym"] + " " + str(len(docs)) + " documents",
-                        )
+                            #time.sleep(1)
+                            doc_progress_recorder.set_progress(
+                                (indi + 1) * 50,
+                                len(docs),
+                                lab["acronym"] + " " + str(len(docs)) + " documents",
+                            )
             else:
                 doc_progress_recorder.set_progress(
                      nblab, len(laboratories_list), lab["acronym"] + " " + " Pas de documents"

@@ -9,6 +9,8 @@ from django.views.generic import TemplateView
 from elasticsearch import BadRequestError
 from uniauth.decorators import login_required
 
+from elasticHal.collect_from_HAL import collect_laboratories_data2
+
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
 from .libs.elastichal import collecte_docs, indexe_chercheur
@@ -502,9 +504,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             struct = request.POST.get("struct")
             i_type = request.POST.get("type")
             p_id = request.POST.get("id")
+            #print(f"struct: {struct}, i_type: {i_type}, p_id: {p_id}")
             taches = self.update_references(struct, i_type, p_id)
             response_data = {"task_id": taches}
-            print(response_data)
+            #print(response_data)
             response = JsonResponse(response_data)
             response["X-Frame-Options"] = self.get_xframe_options_value()
             return response
@@ -522,6 +525,12 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             result = collecte_docs.delay(entity, True)
             taches = result.task_id
             return taches
+
+        if i_type == "lab":
+            result = collect_laboratories_data2.delay(p_id)
+            taches = result.task_id
+            return taches
+
         else:
             return ""
 

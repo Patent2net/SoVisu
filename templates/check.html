@@ -517,15 +517,9 @@
                     </div>
 
                     <div class="dt-buttons-rplc flex mb-2 items-center text-xs flex-col relative">
-                        {% if type == "rsr" %}
+                        {% if type == "rsr" or type == "lab" %}
                             <div class="flex">
-                                                        {% comment %}
-                            <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
-                        text-gray-600 flex mr-2 border-b-2 border-blue-300"
-                               href="/force-update_references/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&filter=all&validation={{ validation }}"
-                            > Collecter HAL
-                            </a>
-                            {% endcomment %}
+
                             <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
                             text-gray-600 flex mr-2 border-b-2 border-blue-300"
                             href="#" id="myLink"> Collecter HAL</a>

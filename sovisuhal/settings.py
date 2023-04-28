@@ -48,16 +48,28 @@ if mode == "Prod":
     LOGGING = {
         "version": 1,
         "disable_existing_loggers": False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
+        },
         "handlers": {
             "filedeb": {
                 "level": "DEBUG",
                 "class": "logging.FileHandler",
-                "filename": "/data/logs/django/debug.log",
+                "filename": "./logs/debug.log",
+                'formatter': 'verbose'
             },
             "fileinf": {
-                "level": "DEBUG",
+                "level": "INFO",
                 "class": "logging.FileHandler",
-                "filename": "/data/logs/django/debuginf.log",
+                "filename": "./logs/debuginf.log",
+                'formatter': 'simple'
             },
         },
         "loggers": {
