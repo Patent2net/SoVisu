@@ -58,7 +58,6 @@ def create_test_context():
 
     publications_message = collecte_docs(chercheur)
     print(publications_message)
-    pass
 
 
 def indexe_chercheur(idhal):  # self,
@@ -108,11 +107,11 @@ def indexe_chercheur(idhal):  # self,
     else:
         supann_princ = []
 
-    if not len(nom) > 0:
+    if len(nom) <= 0:
         nom = [""]
-    elif not len(emploi) > 0:
+    elif len(emploi) <= 0:
         emploi = [""]
-    elif not len(mail) > 0:
+    elif len(mail) <= 0:
         mail = [""]
 
     # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
@@ -136,13 +135,13 @@ def indexe_chercheur(idhal):  # self,
     chercheur["Created"] = datetime.datetime.now().isoformat()
 
     # New step ?
+    aurehal = ""
+    archives_ouvertes_data = {}
 
     if idhal != "":
         aurehal = get_aurehalId(idhal)
         # integration contenus
         archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else:
-        pass
 
     chercheur["halId_s"] = idhal
     chercheur["validated"] = False
@@ -168,72 +167,42 @@ def indexe_chercheur(idhal):  # self,
     return ""
 
 
-def get_labo_from_csv(add_csv=True):
-    laboratories_data = []
+def get_labo_from_csv():
+    laboratories_list = []
+    scope_param = esActions.scope_all()
+    count = es.count(index="test_laboratories", query=scope_param)["count"]
+    res = es.search(index="test_laboratories", query=scope_param, size=count)
+    res = res["hits"]["hits"]
 
-    if add_csv:
-        with open("data/laboratories.csv", encoding="utf-8") as csv_file:
-            laboratories_csv = list(csv.DictReader(csv_file, delimiter=";"))
-            laboratories_data = laboratories_csv
+    for results in res:
+        laboratories_list.append(results["_source"])
 
-    for row in laboratories_data:
-        row["guidingKeywords"] = []
+    # Récupère les nouvelles données dans le csv
+    with open("data/laboratories.csv", encoding="utf-8") as csv_file:
+        laboratories_csv = list(csv.DictReader(csv_file, delimiter=";"))
 
-        # Get researchers from the laboratory
-        rsr_param = scope_p("labHalId", row["halStructId"])
+        # vérifie si les labos dans la liste csv existent déjà dans kibana
+        for laboratory in laboratories_csv:
+            if not any(
+                listed_lab["halStructId"] == laboratory["halStructId"]
+                for listed_lab in laboratories_list
+            ):
+                # rajoute les labos non recensés aux existants
+                concept_tree = laboratory_concepts(laboratory["halStructId"])
 
-        # force le refresh des indices(index) de elasticsearch
-        es.indices.refresh(index="test_researchers")
+                laboratories_list.append(laboratory_notice(laboratory, concept_tree))
+            else:
+                # Compare les données des labos existant dans les deux listes
+                for listed_lab in laboratories_list:
+                    if listed_lab["halStructId"] == laboratory["halStructId"]:
+                        if laboratory["structSirene"] not in listed_lab["structSirene"]:
+                            listed_lab["structSirene"].append(laboratory["structSirene"])
 
-        res = es.search(index="test_researchers", query=rsr_param)
-
-        # Build laboratory skills
-        tree = {"id": "Concepts", "children": []}
-
-        for rsr in res["hits"]["hits"]:
-            concept = rsr["_source"]["concepts"]
-
-            if len(concept) > 0:
-                for child in concept["children"]:
-                    if child["state"] == "invalidated":
-                        tree = utils.append_to_tree(child, rsr["_source"], tree, "invalidated")
-                    else:
-                        tree = utils.append_to_tree(child, rsr["_source"], tree, "validated")
-                    if "children" in child:
-                        for child1 in child["children"]:
-                            if child1["state"] == "invalidated":
-                                tree = utils.append_to_tree(
-                                    child1, rsr["_source"], tree, "invalidated"
-                                )
-                            else:
-                                tree = utils.append_to_tree(
-                                    child1, rsr["_source"], tree, "validated"
-                                )
-
-                            if "children" in child1:
-                                for child2 in child1["children"]:
-                                    if child2["state"] == "invalidated":
-                                        tree = utils.append_to_tree(
-                                            child2, rsr["_source"], tree, "invalidated"
-                                        )
-                                    else:
-                                        tree = utils.append_to_tree(
-                                            child2, rsr["_source"], tree, "validated"
-                                        )
-
-        row["Created"] = datetime.datetime.now().isoformat()
-        row["concepts"] = tree
-
-        # add a category to make differenciation in text_* index pattern
-        row["category"] = "laboratory"
-
-        # add a common SearcherProfile Key who should serve has common key between index
-        row["SearcherProfile"] = []
-
+    for laboratory in laboratories_list:
         es.index(
             index="test_laboratories",
-            id=row["halStructId"],
-            document=json.dumps(row),
+            id=laboratory["halStructId"],
+            document=json.dumps(laboratory),
             refresh="wait_for",
         )
 
@@ -524,6 +493,64 @@ def scope_p(scope_field, scope_value):
     """
     scope = {"match": {scope_field: scope_value}}
     return scope
+
+
+def laboratory_concepts(halStructId):
+    rsr_param = scope_p("labHalId", halStructId)
+    res = es.search(index="test_researchers", query=rsr_param)
+    concept_tree = {"id": "Concepts", "children": []}
+    for searcher in res["hits"]["hits"]:
+        concept = searcher["_source"]["concepts"]
+
+        if len(concept) > 0:
+            for child in concept["children"]:
+                if child["state"] == "invalidated":
+                    concept_tree = utils.append_to_tree(
+                        child, searcher["_source"], concept_tree, "invalidated"
+                    )
+                else:
+                    concept_tree = utils.append_to_tree(
+                        child, searcher["_source"], concept_tree, "validated"
+                    )
+                if "children" in child:
+                    for child1 in child["children"]:
+                        if child1["state"] == "invalidated":
+                            concept_tree = utils.append_to_tree(
+                                child1, searcher["_source"], concept_tree, "invalidated"
+                            )
+                        else:
+                            concept_tree = utils.append_to_tree(
+                                child1, searcher["_source"], concept_tree, "validated"
+                            )
+
+                        if "children" in child1:
+                            for child2 in child1["children"]:
+                                if child2["state"] == "invalidated":
+                                    concept_tree = utils.append_to_tree(
+                                        child2, searcher["_source"], concept_tree, "invalidated"
+                                    )
+                                else:
+                                    concept_tree = utils.append_to_tree(
+                                        child2, searcher["_source"], concept_tree, "validated"
+                                    )
+    return concept_tree
+
+
+def laboratory_notice(notice, concept_tree):
+    labo_notice = {
+        "category": "laboratory",
+        "acronym": notice["acronym"],
+        "halStructId": notice["halStructId"],
+        "idRef": notice["idRef"],
+        "label": notice["label"],
+        "rsnr": notice["rsnr"],
+        "structSirene": [notice["structSirene"]],
+        "guidingKeywords": [],
+        "concepts": concept_tree,
+        "SearcherProfile": [],
+        "Created": datetime.datetime.now().isoformat(),
+    }
+    return labo_notice
 
 
 def concepts():
