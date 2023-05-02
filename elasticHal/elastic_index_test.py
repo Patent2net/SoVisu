@@ -155,7 +155,9 @@ def indexe_chercheur(idhal):  # self,
     chercheur["category"] = "searcher"
 
     # add a common SearcherProfile Key who should serve has common key between index
-    chercheur["SearcherProfile"] = [{"halId_s": chercheur["halId_s"], "validated_concepts": ""}]
+    chercheur["SearcherProfile"] = [
+        {"halId_s": chercheur["halId_s"], "ldapId": chercheur["ldapId"], "validated_concepts": ""}
+    ]
 
     res = es.index(
         index="test_researchers",
@@ -169,8 +171,9 @@ def indexe_chercheur(idhal):  # self,
 
 def get_labo_from_csv():
     laboratories_list = []
-    scope_param = esActions.scope_all()
+    scope_param = scope_all()
     count = es.count(index="test_laboratories", query=scope_param)["count"]
+    print(count)
     res = es.search(index="test_laboratories", query=scope_param, size=count)
     res = res["hits"]["hits"]
 
@@ -297,49 +300,6 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         doc["harvested_from_ids"] = []
         doc["harvested_from_label"] = []
 
-        # if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
-        #     # print ("elastichal.py : test d'autorat no good")
-        #     # test sur le nom complet...
-        #     nom = [
-        #         truc
-        #         for truc in doc["authLastName_s"]
-        #         if chercheur["lastName"].lower() in truc.lower()
-        #     ]  # pour les récemment mariés qui auraient un nom composé...
-        #     # Après si 'lun des co-auteur porte le même nom...
-        #     if len(nom) > 0:
-        #         nom = nom[0].title()
-        #         try:
-        #             if doc["authLastName_s"].index(nom) == 0:  # premier
-        #                 doc["authorship"] = [
-        #                     {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-        #                 ]
-        #             elif (
-        #                 doc["authLastName_s"].index(nom) == len(doc["authLastName_s"]) - 1
-        #             ):  # dernier
-        #                 doc["authorship"] = [
-        #                     {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
-        #                 ]
-        #         except ValueError:
-        #             doc["authorship"] = []
-        #     else:
-        #         doc["authorship"] = []
-        #
-        # elif chercheur["halId_s"] in doc["authIdHal_s"]:
-        #     if doc["authIdHal_s"].index(chercheur["halId_s"]) == 0:
-        #         doc["authorship"] = [
-        #             {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-        #         ]
-        #     elif (
-        #         doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1
-        #     ):  # dernier
-        #         doc["authorship"] = [
-        #             {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
-        #         ]
-        #     else:
-        #         doc["authorship"] = []
-        # else:
-        #     doc["authorship"] = []
-
         doc["harvested_from_ids"].append(chercheur["halId_s"])
 
         doc["records"] = []
@@ -379,6 +339,9 @@ def collecte_docs(chercheur, overwrite=False):  # self,
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
+                    "ldapId": chercheur["ldapId"]
+                    if chercheur["halId_s"] == idhal
+                    else "unassigned",
                     "validated_concepts": validated_concepts,
                     "validated": validated,
                     "authorship": authorship,
@@ -492,6 +455,14 @@ def scope_p(scope_field, scope_value):
     Retourne un ensemble de documents spécifique en fonction d'un filtre
     """
     scope = {"match": {scope_field: scope_value}}
+    return scope
+
+
+def scope_all():
+    """
+    Paramètre pour les requêtes ElasticSearch, retourne tous les documents
+    """
+    scope = {"match_all": {}}
     return scope
 
 
