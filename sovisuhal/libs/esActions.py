@@ -66,7 +66,7 @@ def scope_all():
     """
     Paramètre pour les requêtes ElasticSearch, retourne tous les documents
     """
-    scope = {"query": {"match_all": {}}}
+    scope = {"match_all": {}}
     return scope
 
 
@@ -75,7 +75,7 @@ def scope_p(scope_field, scope_value):
     """
     Retourne un ensemble de documents spécifique en fonction d'un filtre
     """
-    scope = {"query": {"match": {scope_field: scope_value}}}
+    scope = {"match": {scope_field: scope_value}}
     return scope
 
 
@@ -86,7 +86,9 @@ def date_all():
     """
     start_date_param = {
         "size": 1,
-        "sort": [{"producedDate_tdate": {"order": "asc"}}], # champ de date de production. Non Vide sur HAL.
+        "sort": [
+            {"producedDate_tdate": {"order": "asc"}}
+        ],  # champ de date de production. Non Vide sur HAL.
         "query": {"match_all": {}},
     }
     return start_date_param
@@ -122,21 +124,19 @@ def ref_p(
     dans une période donnée
     """
     ref_param = {
-        "query": {
-            "bool": {
-                scope_bool_type: [
-                    {"match_phrase": {scope_field: scope_value}},
-                    {"match": {"validated": validate}},
-                    {
-                        "range": {
-                            date_range_type: {
-                                "gte": scope_date_from,
-                                "lt": scope_date_to,
-                            }
+        "bool": {
+            scope_bool_type: [
+                {"match_phrase": {scope_field: scope_value}},
+                {"match": {"validated": validate}},
+                {
+                    "range": {
+                        date_range_type: {
+                            "gte": scope_date_from,
+                            "lt": scope_date_to,
                         }
-                    },
-                ]
-            }
+                    }
+                },
+            ]
         }
     }
     return ref_param
@@ -162,91 +162,79 @@ def ref_p_filter(
     """
     if p_filter == "uncomplete":
         ref_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "match_phrase": {
-                                            scope_field: scope_value,
+            "bool": {
+                "must": [
+                    {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match_phrase": {
+                                        scope_field: scope_value,
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "validated": validate,
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "producedDate_tdate": {
+                                            "gte": scope_date_from,
+                                            "lt": scope_date_to,
                                         }
-                                    },
-                                    {
-                                        "match": {
-                                            "validated": validate,
-                                        }
-                                    },
-                                    {
-                                        "range": {
-                                            "producedDate_tdate": {
-                                                "gte": scope_date_from,
-                                                "lt": scope_date_to,
-                                            }
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "must": [
-                                    {"range": {
-      "MDS": {
-        "lt": 70
-      }
-    }},
-                                ]
-                            }
-                        },
-                    ]
-                }
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        "bool": {
+                            "must": [
+                                {"range": {"MDS": {"lt": 70}}},
+                            ]
+                        }
+                    },
+                ]
             }
         }
 
     elif p_filter == "complete":
         ref_param = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "match_phrase": {
-                                            scope_field: scope_value,
+            "bool": {
+                "must": [
+                    {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match_phrase": {
+                                        scope_field: scope_value,
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "validated": validate,
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "producedDate_tdate": {
+                                            "gte": scope_date_from,
+                                            "lt": scope_date_to,
                                         }
-                                    },
-                                    {
-                                        "match": {
-                                            "validated": validate,
-                                        }
-                                    },
-                                    {
-                                        "range": {
-                                            "producedDate_tdate": {
-                                                "gte": scope_date_from,
-                                                "lt": scope_date_to,
-                                            }
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "must": [
-                                    {"range": {
-      "MDS": {
-        "gte": 100
-      }
-    }},
-                                ]
-                            }
-                        },
-                    ]
-                }
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        "bool": {
+                            "must": [
+                                {"range": {"MDS": {"gte": 100}}},
+                            ]
+                        }
+                    },
+                ]
             }
         }
     else:
@@ -268,13 +256,31 @@ def confirm_p(scope_field, scope_value, validate):
     qui ont leur champ validated à une certaine valeur.
     """
     has_to_confirm_param = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"match_phrase": {scope_field: scope_value}},
-                    {"match": {"validated": validate}},
-                ]
-            }
+        "bool": {
+            "must": [
+                {"match_phrase": {scope_field: scope_value}},
+                {"match": {"validated": validate}},
+            ]
         }
     }
     return has_to_confirm_param
+
+
+def validated_searcherprofile_p(p_id, validate, date_range_type, date_from, date_to):
+    validated_searcherprofile = {
+        "bool": {
+            "must": [
+                {"match": {"SearcherProfile.ldapId": p_id}},
+                {"match": {"SearcherProfile.validated": validate}},
+                {
+                    "range": {
+                        date_range_type: {
+                            "gte": date_from,
+                            "lt": date_to,
+                        }
+                    }
+                },
+            ]
+        }
+    }
+    return validated_searcherprofile
