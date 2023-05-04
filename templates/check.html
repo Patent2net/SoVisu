@@ -522,7 +522,7 @@
 
                             <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
                             text-gray-600 flex mr-2 border-b-2 border-blue-300"
-                            href="#" id="myLink"> Collecter HAL</a>
+                            href="#" id="collect_hal_notices"> Collecter HAL</a>
 
                             <div class="flex">
                                 <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
@@ -545,7 +545,7 @@
 
                             <script type="text/javascript">
                                 $(function() {
-                                    $("#myLink").click(function() {
+                                    $("#collect_hal_notices").click(function() {
                                         $.ajax({
                                             type: "POST",
                                             url: "{% url 'check' %}",
