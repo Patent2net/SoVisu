@@ -1,9 +1,12 @@
 # from libs import hal, utils, unpaywall, scanR
 import datetime
 import json
+import re
 
+import dateutil.parser
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
+from dateutil.relativedelta import relativedelta
 from decouple import config
 from django.shortcuts import redirect
 from elasticsearch import helpers
@@ -182,17 +185,17 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
 @shared_task(bind=True)
 def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
-    Collecte les documents d'un chercheur
+    Collecte les notices liées à un chercheur
     """
-    init = overwrite  # If True, data persistence is lost when references are updated
+    progress_recorder = ProgressRecorder(self)
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
 
-    progress_recorder = ProgressRecorder(self)
     progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
     # Insert documents collection
     for num, doc in enumerate(docs):
-        doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+        location_docs.generate_countrys_fields(doc)
         doc = doi_enrichissement.docs_enrichissement_doi(doc)
+
         if "fr_abstract_s" in doc.keys():
             if isinstance(doc["fr_abstract_s"], list):
                 doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
@@ -203,6 +206,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                 doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
                     doc["fr_abstract_s"], "fr"
                 )
+
         if "en_abstract_s" in doc.keys():
             if isinstance(doc["en_abstract_s"], list):
                 doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
@@ -215,143 +219,160 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                 )
 
         doc["_id"] = doc["docid"]
-        doc["validated"] = True
 
         doc["harvested_from"] = "researcher"
 
         doc["harvested_from_ids"] = []
         doc["harvested_from_label"] = []
 
-        #
-        #
-        # print(doc["authorship"], doc ['authLastName_s'])
-
-        if len(doc["authIdHal_s"]) != len(doc["authLastName_s"]):
-            # print ("elastichal.py : test d'autorat no good")
-            # test sur le nom complet...
-            nom = [
-                truc
-                for truc in doc["authLastName_s"]
-                if chercheur["lastName"].lower() in truc.lower()
-            ]  # pour les récemment mariés qui auraient un nom composé...
-            # Après si 'lun des co-auteur porte le même nom...
-            if len(nom) > 0:
-                nom = nom[0].title()
-                try:
-                    if doc["authLastName_s"].index(nom) == 0:  # premier
-                        doc["authorship"] = [
-                            {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                        ]
-                    elif (
-                        doc["authLastName_s"].index(nom) == len(doc["authLastName_s"]) - 1
-                    ):  # dernier
-                        doc["authorship"] = [
-                            {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
-                        ]
-                except ValueError:
-                    doc["authorship"] = []
-            else:
-                doc["authorship"] = []
-        elif chercheur["halId_s"] in doc["authIdHal_s"]:
-            if doc["authIdHal_s"].index(chercheur["halId_s"]) == 0:
-                doc["authorship"] = [
-                    {"authorship": "firstAuthor", "authIdHal_s": chercheur["halId_s"]}
-                ]
-            elif (
-                doc["authIdHal_s"].index(chercheur["halId_s"]) == len(doc["authIdHal_s"]) - 1
-            ):  # dernier
-                doc["authorship"] = [
-                    {"authorship": "lastAuthor", "authIdHal_s": chercheur["halId_s"]}
-                ]
-            else:
-                doc["authorship"] = []
-        else:
-            doc["authorship"] = []
-
         doc["harvested_from_ids"].append(chercheur["halId_s"])
-
-        # historique d'appartenance du docId
-        # pour attribuer les bons docs aux chercheurs
-        # harvet_history.append({'docid': doc['docid'], 'from': row['halId_s']})
-        #
-        # for h in harvet_history:
-        #     if h['docid'] == doc['docid']:
-        #         if h['from'] not in doc["harvested_from_ids"]:
-        #             doc["harvested_from_ids"].append(h['from'])
 
         doc["records"] = []
 
         doc["MDS"] = utils.calculate_mds(doc)
 
-        try:
-            should_be_open = utils.should_be_open(doc)
-            if should_be_open == 1:
-                doc["should_be_open"] = True
-            if should_be_open == -1:
-                doc["should_be_open"] = False
+        doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
 
-            if should_be_open == 1 or should_be_open == 2:
-                doc["isOaExtra"] = True
-            elif should_be_open == -1:
-                doc["isOaExtra"] = False
-        except IndexError:
-            print("publicationDate_tdate error ?")
         doc["Created"] = datetime.datetime.now().isoformat()
 
-        if not init:  # récupération de l'existant pour ne pas écraser
-            field = "_id"
-            doc_param = esActions.scope_p(field, doc["_id"])
+        # add a category to make differentiation in text_* index pattern
+        doc["category"] = "Notice"
 
-            if not es.indices.exists(
-                index=chercheur["structSirene"]
-                + "-"
-                + chercheur["labHalId"]
-                + "-researchers-"
-                + chercheur["ldapId"]
-                + "-documents"
-            ):  # -researchers" + row["ldapId"] + "-documents
-                print("exception ", chercheur["labHalId"], chercheur["ldapId"])
+        # add a common SearcherProfile Key who should serve has common key between index
+        doc["SearcherProfile"] = []
+        for idhal in doc["authIdHal_s"]:
+            validated_concepts = ""
+            validated = "unassigned"
 
-            res = es.search(
-                index=chercheur["structSirene"]
-                + "-"
-                + chercheur["labHalId"]
-                + "-researchers-"
-                + chercheur["ldapId"]
-                + "-documents",
-                body=doc_param,
-            )  # -researchers" + row["ldapId"] + "-documents
+            # check validated state depending if searcher is registered
+            doc_param = esActions.scope_p("SearcherProfile.halId_s", idhal)
+            current_state = es.count(index="test_researchers", query=doc_param)
+            if current_state["count"] > 0:
+                # TODO: Rajouter par la partie overwrite ici:
+                #  Si overwrite validated = True, else look existing state and keep it
+                validated = "True"
+                searcher_data = es.search(index="test_researchers", query=doc_param)
+                searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
+                validated_concepts = searcher_data["validated_concepts"]
 
-            if len(res["hits"]["hits"]) > 0:
-                doc["validated"] = res["hits"]["hits"][0]["_source"]["validated"]
-                if "authorship" in res["hits"]["hits"][0]["_source"]:
-                    doc["authorship"] = res["hits"]["hits"][0]["_source"]["authorship"]
-
-                if (
-                    res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                    != doc["modifiedDate_tdate"]
-                ):
-                    doc["records"].append(
-                        {
-                            "beforeModifiedDate_tdate": doc["modifiedDate_tdate"],
-                            "MDS": res["hits"]["hits"][0]["_source"]["MDS"],
-                        }
-                    )
-
+            # check authorship
+            authorship = ""
+            if doc["authIdHal_s"].index(idhal) == 0:
+                authorship = "firstAuthor"
             else:
-                doc["validated"] = True
-        progress_recorder.set_progress(num, len(docs), description="(récolte)")
-    progress_recorder.set_progress(num, len(docs), description="(indexation)")
-    helpers.bulk(
-        es,
-        docs,
-        index=chercheur["structSirene"]
-        + "-"
-        + chercheur["labHalId"]
-        + "-researchers-"
-        + chercheur["ldapId"]
-        + "-documents",
-        refresh="wait_for",
-    )
+                if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                    authorship = "lastAuthor"
 
-    return chercheur  # au cas où
+            doc["SearcherProfile"].append(
+                {
+                    "halId_s": idhal,
+                    "ldapId": chercheur["ldapId"]
+                    if chercheur["halId_s"] == idhal
+                    else "unassigned",
+                    "validated_concepts": validated_concepts,
+                    "validated": validated,
+                    "authorship": authorship,
+                }
+            )
+
+        # if not overwrite:  # récupération de l'existant pour ne pas écraser
+        #     # TODO: Revoir la partie validated dans overwrite
+        #     field = "_id"
+        #     doc_param = esActions.scope_p(field, doc["_id"])
+        #
+        #     res = es.search(index="test_publications", query=doc_param)
+        #
+        #     if len(res["hits"]["hits"]) > 0:
+        #         doc["validated"] = res["hits"]["hits"][0]["_source"]["validated"]
+        #         if "authorship" in res["hits"]["hits"][0]["_source"]:
+        #             doc["authorship"] = res["hits"]["hits"][0]["_source"]["authorship"]
+        #
+        #         if (
+        #             res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
+        #             != doc["modifiedDate_tdate"]
+        #         ):
+        #             doc["records"].append(
+        #                 {
+        #                     "beforeModifiedDate_tdate": doc["modifiedDate_tdate"],
+        #                     "MDS": res["hits"]["hits"][0]["_source"]["MDS"],
+        #                 }
+        #             )
+        #
+        #     else:
+        #         doc["validated"] = True
+
+        progress_recorder.set_progress(num, len(docs), description="(récolte)")
+
+    helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
+
+    progress_recorder.set_progress(num, len(docs), description="(indexation)")
+    print("done")
+    return chercheur
+
+
+# TODO: intégrer dans utils.py après modification du module elasticHal
+def should_be_open(notice):
+    """
+    Remplace should_be_open dans elasticHal/utils.py
+    Calcul l'état de l'embargo d'un document
+    À renommer en conséquence lors de l'intégration générale dans le code
+    """
+    # SHERPA/RoMEO embargo
+    notice["postprint_embargo"] = None
+    if (
+        "fileMain_s" not in notice
+        or notice["openAccess_bool"] is False
+        or "linkExtUrl_s" not in notice
+    ):
+        if "journalSherpaPostPrint_s" in notice:
+            if notice["journalSherpaPostPrint_s"] == "can":
+                notice["postprint_embargo"] = "false"
+            elif (
+                notice["journalSherpaPostPrint_s"] == "restricted"
+                and "publicationDate_tdate" in notice
+                and "journalSherpaPostRest_s" in notice
+            ):
+                matches = re.finditer(
+                    r"(\S+\s+){2}(?=embargo)", notice["journalSherpaPostRest_s"].replace("[", " ")
+                )
+                for match in matches:
+                    duration = match.group().split(" ")[0]
+                    if duration.isnumeric():
+                        publication_date = dateutil.parser.parse(
+                            notice["publicationDate_tdate"]
+                        ).replace(tzinfo=None)
+
+                        curr_date = datetime.now()
+                        age = relativedelta(curr_date, publication_date)
+                        age_in_months = age.years * 12 + age.months
+
+                        if age_in_months > int(duration):
+                            notice["postprint_embargo"] = "false"
+                        else:
+                            notice["postprint_embargo"] = "true"
+            elif notice["journalSherpaPostPrint_s"] == "cannot":
+                notice["postprint_embargo"] = "true"
+            else:
+                notice["postprint_embargo"] = None
+
+    notice["preprint_embargo"] = None
+    if (
+        "fileMain_s" not in notice
+        or notice["openAccess_bool"] is False
+        or "linkExtUrl_s" not in notice
+    ):
+        if "journalSherpaPrePrint_s" in notice:
+            if notice["journalSherpaPrePrint_s"] == "can":
+                notice["preprint_embargo"] = "false"
+            elif (
+                notice["journalSherpaPrePrint_s"] == "restricted"
+                and "journalSherpaPreRest_s" in notice
+            ):
+                if "Must obtain written permission from Editor" in notice["journalSherpaPreRest_s"]:
+                    notice["preprint_embargo"] = "perm_from_editor"
+            elif notice["journalSherpaPrePrint_s"] == "cannot":
+                notice["preprint_embargo"] = "true"
+            else:
+                notice["preprint_embargo"] = None
+
+    return notice["postprint_embargo"], notice["preprint_embargo"]
