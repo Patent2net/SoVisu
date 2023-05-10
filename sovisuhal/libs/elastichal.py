@@ -293,7 +293,6 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
     helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
 
     progress_recorder.set_progress(num, len(docs), description="(indexation)")
-    print("done")
     return chercheur
 
 

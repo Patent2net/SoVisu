@@ -9,6 +9,7 @@ from elasticsearch import helpers
 
 from elasticHal.libs import (
     doi_enrichissement,
+    elastic_formatting,
     hal,
     keyword_enrichissement,
     location_docs,
@@ -193,7 +194,9 @@ def get_labo_from_csv():
                 # rajoute les labos non recensés aux existants
                 concept_tree = laboratory_concepts(laboratory["halStructId"])
 
-                laboratories_list.append(laboratory_notice(laboratory, concept_tree))
+                laboratories_list.append(
+                    elastic_formatting.laboratory_format(laboratory, concept_tree)
+                )
             else:
                 # Compare les données des labos existant dans les deux listes
                 for listed_lab in laboratories_list:
@@ -201,39 +204,21 @@ def get_labo_from_csv():
                         if laboratory["structSirene"] not in listed_lab["structSirene"]:
                             listed_lab["structSirene"].append(laboratory["structSirene"])
 
-    for laboratory in laboratories_list:
-        es.index(
-            index="test_laboratories",
-            id=laboratory["halStructId"],
-            document=json.dumps(laboratory),
-            refresh="wait_for",
-        )
-
+    helpers.bulk(es, laboratories_list, index="test_laboratories", refresh="wait_for")
     return "laboratories added"
 
 
 def get_institution_from_csv(add_csv=True):
-    institutions_data = []
+    institutions_list = []
     if add_csv:
         with open("data/structures.csv", encoding="utf-8") as csv_file:
-            csv_reader = list(csv.DictReader(csv_file, delimiter=";"))
-            institutions_data = csv_reader
+            institution_csv = list(csv.DictReader(csv_file, delimiter=";"))
 
-    for row in institutions_data:
-        # Insert structure data
+    for institution in institution_csv:
+        # insert operations to make before append in the list for indexation
+        institutions_list.append(elastic_formatting.institution_format(institution))
 
-        # add a category to make differenciation in text_* index pattern
-        row["category"] = "institution"
-
-        # add a common SearcherProfile Key who should serve has common key between index
-        row["SearcherProfile"] = []
-
-        es.index(
-            index="test_institutions",
-            id=row["structSirene"],
-            document=json.dumps(row),
-            refresh="wait_for",
-        )
+    helpers.bulk(es, institutions_list, index="test_institutions", refresh="wait_for")
 
     return "institutions added"
 
@@ -242,6 +227,7 @@ def get_expertises():
     concept_list = concepts()
     for row in concept_list:
         # add a category to make differentiation in text_* index pattern
+        row["_id"] = row["id"]
         row["category"] = "expertise"
 
         # add a common SearcherProfile Key who should serve has common key between index
@@ -250,9 +236,9 @@ def get_expertises():
         for children in row["children"]:
             # nécessaire?
             children["category"] = "concept"
-        es.index(
-            index="test_expertises", id=row["id"], document=json.dumps(row), refresh="wait_for"
-        )
+
+    helpers.bulk(es, concept_list, index="test_expertises", refresh="wait_for")
+
     return "concepts added"
 
 
@@ -268,7 +254,7 @@ def collecte_docs(chercheur, overwrite=False):  # self,
 
     # Insert documents collection
     for num, doc in enumerate(docs):
-        doc["country_colaboration"] = location_docs.generate_countrys_fields(doc)
+        location_docs.generate_countrys_fields(doc)
         doc = doi_enrichissement.docs_enrichissement_doi(doc)
 
         if "fr_abstract_s" in doc.keys():
@@ -315,27 +301,43 @@ def collecte_docs(chercheur, overwrite=False):  # self,
 
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
+
+        # check if the document already exist and edit fields depending on overwrite state
+        doc_param = esActions.scope_p("_id", doc["_id"])
+        count_document = es.count(index="test_publications", query=doc_param)
+
+        # Create the records of the searchers linked to the document.
         for idhal in doc["authIdHal_s"]:
             validated_concepts = ""
             validated = "unassigned"
+            authorship = ""
 
-            # check validated state depending if searcher is registered
-            doc_param = scope_p("SearcherProfile.halId_s", idhal)
-            current_state = es.count(index="test_researchers", query=doc_param)
-            if current_state["count"] > 0:
-                validated = "True"
-                searcher_data = es.search(index="test_researchers", query=doc_param)
+            # get validated_concepts of the searcher if registered in SoVisu
+            searcher_param = esActions.scope_p("SearcherProfile.halId_s", idhal)
+            count_searcher = es.count(index="test_researchers", query=searcher_param)
+            if count_searcher["count"] > 0:
+                searcher_data = es.search(index="test_researchers", query=searcher_param)
                 searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
                 validated_concepts = searcher_data["validated_concepts"]
 
-            # check authorship
-            authorship = ""
-            if doc["authIdHal_s"].index(idhal) == 0:
-                authorship = "firstAuthor"
-            else:
+            if overwrite or count_document["count"] == 0:
+                if count_searcher["count"] > 0:
+                    validated = "True"
+                # check authorship
+                if doc["authIdHal_s"].index(idhal) == 0:
+                    authorship = "firstAuthor"
                 if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
                     authorship = "lastAuthor"
+            else:
+                document_data = es.search(index="test_publications", query=doc_param)
+                document_data = document_data["hits"]["hits"][0]["_source"]
 
+                for searcher in document_data["SearcherProfile"]:
+                    if searcher["halId_s"] == idhal:
+                        validated = searcher["validated"]
+                        authorship = searcher["authorship"]
+
+            # add the record of the Searcher in the document
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
@@ -348,33 +350,7 @@ def collecte_docs(chercheur, overwrite=False):  # self,
                 }
             )
 
-        if not overwrite:  # récupération de l'existant pour ne pas écraser
-            field = "_id"
-            doc_param = scope_p(field, doc["_id"])
-
-            res = es.search(index="test_publications", query=doc_param)
-
-            if len(res["hits"]["hits"]) > 0:
-                doc["validated"] = res["hits"]["hits"][0]["_source"]["validated"]
-                if "authorship" in res["hits"]["hits"][0]["_source"]:
-                    doc["authorship"] = res["hits"]["hits"][0]["_source"]["authorship"]
-
-                if (
-                    res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                    != doc["modifiedDate_tdate"]
-                ):
-                    doc["records"].append(
-                        {
-                            "beforeModifiedDate_tdate": doc["modifiedDate_tdate"],
-                            "MDS": res["hits"]["hits"][0]["_source"]["MDS"],
-                        }
-                    )
-
-            else:
-                doc["validated"] = True
-
     helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
-
     return "add publications done"
 
 
@@ -505,23 +481,6 @@ def laboratory_concepts(halStructId):
                                         child2, searcher["_source"], concept_tree, "validated"
                                     )
     return concept_tree
-
-
-def laboratory_notice(notice, concept_tree):
-    labo_notice = {
-        "category": "laboratory",
-        "acronym": notice["acronym"],
-        "halStructId": notice["halStructId"],
-        "idRef": notice["idRef"],
-        "label": notice["label"],
-        "rsnr": notice["rsnr"],
-        "structSirene": [notice["structSirene"]],
-        "guidingKeywords": [],
-        "concepts": concept_tree,
-        "SearcherProfile": [],
-        "Created": datetime.datetime.now().isoformat(),
-    }
-    return labo_notice
 
 
 def concepts():
@@ -2931,4 +2890,10 @@ def concepts():
 
 
 if __name__ == "__main__":
+    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
+
+    for index in index_list:
+        if not es.indices.exists(index=f"test_{index}"):
+            es.indices.create(index=f"test_{index}")
+
     create_test_context()
