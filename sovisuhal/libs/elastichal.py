@@ -106,9 +106,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
     elif not len(mail) > 0:
         mail = [""]
 
-    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
     chercheur = dict()
-    # as-t-on besoin des 3 derniers champs ???
     chercheur["name"] = nom
     chercheur["type"] = chercheur_type
     chercheur["function"] = emploi
@@ -186,6 +184,7 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
 def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
     Collecte les notices liées à un chercheur
+    "overwrite" : remet les valeurs pour l'ensemble du document à ses valeurs initiales.
     """
     progress_recorder = ProgressRecorder(self)
     docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
@@ -240,29 +239,43 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
 
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
+
+        # check if the document already exist and edit fields depending on overwrite state
+        doc_param = esActions.scope_p("_id", doc["_id"])
+        count_document = es.count(index="test_publications", query=doc_param)
+
+        # Create the records of the searchers linked to the document.
         for idhal in doc["authIdHal_s"]:
             validated_concepts = ""
             validated = "unassigned"
+            authorship = ""
 
-            # check validated state depending if searcher is registered
-            doc_param = esActions.scope_p("SearcherProfile.halId_s", idhal)
-            current_state = es.count(index="test_researchers", query=doc_param)
-            if current_state["count"] > 0:
-                # TODO: Rajouter par la partie overwrite ici:
-                #  Si overwrite validated = True, else look existing state and keep it
-                validated = "True"
-                searcher_data = es.search(index="test_researchers", query=doc_param)
+            # get validated_concepts of the searcher if registered in SoVisu
+            searcher_param = esActions.scope_p("SearcherProfile.halId_s", idhal)
+            count_searcher = es.count(index="test_researchers", query=searcher_param)
+            if count_searcher["count"] > 0:
+                searcher_data = es.search(index="test_researchers", query=searcher_param)
                 searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
                 validated_concepts = searcher_data["validated_concepts"]
 
-            # check authorship
-            authorship = ""
-            if doc["authIdHal_s"].index(idhal) == 0:
-                authorship = "firstAuthor"
-            else:
+            if overwrite or count_document["count"] == 0:
+                if count_searcher["count"] > 0:
+                    validated = "True"
+                # check authorship
+                if doc["authIdHal_s"].index(idhal) == 0:
+                    authorship = "firstAuthor"
                 if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
                     authorship = "lastAuthor"
+            else:
+                document_data = es.search(index="test_publications", query=doc_param)
+                document_data = document_data["hits"]["hits"][0]["_source"]
 
+                for searcher in document_data["SearcherProfile"]:
+                    if searcher["halId_s"] == idhal:
+                        validated = searcher["validated"]
+                        authorship = searcher["authorship"]
+
+            # add the record of the Searcher in the document
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
@@ -274,32 +287,6 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                     "authorship": authorship,
                 }
             )
-
-        # if not overwrite:  # récupération de l'existant pour ne pas écraser
-        #     # TODO: Revoir la partie validated dans overwrite
-        #     field = "_id"
-        #     doc_param = esActions.scope_p(field, doc["_id"])
-        #
-        #     res = es.search(index="test_publications", query=doc_param)
-        #
-        #     if len(res["hits"]["hits"]) > 0:
-        #         doc["validated"] = res["hits"]["hits"][0]["_source"]["validated"]
-        #         if "authorship" in res["hits"]["hits"][0]["_source"]:
-        #             doc["authorship"] = res["hits"]["hits"][0]["_source"]["authorship"]
-        #
-        #         if (
-        #             res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-        #             != doc["modifiedDate_tdate"]
-        #         ):
-        #             doc["records"].append(
-        #                 {
-        #                     "beforeModifiedDate_tdate": doc["modifiedDate_tdate"],
-        #                     "MDS": res["hits"]["hits"][0]["_source"]["MDS"],
-        #                 }
-        #             )
-        #
-        #     else:
-        #         doc["validated"] = True
 
         progress_recorder.set_progress(num, len(docs), description="(récolte)")
 

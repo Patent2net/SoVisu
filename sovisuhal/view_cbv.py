@@ -481,17 +481,16 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         if "update_reference" in request.POST:
-            struct = request.POST.get("struct")
             i_type = request.POST.get("type")
             p_id = request.POST.get("id")
-            taches = self.update_references(struct, i_type, p_id)
+            taches = self.update_references(i_type, p_id)
             response_data = {"task_id": taches}
             response = JsonResponse(response_data)
             response["X-Frame-Options"] = self.get_xframe_options_value()
             return response
 
     # TODO: Mettre à jour collecte_docs
-    def update_references(self, struct, i_type, p_id):
+    def update_references(self, i_type, p_id):
         if i_type == "rsr":
             scope_param = esActions.scope_p("_id", p_id)
 
@@ -501,7 +500,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             except IndexError:
                 return redirect("unknown")
 
-            result = collecte_docs.delay(entity, True)
+            result = collecte_docs.delay(entity)
             taches = result.task_id
             return taches
 

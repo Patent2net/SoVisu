@@ -40,8 +40,8 @@ class CreateCredentials(forms.Form):
 
     scope_param = esActions.scope_all()
 
-    count = es.count(index=struct + "test_laboratories", query=scope_param)["count"]
-    res = es.search(index=struct + "test_laboratories", query=scope_param, size=count)
+    count = es.count(index="test_laboratories", query=scope_param)["count"]
+    res = es.search(index="test_laboratories", query=scope_param, size=count)
     entities = res["hits"]["hits"]
     labos = [("", "")]  # empty default field
     labos.extend(
