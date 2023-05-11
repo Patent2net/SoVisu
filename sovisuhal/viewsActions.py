@@ -107,6 +107,16 @@ def validate_references(request):
     else:
         return redirect("unknown")
 
+    update_body = {
+        "script": {
+            "source": "for (profile in ctx._source.SearcherProfile) {"
+            " if (profile.ldapId == params.ldapId) "
+            "{ profile.validated = params.validated } }",
+            "lang": "painless",
+            "params": {"ldapId": p_id, "validated": validate},
+        }
+    }
+
     # Get scope information
     if i_type == "rsr":
         if request.method == "POST":
@@ -116,9 +126,10 @@ def validate_references(request):
                     index="test_publications",
                     refresh="wait_for",
                     id=docid,
-                    document={"doc": {"validated": validate}},
+                    body=update_body,
                 )
 
+    # TODO: Revoir le body renvoyé pour s'adapter au nouveau systeme
     if i_type == "lab":
         if request.method == "POST":
             to_validate = request.POST.get("toValidate", "").split(",")
@@ -603,7 +614,7 @@ def update_members(request):
     )
 
 
-# TODO: voir pour intégrer à la checkview?
+# TODO: voir pour intégrer à checkview dans view_cbv.py?
 def update_authorship(request):
     """
     Met à jour l'autorat des documents d'un utlisateur après vérification de ce dernier

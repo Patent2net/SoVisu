@@ -489,7 +489,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             response["X-Frame-Options"] = self.get_xframe_options_value()
             return response
 
-    # TODO: Mettre à jour collecte_docs
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
             scope_param = esActions.scope_p("_id", p_id)
