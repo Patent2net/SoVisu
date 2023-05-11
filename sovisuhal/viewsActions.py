@@ -107,14 +107,12 @@ def validate_references(request):
     else:
         return redirect("unknown")
 
-    update_body = {
-        "script": {
-            "source": "for (profile in ctx._source.SearcherProfile) {"
-            " if (profile.ldapId == params.ldapId) "
-            "{ profile.validated = params.validated } }",
-            "lang": "painless",
-            "params": {"ldapId": p_id, "validated": validate},
-        }
+    update_script = {
+        "source": "for (profile in ctx._source.SearcherProfile) {"
+        " if (profile.ldapId == params.ldapId) "
+        "{ profile.validated = params.validated } }",
+        "lang": "painless",
+        "params": {"ldapId": p_id, "validated": validate},
     }
 
     # Get scope information
@@ -126,7 +124,7 @@ def validate_references(request):
                     index="test_publications",
                     refresh="wait_for",
                     id=docid,
-                    body=update_body,
+                    script=update_script,
                 )
 
     # TODO: Revoir le body renvoyé pour s'adapter au nouveau systeme
@@ -138,7 +136,7 @@ def validate_references(request):
                     index="test_publications",
                     refresh="wait_for",
                     id=docid,
-                    document={"doc": {"validated": validate}},
+                    doc={"validated": validate},
                 )
 
     return redirect(
@@ -186,7 +184,7 @@ def validate_guiding_domains(request):
                 index="test_researchers",
                 refresh="wait_for",
                 id=p_id,
-                document={"doc": {"guidingDomains": to_validate}},
+                doc={"guidingDomains": to_validate},
             )
 
         if i_type == "lab":
@@ -194,7 +192,7 @@ def validate_guiding_domains(request):
                 index="test_laboratories",
                 refresh="wait_for",
                 id=p_id,
-                document={"doc": {"guidingDomains": to_validate}},
+                doc={"guidingDomains": to_validate},
             )
 
     return redirect(
@@ -310,7 +308,7 @@ def validate_expertise(request):
                 index=index,
                 refresh="wait_for",
                 id=entity["ldapId"],
-                document={"doc": {"concepts": entity["concepts"]}},
+                doc={"concepts": entity["concepts"]},
             )
             # g oublié le labo hier...
             # Faut discuter de la fonction util, je sais pas l'appeler à priori.
@@ -391,15 +389,13 @@ def validate_credentials(request):
                 index="test_researchers",
                 refresh="wait_for",
                 id=p_id,
-                document={
-                    "doc": {
-                        "aurehalId": aurehalId,
-                        "idRef": idref,
-                        "orcId": orcid,
-                        "validated": True,
-                        "function": function,
-                        "concepts": archives_ouvertes_data,
-                    }
+                doc={
+                    "aurehalId": aurehalId,
+                    "idRef": idref,
+                    "orcId": orcid,
+                    "validated": True,
+                    "function": function,
+                    "concepts": archives_ouvertes_data,
                 },
             )
 
@@ -411,7 +407,7 @@ def validate_credentials(request):
                 index="test_laboratories",
                 refresh="wait_for",
                 id=p_id,
-                document={"doc": {"rsnr": rsnr, "idRef": idref, "validated": True}},
+                doc={"rsnr": rsnr, "idRef": idref, "validated": True},
             )
 
     return redirect(
@@ -470,17 +466,15 @@ def validate_research_description(request):
                 index="test_researchers",
                 refresh="wait_for",
                 id=p_id,
-                document={
-                    "doc": {
-                        "research_summary": research_summary,
-                        "research_summary_raw": research_summary_raw,
-                        "research_projectsInProgress": research_projects_in_progress,
-                        "research_projectsInProgress_raw": research_projects_in_progress_raw,
-                        "research_projectsAndFundings": research_projects_and_fundings,
-                        "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
-                        "research_updatedDate": datetime.today().isoformat(),
-                        "guidingKeywords": guiding_keywords,
-                    }
+                doc={
+                    "research_summary": research_summary,
+                    "research_summary_raw": research_summary_raw,
+                    "research_projectsInProgress": research_projects_in_progress,
+                    "research_projectsInProgress_raw": research_projects_in_progress_raw,
+                    "research_projectsAndFundings": research_projects_and_fundings,
+                    "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
+                    "research_updatedDate": datetime.today().isoformat(),
+                    "guidingKeywords": guiding_keywords,
                 },
             )
 
@@ -489,7 +483,7 @@ def validate_research_description(request):
                 index="test_laboratories",
                 refresh="wait_for",
                 id=p_id,
-                document={"doc": {"guidingKeywords": guiding_keywords}},
+                doc={"guidingKeywords": guiding_keywords},
             )
 
     return redirect(
@@ -546,7 +540,7 @@ def refresh_aurehal_id(request):
         index="test_researchers",
         refresh="wait_for",
         id=p_id,
-        document={"doc": {"aurehalId": aurehal_id, "concepts": concepts}},
+        doc={"aurehalId": aurehal_id, "concepts": concepts},
     )
 
     return redirect(
@@ -606,7 +600,7 @@ def update_members(request):
                 index=res["hits"]["hits"][0]["_index"],
                 refresh="wait_for",
                 id=entity["ldapId"],
-                document={"doc": {"axis": element[1]}},
+                doc={"axis": element[1]},
             )
 
     return redirect(
@@ -651,21 +645,19 @@ def update_authorship(request):
         for doc in to_process:
             # update in researcher's collection
 
-            update_query = {
-                "script": {
-                    "source": "for (searcher in ctx._source.SearcherProfile) { "
-                    "if (searcher.ldapId == params.ldapId) "
-                    "{ searcher.authorship = params.new_authorshipstate } }",
-                    "lang": "painless",
-                    "params": {"ldapId": p_id, "new_authorshipstate": doc["authorship"]},
-                }
+            update_script = {
+                "source": "for (searcher in ctx._source.SearcherProfile) { "
+                "if (searcher.ldapId == params.ldapId) "
+                "{ searcher.authorship = params.new_authorshipstate } }",
+                "lang": "painless",
+                "params": {"ldapId": p_id, "new_authorshipstate": doc["authorship"]},
             }
 
             es.update(
                 index="test_publications",
                 refresh="wait_for",
                 id=doc["docid"],
-                body=update_query,
+                script=update_script,
             )
 
     except IndexError:
