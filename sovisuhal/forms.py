@@ -4,7 +4,6 @@ from .libs import esActions
 
 # mesure temporaire,
 # valable tant que seuls les chercheurs UTLN ont le droit de s'inscrire
-struct = "198307662"
 
 const_css_class = "flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none"
 es = esActions.es_connector()
@@ -40,8 +39,8 @@ class CreateCredentials(forms.Form):
 
     scope_param = esActions.scope_all()
 
-    count = es.count(index=struct + "*-laboratories", body=scope_param)["count"]
-    res = es.search(index=struct + "*-laboratories", body=scope_param, size=count)
+    count = es.count(index="*-laboratories", body=scope_param)["count"]
+    res = es.search(index="*-laboratories", body=scope_param, size=count)
     entities = res["hits"]["hits"]
     labos = [("", "")]  # empty default field
     labos.extend(
