@@ -383,7 +383,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     # TODO: expertises validées =>
     #  montrer le contenu de validated_expertises dans le profil chercheur
-    #  Annexes/retirées =>
+    #  Annexes =>
     #  montrer le contenu des expertises dans test_expertises MOINS les concepts déjà validés
     def get_expertise_case(self, entity):
         if "validation" in self.request.GET:

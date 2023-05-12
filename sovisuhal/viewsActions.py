@@ -274,51 +274,12 @@ def validate_expertise(request):
                                         ("state", validate) for k, v in d2.items() if v == concept
                                     )
 
-            # for conceptid in to_invalidate:
-            #     sid = conceptid.split(".")
-            #     for children in entity["concepts"]["children"]:
-            #         if len(sid) >= 1 and sid[0] == children["id"]:
-            #             lab_tree = utils.append_to_tree(
-            #                 children, entity, lab_tree, validate
-            #             )
-            #             children["state"] = validate
-            #
-            #         if "children" in children:
-            #             for children1 in children["children"]:
-            #                 if len(sid) >= 2:
-            #                     if sid[0] + "." + sid[1] == children1["id"]:
-            #                         lab_tree = utils.append_to_tree(
-            #                             children1, entity, lab_tree, validate
-            #                         )
-            #                         children1["state"] = validate
-            #
-            #                 if "children" in children1:
-            #                     for children2 in children1["children"]:
-            #                         if len(sid) >= 3:
-            #                             if (
-            #                                 sid[0] + "." + sid[1] + "." + sid[2]
-            #                                 == children2["id"]
-            #                             ):
-            #                                 lab_tree = utils.append_to_tree(
-            #                                     children2, entity, lab_tree, validate
-            #                                 )
-            #                                 children2["state"] = validate
-
             es.update(
                 index=index,
                 refresh="wait_for",
                 id=entity["ldapId"],
                 doc={"concepts": entity["concepts"]},
             )
-            # g oublié le labo hier...
-            # Faut discuter de la fonction util, je sais pas l'appeler à priori.
-
-            # es.update(
-            #     index=lab_index,
-            #     refresh="wait_for",
-            #     id=entity["labHalId"],
-            #     body={"doc": {"concepts": lab_tree}},
-            # )
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}"

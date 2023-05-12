@@ -1,0 +1,72 @@
+
+                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+
+                    <p>Cet onglet vous permet d'affecter les chercheurs à des groupes. Cette affectation permet de produire des documents de synthèse.
+                        Si le niveau labo est la granularité que vous choisissez, laissez "Aucun axe affecté"</p>
+
+                </div>
+
+                <div class="justify-end flex w-full">
+                    <div class="dt-buttons-rplc flex items-center text-xs">
+                    </div>
+                </div>
+
+                <div class="flex-1">
+
+                    <table id="state">
+
+                        <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-xs">
+                            <th class="hidden">ID</th>
+                            <th>Nom</th>
+                            <th>IDs validés</th>
+                            <th>Axe</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for rsr in researchers %}
+                            <tr class="text-gray-500">
+                                <td class="hidden ldapId">{{ rsr.ldapId }}</td>
+                                <td>
+                                     <a class="text-blue-700 text-sm underline" target="_blank" href="/dashboard/?struct={{ struct }}&type=rsr&id={{rsr.ldapId}}">
+                                     <span class=""> {{ rsr.firstName }} {{ rsr.lastName }} </span>
+                                    </a>
+                                </td>
+                                <td>{{ rsr.validated }}</td>
+
+
+                                    <td>
+                                        <select class="border border-gray-300 axis" name="axis" id="axis">
+                                            <option value="{{ entity.acronym }}">{{ entity.acronym }} (aucun axe défini)</option>
+                                            <option value="axis1">Axe 1</option>
+                                            <option value="axis2">Axe 2</option>
+                                            <option value="axis3">Axe 3</option>
+                                            <option value="axis4">Axe 4</option>
+                                            <option value="axis5">Axe 5</option>
+                                        </select>
+
+                                    </td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="hidden researchers-json">{{ researchers|json_script:"researchers" }}</div>
+
+                <div class="dt-bottom-infos-rplc flex justify-between items-center">
+                    <button class="update-members text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
+                        Mettre à jour
+                    </button>
+
+                </div>
