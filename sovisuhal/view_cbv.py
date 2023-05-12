@@ -324,7 +324,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
             # integration contenus
             # "extIds": ["a", "b", "c"],
-            # TODO: Vérifier la maj de la fiche chercheur
             form = forms.ValidCredentials(
                 halId_s=entity["halId_s"],
                 aurehalId=entity["aurehalId"],
@@ -382,6 +381,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             form,
         )
 
+    # TODO: expertises validées =>
+    #  montrer le contenu de validated_expertises dans le profil chercheur
+    #  Annexes/retirées =>
+    #  montrer le contenu des expertises dans test_expertises MOINS les concepts déjà validés
     def get_expertise_case(self, entity):
         if "validation" in self.request.GET:
             validation = self.request.GET["validation"]
@@ -467,7 +470,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         if i_type == "rsr" or i_type == "lab":
             count = es.count(index="test_publications", query=validated_sp)["count"]
-            print(count)
             references = es.search(index="test_publications", query=validated_sp, size=count)
         else:
             return redirect("unknown")
@@ -931,7 +933,6 @@ class IndexView(CommonContextMixin, TemplateView):
         entities, struct_tab = self.get_elastic_data(context["indexcat"])
 
         context["entities"] = entities
-        print(context["entities"])
         context["struct_tab"] = struct_tab
 
         if context["type"] == -1 and context["id"] == -1:

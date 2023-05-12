@@ -385,6 +385,8 @@ def validate_credentials(request):
                 archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])
                 archives_ouvertes_data = archives_ouvertes_data["concepts"]
 
+            # TODO: supprimer Concepts sur le long terme dans la fonction.
+            #  Doit passer dans SearcherProfile. Et principalement géré par test_expertises
             es.update(
                 index="test_researchers",
                 refresh="wait_for",
