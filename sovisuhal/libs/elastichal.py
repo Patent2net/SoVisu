@@ -30,7 +30,7 @@ es = esActions.es_connector()
 
 
 # @shared_task(bind=True)
-def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
+def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
     """
@@ -59,7 +59,6 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
             ],
         )
         dico = json.loads(conn.response_to_json())["entries"][0]
-        structid = config("structId")
     else:
         dico = {
             "attributes": {
@@ -74,7 +73,6 @@ def indexe_chercheur(ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self
             },
             "dn": "uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr",
         }
-        structid = "198307662"
         ldapid = "dreymond"
     labo = labhalid
 
