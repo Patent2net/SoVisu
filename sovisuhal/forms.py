@@ -38,8 +38,10 @@ class CreateCredentials(forms.Form):
     )
 
     scope_param = esActions.scope_all()
-    institution_count = es.count(index="test_structures", query=scope_param)["count"]
-    institution_res = es.search(index="test_structures", query=scope_param, size=institution_count)
+    institution_count = es.count(index="test_institutions", query=scope_param)["count"]
+    institution_res = es.search(
+        index="test_institutions", query=scope_param, size=institution_count
+    )
     inst_entities = institution_res["hits"]["hits"]
     institution_list = [("", "")]
     institution_list.extend(
