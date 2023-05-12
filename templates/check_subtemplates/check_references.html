@@ -1,200 +1,368 @@
 {% load widget_tweaks %}
 {% load static %}
-                <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    {% if validation == "1" %}
-                    <p>Dans cet onglet, sont listées les références bibliographiques collectées sur HAL à l'aide de votre identifiant. Celle-ci sont indexées dans SoVisu par défaut.
-                        Vous pouvez ici choisir d'exclure des notices que vous considèreriez marginales. Cette opération est réversible.
-                        Pour les rapports HCERES, vous vérifiez ici que votre position d'auteur a bien été identifiée (les "corresponding auteur" sont rarement identifiés sur les notices).
-                        <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le
-                        bouton "Collecter HAL" sert à les importer ici.
-                        </p>
-                    {% endif %}
-                    {% if validation == "0" %} <p>
+<div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
+    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    {% if validation == "1" %}
+    <p>Dans cet onglet, sont listées les références bibliographiques collectées sur HAL à l'aide de votre identifiant. Celle-ci sont indexées dans SoVisu par défaut.
+        Vous pouvez ici choisir d'exclure des notices que vous considèreriez marginales. Cette opération est réversible.
+        Pour les rapports HCERES, vous vérifiez ici que votre position d'auteur a bien été identifiée (les "corresponding auteur" sont rarement identifiés sur les notices).
+        <br>S'il manquait des références, à vous de les ajouter sur Hal à l'aide de vos identifiants. Le
+        bouton "Collecter HAL" sert à les importer ici.
+        </p>
+    {% endif %}
+    {% if validation == "0" %} <p>
 
-                    <br>Restent ici les publications "annexes", pas forcément au c&oelig; ur de votre expertise ou qui ne seraient pas de vous par erreur...
-                        Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.
-                    </p>
-                    {% endif %}
-                </div>
+    <br>Restent ici les publications "annexes", pas forcément au c&oelig; ur de votre expertise ou qui ne seraient pas de vous par erreur...
+        Les raccourcis de sélection <i>Shift</i> et <i>CTRL</i> fonctionnent.
+    </p>
+    {% endif %}
+</div>
 
-                <div class="flex justify-between items-start">
+<div class="flex justify-between items-start">
 
-                    <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
-                        {% if type == "rsr" %}
-                            <a class="px-2 pb-1
-                        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
-                            >Notices validées</a>
-                            <a class="px-2 pb-1
-                        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
-                            >Notices retirées</a>
-                        {% endif %}
+    <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+        {% if type == "rsr" %}
+            <a class="px-2 pb-1
+        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+            >Notices validées</a>
+            <a class="px-2 pb-1
+        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
+            >Notices retirées</a>
+        {% endif %}
 
-                        {% if type == "lab" %}
-                            <a class="px-2 pb-1
-                        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
-                            >Notices validées</a>
-                            <a class="px-2 pb-1
-                        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
-                            >Notices annexes</a>
-                        {% endif %}
+        {% if type == "lab" %}
+            <a class="px-2 pb-1
+        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=1"
+            >Notices validées</a>
+            <a class="px-2 pb-1
+        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+               href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=references&validation=0"
+            >Notices annexes</a>
+        {% endif %}
+    </div>
+
+    <div class="dt-buttons-rplc flex mb-2 items-center text-xs flex-col relative">
+        {% if type == "rsr" or type == "lab" %}
+            <div class="flex">
+
+            <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
+            text-gray-600 flex mr-2 border-b-2 border-blue-300"
+            href="#" id="collect_hal_notices"> Collecter HAL</a>
+
+            <div class="flex">
+                <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
+                    <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px; width:0%;">
                     </div>
-
-                    <div class="dt-buttons-rplc flex mb-2 items-center text-xs flex-col relative">
-                        {% if type == "rsr" or type == "lab" %}
-                            <div class="flex">
-
-                            <a class="px-2 pb-1 font-semibold text-xs whitespace-nowrap text-blue-700
-                            text-gray-600 flex mr-2 border-b-2 border-blue-300"
-                            href="#" id="collect_hal_notices"> Collecter HAL</a>
-
-                            <div class="flex">
-                                <div class='progress-wrapper bg-gray-200 w-48 rounded relative' style="height: 20px">
-                                    <div id='progress-bar' class='bg-blue-200 progress-bar progress-bar-striped rounded' role='progressbar' style="height: 20px; width:0%;">
-                                    </div>
-                                    <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression de collecte</div>
-                                </div>
-                                <div id="progress-bar-container"></div>
-                                <div id="celery-result" class=""></div>
-                                </div>
-                            </div>
+                    <div id="progress-bar-message" class="mr-1 ml-1 absolute top-0 py-0.5 px-1">Progression de collecte</div>
+                </div>
+                <div id="progress-bar-container"></div>
+                <div id="celery-result" class=""></div>
+                </div>
+            </div>
 
 
 {#                                Collecter (ou mettre à jour) de nouvelles références</a>#}
 
-                            <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-                                <!-- Celery Progress -->
-                           <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
-                           <script type="text/javascript" src="{% static 'celery_progress/CustomCelery_progress.js' %}"></script>
+            <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+                <!-- Celery Progress -->
+           <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+           <script type="text/javascript" src="{% static 'celery_progress/CustomCelery_progress.js' %}"></script>
 
-                            <script type="text/javascript">
-                                $(function() {
-                                    $("#collect_hal_notices").click(function() {
-                                        $.ajax({
-                                            type: "POST",
-                                            url: "{% url 'check' %}",
-                                            data: {
-                                                'update_reference': 'True',
-                                                'struct': '{{ struct }}',
-                                                'type': '{{ type }}',
-                                                'id': '{{ id }}',
-                                                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                            },
-                                            beforeSend: function() {
-                                                $("#progress-bar-container").html("");
-                                            },
-                                            success: function (data) {
-                                                var task_id = data.task_id;
-                                                var progressUrl = "{% url 'celery_progress:task_status' 0 %}".replace("0", task_id);
+            <script type="text/javascript">
+                $(function() {
+                    $("#collect_hal_notices").click(function() {
+                        $.ajax({
+                            type: "POST",
+                            url: "{% url 'check' %}",
+                            data: {
+                                'update_reference': 'True',
+                                'struct': '{{ struct }}',
+                                'type': '{{ type }}',
+                                'id': '{{ id }}',
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            beforeSend: function() {
+                                $("#progress-bar-container").html("");
+                            },
+                            success: function (data) {
+                                var task_id = data.task_id;
+                                var progressUrl = "{% url 'celery_progress:task_status' 0 %}".replace("0", task_id);
 
 
-                                                 CeleryProgressBar.initProgressBar(progressUrl, {
-                                                    onResult: customResult,
-                                                    onProgress: customProgress,
-                                                    onSuccess: function() {
-                                                        // Custom success code
-                                                        location.reload();
-                                                    },
-                                                  });
-                                            }
-                                        });
-                                    });
-                                });
-                            </script>
-                        {% endif %}
+                                 CeleryProgressBar.initProgressBar(progressUrl, {
+                                    onResult: customResult,
+                                    onProgress: customProgress,
+                                    onSuccess: function() {
+                                        // Custom success code
+                                        location.reload();
+                                    },
+                                  });
+                            }
+                        });
+                    });
+                });
+            </script>
+        {% endif %}
 
-                    </div>
+    </div>
+</div>
+
+
+
+<div class="flex-1">
+
+    <table id="references">
+
+        <thead>
+        <tr class="bg-gray-100 text-gray-700 text-xs">
+            <th>URL</th>
+            <th>Année</th>
+            <th>Type</th>
+            <th>Titre</th>
+            {% if validation == "1" and type == "rsr" %}
+                <th>Autorat</th>
+            {% endif %}
+            <th>label_bibtex</th>
+            <th class="hidden">docid</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {% for ref in references %}
+            <tr class="text-gray-500">
+                <td class="whitespace-nowrap">{{ ref.halId_s }}</td>
+                <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
+                <td>{{ ref.docType_s }}</td>
+                <td>{{ ref.title_s.0 | safe }}</td>
+                {% if validation == "1" and type == "rsr" %}
+                    <td>
+                        <select class="border border-gray-300 author" name="authorship" id="authorship">
+                            <option value="">---</option>
+                            <option value="firstAuthor">Premier auteur</option>
+                            <option value="lastAuthor">Dernier auteur</option>
+                            <option value="correspondingAuthor">Corresponding auteur</option>
+                        </select>
+                    </td>
+                {% endif %}
+                <td>{{ ref.label_bibtex }}</td>
+                <td class="docid hidden">{{ ref.docid }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<div class="hidden references-json">{{ references|json_script:"references" }}</div>
+<div class="hidden halId_s">{{ entity.halId_s|safe }}</div>
+
+<div class="dt-bottom-infos-rplc flex justify-between items-center">
+    {% if validation == "1" %}
+
+    <form action="/update_authorship/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
+            {% csrf_token %}
+            <input id="toProcess" name="toProcess" class="hidden"/>
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {% for field in form.visible_fields %}
+                <div>
+                    <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
+                    {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
                 </div>
+            {% endfor %}
+
+            {% if  type == "rsr" %}
+                <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'autorat">
+            {% endif %}
+
+        </form>
+
+    {% endif %}
+    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
+        {% if validation == "1" %}
+            Retirer du profil
+        {% endif %}
+        {% if validation == "0" %}
+            Intégrer au profil
+        {% endif %}
+    </button>
+</div>
+
+<script type="text/javascript">
+        {% if validation == "1" and  type == "rsr" and data == "references" %}
+
+            var references = JSON.parse(document.querySelector(".references-json").textContent)
+
+            var getObjectByValue = function (array, key, value) {
+                return array.filter(function (object) {
+                    return object[key] === value;
+                });
+            };
+
+            var table = document.getElementById("references");
+            for (let i in table.rows) {
+                try {
+                    let row = table.rows[i]
+                    let curr_rsr = getObjectByValue(references, "docid", row.cells[6].textContent);
+                    if (curr_rsr[0].SearcherProfile) {
+                        let curr_val = getObjectByValue(curr_rsr[0].SearcherProfile, "ldapId", '{{ id }}');
+                        //console.log(curr_rsr[0].authorship)
+                        //console.log(document.querySelector(".halId_s").textContent)
+                        //console.log(curr_val);
+                        row.cells[4].querySelector('#authorship').value = curr_val[0].authorship;
+                    } else {
+                        row.cells[4].querySelector('#authorship').value = "";
+                    }
+                } catch (error) {
+                }
+            }
 
 
+            refUpdated = []
 
-                <div class="flex-1">
+            const elements = document.querySelectorAll('select#authorship');
+            Array.from(elements).forEach((element, index) => {
 
-                    <table id="references">
+                element.onchange = (event) => {
+                    let val = event.target.value;
+                    let docid = element.parentNode.parentNode.querySelector(".docid").textContent;
 
-                        <thead>
-                        <tr class="bg-gray-100 text-gray-700 text-xs">
-                            <th>URL</th>
-                            <th>Année</th>
-                            <th>Type</th>
-                            <th>Titre</th>
-                            {% if validation == "1" and type == "rsr" %}
-                                <th>Autorat</th>
-                            {% endif %}
-                            <th>label_bibtex</th>
-                            <th class="hidden">docid</th>
-                        </tr>
-                        </thead>
+                    refUpdated.push({'docid': docid, 'authorship': val, author: '{{ entity.ldapId|safe }}'});
 
-                        <tbody>
+                    document.querySelector("#toProcess").value = JSON.stringify(refUpdated);
+                }
+            });
 
-                        {% for ref in references %}
-                            <tr class="text-gray-500">
-                                <td class="whitespace-nowrap">{{ ref.halId_s }}</td>
-                                <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
-                                <td>{{ ref.docType_s }}</td>
-                                <td>{{ ref.title_s.0 | safe }}</td>
-                                {% if validation == "1" and type == "rsr" %}
-                                    <td>
-                                        <select class="border border-gray-300 author" name="authorship" id="authorship">
-                                            <option value="">---</option>
-                                            <option value="firstAuthor">Premier auteur</option>
-                                            <option value="lastAuthor">Dernier auteur</option>
-                                            <option value="correspondingAuthor">Corresponding auteur</option>
-                                        </select>
-                                    </td>
-                                {% endif %}
-                                <td>{{ ref.label_bibtex }}</td>
-                                <td class="docid hidden">{{ ref.docid }}</td>
-                            </tr>
-                        {% endfor %}
+            cols = [
+                {
+                    "targets": [1],
+                    "className": "text-center",
+                },
+                {
+                    "targets": [3],
+                    "orderable": false
+                },
+                {
+                    "targets": [0],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                        }
+                        return data;
+                    },
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [5],
+                    "visible": false
+                }
+            ]
+        {% else %}
+            cols = [
+                {
+                    "targets": [1],
+                    "className": "text-center",
+                },
+                {
+                    "targets": [3],
+                    "orderable": false
+                },
+                {
+                    "targets": [0],
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                        }
+                        return data;
+                    },
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [4],
+                    "visible": false
+                },
+                {
+                    "targets": [5],
+                    "visible": false
+                }
+            ]
+        {% endif %}
 
-                        </tbody>
+            $(document).ready(function () {
+            var table = $('#references').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                    },
+                    dom: 'Bfrtip',
+                    select: true,
+                    buttons: [
+                        {
+                            text: 'Tout sélectionner',
+                            action: function () {
+                                table.rows().select();
+                            }
+                        },
+                        {
+                            text: 'Rien sélectionner',
+                            action: function () {
+                                table.rows().deselect();
+                            }
+                        }
+                    ],
+                    "columnDefs": cols,
+                    scrollResize: true,
+                    scrollY: 100,
+                    scrollCollapse: true,
+                    paging: false,
+                }
+            );
 
-                    </table>
+            table.on('draw', function () {
+                $('.dataTables_scrollHeadInner').css('padding-right', 0);
+                $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
 
-                </div>
 
-                <div class="hidden references-json">{{ references|json_script:"references" }}</div>
-                <div class="hidden halId_s">{{ entity.halId_s|safe }}</div>
+                $('.dataTables_filter').addClass('flex items-center');
+                $('.dt-buttons').addClass('mr-2');
+                $('.dataTables_filter').prepend($('.dt-buttons'));
+                $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
 
-                <div class="dt-bottom-infos-rplc flex justify-between items-center">
-                    {% if validation == "1" %}
+                $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            });
 
-                    <form action="/update_authorship/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}&from={{ from }}&to={{ to }}" method="post" class="mr-2">
-                            {% csrf_token %}
-                            <input id="toProcess" name="toProcess" class="hidden"/>
-                            {% for hidden in form.hidden_fields %}
-                                {{ hidden }}
-                            {% endfor %}
-                            {% for field in form.visible_fields %}
-                                <div>
-                                    <label class="text-sm text-gray-700" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                    {% render_field field class="flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none" %}
-                                </div>
-                            {% endfor %}
+            $('.validate').click(function () {
+                toValidate = []
+                table.rows('.selected').data().map(function (row) {
 
-                            {% if  type == "rsr" %}
-                                <input class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap" type="submit" value="Mettre à jour l'autorat">
-                            {% endif %}
-
-                        </form>
-
+                    {% if validation == "1" and type == "rsr" %}
+                        toValidate.push(row[6])
+                    {% else %}
+                        toValidate.push(row[5])
                     {% endif %}
-                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer validate outline-none whitespace-nowrap">
-                        {% if validation == "1" %}
-                            Retirer du profil
-                        {% endif %}
-                        {% if validation == "0" %}
-                            Intégrer au profil
-                        {% endif %}
-                    </button>
-                </div>
+                });
+
+                var form = $('<form action="/validate_references/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                    '{% csrf_token %}' +
+                    '<input type="text" name="toValidate" value="' + toValidate + '" />' +
+                    '</form>');
+
+                form.appendTo('body').hide()
+                form.submit();
+            });
+
+        });
+</script>

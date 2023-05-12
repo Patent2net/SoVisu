@@ -1,72 +1,243 @@
 <div class="my-3 mt-1 flex w-full bg-yellow-100 border border-yellow-300 rounded text-xs p-4 items-center text-yellow-800">
-                    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    {% if validation == "1" %}
-                        <p>Cet onglet présente les domaines de votre expertise identifiés à partir de vos publications.
-                        Vous trouverez dans <b>Expertises annexes</b> tout ce qui a pu être associé à vos travaux que vous pouvez placer ici en "intégrant au profil".
-                    {% endif %}
-                        {% if validation == "0" %}
-                        <br>Restent ici les expertises qui proviennent d'erreurs, de
-                        collaborations, ou que vous considérez marginales.</p> <p>Les raccourcis de
-                        sélection Shift et CTRL fonctionnent.</p>
-                        {% endif %}
-                </div>
+    <svg class="w-4 h-4 text-yellow-800 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+        {% if validation == "1" %}
+            <p>Cet onglet présente les domaines de votre expertise identifiés à partir de vos publications.
+            Vous trouverez dans <b>Expertises annexes</b> tout ce qui a pu être associé à vos travaux que vous pouvez placer ici en "intégrant au profil".
+        {% endif %}
+            {% if validation == "0" %}
+            <br>Restent ici les expertises qui proviennent d'erreurs, de
+            collaborations, ou que vous considérez marginales.</p> <p>Les raccourcis de
+            sélection Shift et CTRL fonctionnent.</p>
+            {% endif %}
+</div>
 
-                <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
+<div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
 
-                    <a class="px-2 pb-1
-                        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
-                    >Expertises validées</a>
-                    <a class="px-2 pb-1
-                        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
-                    >Expertises annexes</a>
+    <a class="px-2 pb-1
+        {% if validation == "1" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
+    >Expertises validées</a>
+    <a class="px-2 pb-1
+        {% if validation == "0" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=0"
+    >Expertises annexes</a>
 
-                </div>
+</div>
 
 
-                <div class="justify-end flex w-full">
-                    <div class="dt-buttons-rplc flex items-center text-xs">
-                    </div>
-                </div>
+<div class="justify-end flex w-full">
+    <div class="dt-buttons-rplc flex items-center text-xs">
+    </div>
+</div>
 
-                <div class="flex-1">
+<div class="flex-1">
 
-                    <table id="concepts">
+    <table id="concepts">
 
-                        <thead>
-                        <tr class="bg-gray-100 text-gray-700 text-xs">
-                            <th>ID</th>
-                            <th>Domaine</th>
-                        </tr>
-                        </thead>
+        <thead>
+        <tr class="bg-gray-100 text-gray-700 text-xs">
+            <th>ID</th>
+            <th>Domaine</th>
+        </tr>
+        </thead>
 
-                        <tbody>
+        <tbody>
 
-                        {% for concept in concepts %}
-                            <tr class="text-gray-500">
-                                <td>{{ concept.id }}</td>
-                                <td>{{ concept.label_fr | safe }} </td>
-                            </tr>
-                        {% endfor %}
+        {% for concept in concepts %}
+            <tr class="text-gray-500">
+                <td>{{ concept.id }}</td>
+                <td>{{ concept.label_fr | safe }} </td>
+            </tr>
+        {% endfor %}
 
-                        </tbody>
+        </tbody>
 
-                    </table>
+    </table>
+</div>
 
-                </div>
+<div class="dt-bottom-infos-rplc flex justify-between items-center">
+    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer expertise_field outline-none whitespace-nowrap">
+        {% if validation == "1" %}
+            Retirer du profil
+        {% endif %}
+        {% if validation == "0" %}
+            Intégrer au profil
+        {% endif %}
+    </button>
+</div>
 
-                <div class="dt-bottom-infos-rplc flex justify-between items-center">
-                    <button class="text-xs font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer expertise_field outline-none whitespace-nowrap">
-                        {% if validation == "1" %}
-                            Retirer du profil
-                        {% endif %}
-                        {% if validation == "0" %}
-                            Intégrer au profil
-                        {% endif %}
-                    </button>
-                </div>
+<script type="text/javascript">
+    /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
+
+    {% if validation == "1" and  type == "rsr" and data == "references" %}
+
+        var references = JSON.parse(document.querySelector(".references-json").textContent)
+
+        var getObjectByValue = function (array, key, value) {
+            return array.filter(function (object) {
+                return object[key] === value;
+            });
+        };
+
+        var table = document.getElementById("references");
+        for (let i in table.rows) {
+            try {
+                let row = table.rows[i]
+                let curr_rsr = getObjectByValue(references, "docid", row.cells[6].textContent);
+                if (curr_rsr[0].SearcherProfile) {
+                    let curr_val = getObjectByValue(curr_rsr[0].SearcherProfile, "ldapId", '{{ id }}');
+                    //console.log(curr_rsr[0].authorship)
+                    //console.log(document.querySelector(".halId_s").textContent)
+                    //console.log(curr_val);
+                    row.cells[4].querySelector('#authorship').value = curr_val[0].authorship;
+                } else {
+                    row.cells[4].querySelector('#authorship').value = "";
+                }
+            } catch (error) {
+            }
+        }
+
+
+        refUpdated = []
+
+        const elements = document.querySelectorAll('select#authorship');
+        Array.from(elements).forEach((element, index) => {
+
+            element.onchange = (event) => {
+                let val = event.target.value;
+                let docid = element.parentNode.parentNode.querySelector(".docid").textContent;
+
+                refUpdated.push({'docid': docid, 'authorship': val, author: '{{ entity.ldapId|safe }}'});
+
+                document.querySelector("#toProcess").value = JSON.stringify(refUpdated);
+            }
+        });
+
+        cols = [
+            {
+                "targets": [1],
+                "className": "text-center",
+            },
+            {
+                "targets": [3],
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                "render": function (data, type, row, meta) {
+                    if (type === 'display') {
+                        data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                },
+                "className": "text-center",
+                "orderable": false
+            },
+            {
+                "targets": [5],
+                "visible": false
+            }
+        ]
+    {% else %}
+        cols = [
+            {
+                "targets": [1],
+                "className": "text-center",
+            },
+            {
+                "targets": [3],
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                "render": function (data, type, row, meta) {
+                    if (type === 'display') {
+                        data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                },
+                "className": "text-center",
+                "orderable": false
+            },
+            {
+                "targets": [4],
+                "visible": false
+            },
+            {
+                "targets": [5],
+                "visible": false
+            }
+        ]
+    {% endif %}
+
+    $(document).ready(function () {
+        var table2 = $('#concepts').DataTable(
+            {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json',
+                },
+                dom: 'Bfrtip',
+                select: true,
+                buttons: [
+                    {
+                        text: 'Tout sélectionner',
+                        action: function () {
+                            table.rows().select();
+                        }
+                    },
+                    {
+                        text: 'Rien sélectionner',
+                        action: function () {
+                            table.rows().deselect();
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false
+                    }
+                ],
+                scrollResize: true,
+                scrollY: 100,
+                scrollCollapse: true,
+                paging: false,
+            }
+        );
+
+        table2.on('draw', function () {
+            $('.dataTables_scrollHeadInner').css('padding-right', 0);
+            $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+            $('.dataTables_empty').text('Aucune expertise validée, pensez à regarder l\'onglet "Expertises retirées"');
+
+            $('.dataTables_filter').addClass('flex items-center');
+            $('.dt-buttons').addClass('mr-2');
+            $('.dataTables_filter').prepend($('.dt-buttons'));
+            $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+
+            $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+        });
+
+
+        $('.expertise_field').click(function () {
+            toInvalidate = []
+            table2.rows('.selected').data().map(function (row) {
+                toInvalidate.push(row[0])
+            });
+
+            var form = $('<form action="/validate_expertise/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
+                '{% csrf_token %}' +
+                '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' +
+                '</form>');
+
+            form.appendTo('body').hide()
+            form.submit();
+        });
+
+    });
+</script>

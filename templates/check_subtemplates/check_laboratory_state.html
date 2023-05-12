@@ -117,4 +117,48 @@
         form.appendTo('body').hide()
         form.submit();
     });
+
+    $(document).ready(function () {
+            var table3 = $('#state').DataTable(
+                {
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json'
+                    },
+                    dom: 'Bfrtip',
+                    select: false,
+                    buttons: [],
+                    "columnDefs": [
+                        {
+                            "targets": [2],
+                            "render": function (data, type, row, meta) {
+                                if (data === 'True') {
+                                    data = 'Oui';
+                                } else {
+                                    data = 'Non';
+                                }
+                                return data;
+                            },
+                            "className": "text-center",
+                            "orderable": false
+                        }
+                    ],
+                    scrollResize: true,
+                    scrollY: 100,
+                    scrollCollapse: true,
+                    paging: false,
+                }
+            );
+
+            table3.on('draw', function () {
+                $('.dataTables_scrollHeadInner').css('padding-right', 0);
+                $('.dataTables_scrollBody').css('width', 'calc(100% - 4px)');
+
+                $('.dt-bottom-infos-rplc').prepend($('.dataTables_info'));
+                $('.dataTables_filter').addClass('flex items-center');
+                $('.dataTables_filter').prepend($('.dt-buttons'));
+
+                $('.dataTables_info').addClass('flex justify-between w-full pr-2');
+            });
+
+        });
 </script>
