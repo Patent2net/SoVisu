@@ -166,6 +166,7 @@ class CreateView(TemplateView):
             idref = form.cleaned_data["f_IdRef"]
             idhal = form.cleaned_data["f_halId_s"]
             orcid = form.cleaned_data["f_orcId"]
+            structid = form.cleaned_data["f_inst"]
             tempo_lab = form.cleaned_data["f_labo"]
             tempo_lab = tempo_lab.replace("'", "")
             tempo_lab = tempo_lab.replace("(", "")
@@ -177,7 +178,7 @@ class CreateView(TemplateView):
             idhal_test = idhal_checkout(idhal)
 
             if idhal_test > 0:
-                indexe_chercheur(ldapid, accro_lab, labo, idhal, idref, orcid)
+                indexe_chercheur(structid, ldapid, accro_lab, labo, idhal, idref, orcid)
                 field = "halId_s"
                 scope_param = esActions.scope_p(field, idhal)
                 count = es.count(index="test_researchers", query=scope_param)["count"]
