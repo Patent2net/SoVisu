@@ -40,18 +40,22 @@
 
         <thead>
         <tr class="bg-gray-100 text-gray-700 text-xs">
-            <th>ID</th>
-            <th>Domaine</th>
+            <th>ID</th> {% comment %} TODO:supprimer la partie ID et l'intégrer directement avec le json {% endcomment %}
+            <th>Domaines d'expertise</th>
+            <th>Concepts associés</th>
         </tr>
         </thead>
 
         <tbody>
 
-        {% for concept in concepts %}
+        {% for expertise in expertises %}
+            {% for concept in expertise.children%}
             <tr class="text-gray-500">
-                <td>{{ concept.id }}</td>
-                <td>{{ concept.label_fr | safe }} </td>
+                <td>{{ expertise.id }}</td>
+                <td>{{ expertise.label_fr | safe }} </td>
+                <td>{{ concept.label_fr }}</td>
             </tr>
+                {% endfor %}
         {% endfor %}
 
         </tbody>
@@ -73,58 +77,10 @@
 <script type="text/javascript">
     /* https://datatables.net/extensions/buttons/examples/initialisation/select.html#:~:text=Button's%20data%20export%20can%20interface,selected%20option%20of%20the%20exportOptions. */
 
-    {% if validation == "1" and  type == "rsr" and data == "references" %}
-
-        var references = JSON.parse(document.querySelector(".references-json").textContent)
-
-        var getObjectByValue = function (array, key, value) {
-            return array.filter(function (object) {
-                return object[key] === value;
-            });
-        };
-
-        var table = document.getElementById("references");
-        for (let i in table.rows) {
-            try {
-                let row = table.rows[i]
-                let curr_rsr = getObjectByValue(references, "docid", row.cells[6].textContent);
-                if (curr_rsr[0].SearcherProfile) {
-                    let curr_val = getObjectByValue(curr_rsr[0].SearcherProfile, "ldapId", '{{ id }}');
-                    //console.log(curr_rsr[0].authorship)
-                    //console.log(document.querySelector(".halId_s").textContent)
-                    //console.log(curr_val);
-                    row.cells[4].querySelector('#authorship').value = curr_val[0].authorship;
-                } else {
-                    row.cells[4].querySelector('#authorship').value = "";
-                }
-            } catch (error) {
-            }
-        }
-
-
-        refUpdated = []
-
-        const elements = document.querySelectorAll('select#authorship');
-        Array.from(elements).forEach((element, index) => {
-
-            element.onchange = (event) => {
-                let val = event.target.value;
-                let docid = element.parentNode.parentNode.querySelector(".docid").textContent;
-
-                refUpdated.push({'docid': docid, 'authorship': val, author: '{{ entity.ldapId|safe }}'});
-
-                document.querySelector("#toProcess").value = JSON.stringify(refUpdated);
-            }
-        });
-
         cols = [
             {
                 "targets": [1],
                 "className": "text-center",
-            },
-            {
-                "targets": [3],
-                "orderable": false
             },
             {
                 "targets": [0],
@@ -137,42 +93,8 @@
                 "className": "text-center",
                 "orderable": false
             },
-            {
-                "targets": [5],
-                "visible": false
-            }
+
         ]
-    {% else %}
-        cols = [
-            {
-                "targets": [1],
-                "className": "text-center",
-            },
-            {
-                "targets": [3],
-                "orderable": false
-            },
-            {
-                "targets": [0],
-                "render": function (data, type, row, meta) {
-                    if (type === 'display') {
-                        data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                    }
-                    return data;
-                },
-                "className": "text-center",
-                "orderable": false
-            },
-            {
-                "targets": [4],
-                "visible": false
-            },
-            {
-                "targets": [5],
-                "visible": false
-            }
-        ]
-    {% endif %}
 
     $(document).ready(function () {
         var table2 = $('#concepts').DataTable(
@@ -181,7 +103,9 @@
                     url: 'https://cdn.datatables.net/plug-ins/1.10.22/i18n/French.json',
                 },
                 dom: 'Bfrtip',
-                select: true,
+                select: {
+                        style: 'multi'
+                    },
                 buttons: [
                     {
                         text: 'Tout sélectionner',
@@ -197,6 +121,7 @@
                     }
                 ],
                 "columnDefs": [
+                    {"className": "dt-center", "targets": "_all"},
                     {
                         "targets": [0],
                         "visible": false
@@ -224,7 +149,7 @@
         });
 
 
-        $('.expertise_field').click(function () {
+        $('.expertise_field').click(function () { {% comment %} TODO: Modifier pour push un ensemble de données complet (Identifiant du concept sélectionné, identifiant du domaine associé {% endcomment %}
             toInvalidate = []
             table2.rows('.selected').data().map(function (row) {
                 toInvalidate.push(row[0])
@@ -232,7 +157,7 @@
 
             var form = $('<form action="/validate_expertise/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
                 '{% csrf_token %}' +
-                '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' +
+                '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' + {% comment %} TODO:Modifier pour envoyer un json à la palce toinvalidate {% endcomment %}
                 '</form>');
 
             form.appendTo('body').hide()

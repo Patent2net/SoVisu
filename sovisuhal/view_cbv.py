@@ -113,7 +113,7 @@ class ElasticContextMixin:
 
         return key, index_pattern, ext_key, scope_param
 
-    def validated_notices_state(self, struct, i_type, entity):
+    def validated_notices_state(self, i_type, entity):
         """
         Check if at least one notice is in the state setup of the "validate" variable.
         If not, a ping gonna appear next to check in the menu.
@@ -237,9 +237,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         context["entity"] = self.get_entity_data(context["type"], context["id"])
 
-        context["hasToConfirm"] = self.validated_notices_state(
-            context["struct"], context["type"], context["entity"]
-        )
+        context["hasToConfirm"] = self.validated_notices_state(context["type"], context["entity"])
 
         if context["data"] == "state":
             researchers = self.get_state_case(context["id"])
@@ -264,9 +262,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["form"] = form
 
         if context["data"] == "expertise":  # TODO: Doit fonctionner avec test_expertises
-            validation, concepts = self.get_expertise_case(context["entity"])
+            validation, expertises = self.get_expertise_case(context["entity"], context["id"])
             context["validation"] = validation
-            context["concepts"] = concepts
+            context["expertises"] = expertises
 
         if context["data"] == "guiding-domains":
             domains, guiding_domains = self.get_guiding_domains_case(context["entity"])
@@ -275,10 +273,8 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         if context["data"] == "references":
             validation, references = self.get_references_case(
-                context["struct"],
                 context["type"],
                 context["id"],
-                context["entity"],
                 context["from"],
                 context["to"],
             )
@@ -383,60 +379,87 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         )
 
     # TODO: expertises validées =>
-    #  montrer le contenu de validated_expertises dans le profil chercheur
+    #  montrer le contenu de validated_expertises dans le profil chercheur.
+    #  Enregistrer le contenu validé dans test_researchers
     #  Annexes =>
     #  montrer le contenu des expertises dans test_expertises MOINS les concepts déjà validés
-    def get_expertise_case(self, entity):
-        if "validation" in self.request.GET:
-            validation = self.request.GET["validation"]
+    def get_expertise_case(self, entity, p_id):
+        expertise_cleaned = []
 
-            if validation == "1":
-                validate = "validated"
-            elif validation == "0":
-                validate = "invalidated"
-            else:
-                return redirect("unknown")
+        validation = self.request.GET.get("validation")
+
+        # if validation == "1":
+        #     validate = "validated"
+        # elif validation == "0":
+        #     validate = "invalidated"
+        # else:
+        #     return redirect("unknown")
+
+        if validation == "1":  # show the expertises validated by searcher
+            scope_param = esActions.scope_p("_id", p_id)
+            searcher_data = es.search(index="test_researchers", query=scope_param)
+            searcher_data = searcher_data["hits"]["hits"][0]["_source"]
+            searcher_expertise = searcher_data["SearcherProfile"][0]["validated_concepts"]
+            expertise_cleaned = searcher_expertise
+
+        elif validation == "0":  # show the expertises invalidated by searcher
+            scope_param = esActions.scope_all()
+            expertise_count = es.count(index="test_expertises", query=scope_param)["count"]
+            expertises_list = es.search(
+                index="test_expertises", query=scope_param, size=expertise_count
+            )
+            expertises_list = expertises_list["hits"]["hits"]
+            for expertise in expertises_list:
+                expertise = expertise["_source"]
+                # TODO:
+                #  Etape 1: Done (afficher les domaines et les concepts)
+                #  Etape 2: mettre à jour validate_reference afin de rajouter des domaines validés.
+                #  Etape 3: filtrer les expertises affichées par rapport à celles enregistrées
+                #  dans SearcherProfile dans test_searcher
+
+                expertise_cleaned.append(expertise)
+
         else:
             return redirect("unknown")
 
-        concepts = []
-        if "children" in entity["concepts"]:
-            for children in entity["concepts"]["children"]:
-                if "state" in children.keys() and children["state"] == validate:
-                    concepts.append(
-                        {
-                            "id": children["id"],
-                            "label_fr": children["label_fr"],
-                            "state": validate,
-                        }
-                    )
-                if "children" in children:
-                    for children1 in children["children"]:
-                        if "state" in children1.keys():
-                            if children1["state"] == validate:
-                                concepts.append(
-                                    {
-                                        "id": children1["id"],
-                                        "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;&bull; "
-                                        + children1["label_fr"],
-                                        "state": validate,
-                                    }
-                                )
-                            else:
-                                print(children1)
-                        if "children" in children1:
-                            for children2 in children1["children"]:
-                                if "state" in children2.keys() and children2["state"] == validate:
-                                    concepts.append(
-                                        {
-                                            "id": children2["id"],
-                                            "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;\
-                                            &nbsp;&nbsp;&nbsp;&nbsp;- "
-                                            + children2["label_fr"],
-                                            "state": validate,
-                                        }
-                                    )
-        return validation, concepts
+        # if "children" in entity["concepts"]:
+        #     for children in entity["concepts"]["children"]:
+        #         if "state" in children.keys() and children["state"] == validate:
+        #             concepts.append(
+        #                 {
+        #                     "id": children["id"],
+        #                     "label_fr": children["label_fr"],
+        #                     "state": validate,
+        #                 }
+        #             )
+        #         if "children" in children:
+        #             for children1 in children["children"]:
+        #                 if "state" in children1.keys():
+        #                     if children1["state"] == validate:
+        #                         concepts.append(
+        #                             {
+        #                                 "id": children1["id"],
+        #                                 "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;&bull; "
+        #                                 + children1["label_fr"],
+        #                                 "state": validate,
+        #                             }
+        #                         )
+        #                     else:
+        #                         print(children1)
+        #                 if "children" in children1:
+        #                     for children2 in children1["children"]:
+        #                         if "state" in children2.keys() and children2["state"] == validate:
+        #                             concepts.append(
+        #                                 {
+        #                                     "id": children2["id"],
+        #                                     "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;\
+        #                                     &nbsp;&nbsp;&nbsp;&nbsp;- "
+        #                                     + children2["label_fr"],
+        #                                     "state": validate,
+        #                                 }
+        #                             )
+        print(expertise_cleaned)
+        return validation, expertise_cleaned
 
     def get_guiding_domains_case(self, entity):
         domains = halConcepts.concepts()
@@ -448,7 +471,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return domains, guiding_domains
 
-    def get_references_case(self, struct, i_type, p_id, entity, date_from, date_to):
+    def get_references_case(self, i_type, p_id, date_from, date_to):
         if "validation" in self.request.GET:
             validation = self.request.GET["validation"]
             if validation == "1":
@@ -459,8 +482,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 return redirect("unknown")
         else:
             return redirect("unknown")
-
-        key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
         date_range_type = "submittedDate_tdate"
 
@@ -533,7 +554,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
             filtre_lab_b,
             url,
             dash,
-        ) = self.get_elastic_data(context["type"], context["id"], context["struct"])
+        ) = self.get_elastic_data(context["type"], context["id"])
 
         context["dash"] = dash
         context["entity"] = entity
@@ -544,7 +565,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(self, i_type, p_id, struct):
+    def get_elastic_data(self, i_type, p_id):
         # Get scope data
         key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
@@ -597,7 +618,6 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         entity, references_cleaned = self.get_elastic_data(
             context["type"],
             context["id"],
-            context["struct"],
             context["filter"],
             context["from"],
             context["to"],
@@ -607,7 +627,7 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         context["references"] = references_cleaned
         return context
 
-    def get_elastic_data(self, i_type, p_id, struct, i_filter, date_from, date_to):
+    def get_elastic_data(self, i_type, p_id, i_filter, date_from, date_to):
         # Get scope data
         key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
         res = es.search(index="test_*", query=scope_param)
@@ -666,13 +686,13 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        entity = self.get_elastic_data(context["type"], context["id"], context["struct"])
+        entity = self.get_elastic_data(context["type"], context["id"])
 
         context["entity"] = entity
 
         return context
 
-    def get_elastic_data(self, i_type, p_id, struct):
+    def get_elastic_data(self, i_type, p_id):
         # Get scope data
         key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
         # TODO: Verifier avec la version dev
@@ -764,7 +784,7 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
             langue = self.lang
 
         entity, filtrechercheur, filtrelab, url = self.get_elastic_data(
-            context["type"], context["id"], context["struct"]
+            context["type"], context["id"]
         )
 
         context["entity"] = entity
@@ -777,7 +797,7 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(self, i_type, p_id, struct):
+    def get_elastic_data(self, i_type, p_id):
         # Get scope data
         key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
 
@@ -788,15 +808,9 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
         except IndexError:
             return redirect("unknown")
         # /
-        # TODO: Réduire le if/elif
-        if i_type == "rsr":
+        if i_type == "rsr" or i_type == "lab":
             indexsearch = "test_publications"
             filtrechercheur = f'_index: "{indexsearch}"'
-            filtrelab = ""
-
-        elif i_type == "lab":
-            indexsearch = "test_publications"
-            filtrechercheur = ""
             filtrelab = f'_index: "{indexsearch}"'
         else:
             return redirect("unknown")

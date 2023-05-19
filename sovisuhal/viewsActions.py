@@ -114,7 +114,7 @@ def validate_references(request):
         "lang": "painless",
         "params": {"ldapId": p_id, "validated": validate},
     }
-
+    # TODO: Revoir le body renvoyé pour s'adapter au nouveau systeme (ajuster lab avant)
     # Get scope information
     if i_type == "rsr":
         if request.method == "POST":
@@ -127,7 +127,6 @@ def validate_references(request):
                     script=update_script,
                 )
 
-    # TODO: Revoir le body renvoyé pour s'adapter au nouveau systeme
     if i_type == "lab":
         if request.method == "POST":
             to_validate = request.POST.get("toValidate", "").split(",")
@@ -200,6 +199,7 @@ def validate_guiding_domains(request):
     )
 
 
+# TODO: Revoir la fonction complétement
 def validate_expertise(request):
     """
     Validation des domaines d'expertise
@@ -253,7 +253,7 @@ def validate_expertise(request):
         except IndexError:
             return redirect("unknown")
 
-        index = f"{struct}-{entity['labHalId']}-researchers"
+        index = "test_researchers"
 
         if request.method == "POST":
             to_invalidate = request.POST.get("toInvalidate", "").split(",")
