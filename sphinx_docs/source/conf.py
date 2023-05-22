@@ -66,6 +66,23 @@ source_suffix = {
     '.md': 'markdown',
 }
 
+ # conf https://myst-parser.readthedocs.io/en/latest/syntax/optional.html par défaut
+myst_enable_extensions = [
+    # "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    # "linkify",
+    # "replacements",
+    "smartquotes",
+    "strikethrough",
+    # "substitution",
+    "tasklist",
+]
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
