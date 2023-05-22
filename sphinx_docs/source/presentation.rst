@@ -22,23 +22,23 @@ Généralités
 ===========
 
 Technologie
-^^^^^^^^^^^^
+-----------
 
-SoVisu est une application web Python/Django se basant sur les données disponibles sur [HAL](https://hal.science) et constitué de deux applications distinctes :
+SoVisu est une application web Python/Django se basant sur les données disponibles sur https://hal.science et constitué de deux applications distinctes :
   - **elasticHal** : chargée de récupérer les données des laboratoires et chercheurs sur HAL, puis de les enrichir, afin de les incorporer à une base de données Elastic. Accessible via l'interface administration de Django,
   - **sovisuhal** : chargée d'afficher les données aux utilisateurs et se basant sur un environnement Django. Présente les données HAL récupérées puis stockées dans Elastic.
 
 Licence
-^^^^^^^
+-------
 
 EUPL_v1.2_fr.pdf
 
 Code source
-^^^^^^^^^^^^
+-----------
 
 Sur Git-hub : https://github.com/Patent2net/SoVisu
 
 Documentation
-^^^^^^^^^^^^
+-------------
 
 http://sovisu.readthedocs.io/

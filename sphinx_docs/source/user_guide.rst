@@ -20,9 +20,13 @@ Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapp
     :align: center
     :alt: formulaire de demande d'ids
 
+.. note::
+:class: dropdown
+Le formulaire peut aisément intégrer d'autres Is (scopusId, researcherId...)
+
 Notices
 ^^^^^^^
-Vous affiche la liste de vos publications et votre position d'auteur (que vous pouvez modifier à l'aide du bouton "Mise à jour de l'autorat", si mal calculée). Vous pouvez éventuellement retirer de votre profil celles que vous considérez comme marginale avec l'autre bouton. Celle-ci basculera dans le volet des notices retirées. Au plus les productions sont en phase avec votre expertise au mieux le lexique issus de ces dernières ciblera votre profil dans le moteur de recherches.
+Vous affiche la liste de vos publications et votre position d'auteur (que vous pouvez modifier à l'aide du bouton "Mise à jour de l'autorat", si mal calculée). Vous pouvez éventuellement retirer de votre profil celles que vous considérez comme marginales avec l'autre bouton. Celle-ci basculera dans le volet des notices retirées. Au plus les productions sont en phase avec votre expertise au mieux le lexique issus de ces dernières ciblera votre profil dans le moteur de recherches.
 
 .. tip::
   Si vous avez récemment modifié, le bouton "Collecter (ou mettre à jour) de nouvelles références" permet de re-télécharger les notices associées à votre idhal.
@@ -61,7 +65,8 @@ Dans cet onglet vous devez renseigner les mots-clés génériques de votre exper
 
 Les autres champs permettent de spécifier vos projets, travaux, etc.
 
-.. tip::
+:::{note}
+:class: dropdown
   Ces derniers sont non utilisés dans cette version.
 
 Synthèses
