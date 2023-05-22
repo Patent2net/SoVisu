@@ -9,7 +9,7 @@
 .. toctree::
    :maxdepth: 4
    :caption: Contenu:
-   README
+   readme
    fonctionnement
    install
    user_guide
