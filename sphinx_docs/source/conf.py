@@ -42,6 +42,7 @@ release = "1.0.1"
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.autodoc",
+    "myst_parser"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -59,6 +60,11 @@ language = "fr"
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
 # -- Options for HTML output -------------------------------------------------
 
