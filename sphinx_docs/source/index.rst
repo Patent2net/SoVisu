@@ -3,13 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-
-.. include:: ../../README.md
-
 .. toctree::
    :maxdepth: 4
-   :caption: Contenu:
-   readme
+   :caption: Contenu
+
+   presentation
    fonctionnement
    install
    user_guide

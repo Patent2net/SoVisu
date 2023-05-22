@@ -6,7 +6,7 @@ venv/
 .run/Celery.run.xml
 .run/SoVisu.run.xml
 /staticfiles/
-*.log
+sphinx_docs/build/*
 utils/VisuStack/volume/
 utils/VisuStack/nginx/certs/*
 !utils/VisuStack/nginx/certs/Readme.txt
@@ -14,3 +14,4 @@ utils/VisuStack/nginx/certs/*
 utils/*
 
 .run/SoVisu-Noreload.run.xml
+/sphinx_docs/build/
