@@ -4,4 +4,4 @@ sphinx_rtd_theme==1.1.1
 sphinx-jsonschema
 sphinxcontrib-httpexample
 sphinxcontrib-httpdomain
-furo
+#furo
