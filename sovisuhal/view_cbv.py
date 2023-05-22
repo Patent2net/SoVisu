@@ -262,7 +262,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["form"] = form
 
         if context["data"] == "expertise":  # TODO: Doit fonctionner avec test_expertises
-            validation, expertises = self.get_expertise_case(context["entity"], context["id"])
+            validation, expertises = self.get_expertise_case(context["id"])
             context["validation"] = validation
             context["expertises"] = expertises
 
@@ -383,24 +383,15 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
     #  Enregistrer le contenu validé dans test_researchers
     #  Annexes =>
     #  montrer le contenu des expertises dans test_expertises MOINS les concepts déjà validés
-    def get_expertise_case(self, entity, p_id):
+    def get_expertise_case(self, p_id):
         expertise_cleaned = []
 
         validation = self.request.GET.get("validation")
-
-        # if validation == "1":
-        #     validate = "validated"
-        # elif validation == "0":
-        #     validate = "invalidated"
-        # else:
-        #     return redirect("unknown")
+        searcher_response = es.get(index="test_researchers", id=p_id)
+        searcher_response = searcher_response["_source"]["SearcherProfile"]["validated_concepts"]
 
         if validation == "1":  # show the expertises validated by searcher
-            scope_param = esActions.scope_p("_id", p_id)
-            searcher_data = es.search(index="test_researchers", query=scope_param)
-            searcher_data = searcher_data["hits"]["hits"][0]["_source"]
-            searcher_expertise = searcher_data["SearcherProfile"][0]["validated_concepts"]
-            expertise_cleaned = searcher_expertise
+            expertise_cleaned = searcher_response
 
         elif validation == "0":  # show the expertises invalidated by searcher
             scope_param = esActions.scope_all()
@@ -411,54 +402,37 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             expertises_list = expertises_list["hits"]["hits"]
             for expertise in expertises_list:
                 expertise = expertise["_source"]
+
+                if expertise["id"] in [
+                    validated_concepts["id"] for validated_concepts in searcher_response
+                ]:
+                    children = expertise.get("children", [])
+
+                    # Extract the ID of each child from searcher_response
+                    validated_children_ids = [
+                        child_validated["id"]
+                        for validated_concepts in searcher_response
+                        for child_validated in validated_concepts.get("children", [])
+                    ]
+
+                    # Filter children whose ID is not in validated_children_ids
+                    updated_children = [
+                        concept
+                        for concept in children
+                        if concept["id"] not in validated_children_ids
+                    ]
+
+                    # Update the 'children' field with the updated children list
+                    expertise["children"] = updated_children
                 # TODO:
-                #  Etape 1: Done (afficher les domaines et les concepts)
-                #  Etape 2: mettre à jour validate_reference afin de rajouter des domaines validés.
-                #  Etape 3: filtrer les expertises affichées par rapport à celles enregistrées
-                #  dans SearcherProfile dans test_searcher
+                #  Etape 4: OPTIONNEL:
+                #  Voir pour intégrer Expertise<Children<Children (afficher le 2nd niveau)
 
                 expertise_cleaned.append(expertise)
 
         else:
             return redirect("unknown")
 
-        # if "children" in entity["concepts"]:
-        #     for children in entity["concepts"]["children"]:
-        #         if "state" in children.keys() and children["state"] == validate:
-        #             concepts.append(
-        #                 {
-        #                     "id": children["id"],
-        #                     "label_fr": children["label_fr"],
-        #                     "state": validate,
-        #                 }
-        #             )
-        #         if "children" in children:
-        #             for children1 in children["children"]:
-        #                 if "state" in children1.keys():
-        #                     if children1["state"] == validate:
-        #                         concepts.append(
-        #                             {
-        #                                 "id": children1["id"],
-        #                                 "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;&bull; "
-        #                                 + children1["label_fr"],
-        #                                 "state": validate,
-        #                             }
-        #                         )
-        #                     else:
-        #                         print(children1)
-        #                 if "children" in children1:
-        #                     for children2 in children1["children"]:
-        #                         if "state" in children2.keys() and children2["state"] == validate:
-        #                             concepts.append(
-        #                                 {
-        #                                     "id": children2["id"],
-        #                                     "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;\
-        #                                     &nbsp;&nbsp;&nbsp;&nbsp;- "
-        #                                     + children2["label_fr"],
-        #                                     "state": validate,
-        #                                 }
-        #                             )
-        print(expertise_cleaned)
         return validation, expertise_cleaned
 
     def get_guiding_domains_case(self, entity):
@@ -697,7 +671,7 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
         key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
         # TODO: Verifier avec la version dev
         #  pour que le fonctionnement reste le meme (doit fonctionner avec test_expertises)
-        res = es.search(index="test_*", query=scope_param)
+        res = es.search(index=index_pattern, query=scope_param)
         # on pointe sur index générique, car pas de LabHalId ?
         try:
             entity = res["hits"]["hits"][0]["_source"]
@@ -705,10 +679,7 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
             return redirect("unknown")
         # /
 
-        if i_type == "lab":
-            entity["concepts"] = json.dumps(entity["concepts"])
-
-        if i_type == "rsr":
+        if i_type == "lab" or i_type == "rsr":
             entity["concepts"] = json.dumps(entity["concepts"])
 
         entity["concepts"] = json.loads(entity["concepts"])

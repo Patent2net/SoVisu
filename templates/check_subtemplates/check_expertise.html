@@ -40,7 +40,7 @@
 
         <thead>
         <tr class="bg-gray-100 text-gray-700 text-xs">
-            <th>ID</th> {% comment %} TODO:supprimer la partie ID et l'intégrer directement avec le json {% endcomment %}
+            <th>ID</th>
             <th>Domaines d'expertise</th>
             <th>Concepts associés</th>
         </tr>
@@ -51,7 +51,7 @@
         {% for expertise in expertises %}
             {% for concept in expertise.children%}
             <tr class="text-gray-500">
-                <td>{{ expertise.id }}</td>
+                <td>{{ concept.id }}</td>
                 <td>{{ expertise.label_fr | safe }} </td>
                 <td>{{ concept.label_fr }}</td>
             </tr>
@@ -149,15 +149,15 @@
         });
 
 
-        $('.expertise_field').click(function () { {% comment %} TODO: Modifier pour push un ensemble de données complet (Identifiant du concept sélectionné, identifiant du domaine associé {% endcomment %}
-            toInvalidate = []
+        $('.expertise_field').click(function () {
+            concepts_update = []
             table2.rows('.selected').data().map(function (row) {
-                toInvalidate.push(row[0])
+                concepts_update.push(row[0])
             });
 
             var form = $('<form action="/validate_expertise/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
                 '{% csrf_token %}' +
-                '<input type="text" name="toInvalidate" value="' + toInvalidate + '" />' + {% comment %} TODO:Modifier pour envoyer un json à la palce toinvalidate {% endcomment %}
+                '<input type="text" name="toInvalidate" value="' + concepts_update + '" />' +
                 '</form>');
 
             form.appendTo('body').hide()
