@@ -15,7 +15,7 @@ def get_index_list():
     if count > 0:
         result = es.search(index="*-laboratories", body=scope_param, size=count)
         result = result["hits"]["hits"]
-        print(result)
+        #print(result)
         indexes = []
 
         # si lab pas de structAcronym
