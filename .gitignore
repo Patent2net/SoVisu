@@ -1,7 +1,7 @@
 .idea*
 __py*
 db*
-.venv
+.env
 venv/
 .run/Celery.run.xml
 .run/SoVisu.run.xml
@@ -12,6 +12,3 @@ utils/VisuStack/nginx/certs/*
 !utils/VisuStack/nginx/certs/Readme.txt
 .coverage
 utils/*
-
-.run/SoVisu-Noreload.run.xml
-/sphinx_docs/build/
