@@ -8,7 +8,7 @@
    :caption: Contenu
 
    presentation
+   user_guide
    fonctionnement
    install
-   user_guide
    modules
