@@ -20,9 +20,9 @@ Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapp
     :align: center
     :alt: formulaire de demande d'ids
 
+
 .. note::
-    :class: dropdown
-    Le formulaire peut aisément intégrer d'autres Is (scopusId, researcherId...)
+    Le formulaire peut aisément intégrer d'autres Ids (scopusId, researcherId...)
 
 Notices
 ^^^^^^^
@@ -55,7 +55,7 @@ Même principe que précédemment. L'interface vous permet de sélectionner dans
 
 Descriptifs de recherche
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Dans cet onglet vous devez renseigner les mots-clés génériques de votre expertise [#f1]_.
+Dans cet onglet vous devez renseigner les mots-clés génériques de votre expertise.
 
 
 .. image:: images/Descriptifs.png
@@ -64,7 +64,6 @@ Dans cet onglet vous devez renseigner les mots-clés génériques de votre exper
     :alt: onglet domaines
 
 Les autres champs permettent de spécifier vos projets, travaux, etc.
-
 
 .. note::
     Ces derniers sont non utilisés dans cette version.
