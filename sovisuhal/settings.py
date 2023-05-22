@@ -61,8 +61,9 @@ else:
     CELERY_BROKER_URL = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
     IP = "192.168.35.65"
-    DNS = config("univ-tln.fr")
+    DNS = "univ-tln.fr"
     LOGPATH ="./utils/logs/"
+
 
 LOGGING = {
         "version": 1,
