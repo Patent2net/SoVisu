@@ -23,17 +23,26 @@ from sovisuhal.libs import esActions
 # Global variables
 structIdlist = None
 
-# if True, check all the existing data in ES index
-# to compare with those gathered to keep part of totality of data persistence
-check_existing_docs = eval(config("VerifieExistant"))
+if config("mode") == 'Prod':
+    # if True, check all the existing data in ES index
+    # to compare with those gathered to keep part of totality of data persistence
+    check_existing_docs = eval(config("VerifieExistant"))
 
-# if True, overwrite the doc['validated'] status
-# to True for all the docs existing in ES (work only if Check_existing_docs = True)
-force_doc_validated = eval(config("ForceValidation"))
+    # if True, overwrite the doc['validated'] status
+    # to True for all the docs existing in ES (work only if Check_existing_docs = True)
+    force_doc_validated = eval(config("ForceValidation"))
 
-# if True, overwrite the doc["authorship"] status
-# for all the docs existing in ES (work only if Check_existing_docs = True)
-force_doc_authorship =eval(config("ForceAutorat"))
+    # if True, overwrite the doc["authorship"] status
+    # for all the docs existing in ES (work only if Check_existing_docs = True)
+    force_doc_authorship =eval(config("ForceAutorat"))
+else:
+    # Persistance et comportement de la collecte en regard des modifs existantes.
+    # Ne devrait plus être dans la prochaine version : les modifs sont dans le profil labo ou chercheur
+    # les docs sont des docs Hal.
+    #
+    check_existing_docs = False
+    force_doc_validated = False
+    force_doc_authorship = True
 
 
 # If djangodb_open = True script will use django Db to generate index for ES.
@@ -62,7 +71,7 @@ def get_structid_list():
         filter_path=["hits.hits._source.structSirene"],
         request_timeout=50,
     )
-    print(res)
+    #print(res)
     if res:
         structIdlist = [hit["_source"]["structSirene"] for hit in res["hits"]["hits"]]
     # print("\u00A0 \u21D2 ", structIdlist)
@@ -800,7 +809,11 @@ def collect_researchers_data2(self, struct, idx):
 
     for numCh, searcher in enumerate(researchers_list):
         #if numCh<1:
+        if len(str(searcher["halId_s"])) <= 1:
+            doc_progress_recorder.set_progress(
+                numCh, count, "pas d'idhal" + searcher["name"] + ") dans " + struct)
         # pourquoi ne pas lancer un collecte_doc ici ????
+        else:
             doc_progress_recorder.set_progress(
             numCh, count, " chercheur traité (" + searcher["halId_s"] + ") dans " + struct)
             docs = hal.find_publications(searcher["halId_s"], "authIdHal_s")
