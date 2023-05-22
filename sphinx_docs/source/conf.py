@@ -27,8 +27,8 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = "SoVisu"
-copyright = "2022, David Reymond, Alaric Tabariès, Esteban Bara"
-author = "David Reymond, Alaric Tabariès, Esteban Bara"
+copyright = "2022, David Reymond, Alaric Tabariès, Lena Bara"
+author = "David Reymond, Alaric Tabariès, Lena Bara"
 
 # The full version, including alpha/beta/rc tags
 release = "1.0.1"
