@@ -31,7 +31,7 @@ copyright = "2022, David Reymond, Alaric Tabariès, Lena Bara"
 author = "David Reymond, Alaric Tabariès, Lena Bara"
 
 # The full version, including alpha/beta/rc tags
-release = "1.0.1"
+release = "1.0.2"
 
 
 # -- General configuration ---------------------------------------------------
