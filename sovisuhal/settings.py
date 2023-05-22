@@ -48,7 +48,23 @@ if mode == "Prod":
     LOGPATH=config("LOGPATH")
     IP=config("IP")
     DNS=config("DNS")
-    LOGGING = {
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
+    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+    CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
+    CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
+else:
+    SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
+    DEBUG = True
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
+    # Celery Settings
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+    IP = "192.168.35.65"
+    DNS = config("univ-tln.fr")
+    LOGPATH ="./utils/logs/"
+
+LOGGING = {
         "version": 1,
         "disable_existing_loggers": False,
         'formatters': {
@@ -65,13 +81,13 @@ if mode == "Prod":
             "filedeb": {
                 "level": "DEBUG",
                 "class": "logging.FileHandler",
-                "filename": LOGPATH + "debug.log",
+                "filename": os.path.join(BASE_DIR, LOGPATH + "debug.log"),
                 "formatter":"verbose"
             },
             "fileinf": {
                 "level": "INFO",
                 "class": "logging.FileHandler",
-                "filename": LOGPATH + "debuginf.log",
+                "filename":os.path.join(BASE_DIR, LOGPATH + "debuginf.log"),
                 "formatter" : "simple"
             },
         },
@@ -88,17 +104,6 @@ if mode == "Prod":
             },
         },
     }
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
-    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-    CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
-    CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
-else:
-    SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
-    DEBUG = True
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
-    # Celery Settings
-    CELERY_BROKER_URL = "redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # Application definition
