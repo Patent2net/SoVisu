@@ -11,7 +11,7 @@ Pour un chercheur, SoVisu accompagne la vérification et le recensement des Id (
 Pour un laboratoire, ou groupe de, côté gouvernance les mêmes principes et fonctions par agrégations, extractions de la production au format HCERES (4 premiers volets avec calculs réalisés : interrogation unpaywal, appartenance d'un doctorant dans les co-publiants notamment, attribution à des axes/équipes spécifiques). Les agrégations permettent alors d'opérer sur des données bibliographiques validées par les chercheurs.
 
 SoVisu est une application web Python/Django se basant sur les données disponibles sur HAL (https://hal.archives-ouvertes.fr) et constitué de deux applications distinctes :
-  - **elasticHal** :  chargée de récupérer les données des laboratoires et chercheurs sur HAL, puis de les enrichir, afin de les incorporer à une base de données Elastic. Accessible via l'interface administration de Django,
+  - **elasticHal** : chargée de récupérer les données des laboratoires et chercheurs sur HAL, puis de les enrichir, afin de les incorporer à une base de données Elastic. Accessible via l'interface administration de Django,
   - **sovisuhal** : chargée d'afficher les données aux utilisateurs et se basant sur un environnement Django et les données récupérées puis stockées dans Elastic.
 
 
