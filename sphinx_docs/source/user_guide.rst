@@ -14,13 +14,14 @@ Partie incontournable pour entrer du bon pied dans la science ouverte. Vous rapp
 
 .. warning::
   Si les identifiants rapportés sont faux rien de ce qui suit ne fonctionnera.
+  Si l'idhal vient d'être créé, terminez demain !!
 
 .. image:: images/Ids.png
     :width: 800px
     :align: center
     :alt: formulaire de demande d'ids
 
-
+Seul l'idhal est utilisé pour télécharger les notices.
 .. note::
     Le formulaire peut aisément intégrer d'autres Ids (scopusId, researcherId...)
 
@@ -61,7 +62,7 @@ Dans cet onglet vous devez renseigner les mots-clés génériques de votre exper
 .. image:: images/Descriptifs.png
     :width: 800px
     :align: center
-    :alt: onglet domaines
+    :alt: onglet descriptifs
 
 Les autres champs permettent de spécifier vos projets, travaux, etc.
 
