@@ -10,5 +10,6 @@ utils/VisuStack/volume/
 utils/VisuStack/nginx/certs/*
 !utils/VisuStack/nginx/certs/Readme.txt
 .coverage
-utils/*
 /sphinx_docs/build/
+!utils/logs/debug.log
+!utils/logs/debuginf.log
