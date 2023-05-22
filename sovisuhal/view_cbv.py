@@ -411,12 +411,13 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                                     {
                                         "id": children1["id"],
                                         "label_fr": "&nbsp;&nbsp;&nbsp;&nbsp;&bull; "
-                                        + children1["label_fr"],
+                                        + children1["label_fr"], # c'est quoi cette horreur ?
                                         "state": validate,
                                     }
                                 )
                             else:
-                                print(children1)
+                                # print(children1)
+                                pass
                         if "children" in children1:
                             for children2 in children1["children"]:
                                 if "state" in children2.keys() and children2["state"] == validate:
