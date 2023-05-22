@@ -1,4 +1,4 @@
-asgiref==3.5.1
+asgiref==3.5.2
 beautifulsoup4==4.11.1
 #bs4==0.0.1
 celery[redis]==5.2.7
