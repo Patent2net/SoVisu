@@ -50,7 +50,8 @@ def find_publications(idhal, field, increment=0):
     req = http.get(
         f"http://api.archives-ouvertes.fr/search/?q={field}:{str(idhal)}&fl={flags}&start={str(increment)}&sort=docid%20asc"
     )
-
+    if len(str(idhal))<=1: # apparement des idhal nuls
+        return -1
     if req.status_code == 200:
         data = req.json()
         if "response" in data.keys():
