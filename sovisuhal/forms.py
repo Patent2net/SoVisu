@@ -4,7 +4,6 @@ from .libs import esActions
 
 # mesure temporaire,
 # valable tant que seuls les chercheurs UTLN ont le droit de s'inscrire
-struct = "198307662"
 
 const_css_class = "flex text-sm py-1 px-2 border rounded border-gray-200 focus-none outline-none"
 es = esActions.es_connector()
@@ -39,21 +38,29 @@ class CreateCredentials(forms.Form):
     )
 
     scope_param = esActions.scope_all()
+    institution_count = es.count(index="*-structures", body=scope_param)["count"]
+    institution_res = es.search(index="*-structures", body=scope_param, size=institution_count)
+    inst_entities = institution_res["hits"]["hits"]
+    institution_list = [("", "")]
+    institution_list.extend(
+        [(inst["_source"]["structSirene"], inst["_source"]["label"]) for inst in inst_entities]
+    )
+    f_inst = forms.CharField(label="Institutions", widget=forms.Select(choices=institution_list))
 
-    count = es.count(index=struct + "*-laboratories", body=scope_param)["count"]
-    res = es.search(index=struct + "*-laboratories", body=scope_param, size=count)
-    entities = res["hits"]["hits"]
-    labos = [("", "")]  # empty default field
-    labos.extend(
+    laboratories_count = es.count(index="*-laboratories", body=scope_param)["count"]
+    laboratories_res = es.search(index="*-laboratories", body=scope_param, size=laboratories_count)
+    lab_entities = laboratories_res["hits"]["hits"]
+    laboratory_list = [("", "")]  # empty default field
+    laboratory_list.extend(
         [
             (
-                (truc["_source"]["halStructId"], truc["_source"]["acronym"]),
-                truc["_source"]["label"],
+                (lab["_source"]["halStructId"], lab["_source"]["acronym"]),
+                lab["_source"]["label"],
             )
-            for truc in entities
+            for lab in lab_entities
         ]
     )
-    f_labo = forms.CharField(label="Laboratoire", widget=forms.Select(choices=labos))
+    f_labo = forms.CharField(label="Laboratoire", widget=forms.Select(choices=laboratory_list))
 
 
 class ValidCredentials(forms.Form):
