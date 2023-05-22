@@ -65,7 +65,7 @@ Dans cet onglet vous devez renseigner les mots-clés génériques de votre exper
 
 Les autres champs permettent de spécifier vos projets, travaux, etc.
 
-:::{note}
+.. note::
 :class: dropdown
   Ces derniers sont non utilisés dans cette version.
 
