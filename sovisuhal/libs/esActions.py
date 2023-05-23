@@ -284,3 +284,36 @@ def validated_searcherprofile_p(p_id, validate, date_range_type, date_from, date
         }
     }
     return validated_searcherprofile
+
+
+# TODO: remplacer par la fonction ci dessous lorsque mapping mis à jour
+# def validated_searcherprofile_p(p_id, validate, date_range_type, date_from, date_to):
+#     validated_searcherprofile = {
+#             "bool": {
+#                 "must": [
+#                     {
+#                         "nested": {
+#                             "path": "SearcherProfile",
+#                             "query": {
+#                                 "bool": {
+#                                     "must": [
+#                                         {"term": {"SearcherProfile.ldapId": p_id}},
+#                                         {"term": {"SearcherProfile.validated": validate}}
+#                                     ]
+#                                 }
+#                             },
+#                             "inner_hits": {}  # Include only the matched nested documents
+#                         }
+#                     },
+#                     {
+#                         "range": {
+#                             date_range_type: {
+#                                 "gte": date_from,
+#                                 "lt": date_to
+#                             }
+#                         }
+#                     }
+#                 ]
+#             }
+#         }
+#     return validated_searcherprofile

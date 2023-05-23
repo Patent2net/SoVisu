@@ -238,25 +238,30 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
 
-        # check if the document already exist and edit fields depending on overwrite state
-        doc_param = esActions.scope_p("_id", doc["_id"])
-        count_document = es.count(index="test_publications", query=doc_param)
+        document_exist = es.exists(index="test_publications", id=doc["_id"])
 
-        # Create the records of the searchers linked to the document.
+        # iterate for every searcher idhal present in doc
         for idhal in doc["authIdHal_s"]:
             validated_concepts = ""
+            ldapId = "unassigned"
             validated = "unassigned"
             authorship = ""
 
-            # get validated_concepts of the searcher if registered in SoVisu
-            searcher_param = esActions.scope_p("SearcherProfile.halId_s", idhal)
+            # check if the searcher with that idhal already exist in app
+            searcher_param = esActions.scope_p("SearcherProfile.halId_s.keyword", idhal)
             count_searcher = es.count(index="test_researchers", query=searcher_param)
+            # TODO: Changer la méthode de vérification du chercheur,
+            #  lorsque l'id commun passera sur l'idhal
+            # searcher_exist = es.exists(index="test_researchers", id=idhal)
+
+            # if searcher exist, get associated validated_concepts
             if count_searcher["count"] > 0:
                 searcher_data = es.search(index="test_researchers", query=searcher_param)
                 searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
+                ldapId = searcher_data["ldapId"]
                 validated_concepts = searcher_data["validated_concepts"]
 
-            if overwrite or count_document["count"] == 0:
+            if overwrite or not document_exist:
                 if count_searcher["count"] > 0:
                     validated = "True"
                 # check authorship
@@ -265,27 +270,30 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                 if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
                     authorship = "lastAuthor"
             else:
-                document_data = es.search(index="test_publications", query=doc_param)
-                document_data = document_data["hits"]["hits"][0]["_source"]
-
+                document_data = es.get(index="test_publications", id=doc["_id"])
+                document_data = document_data["_source"]
+                # Compare with datas already in document
                 for searcher in document_data["SearcherProfile"]:
                     if searcher["halId_s"] == idhal:
-                        validated = searcher["validated"]
+                        if searcher["validated"] == "unassigned" and count_searcher["count"] > 0:
+                            validated = "True"
+                        else:
+                            validated = searcher["validated"]
                         authorship = searcher["authorship"]
 
             # add the record of the Searcher in the document
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
-                    "ldapId": chercheur["ldapId"]
-                    if chercheur["halId_s"] == idhal
-                    else "unassigned",
+                    "ldapId": ldapId,
                     "validated_concepts": validated_concepts,
                     "validated": validated,
                     "authorship": authorship,
                 }
             )
-
+            if doc["docid"] == "1279659":
+                print("searcherprofile:")
+                print(doc["SearcherProfile"])
         progress_recorder.set_progress(num, len(docs), description="(récolte)")
 
     helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
@@ -294,7 +302,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
     return chercheur
 
 
-# TODO: intégrer dans utils.py après modification du module elasticHal
+# TODO: intégrer dans utils.py après modification du module elasticHal?
 def should_be_open(notice):
     """
     Remplace should_be_open dans elasticHal/utils.py

@@ -378,11 +378,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             form,
         )
 
-    # TODO: expertises validées =>
-    #  montrer le contenu de validated_expertises dans le profil chercheur.
-    #  Enregistrer le contenu validé dans test_researchers
-    #  Annexes =>
-    #  montrer le contenu des expertises dans test_expertises MOINS les concepts déjà validés
     def get_expertise_case(self, p_id):
         expertise_cleaned = []
 
