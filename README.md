@@ -1,6 +1,8 @@
 SoVisu
 ======
 
+![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7963149.svg)(https://doi.org/10.5281/zenodo.7963149)
+
 # Description
 
 SoVisu est un dispositif flexible et ouvert créé pour accompagner la communauté d'un établissement à la Science Ouverte (SO) en lui fournissant les instruments guides de son pilotage, tout en permettant de cartographier l'expertise des chercheurs, faciliter l'autoarchivage et apprécier la qualité de l'indexation. 
