@@ -1,5 +1,7 @@
 import datetime
 
+# Formatter for adding documents in the index
+
 
 def laboratory_format(notice, concept_tree):
     labo_notice = {
@@ -47,3 +49,15 @@ def publication_format(notice):
     }
 
     return publication_notice
+
+
+# TODO: Add a format for searcher notices
+def searcher_format(notice):
+    pass
+
+
+def expertise_concepts_format(notice):
+    pass
+
+
+# Mapping for the Index
