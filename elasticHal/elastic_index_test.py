@@ -157,7 +157,7 @@ def indexe_chercheur(idhal):  # self,
 
     # add a common SearcherProfile Key who should serve has common key between index
     chercheur["SearcherProfile"] = [
-        {"halId_s": chercheur["halId_s"], "ldapId": chercheur["ldapId"], "validated_concepts": ""}
+        {"halId_s": chercheur["halId_s"], "ldapId": chercheur["ldapId"], "validated_concepts": []}
     ]
 
     res = es.index(
