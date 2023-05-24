@@ -27,11 +27,11 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = "SoVisu"
-copyright = "2022, David Reymond, Alaric Tabariès, Esteban Bara"
-author = "David Reymond, Alaric Tabariès, Esteban Bara"
+copyright = "2022, David Reymond, Alaric Tabariès, Lena Bara"
+author = "David Reymond, Alaric Tabariès, Lena Bara"
 
 # The full version, including alpha/beta/rc tags
-release = "1.0.1"
+release = "1.0.2"
 
 
 # -- General configuration ---------------------------------------------------
@@ -42,6 +42,7 @@ release = "1.0.1"
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.autodoc",
+    "myst_parser"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -59,7 +60,29 @@ language = "fr"
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
+ # conf https://myst-parser.readthedocs.io/en/latest/syntax/optional.html par défaut
+myst_enable_extensions = [
+    # "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    # "linkify",
+    # "replacements",
+    "smartquotes",
+    "strikethrough",
+    # "substitution",
+    "tasklist",
+]
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

@@ -1,5 +1,5 @@
-Fonctionnement
-==============
+Principes de fonctionnement
+===========================
 
 SoVisu est un logiciel open source, opérationnel et installable dans un établissement universitaire. SoVisu est issue d’un projet initié en 2019 à l’origine pour cartographier les compétences des membres de l’Université de Toulon. SoViSu est destiné à l’ensemble de la communauté universitaire pour faciliter l'autoarchivage et la gestion individuelle de sa production sur HAL. SoVisu affecte un score de qualité calculé sur la quantité des métadonnées des notices, et extrait automatiquement un lexique propre à chaque document pour l'agréger en un profil informationnel individuel ou collectif. Chacun peut ainsi apprécier la représentation de ses travaux sur les index, et l'adapter pour parfaire sa lisibilité en plus de sa visibilité.
 
@@ -23,8 +23,9 @@ Cette étape construit dans Elastic les index suivant :
 - **SIREN-structures**                            # données de structure
 - **SIREN-labHalid-laboratories**                 # données de laboratoire
 - **SIREN-labHalid-laboratories-documents**       # collection de laboratoire
-- **SIREN-labHalid-researchers**                 # chercheurs du laboratoire
+- **SIREN-labHalid-researchers**                  # chercheurs du laboratoire
 - **SIREN-labHalid-researchers-ldapid-documents** # documents du ldapid de chercheur
+
 
 .. tip::
     Le labHalid Non-labo est créé pour les chercheurs non rattachés.

@@ -15,7 +15,7 @@ Afin d'initialiser le projet, il est nécessaire de disposer d'une machine équi
 
 Il n'est pas nécessaire de créer des index pour Elasticsearch, ces derniers sont créés par elasticHal lors de la collecte.
 
-Le code de SoVisu est accessible sur https://github.com/Patent2net/SoVisu .
+Le code de SoVisu est accessible sur https://github.com/Patent2net/SoVisu . Ce qui suit suppose que vous ayez installé un environnement virtuel python noté ```venv``` par la suite avec les librairies du fichier requirements.txt (point 2 de la procédure).
 
 Configuration de l'environnement
 ---------------------------------
@@ -52,6 +52,8 @@ SoVisu s'appuie sur une architecture telle la figure ci-dessous: Docker héberge
 
 5. Initialisez les migrations de SoVisu:
 
+5.1 Adapter les variables d'environnement
+5.2 Migration
 .. code-block:: console
 
    (.venv) $ python manage.py migrate

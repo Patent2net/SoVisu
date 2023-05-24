@@ -45,7 +45,27 @@ if mode == "Prod":
     UNIAUTH_LOGOUT_REDIRECT_URL = None
     UNIAUTH_MAX_LINKED_EMAILS = 20
     UNIAUTH_PERFORM_RECURSIVE_MERGING = True
-    LOGGING = {
+    LOGPATH=config("LOGPATH")
+    IP=config("IP")
+    DNS=config("DNS")
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
+    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+    CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
+    CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
+else:
+    SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
+    DEBUG = True
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
+    # Celery Settings
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+    IP = "192.168.35.65"
+    DNS = "univ-tln.fr"
+    LOGPATH ="./utils/logs/"
+
+
+LOGGING = {
         "version": 1,
         "disable_existing_loggers": False,
         'formatters': {
@@ -62,14 +82,14 @@ if mode == "Prod":
             "filedeb": {
                 "level": "DEBUG",
                 "class": "logging.FileHandler",
-                "filename": "./logs/debug.log",
-                'formatter': 'verbose'
+                "filename": os.path.join(BASE_DIR, LOGPATH + "debug.log"),
+                "formatter":"verbose"
             },
             "fileinf": {
                 "level": "INFO",
                 "class": "logging.FileHandler",
-                "filename": "./logs/debuginf.log",
-                'formatter': 'simple'
+                "filename":os.path.join(BASE_DIR, LOGPATH + "debuginf.log"),
+                "formatter" : "simple"
             },
         },
         "loggers": {
@@ -85,17 +105,6 @@ if mode == "Prod":
             },
         },
     }
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
-    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-    CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
-    CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
-else:
-    SECRET_KEY = "zs6fmh=6x4+n48zn02mfw8+vd(6dh#+9_d8$)4o=e^&0p2yp$)"
-    DEBUG = True
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
-    # Celery Settings
-    CELERY_BROKER_URL = "redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # Application definition
@@ -128,11 +137,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://sovisu.univ-tln.fr",
-    "https://sovisu.univ-tln.fr:9200",
-    "https://sovisu.univ-tln.fr:5601",
-    "https://sovisu.univ-tln.fr:6379",
-    "http://194.214.84.14:*",
+    "http://"+DNS,
+    "http://"+DNS+":9200",
+    "http://"+DNS+":5601",
+    "http://"+DNS+":6379",
+    "http://"+IP+":*",
     "http://localhost:*",
     "http://localhost:9200",
     "http://localhost:5601",
@@ -144,8 +153,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "194.214.84.14", "sovisu.univ-tln.fr"]
-CSRF_TRUSTED_ORIGINS = ["https://194.214.84.14", "https://localhost"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", IP, DNS]
+CSRF_TRUSTED_ORIGINS = ["http://"+IP, "https://localhost"]
 
 CORS_ALLOW_CREDENTIALS = True
 
