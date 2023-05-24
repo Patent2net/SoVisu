@@ -6,6 +6,8 @@
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
       <env name="mailSoVisu" value="&quot;&quot;" />
+      <env name="LOGPATH" value="&quot./utils/logs/;&quot;" />
+      <env name="IP" value="&quot;localhost&quot;" />
     </envs>
     <option name="SDK_HOME" value="D:\AnacondaProjects\SoVisu-Dev\SoVisu\venv\Scripts\python.exe" />
     <option name="SDK_NAME" value="Python 3.9 (SoVisu) (2)" />
