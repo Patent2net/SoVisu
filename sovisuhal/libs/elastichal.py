@@ -248,7 +248,16 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             authorship = ""
 
             # check if the searcher with that idhal already exist in app
-            searcher_param = esActions.scope_p("SearcherProfile.halId_s.keyword", idhal)
+            searcher_param = {
+                "nested": {
+                    "path": "SearcherProfile",
+                    "query": {
+                        "term": {
+                            "SearcherProfile.halId_s.keyword": idhal
+                        }
+                    }
+                }
+            }
             count_searcher = es.count(index="test_researchers", query=searcher_param)
             # TODO: Changer la méthode de vérification du chercheur,
             #  lorsque l'id commun passera sur l'idhal
@@ -291,9 +300,6 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                     "authorship": authorship,
                 }
             )
-            if doc["docid"] == "1279659":
-                print("searcherprofile:")
-                print(doc["SearcherProfile"])
         progress_recorder.set_progress(num, len(docs), description="(récolte)")
 
     helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
