@@ -60,7 +60,8 @@ def create_test_context():
     publications_message = collecte_docs(chercheur)
     print(publications_message)
 
-
+# TODO: Mettre à jour le format du document chercheur =>
+#  créer un nested pour les labos qui contient structSirene, lab (=> laboratory acronym) et labhalid
 def indexe_chercheur(idhal):  # self,
     """
     Indexe un chercheur dans Elasticsearch
@@ -2890,10 +2891,21 @@ def concepts():
 
 
 if __name__ == "__main__":
-    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
+    """v1"""
+    if not es.ping():
+        raise ValueError("Connection failed")
 
-    for index in index_list:
-        if not es.indices.exists(index=f"test_{index}"):
-            es.indices.create(index=f"test_{index}")
+    index_mapping = {
+        "researchers": elastic_formatting.searcher_mapping(),
+        "publications": elastic_formatting.publication_mapping(),
+        "laboratories": elastic_formatting.laboratories_mapping(),
+        "institutions": elastic_formatting.institutions_mapping(),
+        "expertises": elastic_formatting.expertises_mapping(),
+    }
+
+    for index, mapping_func in index_mapping.items():
+        index_name = f"test_{index}"
+        if not es.indices.exists(index=index_name):
+            es.indices.create(index=index_name, mappings=mapping_func)
 
     create_test_context()
