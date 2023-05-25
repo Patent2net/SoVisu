@@ -299,6 +299,7 @@ def publication_mapping():
                 "type": "float"
             },
             "SearcherProfile": {
+                "type": "nested",
                 "properties": {
                     "authorship": {
                         "type": "text",
