@@ -259,15 +259,20 @@ def validate_expertise(request):
             else:
                 expertise_update.append({"id": expertise_id, "children": [{"id": concept_id}]})
 
+        searcher_response = es.get(index="test_researchers", id=p_id)
+        searcher_response = searcher_response["_source"]["SearcherProfile"][0]["validated_concepts"]
+        updated_concepts = []
+
         if validate_status == "to_validate":  # If the post come from invalidated list
+
+            # get the already validated_concepts as base
+            updated_concepts = searcher_response
             # Load expertises file
             scope_param = esActions.scope_all()
             expertise_count = es.count(index="test_expertises", query=scope_param)["count"]
             expertises_list = es.search(
                 index="test_expertises", query=scope_param, size=expertise_count
             )
-
-            print(f"expertise_list :{expertises_list}")
 
             for expertise in expertises_list["hits"]["hits"]:
                 expertise = expertise["_source"]
@@ -294,25 +299,29 @@ def validate_expertise(request):
                                 child_existing_item["label_en"] = child.get("label_en")
                                 child_existing_item["label_fr"] = child.get("label_fr")
 
-            script_update = {
-                "source": "ctx._source.SearcherProfile.validated_concepts.addAll("
-                "params.new_concepts)",
-                "lang": "painless",
-                "params": {"new_concepts": expertise_update},
-            }
+            for concept in expertise_update:
+                concept_id = concept['id']
+                concept_children = concept['children']
 
-            es.update(index="test_researchers", id=p_id, script=script_update, refresh="wait_for")
+                existing_concept = None
+                for validated_concept in updated_concepts:
+                    if validated_concept['id'] == concept_id:
+                        existing_concept = validated_concept
+                        break
 
-        if validate_status == "to_remove":
-            searcher_response = es.get(index="test_researchers", id=p_id)
-            validated_concepts = searcher_response["_source"]["SearcherProfile"][
-                "validated_concepts"
-            ]
+                if existing_concept is None:
+                    updated_concepts.append(concept)
+                else:
+                    for child in concept_children:
+                        existing_child = next((c for c in existing_concept['children'] if
+                                               c.get('id') == child['id']), None)
+                        if existing_child is None:
+                            existing_concept['children'].append(child)
 
-            updated_concepts = []
-
+        elif validate_status == "to_remove":
             # Iterate over validated_concepts to remove concepts from expertises
-            for expertise in validated_concepts:
+            for expertise in searcher_response:
+
                 if expertise["id"] in [item["id"] for item in expertise_update]:
                     children = expertise.get("children", [])
 
@@ -331,14 +340,25 @@ def validate_expertise(request):
                 # Delete the expertise if no concepts are associated anymore
                 if expertise.get("children", []):
                     updated_concepts.append(expertise)
-            # overwrite validated_concepts data
-            update_doc = {"SearcherProfile": {"validated_concepts": updated_concepts}}
-            es.update(index="test_researchers", id=p_id, doc=update_doc, refresh="wait_for")
+
+        else:
+            return redirect("unknown")
+
+        update_script = {
+            "source": "for (profile in ctx._source.SearcherProfile) {"
+                      " if (profile.ldapId == params.ldapId) "
+                      "{ profile.validated_concepts = params.validated_concepts } }",
+            "lang": "painless",
+            "params": {"ldapId": p_id, "validated_concepts": updated_concepts},
+        }
+
+        es.update(index="test_researchers", id=p_id, script=update_script, refresh="wait_for")
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}"
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
+
 
 
 @login_required()

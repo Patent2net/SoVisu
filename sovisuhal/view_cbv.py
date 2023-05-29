@@ -386,14 +386,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         searcher_response = searcher_response["_source"]["SearcherProfile"]
         searcher_response = searcher_response[0]["validated_concepts"]
 
-        # Get list of concept from the nested documents
-        searcher_concepts = []
-        for nested_document in searcher_response:
-            concept = nested_document[0]
-            searcher_concepts.append(concept)
 
         if validation == "1":  # show the expertises validated by searcher
-            expertise_cleaned = searcher_concepts
+            expertise_cleaned = searcher_response
         elif validation == "0":  # show the expertises invalidated by searcher
             scope_param = esActions.scope_all()
             expertise_count = es.count(index="test_expertises", query=scope_param)["count"]
@@ -405,13 +400,13 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 expertise = expertise["_source"]
 
                 if expertise["id"] in [
-                    validated_concepts["id"] for validated_concepts in searcher_concepts
+                    validated_concepts["id"] for validated_concepts in searcher_response
                 ]:
                     children = expertise.get("children", [])
                     # Extract the ID of each child from searcher_response
                     validated_children_ids = [
                         child_validated["id"]
-                        for validated_concepts in searcher_concepts
+                        for validated_concepts in searcher_response
                         for child_validated in validated_concepts.get("children", [])
                     ]
 
