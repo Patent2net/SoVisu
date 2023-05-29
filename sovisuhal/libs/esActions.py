@@ -64,7 +64,43 @@ def scope_p(scope_field, scope_value):
     scope = {"match": {scope_field: scope_value}}
     return scope
 
+def scope_term(scope_field, scope_value):
+    """
+    Retourne un ensemble de documents spécifiques en fonction d'un filtre
+    sur matching EXACT
+    """
+    scope = {"term": {scope_field: scope_value}}
+    return scope
 
+def scope_term_multi(list_scope_field_value):
+    """
+    Retourne un ensemble de documents spécifiques en fonction d'un filtre
+    sur matchings MAIS alors que les autres fonctionne sur les notices celui là non !!!
+    du coup passé à match.
+    Pour mémo le match_phrase_prefix devrait être utile pour parcourir les arbres des domaines disciplinaires
+    """
+    temp = []
+    for match in list_scope_field_value:
+        temp .append(scope_term(match[0], match[1]))
+    return {'bool': {'should': temp}}
+
+def scope_match(scope_field, scope_value):
+    """
+    Retourne un ensemble de documents spécifiques en fonction d'un filtre
+    sur matching EXACT
+    """
+    scope = {"match": {scope_field: scope_value}}
+    return scope
+
+def scope_match_multi(list_scope_field_value):
+    """
+    Retourne un ensemble de documents spécifiques en fonction d'un filtre
+    sur matchings EXACT
+    """
+    temp = []
+    for match in list_scope_field_value:
+        temp .append(scope_match(match[0], match[1]))
+    return {'bool': {'must': temp}}
 # To call date_all function: variable_name = esActions.date_all()
 def date_all():
     """
