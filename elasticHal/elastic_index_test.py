@@ -27,13 +27,6 @@ def create_test_context():
     idhal = "david-reymond"
     researcher_id = "dreymond"
 
-    # creation des index nécessaires
-    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
-
-    for index in index_list:
-        if not es.indices.exists(index=f"test_{index}"):
-            es.indices.create(index=f"test_{index}")
-
     # remplissage index test_chercheur
     idhal_test = idhal_checkout(idhal)
     if idhal_test > 0:
@@ -60,7 +53,8 @@ def create_test_context():
     publications_message = collecte_docs(chercheur)
     print(publications_message)
 
-
+# TODO: Mettre à jour le format du document chercheur =>
+#  créer un nested pour les labos qui contient structSirene, lab (=> laboratory acronym) et labhalid
 def indexe_chercheur(idhal):  # self,
     """
     Indexe un chercheur dans Elasticsearch
@@ -230,9 +224,6 @@ def get_expertises():
         row["_id"] = row["id"]
         row["category"] = "expertise"
 
-        # add a common SearcherProfile Key who should serve has common key between index
-        row["SearcherProfile"] = []
-
         for children in row["children"]:
             # nécessaire?
             children["category"] = "concept"
@@ -302,25 +293,39 @@ def collecte_docs(chercheur, overwrite=False):  # self,
         # add a common SearcherProfile Key who should serve has common key between index
         doc["SearcherProfile"] = []
 
-        # check if the document already exist and edit fields depending on overwrite state
-        doc_param = esActions.scope_p("_id", doc["_id"])
-        count_document = es.count(index="test_publications", query=doc_param)
+        document_exist = es.exists(index="test_publications", id=doc["_id"])
 
-        # Create the records of the searchers linked to the document.
+        # iterate for every searcher idhal present in doc
         for idhal in doc["authIdHal_s"]:
             validated_concepts = ""
+            ldapId = "unassigned"
             validated = "unassigned"
             authorship = ""
 
-            # get validated_concepts of the searcher if registered in SoVisu
-            searcher_param = esActions.scope_p("SearcherProfile.halId_s", idhal)
+            # check if the searcher with that idhal already exist in app
+            searcher_param = {
+                    "nested": {
+                      "path": "SearcherProfile",
+                      "query": {
+                        "term": {
+                          "SearcherProfile.halId_s.keyword": idhal
+                        }
+                      }
+                    }
+                }
             count_searcher = es.count(index="test_researchers", query=searcher_param)
+            # TODO: Changer la méthode de vérification du chercheur,
+            #  lorsque l'id commun passera sur l'idhal
+            # searcher_exist = es.exists(index="test_researchers", id=idhal)
+
+            # if searcher exist, get associated validated_concepts
             if count_searcher["count"] > 0:
                 searcher_data = es.search(index="test_researchers", query=searcher_param)
                 searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
+                ldapId = searcher_data["ldapId"]
                 validated_concepts = searcher_data["validated_concepts"]
 
-            if overwrite or count_document["count"] == 0:
+            if overwrite or not document_exist:
                 if count_searcher["count"] > 0:
                     validated = "True"
                 # check authorship
@@ -329,21 +334,22 @@ def collecte_docs(chercheur, overwrite=False):  # self,
                 if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
                     authorship = "lastAuthor"
             else:
-                document_data = es.search(index="test_publications", query=doc_param)
-                document_data = document_data["hits"]["hits"][0]["_source"]
-
+                document_data = es.get(index="test_publications", id=doc["_id"])
+                document_data = document_data["_source"]
+                # Compare with datas already in document
                 for searcher in document_data["SearcherProfile"]:
                     if searcher["halId_s"] == idhal:
-                        validated = searcher["validated"]
+                        if searcher["validated"] == "unassigned" and count_searcher["count"] > 0:
+                            validated = "True"
+                        else:
+                            validated = searcher["validated"]
                         authorship = searcher["authorship"]
 
             # add the record of the Searcher in the document
             doc["SearcherProfile"].append(
                 {
                     "halId_s": idhal,
-                    "ldapId": chercheur["ldapId"]
-                    if chercheur["halId_s"] == idhal
-                    else "unassigned",
+                    "ldapId": ldapId,
                     "validated_concepts": validated_concepts,
                     "validated": validated,
                     "authorship": authorship,
@@ -351,6 +357,7 @@ def collecte_docs(chercheur, overwrite=False):  # self,
             )
 
     helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
+
     return "add publications done"
 
 
@@ -2890,10 +2897,20 @@ def concepts():
 
 
 if __name__ == "__main__":
-    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
+    if not es.ping():
+        raise ValueError("Connection failed")
 
-    for index in index_list:
-        if not es.indices.exists(index=f"test_{index}"):
-            es.indices.create(index=f"test_{index}")
+    index_mapping = {
+        "researchers": elastic_formatting.searcher_mapping(),
+        "publications": elastic_formatting.publication_mapping(),
+        "laboratories": elastic_formatting.laboratories_mapping(),
+        "institutions": elastic_formatting.institutions_mapping(),
+        "expertises": elastic_formatting.expertises_mapping(),
+    }
+
+    for index, mapping_func in index_mapping.items():
+        index_name = f"test_{index}"
+        if not es.indices.exists(index=index_name):
+            es.indices.create(index=index_name, mappings=mapping_func)
 
     create_test_context()
