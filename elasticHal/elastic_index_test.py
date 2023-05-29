@@ -27,13 +27,6 @@ def create_test_context():
     idhal = "david-reymond"
     researcher_id = "dreymond"
 
-    # creation des index nécessaires
-    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
-
-    for index in index_list:
-        if not es.indices.exists(index=f"test_{index}"):
-            es.indices.create(index=f"test_{index}")
-
     # remplissage index test_chercheur
     idhal_test = idhal_checkout(idhal)
     if idhal_test > 0:
@@ -231,9 +224,6 @@ def get_expertises():
         row["_id"] = row["id"]
         row["category"] = "expertise"
 
-        # add a common SearcherProfile Key who should serve has common key between index
-        row["SearcherProfile"] = []
-
         for children in row["children"]:
             # nécessaire?
             children["category"] = "concept"
@@ -313,8 +303,6 @@ def collecte_docs(chercheur, overwrite=False):  # self,
             authorship = ""
 
             # check if the searcher with that idhal already exist in app
-            #TODO: corriger la variable searcher_param pour SearcherProfile (nested)
-            # searcher_param = esActions.scope_p("SearcherProfile.halId_s.keyword", idhal)
             searcher_param = {
                     "nested": {
                       "path": "SearcherProfile",
