@@ -353,7 +353,7 @@ def indexe_expertises():
     return str(res[0]), " Concepts added, in index domaines-hal-referentiel"
 
 
-def collecte_docs(chercheur, overwrite=False):  # self,
+def collecte_docs(chercheur):  # self,
     """
     collecte_docs present dans elastichal.py
     partie Celery retirée pour les tests.
@@ -426,20 +426,6 @@ def collecte_docs(chercheur, overwrite=False):  # self,
             doc["records"] = []
             doc["category"] = "notice-hal"
             doc["idhal"] = idhal,  # l'Astuce du
-            if doc["authIdHal_s"].index(idhal) == 0:
-                authorship = "firstAuthor"
-            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
-                authorship = "lastAuthor"
-            # Pas utile ce qui suit. ???
-            doc["SearcherProfile"] = {  # [  # Pas besoin de liste ici je dirais
-                "halId_s": idhal,
-                "ldapId": chercheur["ldapId"],
-                # if chercheur["halId_s"] == idhal else "unassigned",
-                "validated_concepts": [],  # validated_concepts, # concepts validés pour ce doc ?
-                "validated": "unassigned",  # doc validé par ce chercheur
-                "authorship": authorship,
-            }
-            # ]
         else:
             pass
 
