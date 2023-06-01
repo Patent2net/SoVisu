@@ -2,11 +2,10 @@ import datetime
 
 
 # Formatter for adding documents in the index
+# TODO: Adjust all the formats for elastic_index_test2
 
-
-def laboratory_format(notice):
+def laboratory_format(notice):  # Up To Date (for now)
     labo_notice = {
-        "_id": notice["halStructId"],
         "category": "laboratory",
         "acronym": notice["acronym"],
         "halStructId": notice["halStructId"],
@@ -14,16 +13,13 @@ def laboratory_format(notice):
         "label": notice["label"],
         "rsnr": notice["rsnr"],
         "structSirene": [notice["structSirene"]],
-        "guidingKeywords": [],
-        "SearcherProfile": [],
         "Created": datetime.datetime.now().isoformat(),
     }
     return labo_notice
 
 
-def institution_format(notice):
+def institution_format(notice):  # Up To Date (for now)
     institution_notice = {
-        "_id": notice["structSirene"],
         "category": "institution",
         "structSirene": notice["structSirene"],
         "acronym": notice["acronym"],
@@ -36,7 +32,6 @@ def institution_format(notice):
 
 def publication_format(notice):
     publication_notice = {
-        "_id": notice["docid"],
         "category": "notice",
         "authFirstName_s": notice["authFirstName_s"],
         "authLastName_s": "",
@@ -51,13 +46,104 @@ def publication_format(notice):
     return publication_notice
 
 
-# TODO: Add a format for searcher notices
+def publication_format_BIS(notice):
+    publication_notice = {
+        "docid": "",
+        "label_bibtex": "",
+        "openAccess_bool": "",
+        "title_s": [],
+        "fr_keyword_s": [],
+        "fr_abstract_s": "",
+        "authLastName_s": [
+          "Pinède",
+          "Reymond",
+          "Le Blanc",
+          "Lespinet-Najib"
+        ],
+        "authFirstName_s": [
+          "Nathalie",
+          "David",
+          "Benoit",
+          "Véronique"
+        ],
+        "authFullName_s": [],
+        "authIdHal_i": [],
+        "authIdHal_s": [],
+        "rteamStructCountry_s": [],
+        "structCountry_s": [],
+        "labStructId_i": [],
+        "labStructCountry_s": [],
+        "instStructCountry_s": [],
+        "rgrpInstStructCountry_s": [],
+        "contributorFullName_s": "",
+        "language_s": [],
+        "halId_s": "",
+        "version_i": "",
+        "docType_s": "",
+        "bookTitle_s": "",
+        "page_s": "",
+        "modifiedDate_tdate": "",
+        "submittedDate_tdate": "",
+        "producedDate_tdate": "",
+        "publicationDate_tdate": "",
+        "publicationDateY_i": "",
+        "country": [],
+        "deptStructCountry_s": [],
+        "rgrpLabStructCountry_s": [],
+        "country_collaboration": [],
+        "country_s": [],
+        "publicationLocation_s": [],
+        "fr_entites": [],
+        "fr_teeft_keywords": [],
+        "Created": datetime.datetime.now().isoformat(),
+        "harvested_from": "",
+        "harvested_from_ids": [],
+        "harvested_from_label": [],
+        "records": [],
+        "category": "notice-hal",
+        "idhal": [],
+        "postprint_embargo": "",
+        "preprint_embargo": ""
+    }
+    return publication_notice
+
+
 def searcher_format(notice):
-    pass
+    searcher_notice = {
+    "name": "REYMOND David",
+    "type": "Personnel",
+    "function": "Enseignant Chercheur Titulaire",
+    "mail": "david.reymond@univ-tln.fr",
+    "orcId": "",
+    "lab": "IMSIC",
+    "supannAffectation": "IMSIC;IUT TC",
+    "supannEntiteAffectationPrincipale": "IUTTCO",
+    "firstName": "David",
+    "lastName": "REYMOND",
+    "structSirene": "198307662",
+    "labHalId": "527028",
+    "validated": "false",
+    "ldapId": "dreymond",
+    "Created": "2023-06-01T16:32:06.101249",
+    "idhal": "david-reymond",
+    "halId_s": "david-reymond",
+    "aurehalId": "7386",
+    "idRef": "test",
+    "axis": "IMSIC",
+    "category": "searcher"
+  }
+    return searcher_notice
 
 
-def expertise_concepts_format(notice):
-    pass
+def expertise_format(notice):
+    expertise_notice = {
+    "chemin": "",
+    "label_en": "",
+    "label_fr": "",
+    "category": "",
+    "referentiel": ""
+    }
+    return expertise_notice
 
 
 # Mapping for the Index
