@@ -30,65 +30,56 @@ def institution_format(notice):  # Up To Date (for now)
     return institution_notice
 
 
-def publication_format(notice):
+# def publication_format(notice):
+#     publication_notice = {
+#         "category": "notice",
+#         "authFirstName_s": notice["authFirstName_s"],
+#         "authLastName_s": "",
+#         "authFullName_s": "",
+#         "authIdHal_i": "",
+#         "authIdHal_s": "",
+#         "contributorFullName_s": "",  # intéret à l'avoir ?
+#         "country": "",
+#         "country_collaboration": "",
+#     }
+#
+#     return publication_notice
+
+# TODO: connect to collect_doc
+def publication_format(doc, added):
+    # doc: gathered in base doc, added: made by sovisu. TEMPORARY
     publication_notice = {
-        "category": "notice",
-        "authFirstName_s": notice["authFirstName_s"],
-        "authLastName_s": "",
-        "authFullName_s": "",
-        "authIdHal_i": "",
-        "authIdHal_s": "",
-        "contributorFullName_s": "",  # intéret à l'avoir ?
-        "country": "",
-        "country_collaboration": "",
-    }
-
-    return publication_notice
-
-
-def publication_format_BIS(notice):
-    publication_notice = {
-        "docid": "",
-        "label_bibtex": "",
-        "openAccess_bool": "",
-        "title_s": [],
+        "docid": doc["docid"],
+        "label_bibtex": doc["label_bibtex"],
+        "openAccess_bool": doc["openAccess_bool"],
+        "title_s": doc["title_s"],
         "fr_keyword_s": [],
         "fr_abstract_s": "",
-        "authLastName_s": [
-          "Pinède",
-          "Reymond",
-          "Le Blanc",
-          "Lespinet-Najib"
-        ],
-        "authFirstName_s": [
-          "Nathalie",
-          "David",
-          "Benoit",
-          "Véronique"
-        ],
-        "authFullName_s": [],
-        "authIdHal_i": [],
-        "authIdHal_s": [],
-        "rteamStructCountry_s": [],
-        "structCountry_s": [],
-        "labStructId_i": [],
-        "labStructCountry_s": [],
-        "instStructCountry_s": [],
-        "rgrpInstStructCountry_s": [],
-        "contributorFullName_s": "",
-        "language_s": [],
-        "halId_s": "",
-        "version_i": "",
-        "docType_s": "",
+        "authLastName_s": doc["authLastName_s"],
+        "authFirstName_s": doc["authFirstName_s"],
+        "authFullName_s": doc["authFullName_s"],
+        "authIdHal_i": doc["authIdHal_i"],
+        "authIdHal_s": doc["authIdHal_s"],
+        "rteamStructCountry_s": doc["rteamStructCountry_s"],
+        "structCountry_s": doc["structCountry_s"],
+        "labStructId_i": doc["labStructId_i"],
+        "labStructCountry_s": doc["labStructCountry_s"],
+        "instStructCountry_s": doc["instStructCountry_s"],
+        "rgrpInstStructCountry_s": doc["rgrpInstStructCountry_s"],
+        "contributorFullName_s": doc["contributorFullName_s"],
+        "language_s": doc["language_s"],
+        "halId_s": doc["halId_s"],
+        "version_i": doc["version_i"],
+        "docType_s": doc["docType_s"],
         "bookTitle_s": "",
         "page_s": "",
-        "modifiedDate_tdate": "",
-        "submittedDate_tdate": "",
-        "producedDate_tdate": "",
-        "publicationDate_tdate": "",
-        "publicationDateY_i": "",
-        "country": [],
-        "deptStructCountry_s": [],
+        "modifiedDate_tdate": doc["modifiedDate_tdate"],
+        "submittedDate_tdate": doc["submittedDate_tdate"],
+        "producedDate_tdate": doc["producedDate_tdate"],
+        "publicationDate_tdate": doc["publicationDate_tdate"],
+        "publicationDateY_i": doc["publicationDateY_i"],
+        "country": doc["country"],
+        "deptStructCountry_s": doc["deptStructCountry_s"],
         "rgrpLabStructCountry_s": [],
         "country_collaboration": [],
         "country_s": [],
@@ -108,31 +99,31 @@ def publication_format_BIS(notice):
     return publication_notice
 
 
-def searcher_format(notice):
-    searcher_notice = {
-    "name": "REYMOND David",
-    "type": "Personnel",
-    "function": "Enseignant Chercheur Titulaire",
-    "mail": "david.reymond@univ-tln.fr",
-    "orcId": "",
-    "lab": "IMSIC",
-    "supannAffectation": "IMSIC;IUT TC",
-    "supannEntiteAffectationPrincipale": "IUTTCO",
-    "firstName": "David",
-    "lastName": "REYMOND",
-    "structSirene": "198307662",
-    "labHalId": "527028",
-    "validated": "false",
-    "ldapId": "dreymond",
-    "Created": "2023-06-01T16:32:06.101249",
-    "idhal": "david-reymond",
-    "halId_s": "david-reymond",
-    "aurehalId": "7386",
-    "idRef": "test",
-    "axis": "IMSIC",
-    "category": "searcher"
-  }
-    return searcher_notice
+# def searcher_format(notice, orcid, labo_accro, structid, labhalid):
+#     searcher_notice = {
+#     "name": notice["attributes"]["displayName"],
+#     "type": "Personnel",
+#     "function": notice["attributes"]["typeEmploi"],
+#     "mail": notice["attributes"]["mail"],
+#     "orcId": orcid,
+#     "lab": labo_accro,
+#     "supannAffectation": "IMSIC;IUT TC",
+#     "supannEntiteAffectationPrincipale": notice["attributes"]["supannEntiteAffectationPrincipale"],
+#     "firstName": notice["attributes"]["displayName"].split(" ")[1],
+#     "lastName": notice["attributes"]["displayName"].split(" ")[0],
+#     "structSirene": structid,
+#     "labHalId": labhalid,
+#     "validated": False,
+#     "ldapId": "dreymond",
+#     "Created": datetime.datetime.now().isoformat(),
+#     "idhal": "david-reymond",
+#     "halId_s": "david-reymond",
+#     "aurehalId": "7386",
+#     "idRef": "test",
+#     "axis": "IMSIC",
+#     "category": "searcher"
+#   }
+#     return searcher_notice
 
 
 def expertise_format(notice):

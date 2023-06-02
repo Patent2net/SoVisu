@@ -181,6 +181,7 @@ def get_dico(ldapid):
     return dico
 
 
+# TODO: Refactor that function
 def create_searcher_concept_notices(idhal, aurehal):
     archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     chercheur_concept = archives_ouvertes_data["concepts"]
@@ -382,6 +383,7 @@ def collecte_docs(chercheur):  # self,
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
     idhal = chercheur["idhal"]
+    #TODO: look hal.find_publication for full base list of keys
     docs = hal.find_publications(idhal, "authIdHal_s")
     # récupération de l'existant
     doc_param = esActions.scope_term_multi(

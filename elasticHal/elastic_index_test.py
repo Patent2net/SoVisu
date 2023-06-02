@@ -219,7 +219,7 @@ def get_institution_from_csv(add_csv=True):
 
 
 def get_expertises():
-    concept_list = test_concepts.concepts()
+    concept_list = test_static.concepts()
     for row in concept_list:
         # add a category to make differentiation in text_* index pattern
         row["_id"] = row["id"]
