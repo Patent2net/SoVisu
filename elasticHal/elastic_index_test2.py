@@ -18,9 +18,12 @@ from elasticHal.libs import (
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 from sovisuhal.libs import esActions
 from sovisuhal.viewsActions import idhal_checkout
+from ldap3 import ALL, Connection, Server
+from decouple import config
 
 es = esActions.es_connector()
 
+mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
 # defr d'un mapping pour chaque categorie de doc
 # ATTENTTION partiel et redondant
@@ -29,7 +32,13 @@ es = esActions.es_connector()
 def create_test_context():
     # Variables à automatiser plus tard
     idhal = "david-reymond"
-
+    orcid = ""
+    labo_accro = "IMSIC"
+    idref = "test"
+    labhalid = "527028"
+    ldapid = "dreymond"
+    structid = "198307662"
+    """end of temp values"""
     # remplissage index test_laboratoire
     labo_message = get_labo_from_csv()
     print(labo_message)
@@ -45,7 +54,7 @@ def create_test_context():
     # remplissage index test_chercheur
     idhal_test = idhal_checkout(idhal)
     if idhal_test > 0:
-        indexe_chercheur(idhal)
+        indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid)
 
     # remplissage des publications
     # scope_param = scope_p("idhal", researcher_id) # ne renvoit rien, idhal est le bon champ
@@ -61,33 +70,13 @@ def create_test_context():
     print(publications_message)
 
 
-def indexe_chercheur(idhal):  # self,
+def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
     Indexe un chercheur dans Elasticsearch
     """
-    """temp values:"""
-    orcid = ""
-    labo_accro = "IMSIC"
-    idref = "test"
-    labhalid = "527028"
-    """end of temp values"""
 
-    dico = {
-        "attributes": {
-            "displayName": "REYMOND David",
-            "labo": [],
-            "mail": ["david.reymond@univ-tln.fr"],
-            "supannAffectation": ["IMSIC", "IUT TC"],
-            "supannEntiteAffectationPrincipale": "IUTTCO",
-            "supanncodeentite": [],
-            "typeEmploi": "Enseignant Chercheur Titulaire",
-            "ustvStatus": ["OFFI"],
-        },
-        "dn": "uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr",
-    }
-    structid = "198307662"
-    ldapid = "dreymond"
-
+    # Get the basic information about the searcher
+    dico = get_dico(ldapid)
     # -----------------
 
     extrait = dico["dn"].split("uid=")[1].split(",")
@@ -95,62 +84,105 @@ def indexe_chercheur(idhal):  # self,
     suppan_id = extrait[0]
     if suppan_id != ldapid:
         print("aille", ldapid, " --> ", ldapid)
-    nom = dico["attributes"]["displayName"]
-    emploi = dico["attributes"]["typeEmploi"]
-    mail = dico["attributes"]["mail"]
+
+    nom = dico["attributes"]["displayName"] if len(dico["attributes"]["displayName"]) > 0 else [""]
+    emploi = dico["attributes"]["typeEmploi"] if len(dico["attributes"]["typeEmploi"]) > 0 else [""]
+    mail = dico["attributes"]["mail"] if len(dico["attributes"]["mail"]) > 0 else [""]
+
+    supann_affect = []
     if "supannAffectation" in dico["attributes"].keys():
         supann_affect = dico["attributes"]["supannAffectation"]
-    else:
-        supann_affect = []
 
+    supann_princ = []
     if "supannEntiteAffectationPrincipale" in dico["attributes"].keys():
         supann_princ = dico["attributes"]["supannEntiteAffectationPrincipale"]
-    else:
-        supann_princ = []
-
-    if len(nom) <= 0:
-        nom = [""]
-    elif len(emploi) <= 0:
-        emploi = [""]
-    elif len(mail) <= 0:
-        mail = [""]
-
-    # name,type,function,mail,lab,supannAffectation,supannEntiteAffectationPrincipale,halId_s,labHalId,idRef,structDomain,firstName,lastName,aurehalId
-    chercheur = dict()
-    # as-t-on besoin des 3 derniers champs ???
-    chercheur["name"] = nom
-    chercheur["type"] = chercheur_type
-    chercheur["function"] = emploi
-    chercheur["mail"] = mail[0]
-    chercheur["orcId"] = orcid
-    chercheur["lab"] = labo_accro  # acronyme
-    chercheur["supannAffectation"] = ";".join(supann_affect)
-    chercheur["supannEntiteAffectationPrincipale"] = supann_princ
-    chercheur["firstName"] = chercheur["name"].split(" ")[1]
-    chercheur["lastName"] = chercheur["name"].split(" ")[0]
-    chercheur["structSirene"] = structid
-    chercheur["labHalId"] = labhalid
-    chercheur["validated"] = False
-    chercheur["ldapId"] = ldapid
-    chercheur["Created"] = datetime.datetime.now().isoformat()
 
     # New step ?
     aurehal = ""
-    archives_ouvertes_data = {}
 
     if idhal != "":
         aurehal = get_aurehalId(idhal)
         # integration contenus
-        archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    chercheur[
-        "idhal"] = idhal  # sert de clé pivot entre les docs, il faut être sûr que ce champ n'existe dans aucune des docs que l'on pourrait indexer
-    chercheur["halId_s"] = idhal
-    chercheur["aurehalId"] = aurehal  # heu ?
-    chercheur["idRef"] = idref
-    chercheur["axis"] = labo_accro
-    chercheur["category"] = "searcher"
+        create_searcher_concept_notices(idhal, aurehal)
 
-    # Calcul du rattachement. S'effectue par le marquage d'un lien vers le document labo dont il faut récupérer l'id
+    searcher_notice = {
+        "name": nom,
+        "type": chercheur_type,
+        "function": emploi,
+        "mail": mail[0],
+        "orcId": orcid,
+        "lab": labo_accro,
+        "supannAffectation": ";".join(supann_affect),
+        "supannEntiteAffectationPrincipale": supann_princ,
+        "firstName": nom.split(" ")[1],
+        "lastName": nom.split(" ")[0],
+        "structSirene": structid,
+        "labHalId": labhalid,
+        "validated": False,
+        "ldapId": ldapid,
+        "Created": datetime.datetime.now().isoformat(),
+        "idhal": idhal,  # sert de clé pivot entre les docs, il faut être sûr que ce champ n'existe dans aucune des docs que l'on pourrait indexer
+        "halId_s": idhal,
+        "aurehalId": aurehal,
+        "idRef": idref,
+        "axis": labo_accro,  # TODO: INTERET DE CETTE KEY?
+        "category": "searcher"
+    }
+
+    res = es.index(
+        index="test2",
+        document=searcher_notice,
+        refresh="wait_for",
+    )
+    print("statut de la création d'index: ", res["result"])
+    return ""
+
+
+# TODO: Renommer Get_dico pour quelque chose de plus explicite
+def get_dico(ldapid):
+    if mode == "Prod":
+        server = Server("ldap.univ-tln.fr", get_info=ALL)
+        conn = Connection(
+            server,
+            "cn=Sovisu,ou=sysaccount,dc=ldap-univ-tln,dc=fr",
+            config("ldappass"),
+            auto_bind=True,
+        )  # recup des données ldap
+        conn.search(
+            "dc=ldap-univ-tln,dc=fr",
+            "(&(uid=" + ldapid + "))",
+            attributes=[
+                "displayName",
+                "mail",
+                "typeEmploi",
+                "ustvstatus",
+                "supannaffectation",
+                "supanncodeentite",
+                "supannEntiteAffectationPrincipale",
+                "labo",
+            ],
+        )
+        dico = json.loads(conn.response_to_json())["entries"][0]
+    else:
+        dico = {
+            "attributes": {
+                "displayName": "REYMOND David",
+                "labo": [],
+                "mail": ["david.reymond@univ-tln.fr"],
+                "supannAffectation": ["IMSIC", "IUT TC"],
+                "supannEntiteAffectationPrincipale": "IUTTCO",
+                "supanncodeentite": [],
+                "typeEmploi": "Enseignant Chercheur Titulaire",
+                "ustvStatus": ["OFFI"],
+            },
+            "dn": "uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr",
+        }
+
+    return dico
+
+
+def create_searcher_concept_notices(idhal, aurehal):
+    archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     chercheur_concept = archives_ouvertes_data["concepts"]
     if len(chercheur_concept) > 0:
         # scope_param = scope_p("id", [exp['id'] for exp in chercheur_concept['children']])
@@ -207,23 +239,11 @@ def indexe_chercheur(idhal):  # self,
             newFiche = fiche['_source']
             newFiche['validated'] = False  # domaines pas validés par défaut
             # Id proposition : valider les domaines par défaut et laisser la possibilité d'en valider d'autres par explorateur d'arbre ?
-            newFiche['idhal'] = chercheur['halId_s']  # taggage, l'idhal sert de clé
+            newFiche['idhal'] = idhal  # taggage, l'idhal sert de clé
             # Et rajouts besoins spécifiques (genre précisions / notes...)
 
             # Puis on indexe la fiche
-            res = es.index(
-                index="test2",
-                document=json.dumps(newFiche),
-                refresh="wait_for",
-            )
-
-    res = es.index(
-        index="test2",
-        document=json.dumps(chercheur),
-        refresh="wait_for",
-    )
-    print("statut de la création d'index: ", res["result"])
-    return ""
+            es.index(index="test2", document=json.dumps(newFiche), refresh="wait_for",)
 
 
 def get_labo_from_csv():
@@ -520,14 +540,6 @@ def should_be_open(notice):
 # Elasticsearch queries
 # the queries under are different from those already registered,
 # and follow this deprecation worning: https://github.com/elastic/elasticsearch-py/issues/1698
-
-def scope_p(scope_field, scope_value):
-    """
-    Retourne un ensemble de documents spécifique en fonction d'un filtre
-    """
-    scope = {"match": {scope_field: scope_value}}
-    return scope
-
 
 def scope_all():
     """
