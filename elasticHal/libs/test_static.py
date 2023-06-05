@@ -2403,8 +2403,62 @@ def concepts():
         },
     ]
 
-def test_docmap2():
-    docmap = {
+
+def expertises_mapping():
+    mapping = {
+        "properties": {
+            "category": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "chemin": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+            },
+            "label_en": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "label_fr": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "referentiel": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+            },
+        }
+    }
+    return mapping
+
+
+def document_mapping():
+    mapping = {
         "properties": {
             "checked": {
                 "type": "boolean"
@@ -3237,4 +3291,4 @@ def test_docmap2():
         ]
     }
 
-    return docmap
+    return mapping

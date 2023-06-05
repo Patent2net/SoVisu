@@ -552,13 +552,15 @@ def scope_all():
 
 
 if __name__ == "__main__":
-    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
-    docmap = test_static.test_docmap2()
-    if not es.indices.exists(index=f"test2"):
-        es.indices.create(index=f"test2", mappings=docmap)
-    # création d'un référentiel des domaines (ex concepts. On les appelle plus comme çà !!!)
-    if not es.indices.exists(index=f"domaines-hal-referentiel"):
-        es.indices.create(index=f"domaines-hal-referentiel", mappings=docmap)
+
+    index_mapping = {
+        "test2": test_static.document_mapping(),
+        "domaines-hal-referentiel": test_static.expertises_mapping(),
+    }
+    for index, mapping_func in index_mapping.items():
+        if not es.indices.exists(index=index):
+            es.indices.create(index=index, mappings=mapping_func)
+
     # Faudra sur le même modèle rajouter les labos et les structures.
     # Cela permet de générer autant d'axes ou sous groupes que nécessaires ;-)
     create_test_context()
