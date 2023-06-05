@@ -2408,39 +2408,9 @@ def test_docmap2():
         "properties": {
             "checked": {
                 "type": "boolean"
-            },  # notre ancien validateed
-            # "profil": {
-            #       "type": "join",
-            #
-            #       "relations": {
-            #         "composition": ["thèses", "hal", "brevets",     # Publications ou autres
-            #                       "Aurehal", "libre",             # compétences déclarées
-            #                       "formation", "experience",      # Parcours... truc du cv
-            #                       "disciplines",                   # disciplines
-            #                       "labActuel", "structure"  ]     # rattachement
-            #         #ca fait beaucp
-            #               }
-            #           },# se définit par une jointure sur différents documents. parent : enfant
+            },  # notre ancien validated
             # Fiche Référentiel
             "chemin": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "label_fr": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "label_en": {
                 "type": "text",
                 "fields": {
                     "keyword": {
@@ -2739,158 +2709,9 @@ def test_docmap2():
                     }
                 }
             },  # c'est quoi ce champ ????
-            # "validated": {
-            #        "type": "boolean"
-            #      }, # Pas plus judicieux de le mettre dans SearcherProfile ?
-
-            #   } # typage de données # Me suis servi du mapping par défaut sur sovisu actuel pour adapter
-            # docmap['publications'] = { # ce qui suit est pour les docs publication
-            #     "properties": {
-
             "MDS": {
                 "type": "float"
             },
-            #     "SearcherProfile": {
-            #       "type": "nested",
-            #       "properties": {
-            #         "authorship": {
-            #           "type": "text",
-            #           "fields": {
-            #             "keyword": {
-            #               "type": "keyword",
-            #               "ignore_above": 256
-            #             }
-            #           }
-            #         },
-            #         "halId_s": {
-            #           "type": "keyword"
-            #         },
-            #         "ldapId": {
-            #           "type": "keyword"
-            #         },
-            #         "validated": {
-            #           "type": "text",
-            #           "fields": {
-            #             "keyword": {
-            #               "type": "keyword",
-            #               "ignore_above": 256
-            #             }
-            #           }
-            #         },
-            #         "validated_concepts": {
-            #           "type": "nested",
-            #                "properties": {
-            #                 "category": {
-            #                   "type": "text",
-            #                   "fields": {
-            #                     "keyword": {
-            #                       "type": "keyword",
-            #                       "ignore_above": 256
-            #                               }
-            #                               }
-            #                             },
-            #                   "children": {
-            #                       "properties": {
-            #                         "category": {
-            #                           "type": "text",
-            #                           "fields": {
-            #                             "keyword": {
-            #                               "type": "keyword",
-            #                               "ignore_above": 256
-            #                             }
-            #                           }
-            #                         },
-            #                   "children": {
-            #           "properties": {
-            #             "id": {
-            #               "type": "text",
-            #               "fields": {
-            #                 "keyword": {
-            #                   "type": "keyword",
-            #                   "ignore_above": 256
-            #                 }
-            #               }
-            #             },
-            #             "label_en": {
-            #               "type": "text",
-            #               "fields": {
-            #                 "keyword": {
-            #                   "type": "keyword",
-            #                   "ignore_above": 256
-            #                 }
-            #               }
-            #             },
-            #             "label_fr": {
-            #               "type": "text",
-            #               "fields": {
-            #                 "keyword": {
-            #                   "type": "keyword",
-            #                   "ignore_above": 256
-            #                 }
-            #               }
-            #             }
-            #           }
-            #         },
-            #                   "id": {
-            #                       "type": "text",
-            #                       "fields": {
-            #                         "keyword": {
-            #                           "type": "keyword",
-            #                           "ignore_above": 256
-            #                         }
-            #                       }
-            #                     },
-            #                       "label_en": {
-            #           "type": "text",
-            #           "fields": {
-            #             "keyword": {
-            #               "type": "keyword",
-            #               "ignore_above": 256
-            #             }
-            #           }
-            #         },
-            #                       "label_fr": {
-            #           "type": "text",
-            #           "fields": {
-            #             "keyword": {
-            #               "type": "keyword",
-            #               "ignore_above": 256
-            #             }
-            #           }
-            #         }
-            #                       }
-            #                     },
-            #                   "id": {
-            #                       "type": "text",
-            #                       "fields": {
-            #                         "keyword": {
-            #                           "type": "keyword",
-            #                           "ignore_above": 256
-            #                             }
-            #                           }
-            #                        },
-            #                   "label_en": {
-            #       "type": "text",
-            #       "fields": {
-            #         "keyword": {
-            #           "type": "keyword",
-            #           "ignore_above": 256
-            #         }
-            #       }
-            #     },
-            #                   "label_fr": {
-            #       "type": "text",
-            #       "fields": {
-            #         "keyword": {
-            #           "type": "keyword",
-            #           "ignore_above": 256
-            #         }
-            #       }
-            #     }
-            #   }
-            # }
-            #                   },
-            #                 },
             "authFirstName_s": {
                 "type": "text",
                 "fields": {
@@ -2939,9 +2760,6 @@ def test_docmap2():
                     }
                 }
             },
-            "conferenceStartDate_tdate": {
-                "type": "date"
-            },
             "conferenceTitle_s": {
                 "type": "text",
                 "fields": {
@@ -2986,9 +2804,6 @@ def test_docmap2():
                         "ignore_above": 256
                     }
                 }
-            },
-            "defenseDate_tdate": {
-                "type": "date"
             },
             "deptStructCountry_s": {
                 "type": "text",
@@ -3052,55 +2867,6 @@ def test_docmap2():
                         "ignore_above": 256
                     }
                 }
-            },
-            "fr_keyword_s": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "en_keyword_s": {
-                "type": "text",
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
-            },
-            "fr_entites": {
-                "type": "text",
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
-            },
-            "en_entites": {
-                "type": "text",
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
-            },
-            "fr_teeft_keywords": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
-            },
-            "en_teeft_keywords": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 512}},
-            },
-            "en_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "fr_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "it_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "es_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
-            },
-            "pt_abstract_s": {
-                "type": "text",  # formerly "string"
-                "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
             },
             "halId_s": {
                 "type": "text",
@@ -3249,9 +3015,6 @@ def test_docmap2():
                     }
                 }
             },
-            "modifiedDate_tdate": {
-                "type": "date"
-            },
             "oa_host_type": {
                 "type": "text",
                 "fields": {
@@ -3300,14 +3063,8 @@ def test_docmap2():
                     }
                 }
             },
-            "producedDate_tdate": {
-                "type": "date"
-            },
             "publicationDateY_i": {
                 "type": "long"
-            },
-            "publicationDate_tdate": {
-                "type": "date"
             },
             "publicationLocation_s": {
                 "type": "text",
@@ -3363,9 +3120,6 @@ def test_docmap2():
                     }
                 }
             },
-            "submittedDate_tdate": {
-                "type": "date"
-            },
             "times_cited": {
                 "type": "long"
             },
@@ -3390,7 +3144,97 @@ def test_docmap2():
                     }
                 }
             }
-        }
+        },
+        # Create mapping dynamically when the condition path_match is met
+        # AND the field is not explicitly defined in properties
+        # => if multiples condition, apply the first in the list
+        "dynamic_templates": [
+            {  # en_abstract_s, fr_abstract_s etc
+                "abstract_s_template": {
+                    "match_mapping_type": "string",
+                    "path_match": "*_abstract_s",
+                    "mapping": {
+                        "type": "text",
+                        "fields": {
+                          "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 5000
+                          }
+                        }
+                    }
+                }
+            },
+            {  # label_fr, label_en etc
+                "label_template": {
+                    "match_mapping_type": "string",
+                    "path_match": "label_*",
+                    "mapping": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "Date_tdate_template": {
+                    "match_mapping_type": "date",
+                    "path_match": "*Date_tdate",
+                    "mapping": {
+                        "type": "date"
+                    }
+                }
+            },
+            {
+                "entites_template": {
+                    "match_mapping_type": "string",
+                    "path_match": "*_entites",
+                    "mapping": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 512
+                            }
+                        }
+                    }
+                }
+            },
+            {  # en_keyword_s, fr_keyword_s etc
+                "_keyword_s_template": {
+                    "match_mapping_type": "string",
+                    "path_match": "*_keyword_s",
+                    "mapping": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 512
+                            }
+                        }
+                    }
+                }
+            },
+            {  # en_teeft_keywords, fr_teeft_keyword etc
+                "_teeft_keywords_template": {
+                    "match_mapping_type": "string",
+                    "path_match": "*_teeft_keywords",
+                    "mapping": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 512
+                            }
+                        }
+                    }
+                }
+            },
+
+        ]
     }
 
     return docmap
