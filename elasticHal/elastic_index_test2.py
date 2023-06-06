@@ -414,8 +414,8 @@ def collecte_docs(chercheur):  # self,
                 # SI le MDS a changé alors modif qualitative sur la notice
                 changements = True
             else:
-                doc = [docAncien for docAncien in docsExistantes if docAncien["_id"] == doc["_id"]][
-                    0]
+                doc = [docAncien for docAncien in docsExistantes if docAncien["_id"] == doc["_id"]][0]
+
         if doc["docid"] not in IddocsExistantes or changements:
             location_docs.generate_countrys_fields(doc)
             doc = doi_enrichissement.docs_enrichissement_doi(doc)
@@ -438,11 +438,11 @@ def collecte_docs(chercheur):  # self,
                     doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
                         doc["en_abstract_s"], "en")
             # Nouveau aussi ci dessous
+            doc["MDS"] = utils.calculate_mds(doc)
             doc["Created"] = datetime.datetime.now().isoformat()
         if doc["docid"] not in IddocsExistantes:
             doc["harvested_from"] = "researcher"  # inutile je pense
-            doc[
-                "harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
+            doc["harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
             doc["harvested_from_label"] = []  # idem ce champ serait à virer
             doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
             doc["records"] = []
@@ -552,15 +552,13 @@ def scope_all():
 
 
 if __name__ == "__main__":
-
-    index_mapping = {
-        "test2": test_static.document_mapping(),
-        "domaines-hal-referentiel": test_static.expertises_mapping(),
-    }
-    for index, mapping_func in index_mapping.items():
-        if not es.indices.exists(index=index):
-            es.indices.create(index=index, mappings=mapping_func)
-
+    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
+    docmap = test_static.test_docmap2()
+    if not es.indices.exists(index=f"test2"):
+        es.indices.create(index=f"test2", mappings=docmap)
+    # création d'un référentiel des domaines (ex concepts. On les appelle plus comme çà !!!)
+    if not es.indices.exists(index=f"domaines-hal-referentiel"):
+        es.indices.create(index=f"domaines-hal-referentiel", mappings=docmap)
     # Faudra sur le même modèle rajouter les labos et les structures.
     # Cela permet de générer autant d'axes ou sous groupes que nécessaires ;-)
     create_test_context()
