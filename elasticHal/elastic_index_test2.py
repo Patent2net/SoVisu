@@ -39,14 +39,10 @@ def create_test_context():
     structid = "198307662"
     """end of temp values"""
     # remplissage index institution
-    struct_acronym = "UTLN"
+    struct_idref = "031122337"
 
-    institution_message = get_institution(struct_acronym)
-    print(institution_message)
-
-    # remplissage index test_laboratoire
-    labo_message = get_laboratories(struct_acronym)
-    print(labo_message)
+    structure_message = set_elastic_structures(struct_idref)
+    print(structure_message)
 
     # remplissage index concepts
     concepts_message = indexe_expertises()
@@ -64,7 +60,7 @@ def create_test_context():
     chercheur = es.search(index="sovisu_searchers", query=scope_param)
     chercheur = chercheur["hits"]["hits"][0]["_source"]
 
-    ## à ce stade, chercheur contient des trucs inutiles : concepts et profil (ce dernier est là pour test modèle en arborescence (parent-child)
+    # à ce stade, chercheur contient des trucs inutiles : concepts et profil (ce dernier est là pour test modèle en arborescence (parent-child)
     print(chercheur)
     # collecte et indexation des docs
     publications_message = collecte_docs(chercheur)
@@ -72,30 +68,55 @@ def create_test_context():
 
 
 def get_institution(acronym):
-    if not es.indices.exists(index="institutions_directory"):
-        es.indices.create(index="institutions_directory", mappings=test_static.institutions_mapping())
+    if not es.indices.exists(index="structures_directory"):
+        es.indices.create(index="structures_directory", mappings=test_static.structures_mapping())
 
     search_filter = "acronym_s"
     struct_type = "institution"
     structures_entities = hal.find_structures_entities(search_filter, acronym, struct_type)
 
-    helpers.bulk(es, structures_entities, index="institutions_directory", refresh="wait_for")
+    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
 
     return "institutions added"
 
 
 def get_laboratories(acronym):
-    if not es.indices.exists(index="laboratories_directory"):
+    if not es.indices.exists(index="structures_directory"):
 
-        es.indices.create(index="laboratories_directory", mappings=test_static.laboratories_mapping())
+        es.indices.create(index="structures_directory", mappings=test_static.laboratories_mapping())
 
     search_filter = "parentAcronym_s"
     struct_type = "laboratory"
     structures_entities = hal.find_structures_entities(search_filter, acronym, struct_type)
 
-    helpers.bulk(es, structures_entities, index="laboratories_directory", refresh="wait_for")
+    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
 
     return "laboratories added"
+
+
+def set_elastic_structures(search_value):
+    if not es.indices.exists(index="structures_directory"):
+        es.indices.create(index="structures_directory", mappings=test_static.structures_mapping())
+
+    search_filter = "idref_s"
+    struct_type = "*"
+
+    # Get the structure that match the given idref
+    structures_entities = hal.find_structures_entities(search_filter, search_value, struct_type)
+
+    child_filter = "parentIdref_s"
+    # Get the children of the structure that match the given idref
+    child_entities = hal.find_structures_entities(child_filter, search_value, struct_type)
+
+    structures_entities.extend(child_entities)
+
+    for structure in structures_entities:
+        structure["_id"] = structure["docid"]
+
+    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
+
+    return f"{len(structures_entities)} structures added"
+
 
 def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     """
@@ -530,8 +551,7 @@ if __name__ == "__main__":
     index_mapping = {
         "sovisu_searchers": test_static.document_mapping(),
         "domaines-hal-referentiel": test_static.expertises_mapping(),
-        "laboratories_directory": test_static.laboratories_mapping(),
-        "institutions_directory": test_static.institutions_mapping(),
+        "structure_directory": test_static.structures_mapping(),  # TODO: faire un seul index structure_directory qui récupère le contenu de hal.referentiel structures, à la place de laboratory
     }
     for index, mapping_func in index_mapping.items():
         if not es.indices.exists(index=index):
@@ -540,35 +560,35 @@ if __name__ == "__main__":
     # Faudra sur le même modèle rajouter les labos et les structures.
     # Cela permet de générer autant d'axes ou sous groupes que nécessaires ;-)
     create_test_context()
+    # #
+    # print("#################################")
+    # print("Tests : trouver un chercheur")
+    # scope_searcher = esActions.scope_match_multi(
+    #     [("idhal", "david-reymond"), ('category', "searcher")])
+    # cpt = es.count(index="sovisu_searchers", query=scope_searcher)['count']
+    # print("normalement 1 doc :", cpt)
+    # gugusse = es.search(index="sovisu_searchers", query=scope_searcher, size=cpt)["hits"]["hits"]
+    # for gu in gugusse:
+    #     print(gu)
+    # print("#################################")
+    # print("Tests : trouver les notices d'un chercheur")
     #
-    print("#################################")
-    print("Tests : trouver un chercheur")
-    scope_searcher = esActions.scope_match_multi(
-        [("idhal", "david-reymond"), ('category', "searcher")])
-    cpt = es.count(index="sovisu_searchers", query=scope_searcher)['count']
-    print("normalement 1 doc :", cpt)
-    gugusse = es.search(index="sovisu_searchers", query=scope_searcher, size=cpt)["hits"]["hits"]
-    for gu in gugusse:
-        print(gu)
-    print("#################################")
-    print("Tests : trouver les notices d'un chercheur")
-
-    scope_notices = esActions.scope_match_multi(
-        [("idhal", "david-reymond"), ('category', "notice-hal")])
-    cpt = es.count(index="sovisu_searchers", query=scope_notices)['count']
-    print("à ce jour 106 doc :", cpt)
-    doc_gugusse = es.search(index="sovisu_searchers", query=scope_notices, size=cpt)["hits"]["hits"]
-    for doc in doc_gugusse:
-        print(doc)
-    print("#################################")
-
-    scope_exp = esActions.scope_match_multi([("idhal", "david-reymond"), ('category', "expertise")])
-    cpt = es.count(index="sovisu_searchers", query=scope_exp)['count']
-
-    exp_gugusse = es.search(index="sovisu_searchers", query=scope_exp, size=cpt)["hits"]["hits"]
-    print(
-        "normalement 10 docs (MAIS c'est pas bon cf. infra remarques sur les expertises (çà sort d'où ???) !!!",
-        cpt)
-    for exp in exp_gugusse:
-        print(exp)
-    print("#################################")
+    # scope_notices = esActions.scope_match_multi(
+    #     [("idhal", "david-reymond"), ('category', "notice-hal")])
+    # cpt = es.count(index="sovisu_searchers", query=scope_notices)['count']
+    # print("à ce jour 106 doc :", cpt)
+    # doc_gugusse = es.search(index="sovisu_searchers", query=scope_notices, size=cpt)["hits"]["hits"]
+    # for doc in doc_gugusse:
+    #     print(doc)
+    # print("#################################")
+    #
+    # scope_exp = esActions.scope_match_multi([("idhal", "david-reymond"), ('category', "expertise")])
+    # cpt = es.count(index="sovisu_searchers", query=scope_exp)['count']
+    #
+    # exp_gugusse = es.search(index="sovisu_searchers", query=scope_exp, size=cpt)["hits"]["hits"]
+    # print(
+    #     "normalement 10 docs (MAIS c'est pas bon cf. infra remarques sur les expertises (çà sort d'où ???) !!!",
+    #     cpt)
+    # for exp in exp_gugusse:
+    #     print(exp)
+    # print("#################################")

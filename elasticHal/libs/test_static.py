@@ -2457,7 +2457,7 @@ def expertises_mapping():
     return mapping
 
 
-def laboratories_mapping():
+def structures_mapping():
     mapping = {
         "properties": {
             "Created": {

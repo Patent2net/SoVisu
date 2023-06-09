@@ -124,7 +124,8 @@ def get_content(hal_url):
     return doc.body
 
 
-def find_structures_entities(search_filter="parentAcronym_s", search_value="UTLN", struct_type="laboratory"):
+def find_structures_entities(search_filter="parentIdref_s", search_value="031122337", struct_type="laboratory"):
+    # TODO: Rajouter un élément pour récuperer tous les éléments et pas juste une partie. Utiliser count et se baser sur collecte_docs
     """
     Get the structures entities based on a known parameter or a known parameter of the parent.
     For more information about parameters:
@@ -133,7 +134,7 @@ def find_structures_entities(search_filter="parentAcronym_s", search_value="UTLN
     arguments:
     search_filter: the key used to get the information, if you want the childs of a known structure, use parent* keys
     search_value: the matching value to be found
-    struct_type: the category of structure (laboratory, institution, researchteam, department, regrouplaboratory)
+    struct_type: the category of structure (laboratory, institution, researchteam, department, regrouplaboratory).
 
     examples:
     get the data about UTLN institution:
@@ -145,7 +146,7 @@ def find_structures_entities(search_filter="parentAcronym_s", search_value="UTLN
     structures_entities = []
 
     flags = (
-        "docid,label_s,acronym_s,name_s,idRef_s, country_s,"  # Base information about doc
+        "docid,label_s,acronym_s,name_s,idRef_s, country_s,type_s,"  # Base information about doc
         "idref_s,isni_s,rnsr_s,ror_s,"  # information about optional ids
         "parentDocid_i,parentAcronym_s,parentName_s,parentCountry_s,parentType_s,parentIdref_s,parentIsni_s,parentRnsr_s,parentRor_s,"  # informations about parent structrures
     )
@@ -160,7 +161,7 @@ def find_structures_entities(search_filter="parentAcronym_s", search_value="UTLN
             count = entities_data["numFound"]
 
             for entity in entities_data["docs"]:
-                entity["sovisu_category"] = struct_type
+                entity["sovisu_category"] = entity["type_s"]
                 entity["sovisu_referentiel"] = "hal"
                 entity["sovisu_created"] = datetime.datetime.now().isoformat()
                 structures_entities.append(entity)
