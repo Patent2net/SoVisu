@@ -38,8 +38,8 @@ def create_test_context():
     ldapid = "dreymond"
     structid = "198307662"
     """end of temp values"""
-    # remplissage index institution
-    struct_idref = "031122337"
+    # remplissage index structures
+    struct_idref = "031122337"  # UTLN IDREF
 
     structure_message = set_elastic_structures(struct_idref)
     print(structure_message)
@@ -241,10 +241,10 @@ def create_searcher_concept_notices(idhal, aurehal):
         #     }
         #   }
         # AUCUN des deux scope ne remontent toutes les fiches domaine chercheur : elles n'existeent pas
-        count = es.count(index="domaines-hal-referentiel", query=scope_all())["count"]
-        # resDomainesRef = es.search(index="domaines-hal-referentiel", query=scope_param, size=count)
+        count = es.count(index="domaine_hal_referentiel", query=scope_all())["count"]
+        # resDomainesRef = es.search(index="domaine_hal_referentiel", query=scope_param, size=count)
         toutRef = [truc['_source']['chemin'] for truc in
-                   es.search(index="domaines-hal-referentiel", query={'match_all': {}}, size=count)[
+                   es.search(index="domaine_hal_referentiel", query={'match_all': {}}, size=count)[
                        'hits']['hits']]
 
         Vu = set()
@@ -283,7 +283,7 @@ def create_searcher_concept_notices(idhal, aurehal):
             }
         }
 
-        resDomainesRef = es.search(index="domaines-hal-referentiel", query=req)
+        resDomainesRef = es.search(index="domaine_hal_referentiel", query=req)
         for fiche in resDomainesRef['hits']['hits']:
             newFiche = fiche['_source']
             newFiche['validated'] = False  # domaines pas validés par défaut
@@ -359,17 +359,17 @@ def GenereReferentiel(arbre, par):
 
 
 def indexe_expertises():
-    """Les compétences issues d'Aurehal sont indexées en tant que document dans l'index domaines-hal-referentiel.
+    """Les compétences issues d'Aurehal sont indexées en tant que document dans l'index domaine_hal_referentiel.
       Les chercheurs valident ou pas celle issues de HAL, en rajoutent éventuellement. Cette action, copie la fiche
       et l'estampille à son idhal.
     """
     concept_list = GenereReferentiel(test_static.concepts(), "")
 
-    res = helpers.bulk(es, concept_list, index="domaines-hal-referentiel", refresh="wait_for")
-    return str(res[0]), " Concepts added, in index domaines-hal-referentiel"
+    res = helpers.bulk(es, concept_list, index="domaine_hal_referentiel", refresh="wait_for")
+    return str(res[0]), " Concepts added, in index domaine_hal_referentiel"
 
 
-def collecte_docs(chercheur):  # self,
+def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verification des documents existants
     """
     collecte_docs present dans elastichal.py
     partie Celery retirée pour les tests.
@@ -378,7 +378,7 @@ def collecte_docs(chercheur):  # self,
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
     idhal = chercheur["idhal"]
-    #TODO: look hal.find_publication for full base list of keys
+    # TODO: look hal.find_publication for full base list of keys
     docs = hal.find_publications(idhal, "authIdHal_s")
     # récupération de l'existant
     doc_param = esActions.scope_term_multi(
@@ -443,27 +443,18 @@ def collecte_docs(chercheur):  # self,
             doc["records"] = []
             doc["category"] = "notice-hal"
             doc["idhal"] = idhal,  # l'Astuce du
+            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
+            doc["sovisu_validated"] = True
+            doc["_id"] = f'{idhal}.{doc["halId_s"]}'
+            # TODO: Remettre en place l'autorat (doc["authorship"])
         else:
             pass
 
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
 
-    # IddocsExistantes = [doc["_id"] for doc in docs]
-    # searcher_data["liaison"]["travaux"]["hal"] = IddocsExistantes
-    for doc in docs:
-        # liaison du doc avec le chercheur INUTILE
-        # doc ['profil'] = dict()
-        # doc ['profil'] ['name'] = "hal"
-        # TODO: utiliser le bulk en commentaires un peu plus haut car suppression du besoin de gérer le _id
-        # indexation
-        es.options(request_timeout=200, retry_on_timeout=True, max_retries=5).index(refresh=True,
-                                                                                    routing=1,
-                                                                                    # pour contrôler la propagation du lien de parenté
-                                                                                    index="sovisu_searchers",
-                                                                                    document=doc)  # ici par rapport au bulk on force l'id du doc indexé ES comme étant celui du doc.
-    # Mise à jour du chercheur
-    # es.update( index="sovisu_searchers", id=searcher_data ['halId_s'], document=searcher_data)
+    helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
+
     return "add publications done"
 
 
@@ -550,8 +541,9 @@ if __name__ == "__main__":
 
     index_mapping = {
         "sovisu_searchers": test_static.document_mapping(),
-        "domaines-hal-referentiel": test_static.expertises_mapping(),
-        "structure_directory": test_static.structures_mapping(),  # TODO: faire un seul index structure_directory qui récupère le contenu de hal.referentiel structures, à la place de laboratory
+        "sovisu_laboratories": test_static.document_mapping(),
+        "domaine_hal_referentiel": test_static.expertises_mapping(),
+        "structures_directory": test_static.structures_mapping(),
     }
     for index, mapping_func in index_mapping.items():
         if not es.indices.exists(index=index):
