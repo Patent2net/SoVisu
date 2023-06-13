@@ -96,9 +96,9 @@ class ElasticContextMixin:
         # key, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
 
         if i_type == "rsr":
-            field = "_id"
+            field = "halId_s"
             key = "halId_s"
-            index_pattern = "test_researchers"
+            index_pattern = "sovisu_searchers"
 
         elif i_type == "lab":
             field = "halStructId"
@@ -113,7 +113,7 @@ class ElasticContextMixin:
 
         return key, index_pattern, ext_key, scope_param
 
-    def validated_notices_state(self, i_type, entity):
+    def validated_notices_state(self, i_type, entity): # TODO: Revoir la fonction et son utilité
         """
         Check if at least one notice is in the state setup of the "validate" variable.
         If not, a ping gonna appear next to check in the menu.
@@ -122,16 +122,18 @@ class ElasticContextMixin:
 
         validate = True
         if i_type == "rsr":
+            index = "sovisu_searchers"
             field = "authIdHal_s"
             hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
 
         elif i_type == "lab":
+            index = "sovisu_laboratories"
             field = "labStructId_i"
             hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
         else:
             return redirect("unknown")
 
-        if es.count(index="test_publications", query=hastoconfirm_param)["count"] == 0:
+        if es.count(index=index, query=hastoconfirm_param)["count"] == 0:
             hastoconfirm = True
 
         return hastoconfirm
@@ -379,55 +381,46 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         )
 
     def get_expertise_case(self, p_id):
+        # TODO: In the related html, find a way to order taking account of "chemin" field
         expertise_cleaned = []
 
         validation = self.request.GET.get("validation")
-        searcher_response = es.get(index="test_researchers", id=p_id)
-        searcher_response = searcher_response["_source"]["SearcherProfile"]
-        searcher_response = searcher_response[0]["validated_concepts"]
-
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"category": "expertise"}},
+                    {"match": {"idhal": p_id}},
+                ]
+            }
+        }
+        expertises_count = es.count(index="sovisu_searchers", query=query)["count"]
+        searcher_expertises = es.search(index="sovisu_searchers", query=query,
+                                        size=expertises_count)
+        searcher_expertises = searcher_expertises["hits"]["hits"]
 
         if validation == "1":  # show the expertises validated by searcher
-            expertise_cleaned = searcher_response
+            for expertise in searcher_expertises:
+                expertise_cleaned.append(expertise["_source"])
+
         elif validation == "0":  # show the expertises invalidated by searcher
             scope_param = esActions.scope_all()
-            expertise_count = es.count(index="test_expertises", query=scope_param)["count"]
-            expertises_list = es.search(
-                index="test_expertises", query=scope_param, size=expertise_count
+            expertise_count = es.count(index="domaine_hal_referentiel", query=scope_param)["count"]
+            expertise_category = es.search(
+                index="domaine_hal_referentiel", query=scope_param, size=expertise_count
             )
-            expertises_list = expertises_list["hits"]["hits"]
-            for expertise in expertises_list:
+            expertise_category = expertise_category["hits"]["hits"]
+            for expertise in expertise_category:
                 expertise = expertise["_source"]
 
-                if expertise["id"] in [
-                    validated_concepts["id"] for validated_concepts in searcher_response
+                if expertise["chemin"] not in [  # Check if expertise in directory are already in Searcher_expertises
+                    validated_expertises["_source"]["chemin"] for validated_expertises in searcher_expertises
                 ]:
-                    children = expertise.get("children", [])
-                    # Extract the ID of each child from searcher_response
-                    validated_children_ids = [
-                        child_validated["id"]
-                        for validated_concepts in searcher_response
-                        for child_validated in validated_concepts.get("children", [])
-                    ]
 
-                    # Filter children whose ID is not in validated_children_ids
-                    updated_children = [
-                        concept
-                        for concept in children
-                        if concept["id"] not in validated_children_ids
-                    ]
-
-                    # Update the 'children' field with the updated children list
-                    expertise["children"] = updated_children
-                # TODO:
-                #  Etape 4: OPTIONNEL:
-                #  Voir pour intégrer Expertise<Children<Children (afficher le 2nd niveau)
-
-                expertise_cleaned.append(expertise)
+                    expertise_cleaned.append(expertise)
 
         else:
             return redirect("unknown")
-
+        print(expertise_cleaned)
         return validation, expertise_cleaned
 
     def get_guiding_domains_case(self, entity):
@@ -455,13 +448,27 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         date_range_type = "submittedDate_tdate"
 
         # remplace ref_p
-        validated_sp = validated_searcherprofile_p(
-            p_id, validate, date_range_type, date_from, date_to
-        )
-
-        if i_type == "rsr" or i_type == "lab":
-            count = es.count(index="test_publications", query=validated_sp)["count"]
-            references = es.search(index="test_publications", query=validated_sp, size=count)
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"category": "notice-hal"}},
+                    {"match": {"sovisu_id": f"{p_id}.*"}},
+                    {"match": {"sovisu_validated": validate}},
+                    {
+                        "range": {
+                            date_range_type: {
+                                "gte": date_from,
+                                "lte": date_to
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+        if i_type == "rsr" or i_type == "lab":  # TODO: séparer RSR et LAB
+            count = es.count(index="sovisu_searchers", query=query)["count"]
+            print(f"count: {count}")
+            references = es.search(index="sovisu_searchers", query=query, size=count)
         else:
             return redirect("unknown")
 

@@ -37,33 +37,34 @@ class CreateCredentials(forms.Form):
         label="ORCID (exemple : 0000-0003-2071-6594) - champ facultatif", required=False
     )
 
-    scope_param = esActions.scope_all()
-    institution_count = es.count(index="test_institutions", query=scope_param)["count"]
-    institution_res = es.search(
-        index="test_institutions", query=scope_param, size=institution_count
-    )
-    inst_entities = institution_res["hits"]["hits"]
     institution_list = [("", "")]
-    institution_list.extend(
-        [(inst["_source"]["structSirene"], inst["_source"]["label"]) for inst in inst_entities]
-    )
-    f_inst = forms.CharField(label="Institutions", widget=forms.Select(choices=institution_list))
+    laboratory_list = [("", "")]
 
-    laboratories_count = es.count(index="test_laboratories", query=scope_param)["count"]
-    laboratories_res = es.search(
-        index="test_laboratories", query=scope_param, size=laboratories_count
+    scope_param = esActions.scope_all()
+    structures_count = es.count(index="structures_directory", query=scope_param)["count"]
+    structures_list = es.search(
+        index="structures_directory", query=scope_param, size=structures_count
     )
-    lab_entities = laboratories_res["hits"]["hits"]
-    laboratory_list = [("", "")]  # empty default field
-    laboratory_list.extend(
-        [
-            (
-                (lab["_source"]["halStructId"], lab["_source"]["acronym"]),
-                lab["_source"]["label"],
+    structures_list = structures_list["hits"]["hits"]
+    print(structures_list)
+    #  2- for structure in structure_res
+    for structure in structures_list:
+        structure = structure["_source"]
+        if structure["sovisu_category"] == "institution":
+            institution_list.extend(
+                [(structure["docid"], structure["label_s"])]
             )
-            for lab in lab_entities
-        ]
-    )
+
+        if structure["sovisu_category"] == "laboratory":
+            laboratory_list.extend(
+                [
+                    (
+                        structure["docid"], structure["label_s"]
+                    )
+                ]
+            )
+
+    f_inst = forms.CharField(label="Institutions", widget=forms.Select(choices=institution_list))
     f_labo = forms.CharField(label="Laboratoire", widget=forms.Select(choices=laboratory_list))
 
 
