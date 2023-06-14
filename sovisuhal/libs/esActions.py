@@ -170,11 +170,8 @@ def ref_p(
 
 def ref_p_filter(
     p_filter,
-    scope_bool_type,
-    scope_field,
     scope_value,
     validate,
-    date_range_type,
     scope_date_from,
     scope_date_to,
 ):
@@ -182,93 +179,30 @@ def ref_p_filter(
     Retourne un ensemble de documents spécifique en fonction de différents filtres,
     dans une période donnée et d'un filtre p_filter("uncomplete","complete", "all").
     """
+    ref_param = {
+        "bool": {
+            "must": [
+                {"match": {"category": "notice-hal"}},
+                {"match": {"sovisu_id": f"{scope_value}.*"}},
+                {"match": {"sovisu_validated": validate}},
+                {
+                    "range": {
+                        "producedDate_tdate": {
+                            "gte": scope_date_from,
+                            "lte": scope_date_to,
+                        }
+                    }
+                },
+            ]
+        }
+    }
     if p_filter == "uncomplete":
-        ref_param = {
-            "bool": {
-                "must": [
-                    {
-                        "bool": {
-                            "must": [
-                                {
-                                    "match_phrase": {
-                                        scope_field: scope_value,
-                                    }
-                                },
-                                {
-                                    "match": {
-                                        "validated": validate,
-                                    }
-                                },
-                                {
-                                    "range": {
-                                        "producedDate_tdate": {
-                                            "gte": scope_date_from,
-                                            "lt": scope_date_to,
-                                        }
-                                    }
-                                },
-                            ]
-                        }
-                    },
-                    {
-                        "bool": {
-                            "must": [
-                                {"range": {"MDS": {"lt": 70}}},
-                            ]
-                        }
-                    },
-                ]
-            }
-        }
-
+        mds_param = {"range": {"MDS": {"lt": 70}}}
+        ref_param["bool"]["must"].append(mds_param)
     elif p_filter == "complete":
-        ref_param = {
-            "bool": {
-                "must": [
-                    {
-                        "bool": {
-                            "must": [
-                                {
-                                    "match_phrase": {
-                                        scope_field: scope_value,
-                                    }
-                                },
-                                {
-                                    "match": {
-                                        "validated": validate,
-                                    }
-                                },
-                                {
-                                    "range": {
-                                        "producedDate_tdate": {
-                                            "gte": scope_date_from,
-                                            "lt": scope_date_to,
-                                        }
-                                    }
-                                },
-                            ]
-                        }
-                    },
-                    {
-                        "bool": {
-                            "must": [
-                                {"range": {"MDS": {"gte": 100}}},
-                            ]
-                        }
-                    },
-                ]
-            }
-        }
-    else:
-        ref_param = ref_p(
-            scope_bool_type,
-            scope_field,
-            scope_value,
-            validate,
-            date_range_type,
-            scope_date_from,
-            scope_date_to,
-        )
+        mds_param = {"range": {"MDS": {"gte": 100}}}
+        ref_param["bool"]["must"].append(mds_param)
+
     return ref_param
 
 
