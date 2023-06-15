@@ -2,6 +2,7 @@ import grobid_tei_xml
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import datetime
 
 from elasticHal.libs import utils
 
@@ -121,3 +122,48 @@ def get_content(hal_url):
     doc = grobid_tei_xml.parse_document_xml(grobid_resp.text)
 
     return doc.body
+
+
+def find_structures_entities(search_filter="parentIdref_s", search_value="031122337", struct_type="laboratory"):
+    # TODO: Rajouter un élément pour récuperer tous les éléments et pas juste une partie. Utiliser count et se baser sur collecte_docs
+    """
+    Get the structures entities based on a known parameter or a known parameter of the parent.
+    For more information about parameters:
+    https://api.archives-ouvertes.fr/docs/ref/?resource=structure&schema=fields#fields
+
+    arguments:
+    search_filter: the key used to get the information, if you want the childs of a known structure, use parent* keys
+    search_value: the matching value to be found
+    struct_type: the category of structure (laboratory, institution, researchteam, department, regrouplaboratory).
+
+    examples:
+    get the data about UTLN institution:
+    https://api.archives-ouvertes.fr/ref/structure/?wt=json&q=acronym_s:UTLN+valid_s:VALID+type_s:institution&fl=*
+
+    get the data about UTLN children laboratories:
+    https://api.archives-ouvertes.fr/ref/structure/?wt=json&q=parentAcronym_s:UTLN+type_s:laboratory+valid_s:VALID&fl=*
+    """
+    structures_entities = []
+
+    flags = (
+        "docid,label_s,acronym_s,name_s,idRef_s, country_s,type_s,"  # Base information about doc
+        "idref_s,isni_s,rnsr_s,ror_s,"  # information about optional ids
+        "parentDocid_i,parentAcronym_s,parentName_s,parentCountry_s,parentType_s,parentIdref_s,parentIsni_s,parentRnsr_s,parentRor_s,"  # informations about parent structrures
+    )
+    request_entities = http.get(
+        f"https://api.archives-ouvertes.fr/ref/structure/?wt=json&q={search_filter}:{search_value}+type_s:{struct_type}+valid_s:VALID&fl={flags}"
+    )
+
+    if request_entities.status_code == 200:
+        entities_data = request_entities.json()
+        if "response" in entities_data.keys():
+            entities_data = entities_data["response"]
+            count = entities_data["numFound"]
+
+            for entity in entities_data["docs"]:
+                entity["sovisu_category"] = entity["type_s"]
+                entity["sovisu_referentiel"] = "hal"
+                entity["sovisu_created"] = datetime.datetime.now().isoformat()
+                structures_entities.append(entity)
+
+    return structures_entities

@@ -49,13 +49,11 @@
         <tbody>
 
         {% for expertise in expertises %}
-            {% for concept in expertise.children%}
             <tr class="text-gray-500">
                 <td>{{ concept.id }}</td>
                 <td>{{ expertise.label_fr | safe }} </td>
-                <td>{{ concept.label_fr }}</td>
+                <td>{{ concept.chemin }}</td>
             </tr>
-                {% endfor %}
         {% endfor %}
 
         </tbody>

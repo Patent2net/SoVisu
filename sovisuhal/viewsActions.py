@@ -47,16 +47,17 @@ def admin_access_login(request):
         else:
             auth_user = auth_user.replace(patternCas, "").lower()
 
-            field = "_id"
+            field = "ldapId"  # TODO: Keep ldapId for UTLN, change to idhal for others
             scope_param = esActions.scope_p(field, auth_user)
-            count = es.count(index="test_researchers", query=scope_param)["count"]
+            count = es.count(index="sovisu_searchers", query=scope_param)["count"]
             if count > 0:
-                res = es.search(index="test_researchers", query=scope_param, size=count)
+                res = es.search(index="sovisu_searchers", query=scope_param, size=count)
                 entity = res["hits"]["hits"][0]["_source"]
                 struct = entity["structSirene"]
+                user_token = entity["halId_s"]
                 date_to = datetime.today().strftime("%Y-%m-%d")
                 return redirect(
-                    f"check/?struct={struct}&type=rsr&id={auth_user}&from=1990-01-01&to={date_to}&data=credentials"
+                    f"check/?struct={struct}&type=rsr&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"
                 )
             else:
                 return redirect(

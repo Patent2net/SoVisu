@@ -93,12 +93,12 @@ class ElasticContextMixin:
         Retourne des valeurs de variable en fonction du profil (chercheur,labo)
         """
         # utiliser cette fonction pour call get_scope_data
-        # key, index_pattern, ext_key, scope_param = get_scope_data(i_type, p_id)
+        # key, index_pattern, scope_param = get_scope_data(i_type, p_id)
 
         if i_type == "rsr":
-            field = "_id"
+            field = "halId_s"
             key = "halId_s"
-            index_pattern = "test_researchers"
+            index_pattern = "sovisu_searchers"
 
         elif i_type == "lab":
             field = "halStructId"
@@ -107,13 +107,11 @@ class ElasticContextMixin:
         else:
             return redirect("unknown")
 
-        ext_key = "harvested_from_ids"
-
         scope_param = esActions.scope_p(field, p_id)
 
-        return key, index_pattern, ext_key, scope_param
+        return key, index_pattern, scope_param
 
-    def validated_notices_state(self, i_type, entity):
+    def validated_notices_state(self, i_type, entity): # TODO: Revoir la fonction et son utilité
         """
         Check if at least one notice is in the state setup of the "validate" variable.
         If not, a ping gonna appear next to check in the menu.
@@ -122,16 +120,18 @@ class ElasticContextMixin:
 
         validate = True
         if i_type == "rsr":
+            index = "sovisu_searchers"
             field = "authIdHal_s"
             hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
 
         elif i_type == "lab":
+            index = "sovisu_laboratories"
             field = "labStructId_i"
             hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
         else:
             return redirect("unknown")
 
-        if es.count(index="test_publications", query=hastoconfirm_param)["count"] == 0:
+        if es.count(index=index, query=hastoconfirm_param)["count"] == 0:
             hastoconfirm = True
 
         return hastoconfirm
@@ -286,7 +286,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return context
 
     def get_entity_data(self, i_type, p_id):
-        key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
+        key, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
         res = es.search(index=f"{index_pattern}", query=scope_param)
 
         entity = res["hits"]["hits"][0]["_source"]
@@ -379,60 +379,46 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         )
 
     def get_expertise_case(self, p_id):
+        # TODO: In the related html, find a way to order taking account of "chemin" field
         expertise_cleaned = []
 
         validation = self.request.GET.get("validation")
-        searcher_response = es.get(index="test_researchers", id=p_id)
-        searcher_response = searcher_response["_source"]["SearcherProfile"]
-        searcher_response = searcher_response[0]["validated_concepts"]
-
-        # Get list of concept from the nested documents
-        searcher_concepts = []
-        for nested_document in searcher_response:
-            concept = nested_document[0]
-            searcher_concepts.append(concept)
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"category": "expertise"}},
+                    {"match": {"idhal": p_id}},
+                ]
+            }
+        }
+        expertises_count = es.count(index="sovisu_searchers", query=query)["count"]
+        searcher_expertises = es.search(index="sovisu_searchers", query=query,
+                                        size=expertises_count)
+        searcher_expertises = searcher_expertises["hits"]["hits"]
 
         if validation == "1":  # show the expertises validated by searcher
-            expertise_cleaned = searcher_concepts
+            for expertise in searcher_expertises:
+                expertise_cleaned.append(expertise["_source"])
+
         elif validation == "0":  # show the expertises invalidated by searcher
             scope_param = esActions.scope_all()
-            expertise_count = es.count(index="test_expertises", query=scope_param)["count"]
-            expertises_list = es.search(
-                index="test_expertises", query=scope_param, size=expertise_count
+            expertise_count = es.count(index="domaine_hal_referentiel", query=scope_param)["count"]
+            expertise_category = es.search(
+                index="domaine_hal_referentiel", query=scope_param, size=expertise_count
             )
-            expertises_list = expertises_list["hits"]["hits"]
-            for expertise in expertises_list:
+            expertise_category = expertise_category["hits"]["hits"]
+            for expertise in expertise_category:
                 expertise = expertise["_source"]
 
-                if expertise["id"] in [
-                    validated_concepts["id"] for validated_concepts in searcher_concepts
+                if expertise["chemin"] not in [  # Check if expertise in directory are already in Searcher_expertises
+                    validated_expertises["_source"]["chemin"] for validated_expertises in searcher_expertises
                 ]:
-                    children = expertise.get("children", [])
-                    # Extract the ID of each child from searcher_response
-                    validated_children_ids = [
-                        child_validated["id"]
-                        for validated_concepts in searcher_concepts
-                        for child_validated in validated_concepts.get("children", [])
-                    ]
 
-                    # Filter children whose ID is not in validated_children_ids
-                    updated_children = [
-                        concept
-                        for concept in children
-                        if concept["id"] not in validated_children_ids
-                    ]
-
-                    # Update the 'children' field with the updated children list
-                    expertise["children"] = updated_children
-                # TODO:
-                #  Etape 4: OPTIONNEL:
-                #  Voir pour intégrer Expertise<Children<Children (afficher le 2nd niveau)
-
-                expertise_cleaned.append(expertise)
+                    expertise_cleaned.append(expertise)
 
         else:
             return redirect("unknown")
-
+        print(expertise_cleaned)
         return validation, expertise_cleaned
 
     def get_guiding_domains_case(self, entity):
@@ -460,13 +446,27 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         date_range_type = "submittedDate_tdate"
 
         # remplace ref_p
-        validated_sp = validated_searcherprofile_p(
-            p_id, validate, date_range_type, date_from, date_to
-        )
-
-        if i_type == "rsr" or i_type == "lab":
-            count = es.count(index="test_publications", query=validated_sp)["count"]
-            references = es.search(index="test_publications", query=validated_sp, size=count)
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"category": "notice-hal"}},
+                    {"match": {"sovisu_id": f"{p_id}.*"}},
+                    {"match": {"sovisu_validated": validate}},
+                    {
+                        "range": {
+                            date_range_type: {
+                                "gte": date_from,
+                                "lte": date_to
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+        if i_type == "rsr" or i_type == "lab":  # TODO: séparer RSR et LAB
+            count = es.count(index="sovisu_searchers", query=query)["count"]
+            print(f"count: {count}")
+            references = es.search(index="sovisu_searchers", query=query, size=count)
         else:
             return redirect("unknown")
 
@@ -515,7 +515,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
     Gestion de la page affichant les tableaux de bord sous Kibana
     """
 
-    # TODO: Ajuster les dashboards pour qu'il affichent de nouveau les données
+    # TODO: Changer le dashboard affiché pour la visualisation à partir du nouveau système
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -541,9 +541,9 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id):
         # Get scope data
-        key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
+        key, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
 
-        res = es.search(index="test_*", query=scope_param)
+        res = es.search(index="sovisu_*", query=scope_param)
         # on pointe sur index générique, car pas de LabHalId ?
         try:
             entity = res["hits"]["hits"][0]["_source"]
@@ -553,7 +553,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         dash = ""
         if i_type == "rsr":
-            indexsearch = "test_publications"
+            indexsearch = "sovisu_searchers"
             filtrechercheur = f'_index: "{indexsearch}"'
             filtre_lab_a = ""
             filtre_lab_b = ""
@@ -578,7 +578,6 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
     Gestion de la page affichant les références du profil sélectionné
     """
 
-    # TODO: faire fonctionner le système comme avant (comparer avec la version live et/ou dev)
     template_name = "references.html"
 
     def get_context_data(self, **kwargs):
@@ -603,8 +602,8 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id, i_filter, date_from, date_to):
         # Get scope data
-        key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
-        res = es.search(index="test_*", query=scope_param)
+        key, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
+        res = es.search(index="sovisu_*", query=scope_param)
 
         try:
             entity = res["hits"]["hits"][0]["_source"]
@@ -612,23 +611,20 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
             return redirect("unknown")
 
         # Get references
-        scope_bool_type = "filter"
         validate = True
-        date_range_type = "submittedDate_tdate"
         ref_param = esActions.ref_p_filter(
             i_filter,
-            scope_bool_type,
-            ext_key,
             entity[key],
             validate,
-            date_range_type,
             date_from,
             date_to,
         )
-
-        if i_type == "rsr" or i_type == "lab":
-            count = es.count(index="test_publications", query=ref_param)["count"]
-            references = es.search(index="test_publications", query=ref_param, size=count)
+        if i_type == "rsr":
+            count = es.count(index="sovisu_searchers", query=ref_param)["count"]
+            references = es.search(index="sovisu_searchers", query=ref_param, size=count)
+        elif i_type == "lab":
+            count = es.count(index="sovisu_laboratories", query=ref_param)["count"]
+            references = es.search(index="sovisu_laboratories", query=ref_param, size=count)
         else:
             return redirect("unknown")
 
@@ -667,67 +663,80 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return context
 
     def get_elastic_data(self, i_type, p_id):
+        entity = []
         # Get scope data
-        key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
-        # TODO: Verifier avec la version dev
-        #  pour que le fonctionnement reste le meme (doit fonctionner avec test_expertises)
-        res = es.search(index=index_pattern, query=scope_param)
+        key, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
+
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"category": "expertise"}},
+                    {"match": {"idhal": p_id}},
+                ]
+            }
+        }
+        expertise_count = es.count(index=index_pattern, query=query)["count"]
+        searcher_expertises = es.search(index=index_pattern, query=query, size=expertise_count)["hits"]["hits"]
         # on pointe sur index générique, car pas de LabHalId ?
-        try:
-            entity = res["hits"]["hits"][0]["_source"]
-        except IndexError:
-            return redirect("unknown")
-        # /
+        for expertise in searcher_expertises:
+            entity.append(expertise["_source"])
 
-        if i_type == "lab" or i_type == "rsr":
-            entity["concepts"] = json.dumps(entity["concepts"])
-
-        entity["concepts"] = json.loads(entity["concepts"])
-
-        if i_type == "rsr" and "children" in entity["concepts"]:
-            for children in list(entity["concepts"]["children"]):
-                if children["state"] == "invalidated":
-                    entity["concepts"]["children"].remove(children)
-
-                if "children" in children:
-                    for children1 in list(children["children"]):
-                        if children1["state"] == "invalidated":
-                            children["children"].remove(children1)
-
-                        if "children" in children1:
-                            for children2 in list(children1["children"]):
-                                if children2["state"] == "invalidated":
-                                    children1["children"].remove(children2)
-
-        if i_type == "lab" and "children" in entity["concepts"]:
-            for children in list(entity["concepts"]["children"]):
-                state = "invalidated"
-                if "researchers" in children:
-                    for rsr in children["researchers"]:
-                        if rsr["state"] == "validated":
-                            state = "validated"
-                    if state == "invalidated":
-                        entity["concepts"]["children"].remove(children)
-
-                if "children" in children:
-                    for children1 in list(children["children"]):
-                        state = "invalidated"
-                        if "researchers" in children1:
-                            for rsr in children1["researchers"]:
-                                if rsr["state"] == "validated":
-                                    state = "validated"
-                            if state == "invalidated":
-                                children["children"].remove(children1)
-
-                        if "children" in children1:
-                            for children2 in list(children1["children"]):
-                                state = "invalidated"
-                                if "researchers" in children2:
-                                    for rsr in children2["researchers"]:
-                                        if rsr["state"] == "validated":
-                                            state = "validated"
-                                    if state == "invalidated":
-                                        children1["children"].remove(children2)
+        # TODO: Find a way to order with expertise["chemin"]
+        # try:
+        #     entity = res["hits"]["hits"][0]["_source"]
+        # except IndexError:
+        #     return redirect("unknown")
+        # # /
+        #
+        # if i_type == "lab" or i_type == "rsr":
+        #     entity["concepts"] = json.dumps(entity["concepts"])
+        #
+        # entity["concepts"] = json.loads(entity["concepts"])
+        #
+        # if i_type == "rsr" and "children" in entity["concepts"]:
+        #     for children in list(entity["concepts"]["children"]):
+        #         if children["state"] == "invalidated":
+        #             entity["concepts"]["children"].remove(children)
+        #
+        #         if "children" in children:
+        #             for children1 in list(children["children"]):
+        #                 if children1["state"] == "invalidated":
+        #                     children["children"].remove(children1)
+        #
+        #                 if "children" in children1:
+        #                     for children2 in list(children1["children"]):
+        #                         if children2["state"] == "invalidated":
+        #                             children1["children"].remove(children2)
+        #
+        # if i_type == "lab" and "children" in entity["concepts"]:
+        #     for children in list(entity["concepts"]["children"]):
+        #         state = "invalidated"
+        #         if "researchers" in children:
+        #             for rsr in children["researchers"]:
+        #                 if rsr["state"] == "validated":
+        #                     state = "validated"
+        #             if state == "invalidated":
+        #                 entity["concepts"]["children"].remove(children)
+        #
+        #         if "children" in children:
+        #             for children1 in list(children["children"]):
+        #                 state = "invalidated"
+        #                 if "researchers" in children1:
+        #                     for rsr in children1["researchers"]:
+        #                         if rsr["state"] == "validated":
+        #                             state = "validated"
+        #                     if state == "invalidated":
+        #                         children["children"].remove(children1)
+        #
+        #                 if "children" in children1:
+        #                     for children2 in list(children1["children"]):
+        #                         state = "invalidated"
+        #                         if "researchers" in children2:
+        #                             for rsr in children2["researchers"]:
+        #                                 if rsr["state"] == "validated":
+        #                                     state = "validated"
+        #                             if state == "invalidated":
+        #                                 children1["children"].remove(children2)
         return entity
 
 
@@ -770,26 +779,30 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id):
         # Get scope data
-        key, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
+        key, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
 
-        res = es.search(index="test_*", query=scope_param)
+        res = es.search(index="sovisu_*", query=scope_param)
 
         try:
             entity = res["hits"]["hits"][0]["_source"]
         except IndexError:
             return redirect("unknown")
         # /
-        if i_type == "rsr" or i_type == "lab":
-            indexsearch = "test_publications"
-            filtrechercheur = f'_index: "{indexsearch}"'
-            filtrelab = f'_index: "{indexsearch}"'
+        if i_type == "rsr":
+            indexsearch = "sovisu_searchers"
+
+        elif i_type == "lab":
+            indexsearch = "sovisu_laboratories"
         else:
             return redirect("unknown")
+
+        filtrechercheur = f'_index: "{indexsearch}"'
+        filtrelab = f'_index: "{indexsearch}"'
 
         url = (
             viewsActions.vizualisation_url()
         )  # permet d'ajuster l'url des visualisations en fonction du build
-
+        pass
         return entity, filtrechercheur, filtrelab, url
 
 
@@ -894,7 +907,7 @@ class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     # TODO: Revoir cette fonction
     def get_entity_data(self, struct, i_type, p_id):
-        key, search_id, index_pattern, ext_key, scope_param = self.get_scope_data(i_type, p_id)
+        key, search_id, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
         res = es.search(index=f"{struct}-{search_id}{index_pattern}", query=scope_param)
 
         entity = res["hits"]["hits"][0]["_source"]
@@ -929,23 +942,41 @@ class IndexView(CommonContextMixin, TemplateView):
         return context
 
     def get_elastic_data(self, indexcat):
-        scope_param = esActions.scope_all()
+        # TODO: Revoir le filtre pour ne retourner que les institutions
+        get_institution_query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": "institution"}},
+                ]
+            }
+        }
         # création dynamique des tabs sur la page à partir de struct_tab
+        # TODO: Revoir le système d'index chercheur pour le structsirene (n'existe plus dans les labos/institutions indexées) dans elasticindextest2.
+        #  remplacer par idref? Bloque actuellement un élément de l'affichage d'index (appartenance structure)
         struct_tab = es.search(
-            index="test_institutions",
-            query=scope_param,
-            filter_path=["hits.hits._source.structSirene, hits.hits._source.acronym"],
+            index="structures_directory",
+            query=get_institution_query,
+            filter_path=["hits.hits._source.idref_s, hits.hits._source.acronym_s, hits.hits._source.label_s, hits.hits._source.sovisu_category"],
         )
         struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
-
-        indextype = ""
         if indexcat == "lab":
-            indextype = "test_laboratories"
+            indextype = "sovisu_laboratories"
+            category_type = "laboratory"
         elif indexcat == "rsr":
-            indextype = "test_researchers"
+            indextype = "sovisu_searchers"
+            category_type = "searcher"
+        else:
+            return redirect("unknown")
 
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"category": category_type}},
+                ]
+            }
+        }
         count = es.count(index=f"{indextype}")["count"]
-        res = es.search(index=f"{indextype}", query=scope_param, size=count)
+        res = es.search(index=f"{indextype}", query=query, size=count)
         cleaned_entities = [hit["_source"] for hit in res["hits"]["hits"]]
 
         if indexcat == "lab":

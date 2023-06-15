@@ -46,7 +46,7 @@
                     <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1 pt-2">
                         {% if indexcat == "rsr" %}
                             {% for tab in struct_tab %}
-                               <a class="px-2 pb-1 text-gray-600 {% if tab.structSirene == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/index/?indexcat=rsr&indexstruct={{ tab.structSirene }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> {{ tab.acronym }}</a> {% endfor %}
+                               <a class="px-2 pb-1 text-gray-600 {% if tab.structSirene == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/index/?indexcat=rsr&indexstruct={{ tab.structSirene }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> {{ tab.acronym_s }}</a> {% endfor %}
                         {% endif %}
 
                         {% if indexcat == "lab" %}
@@ -54,7 +54,7 @@
                                   <a class="px-2 pb-1 text-gray-600
                                      {% if tab.structSirene == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}"
                                      href="/index/?indexcat=lab&indexstruct={{ tab.structSirene }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}" >
-                                      {{ tab.acronym }}</a>
+                                      {{ tab.acronym_s }}</a>
                             {% endfor %}
                         {% endif %}
                     </div>
@@ -64,15 +64,11 @@
 
                 <ul class="pt-2 index-list">
                     {% for entity in entities %}
-                    {% comment %}
-                        {% for siren in entity.strucSirene %}
-                            {% if siren == indexstruct %}
-                    {% endcomment %}
 
                         {% if  indexstruct in entity.structSirene %}
                             <li class="leading-4 w-full bg-gray-50 py-1 px-2">
                                 <a class="text-blue-700 text-sm"
-                                   href="/dashboard/?struct={{ indexstruct }}&type={% if entity.ldapId %}rsr&id={{ entity.ldapId }}{%  endif %}{% if entity.halStructId %}lab&id={{ entity.halStructId }}{%  endif %}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
+                                   href="/dashboard/?struct={{ indexstruct }}&type={% if entity.halId_s %}rsr&id={{ entity.halId_s }}{%  endif %}{% if entity.halStructId %}lab&id={{ entity.halStructId }}{%  endif %}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
                                 >
                                     <span class="">
                                         {% if entity.ldapId %}
@@ -86,11 +82,6 @@
                                 </a>
                             </li>
                         {% endif %}
-                    {% comment %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endcomment %}
-
 
                     {% endfor %}
                 </ul>

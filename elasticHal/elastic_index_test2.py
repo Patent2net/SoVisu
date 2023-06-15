@@ -9,7 +9,6 @@ from elasticsearch import helpers
 
 from elasticHal.libs import (
     doi_enrichissement,
-    elastic_formatting2,
     hal,
     keyword_enrichissement,
     location_docs,
@@ -39,13 +38,11 @@ def create_test_context():
     ldapid = "dreymond"
     structid = "198307662"
     """end of temp values"""
-    # remplissage index test_laboratoire
-    labo_message = get_labo_from_csv()
-    print(labo_message)
+    # remplissage index structures
+    struct_idref = "031122337"  # UTLN IDREF
 
-    # remplissage index institution
-    institution_message = get_institution_from_csv()
-    print(institution_message)
+    structure_message = set_elastic_structures(struct_idref)
+    print(structure_message)
 
     # remplissage index concepts
     concepts_message = indexe_expertises()
@@ -60,14 +57,65 @@ def create_test_context():
     # scope_param = scope_p("idhal", researcher_id) # ne renvoit rien, idhal est le bon champ
     # On retrouve le chercheur
     scope_param = esActions.scope_term_multi([("idhal", idhal), ('category', "searcher")])
-    chercheur = es.search(index="test2", query=scope_param)
+    chercheur = es.search(index="sovisu_searchers", query=scope_param)
     chercheur = chercheur["hits"]["hits"][0]["_source"]
 
-    ## à ce stade, chercheur contient des trucs inutiles : concepts et profil (ce dernier est là pour test modèle en arborescence (parent-child)
+    # à ce stade, chercheur contient des trucs inutiles : concepts et profil (ce dernier est là pour test modèle en arborescence (parent-child)
     print(chercheur)
     # collecte et indexation des docs
     publications_message = collecte_docs(chercheur)
     print(publications_message)
+
+
+def get_institution(acronym):
+    if not es.indices.exists(index="structures_directory"):
+        es.indices.create(index="structures_directory", mappings=test_static.structures_mapping())
+
+    search_filter = "acronym_s"
+    struct_type = "institution"
+    structures_entities = hal.find_structures_entities(search_filter, acronym, struct_type)
+
+    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
+
+    return "institutions added"
+
+
+def get_laboratories(acronym):
+    if not es.indices.exists(index="structures_directory"):
+
+        es.indices.create(index="structures_directory", mappings=test_static.laboratories_mapping())
+
+    search_filter = "parentAcronym_s"
+    struct_type = "laboratory"
+    structures_entities = hal.find_structures_entities(search_filter, acronym, struct_type)
+
+    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
+
+    return "laboratories added"
+
+
+def set_elastic_structures(search_value):
+    if not es.indices.exists(index="structures_directory"):
+        es.indices.create(index="structures_directory", mappings=test_static.structures_mapping())
+
+    search_filter = "idref_s"
+    struct_type = "*"
+
+    # Get the structure that match the given idref
+    structures_entities = hal.find_structures_entities(search_filter, search_value, struct_type)
+
+    child_filter = "parentIdref_s"
+    # Get the children of the structure that match the given idref
+    child_entities = hal.find_structures_entities(child_filter, search_value, struct_type)
+
+    structures_entities.extend(child_entities)
+
+    for structure in structures_entities:
+        structure["_id"] = structure["docid"]
+
+    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
+
+    return f"{len(structures_entities)} structures added"
 
 
 def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
@@ -125,12 +173,12 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         "halId_s": idhal,
         "aurehalId": aurehal,
         "idRef": idref,
-        "axis": labo_accro,  # TODO: INTERET DE CETTE KEY?
+        "axis": labo_accro,  # TODO: INTERET DE CETTE KEY? contient la même chose que lab
         "category": "searcher"
     }
 
     res = es.index(
-        index="test2",
+        index="sovisu_searchers",
         document=searcher_notice,
         refresh="wait_for",
     )
@@ -193,10 +241,10 @@ def create_searcher_concept_notices(idhal, aurehal):
         #     }
         #   }
         # AUCUN des deux scope ne remontent toutes les fiches domaine chercheur : elles n'existeent pas
-        count = es.count(index="domaines-hal-referentiel", query=scope_all())["count"]
-        # resDomainesRef = es.search(index="domaines-hal-referentiel", query=scope_param, size=count)
+        count = es.count(index="domaine_hal_referentiel", query=scope_all())["count"]
+        # resDomainesRef = es.search(index="domaine_hal_referentiel", query=scope_param, size=count)
         toutRef = [truc['_source']['chemin'] for truc in
-                   es.search(index="domaines-hal-referentiel", query={'match_all': {}}, size=count)[
+                   es.search(index="domaine_hal_referentiel", query={'match_all': {}}, size=count)[
                        'hits']['hits']]
 
         Vu = set()
@@ -235,7 +283,7 @@ def create_searcher_concept_notices(idhal, aurehal):
             }
         }
 
-        resDomainesRef = es.search(index="domaines-hal-referentiel", query=req)
+        resDomainesRef = es.search(index="domaine_hal_referentiel", query=req)
         for fiche in resDomainesRef['hits']['hits']:
             newFiche = fiche['_source']
             newFiche['validated'] = False  # domaines pas validés par défaut
@@ -244,60 +292,7 @@ def create_searcher_concept_notices(idhal, aurehal):
             # Et rajouts besoins spécifiques (genre précisions / notes...)
 
             # Puis on indexe la fiche
-            es.index(index="test2", document=json.dumps(newFiche), refresh="wait_for",)
-
-
-def get_labo_from_csv():
-    # TODO:fonctionne pas si on lance 2 fois.. pas cherché aussi cf.
-    laboratories_list = []
-    scope_param = scope_all()
-    count = es.count(index="test2", query=scope_param)["count"]
-    print(count)
-    res = es.search(index="test2", query=scope_param, size=count)
-    res = res["hits"]["hits"]
-
-    for results in res:
-        laboratories_list.append(results["_source"])
-
-    # Récupère les nouvelles données dans le csv
-    with open("data/laboratories.csv", encoding="utf-8") as csv_file:
-        laboratories_csv = list(csv.DictReader(csv_file, delimiter=";"))
-
-        # vérifie si les labos dans la liste csv existent déjà dans kibana
-        for laboratory in laboratories_csv:
-            if not any(
-                    listed_lab["halStructId"] == laboratory["halStructId"]
-                    for listed_lab in laboratories_list
-            ):
-                # rajoute les labos non recensés aux existants
-                laboratories_list.append(
-                    elastic_formatting2.laboratory_format(laboratory)
-                )
-            else:
-                # Compare les données des labos existant dans les deux listes
-                pass  # çe qui suit plante au 2e lancement
-                # for listed_lab in laboratories_list:
-                #     if listed_lab["halStructId"] == laboratory["halStructId"]:
-                #         if laboratory["structSirene"] not in listed_lab["structSirene"]:
-                #             listed_lab["structSirene"].append(laboratory["structSirene"])
-
-    helpers.bulk(es, laboratories_list, index="test2", refresh="wait_for")
-    return "laboratories added"
-
-
-def get_institution_from_csv(add_csv=True):
-    institutions_list = []
-    if add_csv:
-        with open("data/structures.csv", encoding="utf-8") as csv_file:
-            institution_csv = list(csv.DictReader(csv_file, delimiter=";"))
-
-    for institution in institution_csv:
-        # insert operations to make before append in the list for indexation
-        institutions_list.append(elastic_formatting2.institution_format(institution))
-
-    helpers.bulk(es, institutions_list, index="test2", refresh="wait_for")
-
-    return "institutions added"
+            es.index(index="sovisu_searchers", document=json.dumps(newFiche), refresh="wait_for",)
 
 
 def creeFiche(dom, par):
@@ -364,17 +359,17 @@ def GenereReferentiel(arbre, par):
 
 
 def indexe_expertises():
-    """Les compétences issues d'Aurehal sont indexées en tant que document dans l'index domaines-hal-referentiel.
+    """Les compétences issues d'Aurehal sont indexées en tant que document dans l'index domaine_hal_referentiel.
       Les chercheurs valident ou pas celle issues de HAL, en rajoutent éventuellement. Cette action, copie la fiche
       et l'estampille à son idhal.
     """
     concept_list = GenereReferentiel(test_static.concepts(), "")
 
-    res = helpers.bulk(es, concept_list, index="domaines-hal-referentiel", refresh="wait_for")
-    return str(res[0]), " Concepts added, in index domaines-hal-referentiel"
+    res = helpers.bulk(es, concept_list, index="domaine_hal_referentiel", refresh="wait_for")
+    return str(res[0]), " Concepts added, in index domaine_hal_referentiel"
 
 
-def collecte_docs(chercheur):  # self,
+def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verification des documents existants
     """
     collecte_docs present dans elastichal.py
     partie Celery retirée pour les tests.
@@ -383,12 +378,12 @@ def collecte_docs(chercheur):  # self,
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
     idhal = chercheur["idhal"]
-    #TODO: look hal.find_publication for full base list of keys
+    # TODO: look hal.find_publication for full base list of keys
     docs = hal.find_publications(idhal, "authIdHal_s")
     # récupération de l'existant
     doc_param = esActions.scope_term_multi(
         [("idhal", chercheur["idhal"]), ('category', "notice-hal")])
-    docsExistantes = es.search(index="test2", query=doc_param)
+    docsExistantes = es.search(index="sovisu_searchers", query=doc_param)
     docsExistantes = docsExistantes["hits"]["hits"]
     if len(docsExistantes) > 0:
         docsExistantes = docsExistantes["hits"]["hits"][0]
@@ -448,27 +443,18 @@ def collecte_docs(chercheur):  # self,
             doc["records"] = []
             doc["category"] = "notice-hal"
             doc["idhal"] = idhal,  # l'Astuce du
+            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
+            doc["sovisu_validated"] = True
+            doc["_id"] = f'{idhal}.{doc["halId_s"]}'
+            # TODO: Remettre en place l'autorat (doc["authorship"])
         else:
             pass
 
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
 
-    # IddocsExistantes = [doc["_id"] for doc in docs]
-    # searcher_data["liaison"]["travaux"]["hal"] = IddocsExistantes
-    for doc in docs:
-        # liaison du doc avec le chercheur INUTILE
-        # doc ['profil'] = dict()
-        # doc ['profil'] ['name'] = "hal"
-        # TODO: utiliser le bulk en commentaires un peu plus haut car suppression du besoin de gérer le _id
-        # indexation
-        es.options(request_timeout=200, retry_on_timeout=True, max_retries=5).index(refresh=True,
-                                                                                    routing=1,
-                                                                                    # pour contrôler la propagation du lien de parenté
-                                                                                    index="test2",
-                                                                                    document=doc)  # ici par rapport au bulk on force l'id du doc indexé ES comme étant celui du doc.
-    # Mise à jour du chercheur
-    # es.update( index="test2", id=searcher_data ['halId_s'], document=searcher_data)
+    helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
+
     return "add publications done"
 
 
@@ -552,45 +538,49 @@ def scope_all():
 
 
 if __name__ == "__main__":
-    index_list = ["researchers", "publications", "laboratories", "institutions", "expertises"]
-    docmap = test_static.test_docmap2()
-    if not es.indices.exists(index=f"test2"):
-        es.indices.create(index=f"test2", mappings=docmap)
-    # création d'un référentiel des domaines (ex concepts. On les appelle plus comme çà !!!)
-    if not es.indices.exists(index=f"domaines-hal-referentiel"):
-        es.indices.create(index=f"domaines-hal-referentiel", mappings=docmap)
+
+    index_mapping = {
+        "sovisu_searchers": test_static.document_mapping(),
+        "sovisu_laboratories": test_static.document_mapping(),
+        "domaine_hal_referentiel": test_static.expertises_mapping(),
+        "structures_directory": test_static.structures_mapping(),
+    }
+    for index, mapping_func in index_mapping.items():
+        if not es.indices.exists(index=index):
+            es.indices.create(index=index, mappings=mapping_func)
+
     # Faudra sur le même modèle rajouter les labos et les structures.
     # Cela permet de générer autant d'axes ou sous groupes que nécessaires ;-)
     create_test_context()
+    # #
+    # print("#################################")
+    # print("Tests : trouver un chercheur")
+    # scope_searcher = esActions.scope_match_multi(
+    #     [("idhal", "david-reymond"), ('category', "searcher")])
+    # cpt = es.count(index="sovisu_searchers", query=scope_searcher)['count']
+    # print("normalement 1 doc :", cpt)
+    # gugusse = es.search(index="sovisu_searchers", query=scope_searcher, size=cpt)["hits"]["hits"]
+    # for gu in gugusse:
+    #     print(gu)
+    # print("#################################")
+    # print("Tests : trouver les notices d'un chercheur")
     #
-    print("#################################")
-    print("Tests : trouver un chercheur")
-    scope_searcher = esActions.scope_match_multi(
-        [("idhal", "david-reymond"), ('category', "searcher")])
-    cpt = es.count(index="test2", query=scope_searcher)['count']
-    print("normalement 1 doc :", cpt)
-    gugusse = es.search(index="test2", query=scope_searcher, size=cpt)["hits"]["hits"]
-    for gu in gugusse:
-        print(gu)
-    print("#################################")
-    print("Tests : trouver les notices d'un chercheur")
-
-    scope_notices = esActions.scope_match_multi(
-        [("idhal", "david-reymond"), ('category', "notice-hal")])
-    cpt = es.count(index="test2", query=scope_notices)['count']
-    print("à ce jour 106 doc :", cpt)
-    doc_gugusse = es.search(index="test2", query=scope_notices, size=cpt)["hits"]["hits"]
-    for doc in doc_gugusse:
-        print(doc)
-    print("#################################")
-
-    scope_exp = esActions.scope_match_multi([("idhal", "david-reymond"), ('category', "expertise")])
-    cpt = es.count(index="test2", query=scope_exp)['count']
-
-    exp_gugusse = es.search(index="test2", query=scope_exp, size=cpt)["hits"]["hits"]
-    print(
-        "normalement 10 docs (MAIS c'est pas bon cf. infra remarques sur les expertises (çà sort d'où ???) !!!",
-        cpt)
-    for exp in exp_gugusse:
-        print(exp)
-    print("#################################")
+    # scope_notices = esActions.scope_match_multi(
+    #     [("idhal", "david-reymond"), ('category', "notice-hal")])
+    # cpt = es.count(index="sovisu_searchers", query=scope_notices)['count']
+    # print("à ce jour 106 doc :", cpt)
+    # doc_gugusse = es.search(index="sovisu_searchers", query=scope_notices, size=cpt)["hits"]["hits"]
+    # for doc in doc_gugusse:
+    #     print(doc)
+    # print("#################################")
+    #
+    # scope_exp = esActions.scope_match_multi([("idhal", "david-reymond"), ('category', "expertise")])
+    # cpt = es.count(index="sovisu_searchers", query=scope_exp)['count']
+    #
+    # exp_gugusse = es.search(index="sovisu_searchers", query=scope_exp, size=cpt)["hits"]["hits"]
+    # print(
+    #     "normalement 10 docs (MAIS c'est pas bon cf. infra remarques sur les expertises (çà sort d'où ???) !!!",
+    #     cpt)
+    # for exp in exp_gugusse:
+    #     print(exp)
+    # print("#################################")
