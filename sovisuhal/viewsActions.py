@@ -65,6 +65,7 @@ def admin_access_login(request):
                 )
 
 
+# TODO: Intégrer au CBV?
 def validate_references(request):
     """
     Validation des références HAL
@@ -108,37 +109,27 @@ def validate_references(request):
     else:
         return redirect("unknown")
 
-    update_script = {
-        "source": "for (profile in ctx._source.SearcherProfile) {"
-        " if (profile.ldapId == params.ldapId) "
-        "{ profile.validated = params.validated } }",
-        "lang": "painless",
-        "params": {"ldapId": p_id, "validated": validate},
+    update_doc = {
+        "sovisu_validated": validate
     }
-    # TODO: Revoir le body renvoyé pour s'adapter au nouveau systeme (ajuster lab avant)
+
     # Get scope information
     if i_type == "rsr":
-        if request.method == "POST":
-            to_validate = request.POST.get("toValidate", "").split(",")
-            for docid in to_validate:
-                es.update(
-                    index="test_publications",
-                    refresh="wait_for",
-                    id=docid,
-                    script=update_script,
-                )
+        index_name = "sovisu_searchers"
+    elif i_type == "lab":
+        index_name = "sovisu_laboratories"
+    else:
+        return redirect("unknown")
 
-    if i_type == "lab":
-        if request.method == "POST":
-            to_validate = request.POST.get("toValidate", "").split(",")
-            for docid in to_validate:
-                es.update(
-                    index="test_publications",
-                    refresh="wait_for",
-                    id=docid,
-                    doc={"validated": validate},
-                )
-
+    if request.method == "POST":
+        to_validate = request.POST.get("toValidate", "").split(",")
+        for sovisu_id in to_validate:
+            es.update(
+                index=index_name,
+                refresh="wait_for",
+                id=sovisu_id,
+                doc=update_doc,
+            )
     return redirect(
         f"/check/?struct={struct}&type={i_type}"
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
