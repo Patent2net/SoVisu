@@ -137,6 +137,7 @@ class ElasticContextMixin:
         return hastoconfirm
 
 
+  # TODO: A revoir URGENT
 class CreateView(TemplateView):
     """
     Gestion de la page "Création de profil"
@@ -489,9 +490,17 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
-            scope_param = esActions.scope_p("_id", p_id)
+            # scope_param = esActions.scope_p("idhal", p_id)
+            query = {
+                "bool": {
+                    "must": [
+                        {"match": {"category": "searcher"}},
+                        {"match": {"idhal": p_id}},
+                    ]
+                }
+            }
 
-            res = es.search(index="test_researchers", query=scope_param)
+            res = es.search(index="sovisu_searchers", query=query)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
             except IndexError:

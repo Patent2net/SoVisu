@@ -681,21 +681,18 @@ def update_authorship(request):
     try:
         to_process = json.loads(request.POST.get("toProcess", ""))
         for doc in to_process:
+            print(doc)
             # update in researcher's collection
 
-            update_script = {
-                "source": "for (searcher in ctx._source.SearcherProfile) { "
-                "if (searcher.ldapId == params.ldapId) "
-                "{ searcher.authorship = params.new_authorshipstate } }",
-                "lang": "painless",
-                "params": {"ldapId": p_id, "new_authorshipstate": doc["authorship"]},
+            update_doc = {
+                "sovisu_authorship": doc["sovisu_authorship"]
             }
 
             es.update(
-                index="test_publications",
+                index="sovisu_searchers",
                 refresh="wait_for",
-                id=doc["docid"],
-                script=update_script,
+                id=doc["sovisu_id"],
+                doc=update_doc,
             )
 
     except IndexError:
