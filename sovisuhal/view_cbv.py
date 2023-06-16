@@ -137,6 +137,7 @@ class ElasticContextMixin:
         return hastoconfirm
 
 
+  # TODO: A revoir URGENT
 class CreateView(TemplateView):
     """
     Gestion de la page "Création de profil"
@@ -167,28 +168,23 @@ class CreateView(TemplateView):
             idhal = form.cleaned_data["f_halId_s"]
             orcid = form.cleaned_data["f_orcId"]
             structid = form.cleaned_data["f_inst"]
-            tempo_lab = form.cleaned_data["f_labo"]
-            tempo_lab = tempo_lab.replace("'", "")
-            tempo_lab = tempo_lab.replace("(", "")
-            tempo_lab = tempo_lab.replace(")", "")
-            tempo_lab = tempo_lab.split(",")
-            labo = tempo_lab[0].strip()
-            accro_lab = tempo_lab[1].strip()
+            labHalId = form.cleaned_data["f_labo"]
+            print(labHalId)
 
             idhal_test = idhal_checkout(idhal)
 
             if idhal_test > 0:
-                indexe_chercheur(structid, ldapid, accro_lab, labo, idhal, idref, orcid)
-                field = "halId_s"
-                scope_param = esActions.scope_p(field, idhal)
-                count = es.count(index="test_researchers", query=scope_param)["count"]
-                res = es.search(index="test_researchers", query=scope_param, size=count)
-                entity = res["hits"]["hits"][0]["_source"]
+                labo_data = es.get(index="structures_directory", id=labHalId)
+                labo_data = labo_data["_source"]
+                indexe_chercheur(structid, ldapid, labo_data["acronym_s"], labHalId, idhal, idref, orcid)
+                entity = es.get(index="sovisu_searchers", id=idhal)
+                entity = entity["_source"]
                 struct = entity["structSirene"]
+                user_token = entity["halId_s"]
                 date_to = datetime.today().strftime("%Y-%m-%d")
                 return redirect(
                     f"/check/?struct={struct}&type=rsr"
-                    + f"&id={ldapid}&orcId={orcid}&from=1990-01-01&to={date_to}&data=credentials"
+                    + f"&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"
                 )
             else:
                 return redirect(
@@ -489,9 +485,17 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
-            scope_param = esActions.scope_p("_id", p_id)
+            # scope_param = esActions.scope_p("idhal", p_id)
+            query = {
+                "bool": {
+                    "must": [
+                        {"match": {"category": "searcher"}},
+                        {"match": {"idhal": p_id}},
+                    ]
+                }
+            }
 
-            res = es.search(index="test_researchers", query=scope_param)
+            res = es.search(index="sovisu_searchers", query=query)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
             except IndexError:

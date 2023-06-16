@@ -32,13 +32,8 @@ mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 es = esActions.es_connector()
 
 
-# @shared_task(bind=True)
-def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
-    """
-    Indexe un chercheur dans Elasticsearch
-    """
-    #   progress_recorder = ProgressRecorder(self)
-    #   progress_recorder.set_progress(0, 10, description='récupération des données LDAP')
+# TODO: Renommer Get_dico pour quelque chose de plus explicite
+def get_dico(ldapid):
     if mode == "Prod":
         server = Server("ldap.univ-tln.fr", get_info=ALL)
         conn = Connection(
@@ -76,233 +71,173 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
             },
             "dn": "uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr",
         }
-        ldapid = "dreymond"
-    labo = labhalid
+
+    return dico
+
+
+# @shared_task(bind=True)
+def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
+    """
+    Indexe un chercheur dans Elasticsearch
+    """
+
+    # Get the basic information about the searcher
+    dico = get_dico(ldapid)
+    # -----------------
 
     extrait = dico["dn"].split("uid=")[1].split(",")
     chercheur_type = extrait[1].replace("ou=", "")
     suppan_id = extrait[0]
     if suppan_id != ldapid:
         print("aille", ldapid, " --> ", ldapid)
-    nom = dico["attributes"]["displayName"]
-    emploi = dico["attributes"]["typeEmploi"]
-    mail = dico["attributes"]["mail"]
+
+    nom = dico["attributes"]["displayName"] if len(dico["attributes"]["displayName"]) > 0 else [""]
+    emploi = dico["attributes"]["typeEmploi"] if len(dico["attributes"]["typeEmploi"]) > 0 else [""]
+    mail = dico["attributes"]["mail"] if len(dico["attributes"]["mail"]) > 0 else [""]
+
+    supann_affect = []
     if "supannAffectation" in dico["attributes"].keys():
         supann_affect = dico["attributes"]["supannAffectation"]
-    else:
-        supann_affect = []
 
+    supann_princ = []
     if "supannEntiteAffectationPrincipale" in dico["attributes"].keys():
         supann_princ = dico["attributes"]["supannEntiteAffectationPrincipale"]
-    else:
-        supann_princ = []
-
-    if not len(nom) > 0:
-        nom = [""]
-    elif not len(emploi) > 0:
-        emploi = [""]
-    elif not len(mail) > 0:
-        mail = [""]
-
-    chercheur = dict()
-    chercheur["name"] = nom
-    chercheur["type"] = chercheur_type
-    chercheur["function"] = emploi
-    chercheur["mail"] = mail[0]
-    chercheur["orcId"] = orcid
-    chercheur["lab"] = labo_accro  # acronyme
-    chercheur["supannAffectation"] = ";".join(supann_affect)
-    chercheur["supannEntiteAffectationPrincipale"] = supann_princ
-    chercheur["firstName"] = chercheur["name"].split(" ")[1]
-    chercheur["lastName"] = chercheur["name"].split(" ")[0]
-
-    # Chercheur["aurehalId"]
-
-    # creation des index
-    #  progress_recorder.set_progress(5, 10, description='creation des index')
-    if not es.indices.exists(index=structid + "-structures"):
-        es.indices.create(index=structid + "-structures")
-    if not es.indices.exists(index=structid + "-" + labo + "-researchers"):
-        es.indices.create(index=structid + "-" + labo + "-researchers")
-        es.indices.create(
-            index=structid + "-" + labo + "-researchers-" + ldapid + "-documents"
-        )  # -researchers" + row["ldapId"] + "-documents
-    else:
-        if not es.indices.exists(
-            index=structid + "-" + labo + "-researchers-" + ldapid + "-documents"
-        ):
-            es.indices.create(
-                index=structid + "-" + labo + "-researchers-" + ldapid + "-documents"
-            )  # -researchers" + row["ldapId"] + "-documents" ?
-
-    chercheur["structSirene"] = structid
-    chercheur["labHalId"] = labo
-    chercheur["validated"] = False
-    chercheur["ldapId"] = ldapid
-    chercheur["Created"] = datetime.datetime.now().isoformat()
 
     # New step ?
+    aurehal = ""
 
     if idhal != "":
         aurehal = get_aurehalId(idhal)
         # integration contenus
-        archives_ouvertes_data = get_concepts_and_keywords(aurehal)
-    else:  # sécurité, le code n'est pas censé être lancé par create car vérification du champ idhal
-        return redirect("unknown")
-        # retourne sur check() ?
+        create_searcher_concept_notices(idhal, aurehal)
 
-    chercheur["halId_s"] = idhal
-    chercheur["validated"] = False
-    chercheur["aurehalId"] = aurehal  # heu ?
-    chercheur["concepts"] = archives_ouvertes_data["concepts"]
-    chercheur["guidingKeywords"] = []
-    chercheur["idRef"] = idref
-    chercheur["axis"] = labo_accro
+    searcher_notice = {
+        "name": nom,
+        "type": chercheur_type,
+        "function": emploi,
+        "mail": mail[0],
+        "orcId": orcid,
+        "lab": labo_accro,  # TODO: INTERET DE CETTE KEY?
+        "supannAffectation": ";".join(supann_affect),
+        "supannEntiteAffectationPrincipale": supann_princ,
+        "firstName": nom.split(" ")[1],
+        "lastName": nom.split(" ")[0],
+        "structSirene": structid,
+        "labHalId": labhalid,
+        "validated": False,
+        "ldapId": ldapid,
+        "Created": datetime.datetime.now().isoformat(),
+        "idhal": idhal,  # sert de clé pivot entre les docs, il faut être sûr que ce champ n'existe dans aucune des docs que l'on pourrait indexer
+        "halId_s": idhal,
+        "aurehalId": aurehal,
+        "idRef": idref,
+        "axis": labo_accro,  # TODO: INTERET DE CETTE KEY? contient la même chose que lab
+        "category": "searcher"
+    }
 
-    # Chercheur["mappings"]: {
-    #     "_default_": {
-    #         "_timestamp": {
-    #             "enabled": "true",
-    #             "store": "true",
-    #             "path": "plugins.time_stamp.string",
-    #             "format": "yyyy-MM-dd HH:m:ss"
-    #         }
-    #     }}
     res = es.index(
-        index=chercheur["structSirene"] + "-" + chercheur["labHalId"] + "-researchers",
-        id=chercheur["ldapId"],
-        body=json.dumps(chercheur),
+        index="sovisu_searchers",
+        id=idhal,
+        document=searcher_notice,
         refresh="wait_for",
     )
     print("statut de la création d'index: ", res["result"])
-    return chercheur
 
 
 @shared_task(bind=True)
+# TODO: Ne garde pas la mémoire de l'autorat etc
 def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
     Collecte les notices liées à un chercheur
     "overwrite" : remet les valeurs pour l'ensemble du document à ses valeurs initiales.
     """
     progress_recorder = ProgressRecorder(self)
-    docs = hal.find_publications(chercheur["halId_s"], "authIdHal_s")
+    idhal = chercheur["idhal"]
+    docs = hal.find_publications(idhal, "authIdHal_s")
 
     progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
     # Insert documents collection
+    doc_param = esActions.scope_term_multi(
+        [("idhal", chercheur["idhal"]), ('category', "notice-hal")])
+    docsExistantes = es.search(index="sovisu_searchers", query=doc_param)
+    docsExistantes = docsExistantes["hits"]["hits"]
+    if len(docsExistantes) > 0:
+        docsExistantes = docsExistantes["hits"]["hits"][0]
+        docsExistantes = docsExistantes["_source"]
+        IddocsExistantes = [truc['docid'] for truc in docsExistantes]
+    else:
+        docsExistantes = []
+        IddocsExistantes = []
+    # Insert documents collection
+
     for num, doc in enumerate(docs):
-        location_docs.generate_countrys_fields(doc)
-        doc = doi_enrichissement.docs_enrichissement_doi(doc)
-
-        if "fr_abstract_s" in doc.keys():
-            if isinstance(doc["fr_abstract_s"], list):
-                doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
-            if len(doc["fr_abstract_s"]) > 100:
-                doc["fr_entites"] = keyword_enrichissement.return_entities(
-                    doc["fr_abstract_s"], "fr"
-                )
-                doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
-                    doc["fr_abstract_s"], "fr"
-                )
-
-        if "en_abstract_s" in doc.keys():
-            if isinstance(doc["en_abstract_s"], list):
-                doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
-            if len(doc["en_abstract_s"]) > 100:
-                doc["en_entites"] = keyword_enrichissement.return_entities(
-                    doc["en_abstract_s"], "en"
-                )
-                doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
-                    doc["en_abstract_s"], "en"
-                )
-
-        doc["_id"] = doc["docid"]
-
-        doc["harvested_from"] = "researcher"
-
-        doc["harvested_from_ids"] = []
-        doc["harvested_from_label"] = []
-
-        doc["harvested_from_ids"].append(chercheur["halId_s"])
-
-        doc["records"] = []
-
-        doc["MDS"] = utils.calculate_mds(doc)
-
-        doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
-
-        doc["Created"] = datetime.datetime.now().isoformat()
-
-        # add a category to make differentiation in text_* index pattern
-        doc["category"] = "Notice"
-
-        # add a common SearcherProfile Key who should serve has common key between index
-        doc["SearcherProfile"] = []
-
-        document_exist = es.exists(index="test_publications", id=doc["_id"])
-
-        # iterate for every searcher idhal present in doc
-        for idhal in doc["authIdHal_s"]:
-            validated_concepts = ""
-            ldapId = "unassigned"
-            validated = "unassigned"
-            authorship = ""
-
-            # check if the searcher with that idhal already exist in app
-            searcher_param = {
-                "nested": {
-                    "path": "SearcherProfile",
-                    "query": {
-                        "term": {
-                            "SearcherProfile.halId_s.keyword": idhal
-                        }
-                    }
-                }
-            }
-            count_searcher = es.count(index="test_researchers", query=searcher_param)
-            # TODO: Changer la méthode de vérification du chercheur,
-            #  lorsque l'id commun passera sur l'idhal
-            # searcher_exist = es.exists(index="test_researchers", id=idhal)
-
-            # if searcher exist, get associated validated_concepts
-            if count_searcher["count"] > 0:
-                searcher_data = es.search(index="test_researchers", query=searcher_param)
-                searcher_data = searcher_data["hits"]["hits"][0]["_source"]["SearcherProfile"][0]
-                ldapId = searcher_data["ldapId"]
-                validated_concepts = searcher_data["validated_concepts"]
-
-            if overwrite or not document_exist:
-                if count_searcher["count"] > 0:
-                    validated = "True"
-                # check authorship
-                if doc["authIdHal_s"].index(idhal) == 0:
-                    authorship = "firstAuthor"
-                if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
-                    authorship = "lastAuthor"
+        # L'id du doc est associé à celui du chercheur dans ES
+        # Chaque chercheur ses docs
+        # ci après c'est supposé que ce sont des chaines de caractère. Il me semble qu'on avait eu des soucis !!!
+        # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
+        # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
+        changements = False
+        if doc["docid"] in IddocsExistantes:
+            doc["MDS"] = utils.calculate_mds(doc)
+            #
+            if doc["MDS"] != [docAncien["MDS"] for docAncien in docsExistantes if
+                              docAncien["_id"] == doc["_id"]][0]:
+                # SI le MDS a changé alors modif qualitative sur la notice
+                changements = True
             else:
-                document_data = es.get(index="test_publications", id=doc["_id"])
-                document_data = document_data["_source"]
-                # Compare with datas already in document
-                for searcher in document_data["SearcherProfile"]:
-                    if searcher["halId_s"] == idhal:
-                        if searcher["validated"] == "unassigned" and count_searcher["count"] > 0:
-                            validated = "True"
-                        else:
-                            validated = searcher["validated"]
-                        authorship = searcher["authorship"]
+                doc = [docAncien for docAncien in docsExistantes if docAncien["_id"] == doc["_id"]][
+                    0]
 
-            # add the record of the Searcher in the document
-            doc["SearcherProfile"].append(
-                {
-                    "halId_s": idhal,
-                    "ldapId": ldapId,
-                    "validated_concepts": validated_concepts,
-                    "validated": validated,
-                    "authorship": authorship,
-                }
-            )
+        if doc["docid"] not in IddocsExistantes or changements:
+            location_docs.generate_countrys_fields(doc)
+            doc = doi_enrichissement.docs_enrichissement_doi(doc)
+            if "fr_abstract_s" in doc.keys():
+                if isinstance(doc["fr_abstract_s"], list):
+                    doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
+                if len(doc["fr_abstract_s"]) > 100:
+                    doc["fr_entites"] = keyword_enrichissement.return_entities(
+                        doc["fr_abstract_s"], "fr"
+                    )
+                    doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
+                        doc["fr_abstract_s"], "fr"
+                    )
+            if "en_abstract_s" in doc.keys():
+                if isinstance(doc["en_abstract_s"], list):
+                    doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
+                if len(doc["en_abstract_s"]) > 100:
+                    doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"],
+                                                                               "en")
+                    doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
+                        doc["en_abstract_s"], "en")
+            # Nouveau aussi ci dessous
+            doc["MDS"] = utils.calculate_mds(doc)
+            doc["Created"] = datetime.datetime.now().isoformat()
+        if doc["docid"] not in IddocsExistantes:
+            doc["harvested_from"] = "researcher"  # inutile je pense
+            doc[
+                "harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
+            doc["harvested_from_label"] = []  # idem ce champ serait à virer
+            doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
+            doc["records"] = []
+            doc["category"] = "notice-hal"
+            doc["idhal"] = idhal,  # l'Astuce du
+            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
+            doc["sovisu_validated"] = True
+            doc["_id"] = f'{idhal}.{doc["halId_s"]}'
+            authorship = ""
+            # TODO: Revoir pour être plus fiable?
+            if doc["authIdHal_s"].index(idhal) == 0:
+                authorship = "firstAuthor"
+            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                authorship = "lastAuthor"
+
+            doc["sovisu_authorship"] = authorship
+        else:
+            pass
+
         progress_recorder.set_progress(num, len(docs), description="(récolte)")
 
-    helpers.bulk(es, docs, index="test_publications", refresh="wait_for")
+    helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
 
     progress_recorder.set_progress(num, len(docs), description="(indexation)")
     return chercheur
@@ -374,3 +309,71 @@ def should_be_open(notice):
                 notice["preprint_embargo"] = None
 
     return notice["postprint_embargo"], notice["preprint_embargo"]
+
+
+# TODO: Refactor that function
+def create_searcher_concept_notices(idhal, aurehal):
+    archives_ouvertes_data = get_concepts_and_keywords(aurehal)
+    chercheur_concept = archives_ouvertes_data["concepts"]
+    if len(chercheur_concept) > 0:
+        # scope_param = scope_p("id", [exp['id'] for exp in chercheur_concept['children']])
+        # scope_param =  {
+        #     "terms": {
+        #       "chemin": ["domAurehal."+exp['id'] for exp in chercheur_concept['children']]
+        #     }
+        #   }
+        # AUCUN des deux scope ne remontent toutes les fiches domaine chercheur : elles n'existeent pas
+        query = esActions.scope_all()
+        count = es.count(index="domaine_hal_referentiel", query=query)["count"]
+        # resDomainesRef = es.search(index="domaine_hal_referentiel", query=scope_param, size=count)
+        toutRef = [truc['_source']['chemin'] for truc in
+                   es.search(index="domaine_hal_referentiel", query={'match_all': {}}, size=count)[
+                       'hits']['hits']]
+
+        Vu = set()
+        pasVu = set()
+        idDomainChecheur = [exp['id'] for exp in chercheur_concept['children']]
+        for ids in idDomainChecheur:
+            ok = False
+            for ch in toutRef:
+                if ch.endswith(ids):
+                    Vu.add(ch)
+                    ok = True
+            if not ok:
+                pasVu.add(ids)
+        for new in pasVu:
+            print("Nouveau dans le dico ??? çà sort d'où ?", new)
+        ####
+        # Traitement des vus... matchés on recopie la fiche référentiel et on personnalise. Actuellement, on taggue
+
+        lstReq = []
+        for dom in Vu:
+            lstReq.append({
+                "match": {
+                    "chemin": dom
+                }
+            })
+
+        req = {
+            "bool": {
+                "should": lstReq,
+                "minimum_should_match": 1,
+                "must": [
+                    {
+                        "match_all": {}
+                    }
+                ]
+            }
+        }
+
+        resDomainesRef = es.search(index="domaine_hal_referentiel", query=req)
+        for fiche in resDomainesRef['hits']['hits']:
+            newFiche = fiche['_source']
+            newFiche['validated'] = False  # domaines pas validés par défaut
+            # Id proposition : valider les domaines par défaut et laisser la possibilité d'en valider d'autres par explorateur d'arbre ?
+            newFiche['idhal'] = idhal  # taggage, l'idhal sert de clé
+            # Et rajouts besoins spécifiques (genre précisions / notes...)
+            elastic_id = f"{idhal}.{newFiche['chemin']}"
+            # Puis on indexe la fiche
+            es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
+

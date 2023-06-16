@@ -130,7 +130,7 @@
                 <th>Autorat</th>
             {% endif %}
             <th>label_bibtex</th>
-            <th class="hidden">docid</th>
+            <th class="hidden">sovisu_id</th>
         </tr>
         </thead>
 
@@ -153,7 +153,7 @@
                     </td>
                 {% endif %}
                 <td>{{ ref.label_bibtex }}</td>
-                <td class="docid hidden">{{ ref.docid }}</td>
+                <td class="sovisu_id hidden">{{ ref.sovisu_id }}</td>
             </tr>
         {% endfor %}
 
@@ -214,15 +214,14 @@
             for (let i in table.rows) {
                 try {
                     let row = table.rows[i]
-                    let curr_rsr = getObjectByValue(references, "docid", row.cells[6].textContent);
-                    if (curr_rsr[0].SearcherProfile) {
-                        let curr_val = getObjectByValue(curr_rsr[0].SearcherProfile, "ldapId", '{{ id }}');
-                        //console.log(curr_rsr[0].authorship)
-                        //console.log(document.querySelector(".halId_s").textContent)
-                        //console.log(curr_val);
-                        row.cells[4].querySelector('#authorship').value = curr_val[0].authorship;
+                    let curr_rsr = getObjectByValue(references, "sovisu_id", row.cells[6].textContent);
+                    console.log("curr_rsr:", curr_rsr); // Add this line to display the content of curr_rsr
+                    if (curr_rsr[0].sovisu_authorship) {
+                        let authorshipInput = row.cells[4].querySelector('#authorship');
+                        authorshipInput.value = curr_rsr[0].sovisu_authorship;
                     } else {
-                        row.cells[4].querySelector('#authorship').value = "";
+                      let authorshipInput = row.cells[4].querySelector('#authorship');
+                      authorshipInput.value = "";
                     }
                 } catch (error) {
                 }
@@ -236,9 +235,9 @@
 
                 element.onchange = (event) => {
                     let val = event.target.value;
-                    let docid = element.parentNode.parentNode.querySelector(".docid").textContent;
+                    let sovisu_id = element.parentNode.parentNode.querySelector(".sovisu_id").textContent;
 
-                    refUpdated.push({'docid': docid, 'authorship': val, author: '{{ entity.ldapId|safe }}'});
+                    refUpdated.push({'sovisu_id': sovisu_id, 'sovisu_authorship': val, author: '{{ entity.ldapId|safe }}'});
 
                     document.querySelector("#toProcess").value = JSON.stringify(refUpdated);
                 }
