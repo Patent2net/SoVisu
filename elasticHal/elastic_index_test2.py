@@ -32,7 +32,7 @@ def create_test_context():
     # Variables à automatiser plus tard
     idhal = "david-reymond"
     orcid = ""
-    labo_accro = "IMSIC"
+    labo_accro = "IMSIC"  # TODO: Faire sauter cette clé, remplacer par systeme qui créé fiche labo par chercheur
     idref = "test"
     labhalid = "527028"
     ldapid = "dreymond"
@@ -119,6 +119,7 @@ def set_elastic_structures(search_value):
 
 
 def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
+    # TODO: Fonction originale dans sovisu/libs/elastichal.py => update quand fini
     # TODO: Revoir les éléments nécessaires à indexe_chercheur: certains éléments n'existent plus (structsirene, autres?) et ajuster le code
     """
     Indexe un chercheur dans Elasticsearch
@@ -160,7 +161,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         "function": emploi,
         "mail": mail[0],
         "orcId": orcid,
-        "lab": labo_accro,
+        "lab": labo_accro,  # TODO: INTERET DE CETTE KEY?
         "supannAffectation": ";".join(supann_affect),
         "supannEntiteAffectationPrincipale": supann_princ,
         "firstName": nom.split(" ")[1],
@@ -292,9 +293,10 @@ def create_searcher_concept_notices(idhal, aurehal):
             # Id proposition : valider les domaines par défaut et laisser la possibilité d'en valider d'autres par explorateur d'arbre ?
             newFiche['idhal'] = idhal  # taggage, l'idhal sert de clé
             # Et rajouts besoins spécifiques (genre précisions / notes...)
-
+            elastic_id = f"{idhal}.{newFiche['chemin']}"
             # Puis on indexe la fiche
-            es.index(index="sovisu_searchers", document=json.dumps(newFiche), refresh="wait_for",)
+            es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche),
+                     refresh="wait_for", )
 
 
 def creeFiche(dom, par):
