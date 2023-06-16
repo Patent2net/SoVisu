@@ -391,11 +391,9 @@ def validate_credentials(request):
             orcid = request.POST.get("f_orcId")
             function = request.POST.get("f_status")
 
-            scope_param = esActions.scope_p("_id", p_id)
-
-            res = es.search(index="test_researchers", query=scope_param)
+            res = es.get(index="sovisu_searchers", id=p_id)
             try:
-                entity = res["hits"]["hits"][0]["_source"]
+                entity = res["_source"]
             except IndexError:
                 return redirect("unknown")
 
@@ -407,15 +405,11 @@ def validate_credentials(request):
             if aurehalId != aurehalId_get:
                 aurehalId = aurehalId_get
                 entity["aurehalId"] = aurehalId
-            archives_ouvertes_data = ""
-            if aurehalId != "":
-                archives_ouvertes_data = get_concepts_and_keywords(entity["aurehalId"])
-                archives_ouvertes_data = archives_ouvertes_data["concepts"]
 
             # TODO: supprimer Concepts sur le long terme dans la fonction.
             #  Doit passer dans SearcherProfile. Et principalement géré par test_expertises
             es.update(
-                index="test_researchers",
+                index="sovisu_searchers",
                 refresh="wait_for",
                 id=p_id,
                 doc={
@@ -424,7 +418,6 @@ def validate_credentials(request):
                     "orcId": orcid,
                     "validated": True,
                     "function": function,
-                    "concepts": archives_ouvertes_data,
                 },
             )
 

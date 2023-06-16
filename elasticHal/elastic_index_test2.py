@@ -119,6 +119,7 @@ def set_elastic_structures(search_value):
 
 
 def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
+    # TODO: Revoir les éléments nécessaires à indexe_chercheur: certains éléments n'existent plus (structsirene, autres?) et ajuster le code
     """
     Indexe un chercheur dans Elasticsearch
     """
@@ -179,6 +180,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
 
     res = es.index(
         index="sovisu_searchers",
+        id=idhal,
         document=searcher_notice,
         refresh="wait_for",
     )
