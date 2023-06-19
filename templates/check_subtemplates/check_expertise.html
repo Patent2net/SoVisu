@@ -50,9 +50,9 @@
 
         {% for expertise in expertises %}
             <tr class="text-gray-500">
-                <td>{{ concept.id }}</td>
+                <td>{{ expertise.sovisu_id }}</td>
                 <td>{{ expertise.label_fr | safe }} </td>
-                <td>{{ concept.chemin }}</td>
+                <td>{{ expertise.chemin }}</td>
             </tr>
         {% endfor %}
 
@@ -122,6 +122,10 @@
                     {"className": "dt-center", "targets": "_all"},
                     {
                         "targets": [0],
+                        "visible": false
+                    },
+                    {
+                        "targets": [2],
                         "visible": false
                     }
                 ],

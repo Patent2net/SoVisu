@@ -374,6 +374,7 @@ def create_searcher_concept_notices(idhal, aurehal):
             newFiche['idhal'] = idhal  # taggage, l'idhal sert de clé
             # Et rajouts besoins spécifiques (genre précisions / notes...)
             elastic_id = f"{idhal}.{newFiche['chemin']}"
+            newFiche['sovisu_id'] = elastic_id
             # Puis on indexe la fiche
             es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
 

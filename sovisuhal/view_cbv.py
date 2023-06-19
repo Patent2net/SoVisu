@@ -137,13 +137,10 @@ class ElasticContextMixin:
         return hastoconfirm
 
 
-  # TODO: A revoir URGENT
 class CreateView(TemplateView):
     """
     Gestion de la page "Création de profil"
     """
-
-    # TODO: Revoir tout le système de create
 
     template_name = "create.html"
     form_class = forms.CreateCredentials
@@ -398,25 +395,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                     expertise_cleaned.append(expertise["_source"])
 
         elif validation == "0":  # show the expertises invalidated by searcher
-            scope_param = esActions.scope_all()
             for expertise in searcher_expertises:
                 if not expertise["_source"]['validated']:
                     expertise_cleaned.append(expertise["_source"])
-
-            # expertise_count = es.count(index="domaine_hal_referentiel", query=scope_param)["count"]
-            # expertise_category = es.search(
-            #     index="domaine_hal_referentiel", query=scope_param, size=expertise_count
-            # )
-            # expertise_category = expertise_category["hits"]["hits"]
-            # for expertise in expertise_category:
-            #     expertise = expertise["_source"]
-            #
-            #     if expertise["chemin"] not in [  # Check if expertise in directory are already in Searcher_expertises
-            #         validated_expertises["_source"]["chemin"] for validated_expertises in searcher_expertises
-            #     ]:
-            #
-            #         expertise_cleaned.append(expertise)
-
         else:
             return redirect("unknown")
         print(expertise_cleaned)

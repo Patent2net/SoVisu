@@ -191,6 +191,7 @@ def validate_guiding_domains(request):
 
 
 def validate_expertise(request):
+    # TODO: intégrer à views_cbv
     """
     Validation des domaines d'expertise
     """
@@ -226,106 +227,23 @@ def validate_expertise(request):
     else:
         date_to = datetime.today().strftime("%Y-%m-%d")
 
-    if int(validation) == 0:
-        validate_status = "to_validate"
-    elif int(validation) == 1:
-        validate_status = "to_remove"
+    if int(validation) == 0:  # validation is at 0 when page show unvalidated concepts
+        update_doc = {
+            "validated": True
+        }
+    elif int(validation) == 1:  # validation is at 1 when page show validated concepts
+        update_doc = {
+            "validated": False
+        }
     else:
         return redirect("unknown")
 
     if request.method == "POST":
         # get values sent via the form
-        concepts_update = request.POST.get("toInvalidate", "").split(",")
+        concepts_to_update = request.POST.get("toInvalidate", "").split(",")
 
-        expertise_update = []
-
-        for concept_id in concepts_update:
-            # get the id of the expertise related to the concept
-            expertise_id = concept_id.split(".", 1)[0]
-
-            existing_item = next(
-                (item for item in expertise_update if item["id"] == expertise_id), None
-            )
-            if existing_item:
-                existing_item["children"].append({"id": concept_id})
-            else:
-                expertise_update.append({"id": expertise_id, "children": [{"id": concept_id}]})
-
-        if validate_status == "to_validate":  # If the post come from invalidated list
-            # Load expertises file
-            scope_param = esActions.scope_all()
-            expertise_count = es.count(index="test_expertises", query=scope_param)["count"]
-            expertises_list = es.search(
-                index="test_expertises", query=scope_param, size=expertise_count
-            )
-
-            print(f"expertise_list :{expertises_list}")
-
-            for expertise in expertises_list["hits"]["hits"]:
-                expertise = expertise["_source"]
-                id_to_check = expertise["id"]
-
-                for update in expertise_update:
-                    if update["id"] == id_to_check:
-                        update["label_fr"] = expertise.get("label_fr")
-                        update["label_en"] = expertise.get("label_en")
-
-                        children = expertise.get("children", [])
-                        for child in children:
-                            child_id = child.get("id")
-                            child_existing_item = next(
-                                (
-                                    child_item
-                                    for child_item in update["children"]
-                                    if child_item["id"] == child_id
-                                ),
-                                None,
-                            )
-                            # Update the existing child item in check_values with label information
-                            if child_existing_item:
-                                child_existing_item["label_en"] = child.get("label_en")
-                                child_existing_item["label_fr"] = child.get("label_fr")
-
-            script_update = {
-                "source": "ctx._source.SearcherProfile.validated_concepts.addAll("
-                "params.new_concepts)",
-                "lang": "painless",
-                "params": {"new_concepts": expertise_update},
-            }
-
-            es.update(index="test_researchers", id=p_id, script=script_update, refresh="wait_for")
-
-        if validate_status == "to_remove":
-            searcher_response = es.get(index="test_researchers", id=p_id)
-            validated_concepts = searcher_response["_source"]["SearcherProfile"][
-                "validated_concepts"
-            ]
-
-            updated_concepts = []
-
-            # Iterate over validated_concepts to remove concepts from expertises
-            for expertise in validated_concepts:
-                if expertise["id"] in [item["id"] for item in expertise_update]:
-                    children = expertise.get("children", [])
-
-                    validated_children_ids = [
-                        child_item["id"]
-                        for item in expertise_update
-                        for child_item in item.get("children", [])
-                    ]
-
-                    updated_children = [
-                        child for child in children if child["id"] not in validated_children_ids
-                    ]
-
-                    expertise["children"] = updated_children
-
-                # Delete the expertise if no concepts are associated anymore
-                if expertise.get("children", []):
-                    updated_concepts.append(expertise)
-            # overwrite validated_concepts data
-            update_doc = {"SearcherProfile": {"validated_concepts": updated_concepts}}
-            es.update(index="test_researchers", id=p_id, doc=update_doc, refresh="wait_for")
+        for concept in concepts_to_update:
+            es.update(index="sovisu_searchers", refresh="wait_for", id=concept, doc=update_doc)
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}"
@@ -863,3 +781,7 @@ def vizualisation_url():
     """
     url = "/kibana"
     return url
+
+
+# TODO: Faire une fonction pour gérer les status validated de manière générale:
+#  (passage "validated" de true à false)
