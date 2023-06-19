@@ -167,3 +167,8 @@ def find_structures_entities(search_filter="parentIdref_s", search_value="031122
                 structures_entities.append(entity)
 
     return structures_entities
+
+
+# TODO: faire une fonction pour récupérer l'ensemble des documents d'une collection labo
+#  -https://api.archives-ouvertes.fr/search/IMSIC/
+#  - api/search/{lab_acronym}/{filters}

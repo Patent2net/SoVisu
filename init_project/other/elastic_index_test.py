@@ -9,12 +9,12 @@ from elasticsearch import helpers
 
 from elasticHal.libs import (
     doi_enrichissement,
-    elastic_formatting,
     hal,
     keyword_enrichissement,
     location_docs,
-    utils, test_static,
-)
+    utils, )
+from init_project import init_sovisu_static
+from init_project.other import elastic_formatting
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 from sovisuhal.libs import esActions
 from sovisuhal.viewsActions import idhal_checkout
@@ -179,7 +179,7 @@ def get_labo_from_csv():
         laboratories_list.append(results["_source"])
 
     # Récupère les nouvelles données dans le csv
-    with open("data/data_test/laboratories.csv", encoding="utf-8") as csv_file:
+    with open("../../elasticHal/data/data_test/laboratories.csv", encoding="utf-8") as csv_file:
         laboratories_csv = list(csv.DictReader(csv_file, delimiter=";"))
 
         # vérifie si les labos dans la liste csv existent déjà dans kibana
@@ -206,7 +206,7 @@ def get_labo_from_csv():
 def get_institution_from_csv(add_csv=True):
     institutions_list = []
     if add_csv:
-        with open("data/data_test/structures.csv", encoding="utf-8") as csv_file:
+        with open("../../elasticHal/data/data_test/structures.csv", encoding="utf-8") as csv_file:
             institution_csv = list(csv.DictReader(csv_file, delimiter=";"))
 
     for institution in institution_csv:
@@ -219,7 +219,7 @@ def get_institution_from_csv(add_csv=True):
 
 
 def get_expertises():
-    concept_list = test_static.concepts()
+    concept_list = init_sovisu_static.concepts()
     for row in concept_list:
         # add a category to make differentiation in text_* index pattern
         row["_id"] = row["id"]
