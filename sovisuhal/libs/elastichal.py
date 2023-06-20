@@ -149,7 +149,6 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
 
 
 @shared_task(bind=True)
-# TODO: Ne garde pas la mémoire de l'autorat etc
 def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
     Collecte les notices liées à un chercheur
@@ -161,18 +160,6 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
 
     progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
     # Insert documents collection
-    doc_param = esActions.scope_term_multi(
-        [("idhal", chercheur["idhal"]), ('sovisu_category', "notice")])
-    docsExistantes = es.search(index="sovisu_searchers", query=doc_param)
-    docsExistantes = docsExistantes["hits"]["hits"]
-    if len(docsExistantes) > 0:
-        docsExistantes = docsExistantes["hits"]["hits"][0]
-        docsExistantes = docsExistantes["_source"]
-        IddocsExistantes = [truc['docid'] for truc in docsExistantes]
-    else:
-        docsExistantes = []
-        IddocsExistantes = []
-    # Insert documents collection
 
     for num, doc in enumerate(docs):
         # L'id du doc est associé à celui du chercheur dans ES
@@ -181,18 +168,21 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
         # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
         changements = False
-        if doc["docid"] in IddocsExistantes:
+        check_existing_doc_id = f"{idhal}.{doc['halId_s']}"
+        document_exist = es.exists(index="sovisu_searchers", id=check_existing_doc_id)
+        if document_exist:
+            existing_document = es.get(index="sovisu_searchers", id=check_existing_doc_id)
+            existing_document = existing_document["_source"]
+
             doc["MDS"] = utils.calculate_mds(doc)
-            #
-            if doc["MDS"] != [docAncien["MDS"] for docAncien in docsExistantes if
-                              docAncien["_id"] == doc["_id"]][0]:
+
+            if doc["MDS"] != existing_document["MDS"]:
                 # SI le MDS a changé alors modif qualitative sur la notice
                 changements = True
             else:
-                doc = [docAncien for docAncien in docsExistantes if docAncien["_id"] == doc["_id"]][
-                    0]
+                doc = existing_document
 
-        if doc["docid"] not in IddocsExistantes or changements:
+        if not document_exist or changements:
             location_docs.generate_countrys_fields(doc)
             doc = doi_enrichissement.docs_enrichissement_doi(doc)
             if "fr_abstract_s" in doc.keys():
@@ -216,9 +206,11 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             # Nouveau aussi ci dessous
             doc["MDS"] = utils.calculate_mds(doc)
             doc["Created"] = datetime.datetime.now().isoformat()
-        if doc["docid"] not in IddocsExistantes:
+
+        if not document_exist:
             doc["harvested_from"] = "researcher"  # inutile je pense
-            doc["harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
+            doc[
+                "harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
             doc["harvested_from_label"] = []  # idem ce champ serait à virer
             doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
             doc["records"] = []

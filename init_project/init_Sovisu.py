@@ -42,11 +42,11 @@ def create_test_context():
     # remplissage des publications
     # scope_param = scope_p("idhal", researcher_id) # ne renvoit rien, idhal est le bon champ
     # On retrouve le chercheur
-    scope_param = esActions.scope_term_multi([("idhal", idhal), ('sovisu_category', "searcher")])
-    chercheur = es.search(index="sovisu_searchers", query=scope_param)
-    chercheur = chercheur["hits"]["hits"][0]["_source"]
 
-    # à ce stade, chercheur contient des trucs inutiles : concepts et profil (ce dernier est là pour test modèle en arborescence (parent-child)
+    # scope_param = esActions.scope_term_multi([("idhal", idhal), ('sovisu_category', "searcher")])
+    chercheur = es.get(index="sovisu_searchers", id=idhal)
+    chercheur = chercheur["_source"]
+    print("______________")
     print(chercheur)
     # collecte et indexation des docs
     publications_message = collecte_docs(chercheur)
@@ -154,7 +154,7 @@ def indexe_expertises():
     return str(res[0]), " Concepts added, in index domaine_hal_referentiel"
 
 
-def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verification des documents existants
+def collecte_docs(chercheur):  # self,
     """
     collecte_docs present dans elastichal.py
     partie Celery retirée pour les tests.
@@ -163,21 +163,8 @@ def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verificatio
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
     idhal = chercheur["idhal"]
-    # TODO: look hal.find_publication for full base list of keys
+    # look hal.find_publication for full base list of keys
     docs = hal.find_publications(idhal, "authIdHal_s")
-    # récupération de l'existant
-    doc_param = esActions.scope_term_multi(
-        [("idhal", chercheur["idhal"]), ('sovisu_category', "notice")])
-    docsExistantes = es.search(index="sovisu_searchers", query=doc_param)
-    docsExistantes = docsExistantes["hits"]["hits"]
-    if len(docsExistantes) > 0:
-        docsExistantes = docsExistantes["hits"]["hits"][0]
-        docsExistantes = docsExistantes["_source"]
-        IddocsExistantes = [truc['docid'] for truc in docsExistantes]
-    else:
-        docsExistantes = []
-        IddocsExistantes = []
-    # Insert documents collection
 
     for num, doc in enumerate(docs):
         # L'id du doc est associé à celui du chercheur dans ES
@@ -186,17 +173,21 @@ def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verificatio
         # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
         # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
         changements = False
-        if doc["docid"] in IddocsExistantes:
+        check_existing_doc_id = f"{idhal}.{doc['halId_s']}"
+        document_exist = es.exists(index="sovisu_searchers", id=check_existing_doc_id)
+        if document_exist:
+            existing_document = es.get(index="sovisu_searchers", id=check_existing_doc_id)
+            existing_document = existing_document["_source"]
+
             doc["MDS"] = utils.calculate_mds(doc)
-            #
-            if doc["MDS"] != [docAncien["MDS"] for docAncien in docsExistantes if
-                              docAncien["_id"] == doc["_id"]][0]:
+
+            if doc["MDS"] != existing_document["MDS"]:
                 # SI le MDS a changé alors modif qualitative sur la notice
                 changements = True
             else:
-                doc = [docAncien for docAncien in docsExistantes if docAncien["_id"] == doc["_id"]][0]
+                doc = existing_document
 
-        if doc["docid"] not in IddocsExistantes or changements:
+        if not document_exist or changements:
             location_docs.generate_countrys_fields(doc)
             doc = doi_enrichissement.docs_enrichissement_doi(doc)
             if "fr_abstract_s" in doc.keys():
@@ -220,7 +211,8 @@ def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verificatio
             # Nouveau aussi ci dessous
             doc["MDS"] = utils.calculate_mds(doc)
             doc["Created"] = datetime.datetime.now().isoformat()
-        if doc["docid"] not in IddocsExistantes:
+
+        if not document_exist:
             doc["harvested_from"] = "researcher"  # inutile je pense
             doc["harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
             doc["harvested_from_label"] = []  # idem ce champ serait à virer
