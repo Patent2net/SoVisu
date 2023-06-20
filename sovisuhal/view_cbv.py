@@ -379,7 +379,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         query = {
             "bool": {
                 "must": [
-                    {"match": {"category": "expertise"}},
+                    {"match": {"sovisu_category": "expertise"}},
                     {"match": {"idhal": p_id}},
                 ]
             }
@@ -431,7 +431,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         query = {
             "bool": {
                 "must": [
-                    {"match": {"category": "notice-hal"}},
+                    {"match": {"sovisu_category": "notice"}},
                     {"match": {"sovisu_id": f"{p_id}.*"}},
                     {"match": {"sovisu_validated": validate}},
                     {
@@ -475,7 +475,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             query = {
                 "bool": {
                     "must": [
-                        {"match": {"category": "searcher"}},
+                        {"match": {"sovisu_category": "searcher"}},
                         {"match": {"idhal": p_id}},
                     ]
                 }
@@ -660,7 +660,7 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
         query = {
             "bool": {
                 "must": [
-                    {"match": {"category": "expertise"}},
+                    {"match": {"sovisu_category": "expertise"}},
                     {"match": {"idhal": p_id}},
                 ]
             }
@@ -961,7 +961,7 @@ class IndexView(CommonContextMixin, TemplateView):
         query = {
             "bool": {
                 "must": [
-                    {"match": {"category": category_type}},
+                    {"match": {"sovisu_category": category_type}},
                 ]
             }
         }
