@@ -218,8 +218,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             doc["Created"] = datetime.datetime.now().isoformat()
         if doc["docid"] not in IddocsExistantes:
             doc["harvested_from"] = "researcher"  # inutile je pense
-            doc[
-                "harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
+            doc["harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
             doc["harvested_from_label"] = []  # idem ce champ serait à virer
             doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
             doc["records"] = []

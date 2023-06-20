@@ -30,11 +30,11 @@ def create_test_context():
     structure_message = set_elastic_structures(struct_idref)
     print(structure_message)
 
-    # remplissage index concepts
+    # remplissage index de reference concepts
     concepts_message = indexe_expertises()
     print(concepts_message)
 
-    # remplissage index test_chercheur
+    # remplissage index sovisu_searchers
     idhal_test = idhal_checkout(idhal)
     if idhal_test > 0:
         elastichal.indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid)
@@ -51,6 +51,9 @@ def create_test_context():
     # collecte et indexation des docs
     publications_message = collecte_docs(chercheur)
     print(publications_message)
+
+    # Remplissage de l'index sovisu_laboratories
+
 
 
 def set_elastic_structures(search_value):
@@ -229,7 +232,14 @@ def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verificatio
             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
             doc["sovisu_validated"] = True
             doc["_id"] = f'{idhal}.{doc["halId_s"]}'
-            # TODO: Remettre en place l'autorat (doc["authorship"])
+            authorship = ""
+            # TODO: Revoir pour être plus fiable?
+            if doc["authIdHal_s"].index(idhal) == 0:
+                authorship = "firstAuthor"
+            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                authorship = "lastAuthor"
+
+            doc["sovisu_authorship"] = authorship
         else:
             pass
 
