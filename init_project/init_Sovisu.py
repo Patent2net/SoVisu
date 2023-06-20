@@ -42,7 +42,7 @@ def create_test_context():
     # remplissage des publications
     # scope_param = scope_p("idhal", researcher_id) # ne renvoit rien, idhal est le bon champ
     # On retrouve le chercheur
-    scope_param = esActions.scope_term_multi([("idhal", idhal), ('category', "searcher")])
+    scope_param = esActions.scope_term_multi([("idhal", idhal), ('sovisu_category', "searcher")])
     chercheur = es.search(index="sovisu_searchers", query=scope_param)
     chercheur = chercheur["hits"]["hits"][0]["_source"]
 
@@ -86,8 +86,8 @@ def creeFiche(dom, par):
 
     fiche['label_en'] = dom['label_en']
     fiche['label_fr'] = dom['label_fr']
-    fiche["category"] = "expertise"
-    fiche["referentiel"] = "hal"
+    fiche["sovisu_category"] = "expertise"
+    fiche["sovisu_referentiel"] = "hal"
     return fiche
 
 
@@ -164,7 +164,7 @@ def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verificatio
     docs = hal.find_publications(idhal, "authIdHal_s")
     # récupération de l'existant
     doc_param = esActions.scope_term_multi(
-        [("idhal", chercheur["idhal"]), ('category', "notice-hal")])
+        [("idhal", chercheur["idhal"]), ('sovisu_category', "notice")])
     docsExistantes = es.search(index="sovisu_searchers", query=doc_param)
     docsExistantes = docsExistantes["hits"]["hits"]
     if len(docsExistantes) > 0:
@@ -223,7 +223,8 @@ def collecte_docs(chercheur):  # self, # TODO: Revoir la méthode de verificatio
             doc["harvested_from_label"] = []  # idem ce champ serait à virer
             doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
             doc["records"] = []
-            doc["category"] = "notice-hal"
+            doc["sovisu_category"] = "notice"
+            doc["sovisu_referentiel"] = "hal"
             doc["idhal"] = idhal,  # l'Astuce du
             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
             doc["sovisu_validated"] = True
@@ -273,7 +274,7 @@ if __name__ == "__main__":
     # print("Tests : trouver les notices d'un chercheur")
     #
     # scope_notices = esActions.scope_match_multi(
-    #     [("idhal", "david-reymond"), ('category', "notice-hal")])
+    #     [("idhal", "david-reymond"), ('category', "notice")])
     # cpt = es.count(index="sovisu_searchers", query=scope_notices)['count']
     # print("à ce jour 106 doc :", cpt)
     # doc_gugusse = es.search(index="sovisu_searchers", query=scope_notices, size=cpt)["hits"]["hits"]

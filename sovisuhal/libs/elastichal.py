@@ -132,7 +132,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         "aurehalId": aurehal,
         "idRef": idref,
         "axis": labo_accro,  # TODO: INTERET DE CETTE KEY? contient la même chose que lab
-        "category": "searcher"
+        "sovisu_category": "searcher"
     }
 
     res = es.index(
@@ -158,7 +158,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
     progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
     # Insert documents collection
     doc_param = esActions.scope_term_multi(
-        [("idhal", chercheur["idhal"]), ('category', "notice-hal")])
+        [("idhal", chercheur["idhal"]), ('sovisu_category', "notice")])
     docsExistantes = es.search(index="sovisu_searchers", query=doc_param)
     docsExistantes = docsExistantes["hits"]["hits"]
     if len(docsExistantes) > 0:
@@ -219,7 +219,8 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             doc["harvested_from_label"] = []  # idem ce champ serait à virer
             doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
             doc["records"] = []
-            doc["category"] = "notice-hal"
+            doc["sovisu_category"] = "notice"
+            doc["sovisu_referentiel"] = "hal"
             doc["idhal"] = idhal,  # l'Astuce du
             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
             doc["sovisu_validated"] = True
