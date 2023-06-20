@@ -77,6 +77,8 @@ def get_dico(ldapid):
 
 # @shared_task(bind=True)
 def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
+    # TODO: séparer en fonctions distinctes chaque élément de la fonction:
+    #  Modele: une fonction générale qui call chaque élément dans l'ordre souhaité (création fiche chercheur, puis fiche labo liée, puis récupération concepts liés
     """
     Indexe un chercheur dans Elasticsearch
     """
@@ -108,8 +110,6 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
 
     if idhal != "":
         aurehal = get_aurehalId(idhal)
-        # integration contenus
-        create_searcher_concept_notices(idhal, aurehal)
 
     searcher_notice = {
         "name": nom,
@@ -141,6 +141,10 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         document=searcher_notice,
         refresh="wait_for",
     )
+
+    # integration contenus
+    create_searcher_concept_notices(idhal, aurehal)
+    create_searcher_structure_notices(idhal, labhalid)
     print("statut de la création d'index: ", res["result"])
 
 
@@ -379,3 +383,10 @@ def create_searcher_concept_notices(idhal, aurehal):
             # Puis on indexe la fiche
             es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
 
+
+def create_searcher_structure_notices(idhal, labhalid):
+    searcher_structure = es.get(index="structures_directory", id=labhalid)
+    searcher_structure = searcher_structure["_source"]
+    searcher_structure['idhal'] = idhal  # taggage, l'idhal sert de clé
+    elastic_id = f"{idhal}.{searcher_structure['docid']}"
+    es.index(index="sovisu_searchers", id=elastic_id, document=searcher_structure)
