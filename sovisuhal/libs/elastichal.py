@@ -33,7 +33,8 @@ es = esActions.es_connector()
 
 
 # TODO: Renommer Get_dico pour quelque chose de plus explicite
-def get_dico(ldapid):
+# TODO: Revoir la fonction pour débloquer la création de profils
+def check_ldapid(ldapid):
     if mode == "Prod":
         server = Server("ldap.univ-tln.fr", get_info=ALL)
         conn = Connection(
@@ -46,30 +47,29 @@ def get_dico(ldapid):
             "dc=ldap-univ-tln,dc=fr",
             "(&(uid=" + ldapid + "))",
             attributes=[
-                "displayName",
+                "displayName",  # A faire sauter
                 "mail",
                 "typeEmploi",
                 "ustvstatus",
                 "supannaffectation",
                 "supanncodeentite",
                 "supannEntiteAffectationPrincipale",
-                "labo",
+                "labo",  # A faire sauter
             ],
         )
         dico = json.loads(conn.response_to_json())["entries"][0]
     else:
         dico = {
             "attributes": {
-                "displayName": "REYMOND David",
                 "labo": [],
-                "mail": ["david.reymond@univ-tln.fr"],
+                "mail": ["test@test.fr"],
                 "supannAffectation": ["IMSIC", "IUT TC"],
                 "supannEntiteAffectationPrincipale": "IUTTCO",
                 "supanncodeentite": [],
                 "typeEmploi": "Enseignant Chercheur Titulaire",
                 "ustvStatus": ["OFFI"],
             },
-            "dn": "uid=dreymond,ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr",
+            "dn": f"uid={ldapid},ou=Personnel,ou=people,dc=ldap-univ-tln,dc=fr",
         }
 
     return dico
@@ -84,7 +84,11 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
     """
 
     # Get the basic information about the searcher
-    dico = get_dico(ldapid)
+    dico = check_ldapid(ldapid)
+
+    # Get searcher data from HAL:
+    searcher_data = hal.get_searcher_hal_data(idhal)
+
     # -----------------
 
     extrait = dico["dn"].split("uid=")[1].split(",")
@@ -93,9 +97,8 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
     if suppan_id != ldapid:
         print("aille", ldapid, " --> ", ldapid)
 
-    nom = dico["attributes"]["displayName"] if len(dico["attributes"]["displayName"]) > 0 else [""]
-    emploi = dico["attributes"]["typeEmploi"] if len(dico["attributes"]["typeEmploi"]) > 0 else [""]
-    mail = dico["attributes"]["mail"] if len(dico["attributes"]["mail"]) > 0 else [""]
+    emploi = dico["attributes"]["typeEmploi"] if len(dico["attributes"]["typeEmploi"]) > 0 else [""] # TODO: Revoir
+    mail = dico["attributes"]["mail"] if len(dico["attributes"]["mail"]) > 0 else [""] # TODO: revoir
 
     supann_affect = []
     if "supannAffectation" in dico["attributes"].keys():
@@ -110,18 +113,18 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
 
     if idhal != "":
         aurehal = get_aurehalId(idhal)
-
+    # TODO: continuer à ajuster pour fonctionner le plus possible avec searcher_data
     searcher_notice = {
-        "name": nom,
+        "name": searcher_data["fullName_s"],
         "type": chercheur_type,
         "function": emploi,
-        "mail": mail[0],
+        "mail": mail[0],  # TODO: Intéret?
         "orcId": orcid,
         "lab": labo_accro,  # TODO: INTERET DE CETTE KEY?
-        "supannAffectation": ";".join(supann_affect),
-        "supannEntiteAffectationPrincipale": supann_princ,
-        "firstName": nom.split(" ")[1],
-        "lastName": nom.split(" ")[0],
+        "supannAffectation": ";".join(supann_affect),  # TODO: faire sauter pour créer un document structure à la place?
+        "supannEntiteAffectationPrincipale": supann_princ,  # TODO: faire sauter pour créer un document structure à la place?
+        "firstName": searcher_data["firstName_s"],
+        "lastName": searcher_data["lastName_s"],
         "structSirene": structid,
         "labHalId": labhalid,
         "validated": False,
@@ -148,6 +151,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
     print("statut de la création d'index: ", res["result"])
 
 
+# TODO: Corriger le soucis de doublon lors de récupération de documents déjà existants
 @shared_task(bind=True)
 def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
@@ -168,10 +172,10 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
         # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
         # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
         changements = False
-        check_existing_doc_id = f"{idhal}.{doc['halId_s']}"
-        document_exist = es.exists(index="sovisu_searchers", id=check_existing_doc_id)
+        elastic_doc_id = f"{idhal}.{doc['halId_s']}"
+        document_exist = es.exists(index="sovisu_searchers", id=elastic_doc_id)
         if document_exist:
-            existing_document = es.get(index="sovisu_searchers", id=check_existing_doc_id)
+            existing_document = es.get(index="sovisu_searchers", id=elastic_doc_id)
             existing_document = existing_document["_source"]
 
             doc["MDS"] = utils.calculate_mds(doc)
@@ -219,7 +223,8 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             doc["idhal"] = idhal,  # l'Astuce du
             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
             doc["sovisu_validated"] = True
-            doc["_id"] = f'{idhal}.{doc["halId_s"]}'
+
+            # Calcul de l'autorat du chercheur
             authorship = ""
             # TODO: Revoir pour être plus fiable?
             if doc["authIdHal_s"].index(idhal) == 0:
@@ -228,9 +233,13 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                 authorship = "lastAuthor"
 
             doc["sovisu_authorship"] = authorship
-        else:
-            pass
 
+        # Le doc["_id"] est donné à chaque fois car non stocké dans le contenu des documents existants.
+        # doc["_id"] = elastic_doc_id
+
+        # on recalcule à chaque collecte... pour màj
+        doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
+        doc["_id"] = elastic_doc_id
         progress_recorder.set_progress(num, len(docs), description="(récolte)")
 
     helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
