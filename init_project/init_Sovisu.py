@@ -91,6 +91,7 @@ def creeFiche(dom, par):
     fiche['label_fr'] = dom['label_fr']
     fiche["sovisu_category"] = "expertise"
     fiche["sovisu_referentiel"] = "hal"
+    fiche["_id"] = fiche["chemin"]
     return fiche
 
 
@@ -154,6 +155,7 @@ def indexe_expertises():
     return str(res[0]), " Concepts added, in index domaine_hal_referentiel"
 
 
+# TODO: Corriger le soucis de doublon lors de récupération de documents déjà existants. Faire un système de tri entre docs existants et nouveaux
 def collecte_docs(chercheur):  # self,
     """
     collecte_docs present dans elastichal.py
@@ -173,10 +175,10 @@ def collecte_docs(chercheur):  # self,
         # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
         # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
         changements = False
-        check_existing_doc_id = f"{idhal}.{doc['halId_s']}"
-        document_exist = es.exists(index="sovisu_searchers", id=check_existing_doc_id)
+        elastic_doc_id = f"{idhal}.{doc['halId_s']}"
+        document_exist = es.exists(index="sovisu_searchers", id=elastic_doc_id)
         if document_exist:
-            existing_document = es.get(index="sovisu_searchers", id=check_existing_doc_id)
+            existing_document = es.get(index="sovisu_searchers", id=elastic_doc_id)
             existing_document = existing_document["_source"]
 
             doc["MDS"] = utils.calculate_mds(doc)
@@ -223,7 +225,8 @@ def collecte_docs(chercheur):  # self,
             doc["idhal"] = idhal,  # l'Astuce du
             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
             doc["sovisu_validated"] = True
-            doc["_id"] = f'{idhal}.{doc["halId_s"]}'
+
+            # Calcul de l'autorat du chercheur
             authorship = ""
             # TODO: Revoir pour être plus fiable?
             if doc["authIdHal_s"].index(idhal) == 0:
@@ -232,12 +235,13 @@ def collecte_docs(chercheur):  # self,
                 authorship = "lastAuthor"
 
             doc["sovisu_authorship"] = authorship
-        else:
-            pass
+
+        # Le doc["_id"] est donné à chaque fois car non stocké dans le contenu des documents existants.
+        # doc["_id"] = elastic_doc_id
 
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = elastichal.should_be_open(doc)
-
+        doc["_id"] = elastic_doc_id
     helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
 
     return "add publications done"

@@ -47,7 +47,7 @@ def admin_access_login(request):
         else:
             auth_user = auth_user.replace(patternCas, "").lower()
 
-            field = "ldapId"  # TODO: Keep ldapId for UTLN, change to idhal for others
+            field = "ldapId"
             scope_param = esActions.scope_p(field, auth_user)
             count = es.count(index="sovisu_searchers", query=scope_param)["count"]
             if count > 0:
@@ -754,7 +754,7 @@ def export_hceres_xls(request):
 
     return response
 
-
+# TODO: revoir pour fonctionner avec référentiel auteur au lieu de chercheur les documents
 def idhal_checkout(idhal):
     """
     Vérifie si le halId renseigné existe
