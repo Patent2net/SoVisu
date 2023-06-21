@@ -182,7 +182,7 @@ def ref_p_filter(
     ref_param = {
         "bool": {
             "must": [
-                {"match": {"category": "notice-hal"}},
+                {"match": {"sovisu_category": "notice"}},
                 {"match": {"sovisu_id": f"{scope_value}.*"}},
                 {"match": {"sovisu_validated": validate}},
                 {
