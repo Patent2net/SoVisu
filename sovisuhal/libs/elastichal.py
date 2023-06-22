@@ -151,7 +151,6 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
     print("statut de la création d'index: ", res["result"])
 
 
-# TODO: Corriger le soucis de doublon lors de récupération de documents déjà existants
 @shared_task(bind=True)
 def collecte_docs(self, chercheur, overwrite=False):  # self,
     """
@@ -159,6 +158,7 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
     "overwrite" : remet les valeurs pour l'ensemble du document à ses valeurs initiales.
     """
     progress_recorder = ProgressRecorder(self)
+    new_documents = []
     idhal = chercheur["idhal"]
     docs = hal.find_publications(idhal, "authIdHal_s")
 
@@ -166,11 +166,9 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
     # Insert documents collection
 
     for num, doc in enumerate(docs):
-        # L'id du doc est associé à celui du chercheur dans ES
-        # Chaque chercheur ses docs
-        # ci après c'est supposé que ce sont des chaines de caractère. Il me semble qu'on avait eu des soucis !!!
-        # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
-        # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
+        # Check if the document already exist in elastic for the searcher.
+        # If yes, it update values depending if the mds changed or not and then es.updated
+        # if not, it create the document, append it to new_documents and then helpers.bulk
         changements = False
         elastic_doc_id = f"{idhal}.{doc['halId_s']}"
         document_exist = es.exists(index="sovisu_searchers", id=elastic_doc_id)
@@ -185,6 +183,24 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
                 changements = True
             else:
                 doc = existing_document
+
+        else:
+            doc["records"] = []
+            doc["sovisu_category"] = "notice"
+            doc["sovisu_referentiel"] = "hal"
+            doc["idhal"] = idhal,  # l'Astuce du
+            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
+            doc["sovisu_validated"] = True
+
+            # Calcul de l'autorat du chercheur
+            authorship = ""
+            # TODO: Revoir pour être plus fiable?
+            if doc["authIdHal_s"].index(idhal) == 0:
+                authorship = "firstAuthor"
+            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                authorship = "lastAuthor"
+
+            doc["sovisu_authorship"] = authorship
 
         if not document_exist or changements:
             location_docs.generate_countrys_fields(doc)
@@ -211,38 +227,17 @@ def collecte_docs(self, chercheur, overwrite=False):  # self,
             doc["MDS"] = utils.calculate_mds(doc)
             doc["Created"] = datetime.datetime.now().isoformat()
 
-        if not document_exist:
-            doc["harvested_from"] = "researcher"  # inutile je pense
-            doc[
-                "harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
-            doc["harvested_from_label"] = []  # idem ce champ serait à virer
-            doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
-            doc["records"] = []
-            doc["sovisu_category"] = "notice"
-            doc["sovisu_referentiel"] = "hal"
-            doc["idhal"] = idhal,  # l'Astuce du
-            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
-            doc["sovisu_validated"] = True
-
-            # Calcul de l'autorat du chercheur
-            authorship = ""
-            # TODO: Revoir pour être plus fiable?
-            if doc["authIdHal_s"].index(idhal) == 0:
-                authorship = "firstAuthor"
-            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
-                authorship = "lastAuthor"
-
-            doc["sovisu_authorship"] = authorship
-
-        # Le doc["_id"] est donné à chaque fois car non stocké dans le contenu des documents existants.
-        # doc["_id"] = elastic_doc_id
-
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
-        doc["_id"] = elastic_doc_id
+
+        if document_exist:
+            es.update(index="sovisu_searchers", id=elastic_doc_id, doc=doc, refresh="wait_for")
+        else:
+            doc["_id"] = elastic_doc_id
+            new_documents.append(doc)
         progress_recorder.set_progress(num, len(docs), description="(récolte)")
 
-    helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
+    helpers.bulk(es, new_documents, index="sovisu_searchers", refresh="wait_for")
 
     progress_recorder.set_progress(num, len(docs), description="(indexation)")
     return chercheur
