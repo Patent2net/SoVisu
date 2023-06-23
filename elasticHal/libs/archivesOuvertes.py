@@ -274,6 +274,7 @@ def get_concepts_and_keywords(aurehalid):
 def get_aurehalId(authIdHal_s):
     """
     get the aurehalId (authIdHal_i) of the searcher with authIdHal_s (halId_s)
+
     """
     if len(authIdHal_s) == 0:
         return 0

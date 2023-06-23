@@ -7,6 +7,18 @@ from dateutil.relativedelta import relativedelta
 from nested_lookup import nested_lookup
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
+def creeFiche(dom):
+    fiche = dict()
+    fiche['chemin'] = "domAurehal." + dom[
+        'id']  # .replace('.',',')  # donnera le chemin d'accès de l'arborescence. i.e: chercher .shs
+
+    # https://www.mongodb.com/docs/manual/tutorial/model-tree-structures-with-materialized-paths/
+
+    fiche['label_en'] = dom['label_en']
+    fiche['label_fr'] = dom['label_fr']
+    fiche["sovisu_category"] = "expertise"
+    fiche["sovisu_referentiel"] = "hal"
+    return fiche
 
 def remove_page(pdf_file, pages):
     """

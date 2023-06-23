@@ -373,6 +373,8 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def get_expertise_case(self, p_id):
         # TODO: In the related html, find a way to order taking account of "chemin" field
+
+        # Peut être un sort() puis un count (".") dans chemin qui détermine le nombre de tabulations ;-)
         expertise_cleaned = []
 
         validation = self.request.GET.get("validation")

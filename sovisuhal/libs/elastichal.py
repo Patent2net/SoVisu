@@ -328,8 +328,17 @@ def create_searcher_concept_notices(idhal, aurehal):
 
         Vu = set()
         pasVu = set()
-        idDomainChecheur = [exp['id'] for exp in chercheur_concept['children']]
-        for ids in idDomainChecheur:
+        idDomainChecheur =[]
+        for concept1 in chercheur_concept['children']:
+            idDomainChecheur .append(concept1['id'])
+            if 'children' in concept1.keys():
+                for concept2 in concept1['children']:
+                    idDomainChecheur. append(concept2['id'])
+                    if 'children' in concept2.keys(): # pas sûr du besoin de ce niveau là
+                        for concept3 in concept2['children']:
+                            idDomainChecheur.append(concept3['id'])
+        #idDomainChecheur = [exp['id'] for exp in chercheur_concept['children']]
+        for ids in list(set(idDomainChecheur)):
             ok = False
             for ch in toutRef:
                 if ch.endswith(ids):
@@ -338,41 +347,61 @@ def create_searcher_concept_notices(idhal, aurehal):
             if not ok:
                 pasVu.add(ids)
         for new in pasVu:
-            print("Nouveau dans le dico ??? çà sort d'où ?", new)
+            # ces domaines ou sous domaines ne sont pas dans https://api.archives-ouvertes.fr/ref/domain/?q=*&wt=json&fl=*
+            # on créé les entrées ici et on marque le problème du référentiel dans le champ refOk
+            domaine = dict()
+            domaine["id"] = new
+            domaine ["label_fr"] = new
+            domaine["label_en"] = new
+            newFiche = utils.creeFiche(domaine)
+            newFiche['idhal'] = idhal
+            newFiche['idhal'] = idhal
+            newFiche['validated'] = False
+            elastic_id = f"{idhal}.{newFiche['chemin']}"
+            newFiche['sovisu_id'] = elastic_id
+            newFiche['refOk'] = False
+
+            #print("Nouveau dans le dico ??? çà sort d'où ?", new)
+            es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for", )
         ####
         # Traitement des vus... matchés on recopie la fiche référentiel et on personnalise. Actuellement, on taggue
 
-        lstReq = []
+        # Ci dessous peut être grandement simplifié
+        # il suffit de trouver la requête sur es qui donne un match exact (sur le champ chemin) pour tous les Vu
         for dom in Vu:
+            lstReq = []
             lstReq.append({
                 "match": {
                     "chemin": dom
                 }
             })
 
-        req = {
-            "bool": {
-                "should": lstReq,
-                "minimum_should_match": 1,
-                "must": [
-                    {
-                        "match_all": {}
-                    }
-                ]
+            req = {
+                "bool": {
+                    "should": lstReq,
+                    "minimum_should_match": 1,
+                    "must": [
+                        {
+                            "match_all": {}
+                        }
+                    ]
+                }
             }
-        }
 
-        resDomainesRef = es.search(index="domaine_hal_referentiel", query=req)
-        for fiche in resDomainesRef['hits']['hits']:
-            newFiche = fiche['_source']
-            newFiche['validated'] = False  # domaines pas validés par défaut
-            # Id proposition : valider les domaines par défaut et laisser la possibilité d'en valider d'autres par explorateur d'arbre ?
-            newFiche['idhal'] = idhal  # taggage, l'idhal sert de clé
-            # Et rajouts besoins spécifiques (genre précisions / notes...)
-            elastic_id = f"{idhal}.{newFiche['chemin']}"
-            newFiche['sovisu_id'] = elastic_id
-            # Puis on indexe la fiche
-            es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
+            resDomainesRef = es.search(index="domaine_hal_referentiel", query=req)
+            for fiche in resDomainesRef['hits']['hits']:
+                if fiche['_source']['chemin'] == dom: # si la req pouvait donner un match exact, on se passerait de çà
+                    newFiche = fiche['_source']
+                    newFiche['validated'] = False  # domaines pas validés par défaut
+                    # Id proposition : valider les domaines par défaut et laisser la possibilité d'en valider d'autres par explorateur d'arbre ?
+                    newFiche['idhal'] = idhal  # taggage, l'idhal sert de clé
+                    newFiche['aurehal'] = aurehal # un domaine est attaché à l'aurehalId
+                    # Et rajouts besoins spécifiques (genre précisions / notes...)
+                    elastic_id = f"{idhal}.{newFiche['chemin']}"
+                    newFiche['sovisu_id'] = elastic_id
+                    newFiche['refOk'] = True    # champ pour désigner les pb du référentiel
+                    # Puis on indexe la fiche
+                    es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
 
 
 def create_searcher_structure_notices(idhal, labhalid):

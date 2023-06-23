@@ -80,7 +80,7 @@ def set_elastic_structures(search_value):
     return f"{len(structures_entities)} structures added"
 
 
-def creeFiche(dom, par):
+def creeFiche(dom): # placée dans elasticHal.utils
     fiche = dict()
     fiche['chemin'] = "domAurehal." + dom[
         'id']  # .replace('.',',')  # donnera le chemin d'accès de l'arborescence. i.e: chercher .shs
@@ -95,6 +95,7 @@ def creeFiche(dom, par):
 
 
 def GenereReferentiel(arbre, par):
+    # TODO: utiliser l'API https://api.archives-ouvertes.fr/ref/domain/?q=*&wt=json&fl=*
     fiches = []
     if isinstance(arbre, list):
         for dom in arbre:
@@ -102,7 +103,7 @@ def GenereReferentiel(arbre, par):
             if "children" in dom.keys():
                 # {'id': 'chim.anal', 'label_en': 'Analytical chemistry', 'label_fr': 'Chimie analytique', 'children': []}
                 if len(dom['children']) != 0:
-                    fiches.append(creeFiche(dom, par))
+                    fiches.append(creeFiche(dom))
                     for sousdom in dom['children']:
                         temp = GenereReferentiel(sousdom, par=dom['id'])
                         if isinstance(temp, dict):
@@ -117,14 +118,14 @@ def GenereReferentiel(arbre, par):
                     fiches.append(creeFiche(dom, par))
             else:
 
-                fiches.append(creeFiche(dom, par))
-        fiches.append(creeFiche(dom, par))
+                fiches.append(creeFiche(dom))
+        fiches.append(creeFiche(dom))
     else:
-        fiches.append(creeFiche(arbre, par))
+        fiches.append(creeFiche(arbre))
         if "children" in arbre.keys():
             # {'id': 'chim.anal', 'label_en': 'Analytical chemistry', 'label_fr': 'Chimie analytique', 'children': []}
             if len(arbre['children']) != 0:
-                fiches.append(creeFiche(arbre, par))
+                fiches.append(creeFiche(arbre))
                 for sousdom in arbre['children']:
                     temp = GenereReferentiel(sousdom, par=arbre['id'])
                     if isinstance(temp, dict):
