@@ -91,6 +91,7 @@ def creeFiche(dom): # placée dans elasticHal.utils
     fiche['label_fr'] = dom['label_fr']
     fiche["sovisu_category"] = "expertise"
     fiche["sovisu_referentiel"] = "hal"
+    fiche["_id"] = fiche["chemin"]
     return fiche
 
 
@@ -163,21 +164,20 @@ def collecte_docs(chercheur):  # self,
     À mettre à jour et renommer lorsque intégré dans le code.
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
+    new_documents = []
     idhal = chercheur["idhal"]
     # look hal.find_publication for full base list of keys
     docs = hal.find_publications(idhal, "authIdHal_s")
 
     for num, doc in enumerate(docs):
-        # L'id du doc est associé à celui du chercheur dans ES
-        # Chaque chercheur ses docs
-        # ci après c'est supposé que ce sont des chaines de caractère. Il me semble qu'on avait eu des soucis !!!
-        # doc["_id"] = doc["docid"] + '_' + chercheur["idhal"] #c'est son doc à lui. Pourront être rajoutés ses choix de mots clés etc
-        # supression des références au _id : laissons elastic gérer. On utilise le docid du doc. l'idhal du chercheur
+        # Check if the document already exist in elastic for the searcher.
+        # If yes, it update values depending if the mds changed or not and then es.updated
+        # if not, it create the document, append it to new_documents and then helpers.bulk
         changements = False
-        check_existing_doc_id = f"{idhal}.{doc['halId_s']}"
-        document_exist = es.exists(index="sovisu_searchers", id=check_existing_doc_id)
+        elastic_doc_id = f"{idhal}.{doc['halId_s']}"
+        document_exist = es.exists(index="sovisu_searchers", id=elastic_doc_id)
         if document_exist:
-            existing_document = es.get(index="sovisu_searchers", id=check_existing_doc_id)
+            existing_document = es.get(index="sovisu_searchers", id=elastic_doc_id)
             existing_document = existing_document["_source"]
 
             doc["MDS"] = utils.calculate_mds(doc)
@@ -187,6 +187,24 @@ def collecte_docs(chercheur):  # self,
                 changements = True
             else:
                 doc = existing_document
+
+        else:
+            doc["records"] = []
+            doc["sovisu_category"] = "notice"
+            doc["sovisu_referentiel"] = "hal"
+            doc["idhal"] = idhal,  # l'Astuce du
+            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
+            doc["sovisu_validated"] = True
+
+            # Calcul de l'autorat du chercheur
+            authorship = ""
+            # TODO: Revoir pour être plus fiable?
+            if doc["authIdHal_s"].index(idhal) == 0:
+                authorship = "firstAuthor"
+            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+                authorship = "lastAuthor"
+
+            doc["sovisu_authorship"] = authorship
 
         if not document_exist or changements:
             location_docs.generate_countrys_fields(doc)
@@ -213,33 +231,16 @@ def collecte_docs(chercheur):  # self,
             doc["MDS"] = utils.calculate_mds(doc)
             doc["Created"] = datetime.datetime.now().isoformat()
 
-        if not document_exist:
-            doc["harvested_from"] = "researcher"  # inutile je pense
-            doc["harvested_from_ids"] = []  # du coup çà devient inutile car présent dans le docId Mais ...
-            doc["harvested_from_label"] = []  # idem ce champ serait à virer
-            doc["harvested_from_ids"].append(chercheur["idhal"])  # idem ici
-            doc["records"] = []
-            doc["sovisu_category"] = "notice"
-            doc["sovisu_referentiel"] = "hal"
-            doc["idhal"] = idhal,  # l'Astuce du
-            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
-            doc["sovisu_validated"] = True
-            doc["_id"] = f'{idhal}.{doc["halId_s"]}'
-            authorship = ""
-            # TODO: Revoir pour être plus fiable?
-            if doc["authIdHal_s"].index(idhal) == 0:
-                authorship = "firstAuthor"
-            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
-                authorship = "lastAuthor"
-
-            doc["sovisu_authorship"] = authorship
-        else:
-            pass
-
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = elastichal.should_be_open(doc)
 
-    helpers.bulk(es, docs, index="sovisu_searchers", refresh="wait_for")
+        if document_exist:
+            es.update(index="sovisu_searchers", id=elastic_doc_id, doc=doc, refresh="wait_for")
+        else:
+            doc["_id"] = elastic_doc_id
+            new_documents.append(doc)
+
+    helpers.bulk(es, new_documents, index="sovisu_searchers", refresh="wait_for")
 
     return "add publications done"
 
