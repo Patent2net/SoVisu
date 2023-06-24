@@ -72,6 +72,7 @@ html { font-family: 'Inter', sans-serif; }
 table.dataTable thead th, table.dataTable thead td {
     font-size: 0.75rem;
     line-height: 1rem;
+    class: dt-center;
 }
 
 table.dataTable tbody tr.even {
