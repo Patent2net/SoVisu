@@ -330,6 +330,7 @@ def create_searcher_concept_notices(idhal, aurehal):
                    es.search(index="domaine_hal_referentiel", query={'match_all': {}}, size=count)[
                        'hits']['hits']]
 
+
         Vu = set()
         pasVu = set()
         idDomainChecheur =[]
@@ -342,6 +343,30 @@ def create_searcher_concept_notices(idhal, aurehal):
                         for concept3 in concept2['children']:
                             idDomainChecheur.append(concept3['id'])
         #idDomainChecheur = [exp['id'] for exp in chercheur_concept['children']]
+
+        # Gestion des existants
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": "expertise"}},
+                    {"match": {"idhal": idhal}},
+                ]
+            }
+        }
+        expertises_count = es.count(index="sovisu_searchers", query=query)["count"]
+        searcher_expertises = es.search(index="sovisu_searchers", query=query,
+                                        size=expertises_count)
+        searcher_expertises = searcher_expertises["hits"]["hits"]
+        dejaLa = [fiche for fiche in searcher_expertises if
+                  fiche["_source"]['chemin'].replace("domAurehal.", "") in idDomainChecheur]
+
+        for fiche in dejaLa:
+            if fiche["_source"]['origin']!= "datagouv":
+                fiche["_source"]['origin'] = "datagouv"
+                es.update(index="sovisu_searchers", id=fiche["_id"], body=fiche["_source"])
+            idDomainChecheur .remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
+
+        # Traitement des nouveaux
         for ids in list(set(idDomainChecheur)):
             ok = False
             for ch in toutRef:
@@ -350,6 +375,10 @@ def create_searcher_concept_notices(idhal, aurehal):
                     ok = True
             if not ok:
                 pasVu.add(ids)
+        ####
+        # Traitement des vus... matchés on recopie la fiche référentiel et on personnalise. Actuellement, on taggue
+
+
         for new in pasVu:
             # ces domaines ou sous domaines ne sont pas dans https://api.archives-ouvertes.fr/ref/domain/?q=*&wt=json&fl=*
             # on créé les entrées ici et on marque le problème du référentiel dans le champ refOk
@@ -365,11 +394,13 @@ def create_searcher_concept_notices(idhal, aurehal):
             newFiche['sovisu_id'] = elastic_id
             newFiche['refOk'] = False
             newFiche['level'] = newFiche['chemin'].count('.')   # champ pour affichage... pas trouvé mieux
-
+            newFiche['origin'] = "datagouv"
             #print("Nouveau dans le dico ??? çà sort d'où ?", new)
             es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for", )
-        ####
-        # Traitement des vus... matchés on recopie la fiche référentiel et on personnalise. Actuellement, on taggue
+
+
+
+
 
         # Ci dessous peut être grandement simplifié
         # il suffit de trouver la requête sur es qui donne un match exact (sur le champ chemin) pour tous les Vu
@@ -407,6 +438,7 @@ def create_searcher_concept_notices(idhal, aurehal):
                     newFiche['level'] = dom.count('.')  # champ pour affichage... pas trouvé mieux
                     newFiche['refOk'] = True    # champ pour désigner les pb du référentiel
                     # Puis on indexe la fiche
+                    newFiche['origin'] = "datagouv"
                     es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
 
 
