@@ -213,6 +213,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
     ]
     data_check_default = "credentials"
 
+    def countPoint(self):
+        return self.chemin.count('.')
+
     def get_xframe_options_value(self):
         return "ALLOW-FROM http://localhost:8000/"
 
@@ -403,7 +406,8 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         else:
             return redirect("unknown")
         print(expertise_cleaned)
-        return validation, expertise_cleaned
+
+        return validation, sorted(expertise_cleaned, key=lambda x: x['chemin'])
 
     def get_guiding_domains_case(self, entity):
         domains = halConcepts.concepts()

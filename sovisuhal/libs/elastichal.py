@@ -364,6 +364,7 @@ def create_searcher_concept_notices(idhal, aurehal):
             elastic_id = f"{idhal}.{newFiche['chemin']}"
             newFiche['sovisu_id'] = elastic_id
             newFiche['refOk'] = False
+            newFiche['level'] = newFiche['chemin'].count('.')   # champ pour affichage... pas trouvé mieux
 
             #print("Nouveau dans le dico ??? çà sort d'où ?", new)
             es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for", )
@@ -403,6 +404,7 @@ def create_searcher_concept_notices(idhal, aurehal):
                     # Et rajouts besoins spécifiques (genre précisions / notes...)
                     elastic_id = f"{idhal}.{newFiche['chemin']}"
                     newFiche['sovisu_id'] = elastic_id
+                    newFiche['level'] = dom.count('.')  # champ pour affichage... pas trouvé mieux
                     newFiche['refOk'] = True    # champ pour désigner les pb du référentiel
                     # Puis on indexe la fiche
                     es.index(index="sovisu_searchers", id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)

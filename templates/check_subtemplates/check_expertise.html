@@ -49,9 +49,9 @@
         <tbody>
 
         {% for expertise in expertises %}
-            <tr class="text-gray-500">
+            <tr class="text-gray-500" >
                 <td>{{ expertise.sovisu_id }}</td>
-                <td>{{ expertise.label_fr | safe }} </td>
+                <td style="padding-left:{{ expertise.level}}em;">{{  expertise.label_fr }} </td>
                 <td>{{ expertise.chemin }}</td>
             </tr>
         {% endfor %}
@@ -119,7 +119,7 @@
                     }
                 ],
                 "columnDefs": [
-                    {"className": "dt-center", "targets": "_all"},
+                    {"className": "dt-left", "targets": "_all"},
                     {
                         "targets": [0],
                         "visible": false
