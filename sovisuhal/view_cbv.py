@@ -263,10 +263,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["expertises"] = expertises
 
         if context["data"] == "guiding-domains":
-            domains, guiding_domains = self.get_guiding_domains_case(context["entity"])
+            domains, guiding_domains, aurehal = self.get_guiding_domains_case(context["entity"])
             context["domains"] = domains
             context["guidingDomains"] = guiding_domains
-
+            context["aurehal"] = context["entity"]['aurehalId'] # pas sûr que ce soit pas un hack pas bô
         if context["data"] == "references":
             validation, references = self.get_references_case(
                 context["type"],
@@ -405,19 +405,33 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                     expertise_cleaned.append(expertise["_source"])
         else:
             return redirect("unknown")
-        print(expertise_cleaned)
+        #print(expertise_cleaned)
 
         return validation, sorted(expertise_cleaned, key=lambda x: x['chemin'])
 
     def get_guiding_domains_case(self, entity):
         domains = halConcepts.concepts()
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": "expertise"}},
+                    {"match": {"validated": True}},
+                    {"match": {"idhal": entity['idhal']}},
+                ]
+            }
+        }
+        expertises_count = es.count(index="sovisu_searchers", query=query)["count"]
+        searcher_expertises = es.search(index="sovisu_searchers", query=query,
+                                        size=expertises_count)
+        searcher_expertises = [exp['_source']['chemin'].replace("domAurehal.", "") for exp in searcher_expertises["hits"]["hits"]]
 
         guiding_domains = []
-
-        if "guidingDomains" in entity:
+        guiding_domains = searcher_expertises
+        if "guidingDomains" in entity: # Plus sûr qu'il y ait besoin de çà
             guiding_domains = entity["guidingDomains"]
-
-        return domains, guiding_domains
+        if 'aurehalId' in entity:
+            aurehal = entity["aurehalId"]
+        return domains, guiding_domains, aurehal
 
     def get_references_case(self, i_type, p_id, date_from, date_to):
         if "validation" in self.request.GET:

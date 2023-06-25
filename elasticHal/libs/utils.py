@@ -20,6 +20,7 @@ def creeFiche(dom):
     fiche["sovisu_referentiel"] = "hal"
     return fiche
 
+
 def remove_page(pdf_file, pages):
     """
     Supprime des pages d'un pdf

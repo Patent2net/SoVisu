@@ -12,6 +12,7 @@ from uniauth.decorators import login_required
 
 from elasticHal.libs import utils
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
+from sovisuhal.libs.elastichal import creeFichesExpertise
 
 from . import settings
 from .libs import esActions, hceres
@@ -169,21 +170,49 @@ def validate_guiding_domains(request):
 
     if request.method == "POST":
         to_validate = request.POST.get("toValidate", "").split(",")
+        aurehal = request.POST.get("aurehal")
+        query = {"bool": {"must": [{"match": {"sovisu_category": "expertise"}}, {"match": {"idhal": p_id}}, ]}}
 
         if i_type == "rsr":
-            elastic_index = "test_researchers"
+            elastic_index = "sovisu_searchers"
+            count = es.count(index="sovisu_searchers", query=query)["count"]
+            fichesExpertise = es.search(index="sovisu_searchers", query=query, size=count)
+            if fichesExpertise['_shards']['successful']>0:
+                fichesExpertise =fichesExpertise ['hits']['hits']
 
+                dejaLa = [fiche["_source"]['chemin'].replace("domAurehal.", "") for fiche in fichesExpertise if
+                          fiche["_source"]['chemin'].replace("domAurehal.", "") in to_validate
+                          and fiche["_source"]['validated'] ]
+                if len(to_validate) != len(dejaLa):
+                    dejaLaPasValid =[fiche for fiche in fichesExpertise if
+                     fiche["_source"]['chemin'].replace("domAurehal.", "") in to_validate
+                     and not fiche["_source"]['validated']]
+                    # Mise à jour
+                    for fiche in dejaLaPasValid:
+                        if fiche["_source"]['origin'] != "datagouv":
+                            fiche["_source"]['origin'] = "datagouv"
+                            fiche["_source"]['validated'] = True
+                            es.update(index="sovisu_searchers", id=fiche["_id"], body=fiche["_source"])
+                        to_validate.remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
+
+                    creeFichesExpertise(idx="sovisu_searchers", idHal=p_id, aureHal=aurehal, lstDom= [fic for fic in to_validate if fic not in dejaLa and fic not in dejaLaPasValid])
+                #fichesExpertise ["_source"]["validated"]
+            else:
+
+                creeFichesExpertise(idx="sovisu_searchers", idHal=p_id, aureHal=aurehal, lstDom=to_validate)
         elif i_type == "lab":
+
             elastic_index = "test_laboratories"
         else:
             return redirect("unknown")
 
-        es.update(
-            index=elastic_index,
-            refresh="wait_for",
-            id=p_id,
-            doc={"guidingDomains": to_validate},
-        )
+
+        # es.update(
+        #     index=elastic_index,
+        #     refresh="wait_for",
+        #     id=p_id,
+        #     doc={"guidingDomains": to_validate},
+        # )
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"

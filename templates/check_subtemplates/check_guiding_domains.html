@@ -20,7 +20,7 @@
 </div>
 
 <script type="text/javascript">
-
+    var aurehal = {% autoescape off %}{{ aurehal }}{% endautoescape %};
     var selectedDoms = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
     var entityDomains = {% autoescape off %}{{ guidingDomains }}{% endautoescape %};
     entityDomains = entityDomains.filter(item => item);
@@ -229,6 +229,7 @@
     width = $('#tree').width();
 
     data = {% autoescape off %}{{ domains }}{% endautoescape %};
+
     data["label"] = "Concepts"
 
     if (data.length == 1) {
@@ -253,6 +254,7 @@
         var form = $('<form action="/validate_guiding-domains/' + window.location.href.substring(window.location.href.lastIndexOf("/") + 1, window.location.href.length) + '" method="post">' +
             '{% csrf_token %}' +
             '<input type="text" name="toValidate" value="' + selectedDoms + '" />' +
+            '<input type="text" name="aurehal" value="' + aurehal + '" />' +
             '</form>');
 
         form.appendTo('body').hide()
