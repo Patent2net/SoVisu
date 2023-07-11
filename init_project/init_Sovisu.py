@@ -16,6 +16,7 @@ es = esActions.es_connector()
 
 def create_test_context():
     # Variables à automatiser plus tard
+    index = settings.SOVISU_INDEX
     idhal = "david-reymond"
     orcid = ""
     labo_accro = "IMSIC"  # TODO: Faire sauter cette clé, remplacer par systeme qui créé fiche labo par chercheur
@@ -44,7 +45,7 @@ def create_test_context():
     # On retrouve le chercheur
 
     # scope_param = esActions.scope_term_multi([("idhal", idhal), ('sovisu_category', "searcher")])
-    chercheur = es.get(index="sovisu_searchers", id=idhal)
+    chercheur = es.get(index = settings.SOVISU_INDEX, id=idhal)
     chercheur = chercheur["_source"]
     print("______________")
     print(chercheur)
@@ -164,6 +165,8 @@ def collecte_docs(chercheur):  # self,
     À mettre à jour et renommer lorsque intégré dans le code.
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
+    #doc_progress_recorder = ProgressRecorder(self)
+    index = settings.SOVISU_INDEX
     new_documents = []
     idhal = chercheur["idhal"]
     # look hal.find_publication for full base list of keys
@@ -175,9 +178,9 @@ def collecte_docs(chercheur):  # self,
         # if not, it create the document, append it to new_documents and then helpers.bulk
         changements = False
         elastic_doc_id = f"{idhal}.{doc['halId_s']}"
-        document_exist = es.exists(index="sovisu_searchers", id=elastic_doc_id)
+        document_exist = es.exists(index=index, id=elastic_doc_id)
         if document_exist:
-            existing_document = es.get(index="sovisu_searchers", id=elastic_doc_id)
+            existing_document = es.get(index=index, id=elastic_doc_id)
             existing_document = existing_document["_source"]
 
             doc["MDS"] = utils.calculate_mds(doc)
@@ -235,13 +238,21 @@ def collecte_docs(chercheur):  # self,
         doc["postprint_embargo"], doc["preprint_embargo"] = elastichal.should_be_open(doc)
 
         if document_exist:
-            es.update(index="sovisu_searchers", id=elastic_doc_id, doc=doc, refresh="wait_for")
+            es.update(index=index, id=elastic_doc_id, doc=doc, refresh="wait_for")
         else:
             doc["_id"] = elastic_doc_id
             new_documents.append(doc)
+        #doc_progress_recorder.set_progress(num,len(docs), str(num) + " sur " + str(len(docs)) + " documents")
 
-    helpers.bulk(es, new_documents, index="sovisu_searchers", refresh="wait_for")
+    for indi in range(int(len(new_documents) // 50) + 1):
+        boutdeDoc = new_documents[indi * 50: indi * 50 + 50]
+        helpers.bulk(
+            es,
+            boutdeDoc,
+            index=index,
+        )
 
+    #doc_progress_recorder.set_progress( num, len(docs), str(num) + " sur " + str(len(docs)) + " indexés")
     return "add publications done"
 
 # Elasticsearch queries
@@ -250,9 +261,10 @@ def collecte_docs(chercheur):  # self,
 
 
 if __name__ == "__main__":
-
+    settings.sovisu_index = "settings.sovisu_index"
     index_mapping = {
-        "sovisu_searchers": init_sovisu_static.document_mapping(),
+        settings.sovisu_index : {**init_sovisu_static.document_mapping(), **init_sovisu_static.document_mapping()},
+        #settings.sovisu_index: init_sovisu_static.document_mapping(),
         "sovisu_laboratories": init_sovisu_static.document_mapping(),
         "domaine_hal_referentiel": init_sovisu_static.expertises_mapping(),
         "structures_directory": init_sovisu_static.structures_mapping(),
@@ -269,9 +281,9 @@ if __name__ == "__main__":
     # print("Tests : trouver un chercheur")
     # scope_searcher = esActions.scope_match_multi(
     #     [("idhal", "david-reymond"), ('category', "searcher")])
-    # cpt = es.count(index="sovisu_searchers", query=scope_searcher)['count']
+    # cpt = es.count(index=settings.SOVISU_INDEX, query=scope_searcher)['count']
     # print("normalement 1 doc :", cpt)
-    # gugusse = es.search(index="sovisu_searchers", query=scope_searcher, size=cpt)["hits"]["hits"]
+    # gugusse = es.search(index=settings.SOVISU_INDEX, query=scope_searcher, size=cpt)["hits"]["hits"]
     # for gu in gugusse:
     #     print(gu)
     # print("#################################")
@@ -279,17 +291,17 @@ if __name__ == "__main__":
     #
     # scope_notices = esActions.scope_match_multi(
     #     [("idhal", "david-reymond"), ('category', "notice")])
-    # cpt = es.count(index="sovisu_searchers", query=scope_notices)['count']
+    # cpt = es.count(index=settings.SOVISU_INDEX, query=scope_notices)['count']
     # print("à ce jour 106 doc :", cpt)
-    # doc_gugusse = es.search(index="sovisu_searchers", query=scope_notices, size=cpt)["hits"]["hits"]
+    # doc_gugusse = es.search(index=settings.SOVISU_INDEX, query=scope_notices, size=cpt)["hits"]["hits"]
     # for doc in doc_gugusse:
     #     print(doc)
     # print("#################################")
     #
     # scope_exp = esActions.scope_match_multi([("idhal", "david-reymond"), ('category', "expertise")])
-    # cpt = es.count(index="sovisu_searchers", query=scope_exp)['count']
+    # cpt = es.count(index=settings.SOVISU_INDEX, query=scope_exp)['count']
     #
-    # exp_gugusse = es.search(index="sovisu_searchers", query=scope_exp, size=cpt)["hits"]["hits"]
+    # exp_gugusse = es.search(index=settings.SOVISU_INDEX, query=scope_exp, size=cpt)["hits"]["hits"]
     # print(
     #     "normalement 10 docs (MAIS c'est pas bon cf. infra remarques sur les expertises (çà sort d'où ???) !!!",
     #     cpt)

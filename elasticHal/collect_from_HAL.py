@@ -20,9 +20,13 @@ from elasticHal.models import Laboratory, Researcher
 
 # Custom libs
 from sovisuhal.libs import esActions
+from django.conf import settings
+# Global variables
+structIdlist = None
 
 # Global variables
 structIdlist = None
+
 
 # if True, check all the existing data in ES index
 # to compare with those gathered to keep part of totality of data persistence

@@ -89,6 +89,7 @@ def find_publications(idhal, field, increment=0):
                 tmp_articles = find_publications(idhal, field, increment=increment)
                 if tmp_articles != -1:
                     for tmp_article in tmp_articles:
+
                         articles.append(tmp_article)
                 return articles
             else:
@@ -172,7 +173,7 @@ def find_structures_entities(search_filter="parentIdref_s", search_value="031122
 # TODO: faire une fonction pour récupérer l'ensemble des documents d'une collection labo
 #  -https://api.archives-ouvertes.fr/search/IMSIC/
 #  - api/search/{lab_acronym}/{filters}
-
+#  NE PAS Passer par l'accronyme mais par le labHalId - la collection Hal
 def get_searcher_hal_data(idhal_s):
     req = http.get(
         f"https://api.archives-ouvertes.fr/ref/author/?wt=json&q=valid_s:PREFERRED+idHal_s:{idhal_s}&fl=*"

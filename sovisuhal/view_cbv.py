@@ -16,7 +16,7 @@ from .libs import esActions, halConcepts
 from .libs.elastichal import collecte_docs, indexe_chercheur
 from .libs.esActions import validated_searcherprofile_p
 from .viewsActions import idhal_checkout
-
+from django.conf import settings
 es = esActions.es_connector()
 
 
@@ -98,7 +98,7 @@ class ElasticContextMixin:
         if i_type == "rsr":
             field = "halId_s"
             key = "halId_s"
-            index_pattern = "sovisu_searchers"
+            index_pattern = settings.SOVISU_INDEX
 
         elif i_type == "lab":
             field = "halStructId"
@@ -120,7 +120,7 @@ class ElasticContextMixin:
 
         validate = True
         if i_type == "rsr":
-            index = "sovisu_searchers"
+            index = settings.SOVISU_INDEX
             field = "authIdHal_s"
             hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
 
@@ -174,7 +174,7 @@ class CreateView(TemplateView):
                 labo_data = es.get(index="structures_directory", id=labHalId)
                 labo_data = labo_data["_source"]
                 indexe_chercheur(structid, ldapid, labo_data["acronym_s"], labHalId, idhal, idref, orcid)
-                entity = es.get(index="sovisu_searchers", id=idhal)
+                entity = es.get(index=settings.SOVISU_INDEX, id=idhal)
                 entity = entity["_source"]
                 struct = entity["structSirene"]
                 user_token = entity["halId_s"]
@@ -389,8 +389,8 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 ]
             }
         }
-        expertises_count = es.count(index="sovisu_searchers", query=query)["count"]
-        searcher_expertises = es.search(index="sovisu_searchers", query=query,
+        expertises_count = es.count(index=settings.SOVISU_INDEX, query=query)["count"]
+        searcher_expertises = es.search(index=settings.SOVISU_INDEX, query=query,
                                         size=expertises_count)
         searcher_expertises = searcher_expertises["hits"]["hits"]
 
@@ -420,8 +420,8 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 ]
             }
         }
-        expertises_count = es.count(index="sovisu_searchers", query=query)["count"]
-        searcher_expertises = es.search(index="sovisu_searchers", query=query,
+        expertises_count = es.count(index=settings.SOVISU_INDEX, query=query)["count"]
+        searcher_expertises = es.search(index=settings.SOVISU_INDEX, query=query,
                                         size=expertises_count)
         searcher_expertises = [exp['_source']['chemin'].replace("domAurehal.", "") for exp in searcher_expertises["hits"]["hits"]]
 
@@ -466,9 +466,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             }
         }
         if i_type == "rsr" or i_type == "lab":  # TODO: séparer RSR et LAB
-            count = es.count(index="sovisu_searchers", query=query)["count"]
+            count = es.count(index=settings.SOVISU_INDEX, query=query)["count"]
             print(f"count: {count}")
-            references = es.search(index="sovisu_searchers", query=query, size=count)
+            references = es.search(index=settings.SOVISU_INDEX, query=query, size=count)
         else:
             return redirect("unknown")
 
@@ -501,7 +501,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 }
             }
 
-            res = es.search(index="sovisu_searchers", query=query)
+            res = es.search(index=settings.SOVISU_INDEX, query=query)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
             except IndexError:
@@ -512,7 +512,22 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             return taches
 
         if i_type == "lab":
-            result = collect_laboratories_data2.delay(p_id)
+            query = {
+                "bool": {
+                    "must": [
+                        {"match": {"sovisu_category": "laboratory"}},
+                        {"match": {"idhal": p_id}},
+                    ]
+                }
+            }
+
+            res = es.search(index="sovisu", query=query)
+            try:
+                entity = res["hits"]["hits"][0]["_source"]
+            except IndexError:
+                return redirect("unknown")
+
+            result = collecte_docs.delay(entity)
             taches = result.task_id
             return taches
 
@@ -553,7 +568,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
         # Get scope data
         key, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
 
-        res = es.search(index="sovisu_*", query=scope_param)
+        res = es.search(index=settings.SOVISU_INDEX, query=scope_param)
         # on pointe sur index générique, car pas de LabHalId ?
         try:
             entity = res["hits"]["hits"][0]["_source"]
@@ -563,7 +578,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         dash = ""
         if i_type == "rsr":
-            indexsearch = "sovisu_searchers"
+            indexsearch = settings.SOVISU_INDEX
             filtrechercheur = f'_index: "{indexsearch}"'
             filtre_lab_a = ""
             filtre_lab_b = ""
@@ -630,8 +645,8 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
             date_to,
         )
         if i_type == "rsr":
-            count = es.count(index="sovisu_searchers", query=ref_param)["count"]
-            references = es.search(index="sovisu_searchers", query=ref_param, size=count)
+            count = es.count(index=settings.SOVISU_INDEX, query=ref_param)["count"]
+            references = es.search(index=settings.SOVISU_INDEX, query=ref_param, size=count)
         elif i_type == "lab":
             count = es.count(index="sovisu_laboratories", query=ref_param)["count"]
             references = es.search(index="sovisu_laboratories", query=ref_param, size=count)
@@ -799,7 +814,7 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
             return redirect("unknown")
         # /
         if i_type == "rsr":
-            indexsearch = "sovisu_searchers"
+            indexsearch = settings.SOVISU_INDEX
 
         elif i_type == "lab":
             indexsearch = "sovisu_laboratories"
@@ -973,7 +988,7 @@ class IndexView(CommonContextMixin, TemplateView):
             indextype = "sovisu_laboratories"
             category_type = "laboratory"
         elif indexcat == "rsr":
-            indextype = "sovisu_searchers"
+            indextype = settings.SOVISU_INDEX
             category_type = "searcher"
         else:
             return redirect("unknown")

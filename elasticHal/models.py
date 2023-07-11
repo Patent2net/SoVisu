@@ -11,7 +11,7 @@ class Structure(models.Model):
     class Meta:
         verbose_name = "Structure"
         verbose_name_plural = "Structures"
-
+        app_label = 'elasticHal'
     structSirene = models.CharField(max_length=20, default="")
     label = models.CharField(max_length=50, default="")
     acronym = models.CharField(max_length=50, default="")
@@ -29,7 +29,7 @@ class Laboratory(models.Model):
     class Meta:
         verbose_name = "Laboratoire"
         verbose_name_plural = "Laboratoires"
-
+        app_label = 'elasticHal'
     structSirene = models.CharField(max_length=20, default="")
     acronym = models.CharField(max_length=10, default="")
     label = models.CharField(max_length=300, default="")
@@ -49,7 +49,7 @@ class Researcher(models.Model):
     class Meta:
         verbose_name = "Chercheur"
         verbose_name_plural = "Chercheurs"
-
+        app_label = 'elasticHal'
     structSirene = models.CharField(max_length=20, default="")
     ldapId = models.CharField(max_length=30, default="")
     name = models.CharField(max_length=80, default="")

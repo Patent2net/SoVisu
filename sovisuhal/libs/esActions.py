@@ -6,12 +6,14 @@ from elasticsearch import Elasticsearch
 
 mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
-
+from django.conf import settings
 # To call es_connector function: es = esActions.es_connector()
 def es_connector(mode=mode):
     """
     Assure la connexion de SoVisu à l'instance ElasticSearch
     """
+
+
     if mode == "Prod":
         secret = config("ELASTIC_PASSWORD_SOVISU")
         # context = create_ssl_context(cafile="../../stackELK/secrets/certs/ca/ca.crt")
@@ -61,7 +63,8 @@ def scope_p(scope_field, scope_value):
     """
     Retourne un ensemble de documents spécifique en fonction d'un filtre
     """
-    scope = {"match": {scope_field: scope_value}}
+    scope = { "match": {scope_field: scope_value}}
+
     return scope
 
 def scope_term(scope_field, scope_value):

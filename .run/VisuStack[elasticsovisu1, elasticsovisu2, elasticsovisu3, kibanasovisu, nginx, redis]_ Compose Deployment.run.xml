@@ -1,0 +1,23 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="VisuStack[elasticsovisu1, elasticsovisu2, elasticsovisu3, kibanasovisu, nginx, redis]: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" singleton="false" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="envFilePath" value="" />
+        <option name="services">
+          <list>
+            <option value="elasticsovisu1" />
+            <option value="elasticsovisu2" />
+            <option value="elasticsovisu3" />
+            <option value="kibanasovisu" />
+            <option value="nginx" />
+            <option value="redis" />
+          </list>
+        </option>
+        <option name="sourceFilePath" value="utils/VisuStack/docker-compose.yml" />
+        <option name="upAbortOnContainerExit" value="true" />
+        <option name="upDetach" value="false" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
