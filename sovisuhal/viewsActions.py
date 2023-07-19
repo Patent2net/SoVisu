@@ -21,7 +21,6 @@ from .libs import esActions, hceres
 mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
 
-
 # Connect to DB
 es = esActions.es_connector()
 
@@ -172,22 +171,25 @@ def validate_guiding_domains(request):
     if request.method == "POST":
         to_validate = request.POST.get("toValidate", "").split(",")
         aurehal = request.POST.get("aurehal")
-        query = {"bool": {"must": [{"match": {"sovisu_category": "expertise"}}, {"match": {"idhal": p_id}}, ]}}
+        query = {"bool": {
+            "must": [{"match": {"sovisu_category": "expertise"}}, {"match": {"idhal": p_id}}, ]}}
 
         if i_type == "rsr":
             elastic_index = SV_INDEX
             count = es.count(index=SV_INDEX, query=query)["count"]
             fichesExpertise = es.search(index=SV_INDEX, query=query, size=count)
-            if fichesExpertise['_shards']['successful']>0:
-                fichesExpertise =fichesExpertise ['hits']['hits']
+            if fichesExpertise['_shards']['successful'] > 0:
+                fichesExpertise = fichesExpertise['hits']['hits']
 
-                dejaLa = [fiche["_source"]['chemin'].replace("domAurehal.", "") for fiche in fichesExpertise if
+                dejaLa = [fiche["_source"]['chemin'].replace("domAurehal.", "") for fiche in
+                          fichesExpertise if
                           fiche["_source"]['chemin'].replace("domAurehal.", "") in to_validate
-                          and fiche["_source"]['validated'] ]
+                          and fiche["_source"]['validated']]
                 if len(to_validate) != len(dejaLa):
-                    dejaLaPasValid =[fiche for fiche in fichesExpertise if
-                     fiche["_source"]['chemin'].replace("domAurehal.", "") in to_validate
-                     and not fiche["_source"]['validated']]
+                    dejaLaPasValid = [fiche for fiche in fichesExpertise if
+                                      fiche["_source"]['chemin'].replace("domAurehal.",
+                                                                         "") in to_validate
+                                      and not fiche["_source"]['validated']]
                     # Mise à jour
                     for fiche in dejaLaPasValid:
                         if fiche["_source"]['origin'] != "datagouv":
@@ -196,8 +198,10 @@ def validate_guiding_domains(request):
                             es.update(index=SV_INDEX, id=fiche["_id"], body=fiche["_source"])
                         to_validate.remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
 
-                    creeFichesExpertise(idx=SV_INDEX, idHal=p_id, aureHal=aurehal, lstDom= [fic for fic in to_validate if fic not in dejaLa and fic not in dejaLaPasValid])
-                #fichesExpertise ["_source"]["validated"]
+                    creeFichesExpertise(idx=SV_INDEX, idHal=p_id, aureHal=aurehal,
+                                        lstDom=[fic for fic in to_validate if
+                                                fic not in dejaLa and fic not in dejaLaPasValid])
+                # fichesExpertise ["_source"]["validated"]
             else:
 
                 creeFichesExpertise(idx=SV_INDEX, idHal=p_id, aureHal=aurehal, lstDom=to_validate)
@@ -206,7 +210,6 @@ def validate_guiding_domains(request):
             elastic_index = "test_laboratories"
         else:
             return redirect("unknown")
-
 
         # es.update(
         #     index=elastic_index,
@@ -365,81 +368,81 @@ def validate_credentials(request):
     )
 
 
-def validate_research_description(request):
-    """
-    Validation de la description de recherche
-    """
-    # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
-
-    if "type" in request.GET and "id" in request.GET:
-        i_type = request.GET["type"]
-        p_id = request.GET["id"]
-    else:
-        return redirect("unknown")
-
-    if "data" in request.GET:
-        data = request.GET["data"]
-    else:
-        data = -1
-
-    if "from" in request.GET:
-        date_from = request.GET["from"]
-    else:
-        date_from = "2000-01-01"
-
-    if "to" in request.GET:
-        date_to = request.GET["to"]
-    else:
-        date_to = datetime.today().strftime("%Y-%m-%d")
-
-    if request.method == "POST":
-        guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
-        research_summary = request.POST.get("f_research_summary")
-        research_projects_in_progress = request.POST.get("f_research_projectsInProgress")
-        research_projects_and_fundings = request.POST.get("f_research_projectsAndFundings")
-
-        soup = BeautifulSoup(research_summary, "html.parser")
-        research_summary_raw = soup.getText().replace("\n", " ")
-
-        soup = BeautifulSoup(research_projects_in_progress, "html.parser")
-        research_projects_in_progress_raw = soup.getText().replace("\n", " ")
-
-        soup = BeautifulSoup(research_projects_and_fundings, "html.parser")
-        research_projects_and_fundings_raw = soup.getText().replace("\n", " ")
-
-        if i_type == "rsr":
-            es.update(
-                index="test_researchers",
-                refresh="wait_for",
-                id=p_id,
-                doc={
-                    "research_summary": research_summary,
-                    "research_summary_raw": research_summary_raw,
-                    "research_projectsInProgress": research_projects_in_progress,
-                    "research_projectsInProgress_raw": research_projects_in_progress_raw,
-                    "research_projectsAndFundings": research_projects_and_fundings,
-                    "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
-                    "research_updatedDate": datetime.today().isoformat(),
-                    "guidingKeywords": guiding_keywords,
-                },
-            )
-
-        elif i_type == "lab":
-            es.update(
-                index="test_laboratories",
-                refresh="wait_for",
-                id=p_id,
-                doc={"guidingKeywords": guiding_keywords},
-            )
-
-    return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
-    )
-
+# def validate_research_description(request):
+#     """
+#     Validation de la description de recherche
+#     """
+#     # Get parameters
+#     if "struct" in request.GET:
+#         struct = request.GET["struct"]
+#     else:
+#         return redirect("unknown")
+#
+#     if "type" in request.GET and "id" in request.GET:
+#         i_type = request.GET["type"]
+#         p_id = request.GET["id"]
+#     else:
+#         return redirect("unknown")
+#
+#     if "data" in request.GET:
+#         data = request.GET["data"]
+#     else:
+#         data = -1
+#
+#     if "from" in request.GET:
+#         date_from = request.GET["from"]
+#     else:
+#         date_from = "2000-01-01"
+#
+#     if "to" in request.GET:
+#         date_to = request.GET["to"]
+#     else:
+#         date_to = datetime.today().strftime("%Y-%m-%d")
+#
+#     if request.method == "POST":
+#         guiding_keywords = request.POST.get("f_guidingKeywords").split(";")
+#         research_summary = request.POST.get("f_research_summary")
+#         research_projects_in_progress = request.POST.get("f_research_projectsInProgress")
+#         research_projects_and_fundings = request.POST.get("f_research_projectsAndFundings")
+#
+#         soup = BeautifulSoup(research_summary, "html.parser")
+#         research_summary_raw = soup.getText().replace("\n", " ")
+#
+#         soup = BeautifulSoup(research_projects_in_progress, "html.parser")
+#         research_projects_in_progress_raw = soup.getText().replace("\n", " ")
+#
+#         soup = BeautifulSoup(research_projects_and_fundings, "html.parser")
+#         research_projects_and_fundings_raw = soup.getText().replace("\n", " ")
+#
+#         if i_type == "rsr":
+#             es.update(
+#                 index="test_researchers",
+#                 refresh="wait_for",
+#                 id=p_id,
+#                 doc={
+#                     "research_summary": research_summary,
+#                     "research_summary_raw": research_summary_raw,
+#                     "research_projectsInProgress": research_projects_in_progress,
+#                     "research_projectsInProgress_raw": research_projects_in_progress_raw,
+#                     "research_projectsAndFundings": research_projects_and_fundings,
+#                     "research_projectsAndFundings_raw": research_projects_and_fundings_raw,
+#                     "research_updatedDate": datetime.today().isoformat(),
+#                     "guidingKeywords": guiding_keywords,
+#                 },
+#             )
+#
+#         elif i_type == "lab":
+#             es.update(
+#                 index="test_laboratories",
+#                 refresh="wait_for",
+#                 id=p_id,
+#                 doc={"guidingKeywords": guiding_keywords},
+#             )
+#
+#     return redirect(
+#         f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+#     )
+#
 
 def refresh_aurehal_id(request):
     """
@@ -784,6 +787,7 @@ def export_hceres_xls(request):
 
     return response
 
+
 # TODO: revoir pour fonctionner avec référentiel auteur au lieu de chercheur les documents
 def idhal_checkout(idhal):
     """
@@ -811,7 +815,6 @@ def vizualisation_url():
     """
     url = "/kibana"
     return url
-
 
 # TODO: Faire une fonction pour gérer les status validated de manière générale:
 #  (passage "validated" de true à false)

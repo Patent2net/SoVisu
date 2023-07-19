@@ -95,11 +95,11 @@ urlpatterns = [
         viewsActions.validate_guiding_domains,
         name="validate_guiding-domains",
     ),
-    path(
-        "validate_research-description/",
-        viewsActions.validate_research_description,
-        name="validate_research-description",
-    ),
+    # path(
+    #     "validate_research-description/",
+    #     viewsActions.validate_research_description,
+    #     name="validate_research-description",
+    # ),
     path("export_hceres_xls/", viewsActions.export_hceres_xls, name="export_hceres_xls"),
     path("accounts/", include("uniauth.urls", namespace="uniauth")),
     path("tinymce/", include("tinymce.urls")),
