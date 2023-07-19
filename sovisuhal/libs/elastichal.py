@@ -12,7 +12,8 @@ from django.shortcuts import redirect
 from elasticsearch import helpers
 from ldap3 import ALL, Connection, Server
 
- # probablement le num établissement à terme
+from constants import SV_INDEX
+# probablement le num établissement à terme
 from elasticHal.libs import (
     doi_enrichissement,
     hal,
@@ -32,7 +33,6 @@ mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
 # Connect to DB
 es = esActions.es_connector()
-from django.conf import settings
 
 # TODO: Renommer Get_dico pour quelque chose de plus explicite
 # TODO: Revoir la fonction pour débloquer la création de profils
@@ -78,7 +78,7 @@ def check_ldapid(ldapid):
 
 
 # @shared_task(bind=True)
-def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid, sovisu_index=settings.SOVISU_INDEX):  # self,
+def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid):  # self,
     # TODO: séparer en fonctions distinctes chaque élément de la fonction:
     #  Modele: une fonction générale qui call chaque élément dans l'ordre souhaité (création fiche chercheur, puis fiche labo liée, puis récupération concepts liés
     """
@@ -141,7 +141,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
     }
 
     res = es.index(
-        index=settings.SOVISU_INDEX,
+        index=SV_INDEX,
         id=idhal,
         document=searcher_notice,
         refresh="wait_for",
@@ -154,7 +154,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
 
 
 @shared_task(bind=True)
-def collecte_docs(self, entite, sovisu_index=settings.SOVISU_INDEX):  # self,
+def collecte_docs(self, entite):  # self,
     """
     collecte_docs present dans elastichal.py
     partie Celery retirée pour les tests.
@@ -242,7 +242,7 @@ def collecte_docs(self, entite, sovisu_index=settings.SOVISU_INDEX):  # self,
         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
 
         if document_exist:
-            es.update(index=settings.SOVISU_INDEX, id=elastic_doc_id, doc=doc, refresh="wait_for")
+            es.update(index=SV_INDEX, id=elastic_doc_id, doc=doc, refresh="wait_for")
         else:
             doc["_id"] = elastic_doc_id
             new_documents.append(doc)
@@ -259,97 +259,97 @@ def collecte_docs(self, entite, sovisu_index=settings.SOVISU_INDEX):  # self,
     doc_progress_recorder.set_progress(num, len(docs), str(num) + " sur " + str(len(docs)) + " indexés")
     return "add publications done"
 
-@shared_task(bind=True)
-def collecte_docs_old(self, chercheur, overwrite=False, sovisu_index=settings.SOVISU_INDEX):  # self,
-    """
-    Collecte les notices liées à un chercheur
-    "overwrite" : remet les valeurs pour l'ensemble du document à ses valeurs initiales.
-    """
-    progress_recorder = ProgressRecorder(self)
-    new_documents = []
-    idhal = chercheur["idhal"]
-    docs = hal.find_publications(idhal, "authIdHal_s")
+# @shared_task(bind=True)
+# def collecte_docs_old(self, chercheur, overwrite=False):  # self,
+#     """
+#     Collecte les notices liées à un chercheur
+#     "overwrite" : remet les valeurs pour l'ensemble du document à ses valeurs initiales.
+#     """
+#     progress_recorder = ProgressRecorder(self)
+#     new_documents = []
+#     idhal = chercheur["idhal"]
+#     docs = hal.find_publications(idhal, "authIdHal_s")
+#
+#     progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
+#     # Insert documents collection
+#
+#     for num, doc in enumerate(docs):
+#         # Check if the document already exist in elastic for the searcher.
+#         # If yes, it update values depending if the mds changed or not and then es.updated
+#         # if not, it create the document, append it to new_documents and then helpers.bulk
+#         changements = False
+#         elastic_doc_id = f"{idhal}.{doc['halId_s']}"
+#         document_exist = es.exists(index=SV_INDEX, id=elastic_doc_id)
+#         if document_exist:
+#             existing_document = es.get(index=SV_INDEX, id=elastic_doc_id)
+#             existing_document = existing_document["_source"]
+#
+#             doc["MDS"] = utils.calculate_mds(doc)
+#
+#             if doc["MDS"] != existing_document["MDS"]:
+#                 # SI le MDS a changé alors modif qualitative sur la notice
+#                 changements = True
+#             else:
+#                 doc = existing_document
+#
+#         else:
+#             doc["records"] = []
+#             doc["sovisu_category"] = "notice"
+#             doc["sovisu_referentiel"] = "hal"
+#             doc["idhal"] = idhal,  # l'Astuce du
+#             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
+#             doc["sovisu_validated"] = True
+#
+#             # Calcul de l'autorat du chercheur
+#             authorship = ""
 
-    progress_recorder.set_progress(0, len(docs), description="récupération des données HAL")
-    # Insert documents collection
-
-    for num, doc in enumerate(docs):
-        # Check if the document already exist in elastic for the searcher.
-        # If yes, it update values depending if the mds changed or not and then es.updated
-        # if not, it create the document, append it to new_documents and then helpers.bulk
-        changements = False
-        elastic_doc_id = f"{idhal}.{doc['halId_s']}"
-        document_exist = es.exists(index=settings.SOVISU_INDEX, id=elastic_doc_id)
-        if document_exist:
-            existing_document = es.get(index=settings.SOVISU_INDEX, id=elastic_doc_id)
-            existing_document = existing_document["_source"]
-
-            doc["MDS"] = utils.calculate_mds(doc)
-
-            if doc["MDS"] != existing_document["MDS"]:
-                # SI le MDS a changé alors modif qualitative sur la notice
-                changements = True
-            else:
-                doc = existing_document
-
-        else:
-            doc["records"] = []
-            doc["sovisu_category"] = "notice"
-            doc["sovisu_referentiel"] = "hal"
-            doc["idhal"] = idhal,  # l'Astuce du
-            doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
-            doc["sovisu_validated"] = True
-
-            # Calcul de l'autorat du chercheur
-            authorship = ""
-            # TODO: Revoir pour être plus fiable?
-            if doc["authIdHal_s"].index(idhal) == 0:
-                authorship = "firstAuthor"
-            if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
-                authorship = "lastAuthor"
-
-            doc["sovisu_authorship"] = authorship
-
-        if not document_exist or changements:
-            location_docs.generate_countrys_fields(doc)
-            doc = doi_enrichissement.docs_enrichissement_doi(doc)
-            if "fr_abstract_s" in doc.keys():
-                if isinstance(doc["fr_abstract_s"], list):
-                    doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
-                if len(doc["fr_abstract_s"]) > 100:
-                    doc["fr_entites"] = keyword_enrichissement.return_entities(
-                        doc["fr_abstract_s"], "fr"
-                    )
-                    doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
-                        doc["fr_abstract_s"], "fr"
-                    )
-            if "en_abstract_s" in doc.keys():
-                if isinstance(doc["en_abstract_s"], list):
-                    doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
-                if len(doc["en_abstract_s"]) > 100:
-                    doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"],
-                                                                               "en")
-                    doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
-                        doc["en_abstract_s"], "en")
-            # Nouveau aussi ci dessous
-            doc["MDS"] = utils.calculate_mds(doc)
-            doc["Created"] = datetime.datetime.now().isoformat()
-
-        # on recalcule à chaque collecte... pour màj
-        doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
-
-        if document_exist:
-            es.update(index=settings.SOVISU_INDEX, id=elastic_doc_id, doc=doc, refresh="wait_for")
-        else:
-            doc["_id"] = elastic_doc_id
-            new_documents.append(doc)
-        progress_recorder.set_progress(num, len(docs), description="(récolte)")
-
-    helpers.bulk(es, new_documents, index=settings.SOVISU_INDEX, refresh="wait_for")
-
-    progress_recorder.set_progress(num, len(docs), description="(indexation)")
-    return chercheur
-
+#             if doc["authIdHal_s"].index(idhal) == 0:
+#                 authorship = "firstAuthor"
+#             if doc["authIdHal_s"].index(idhal) == len(doc["authIdHal_s"]) - 1:
+#                 authorship = "lastAuthor"
+#
+#             doc["sovisu_authorship"] = authorship
+#
+#         if not document_exist or changements:
+#             location_docs.generate_countrys_fields(doc)
+#             doc = doi_enrichissement.docs_enrichissement_doi(doc)
+#             if "fr_abstract_s" in doc.keys():
+#                 if isinstance(doc["fr_abstract_s"], list):
+#                     doc["fr_abstract_s"] = "/n".join(doc["fr_abstract_s"])
+#                 if len(doc["fr_abstract_s"]) > 100:
+#                     doc["fr_entites"] = keyword_enrichissement.return_entities(
+#                         doc["fr_abstract_s"], "fr"
+#                     )
+#                     doc["fr_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
+#                         doc["fr_abstract_s"], "fr"
+#                     )
+#             if "en_abstract_s" in doc.keys():
+#                 if isinstance(doc["en_abstract_s"], list):
+#                     doc["en_abstract_s"] = "/n".join(doc["en_abstract_s"])
+#                 if len(doc["en_abstract_s"]) > 100:
+#                     doc["en_entites"] = keyword_enrichissement.return_entities(doc["en_abstract_s"],
+#                                                                                "en")
+#                     doc["en_teeft_keywords"] = keyword_enrichissement.keyword_from_teeft(
+#                         doc["en_abstract_s"], "en")
+#             # Nouveau aussi ci dessous
+#             doc["MDS"] = utils.calculate_mds(doc)
+#             doc["Created"] = datetime.datetime.now().isoformat()
+#
+#         # on recalcule à chaque collecte... pour màj
+#         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
+#
+#         if document_exist:
+#             es.update(index=SV_INDEX, id=elastic_doc_id, doc=doc, refresh="wait_for")
+#         else:
+#             doc["_id"] = elastic_doc_id
+#             new_documents.append(doc)
+#         progress_recorder.set_progress(num, len(docs), description="(récolte)")
+#
+#     helpers.bulk(es, new_documents, index=SV_INDEX, refresh="wait_for")
+#
+#     progress_recorder.set_progress(num, len(docs), description="(indexation)")
+#     return chercheur
+#
 
 # TODO: intégrer dans utils.py après modification du module elasticHal?
 def should_be_open(notice):
@@ -499,8 +499,9 @@ def creeFichesExpertise(idx, idHal, aureHal, lstDom) :
                 newFiche['origin'] = "datagouv"
                 es.index(index=idx, id=elastic_id, document=json.dumps(newFiche), refresh="wait_for",)
 
+
 # TODO: Refactor that function
-def create_searcher_concept_notices(idhal, aurehal, sovisu_index=settings.SOVISU_INDEX):
+def create_searcher_concept_notices(idhal, aurehal):
     archives_ouvertes_data = get_concepts_and_keywords(aurehal)
     # Gestion des existants
     chercheur_concept = archives_ouvertes_data["concepts"]
@@ -512,8 +513,8 @@ def create_searcher_concept_notices(idhal, aurehal, sovisu_index=settings.SOVISU
             ]
         }
     }
-    expertises_count = es.count(index=settings.SOVISU_INDEX, query=query)["count"]
-    searcher_expertises = es.search(index=settings.SOVISU_INDEX, query=query,
+    expertises_count = es.count(index=SV_INDEX, query=query)["count"]
+    searcher_expertises = es.search(index=SV_INDEX, query=query,
                                     size=expertises_count)
     searcher_expertises = searcher_expertises["hits"]["hits"]
 
@@ -539,15 +540,15 @@ def create_searcher_concept_notices(idhal, aurehal, sovisu_index=settings.SOVISU
             if fiche["_source"]['origin']!= "datagouv":
                 fiche["_source"]['origin'] = "datagouv"
                 #fiche["_source"]['validated'] = True
-                es.update(index=settings.SOVISU_INDEX, id=fiche["_id"], body=fiche["_source"])
+                es.update(index=SV_INDEX, id=fiche["_id"], body=fiche["_source"])
             idDomainChecheur .remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
         # les autres on les créé
-        creeFichesExpertise(idx=settings.SOVISU_INDEX, idHal=idhal, aureHal=aurehal, lstDom=idDomainChecheur)
+        creeFichesExpertise(idx=SV_INDEX, idHal=idhal, aureHal=aurehal, lstDom=idDomainChecheur)
 
 
-def create_searcher_structure_notices(idhal, labhalid, sovisu_index=settings.SOVISU_INDEX):
+def create_searcher_structure_notices(idhal, labhalid):
     searcher_structure = es.get(index="structures_directory", id=labhalid)
     searcher_structure = searcher_structure["_source"]
     searcher_structure['idhal'] = idhal  # taggage, l'idhal sert de clé
     elastic_id = f"{idhal}.{searcher_structure['docid']}"
-    es.index(index=settings.SOVISU_INDEX, id=elastic_id, document=searcher_structure)
+    es.index(index=SV_INDEX, id=elastic_id, document=searcher_structure)

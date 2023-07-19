@@ -8,15 +8,18 @@ from elasticHal.libs import (
     location_docs,
     utils, )
 from init_project import init_sovisu_static
-from sovisuhal.libs import esActions, elastichal
+from sovisuhal.libs import esActions
+from sovisuhal.libs.elastichal import should_be_open, indexe_chercheur
 from sovisuhal.viewsActions import idhal_checkout
+
+# Import constants
+from constants import SV_INDEX, SV_HAL_REFERENCES, SV_STRUCTURES_REFERENCES
 
 es = esActions.es_connector()
 
 
 def create_test_context():
     # Variables à automatiser plus tard
-    index = settings.SOVISU_INDEX
     idhal = "david-reymond"
     orcid = ""
     labo_accro = "IMSIC"  # TODO: Faire sauter cette clé, remplacer par systeme qui créé fiche labo par chercheur
@@ -38,14 +41,14 @@ def create_test_context():
     # remplissage index sovisu_searchers
     idhal_test = idhal_checkout(idhal)
     if idhal_test > 0:
-        elastichal.indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid)
+        indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid)
 
     # remplissage des publications
     # scope_param = scope_p("idhal", researcher_id) # ne renvoit rien, idhal est le bon champ
     # On retrouve le chercheur
 
     # scope_param = esActions.scope_term_multi([("idhal", idhal), ('sovisu_category', "searcher")])
-    chercheur = es.get(index = settings.SOVISU_INDEX, id=idhal)
+    chercheur = es.get(index=SV_INDEX, id=idhal)
     chercheur = chercheur["_source"]
     print("______________")
     print(chercheur)
@@ -56,10 +59,10 @@ def create_test_context():
     # Remplissage de l'index sovisu_laboratories
 
 
-
 def set_elastic_structures(search_value):
-    if not es.indices.exists(index="structures_directory"):
-        es.indices.create(index="structures_directory", mappings=init_sovisu_static.structures_mapping())
+    if not es.indices.exists(index=SV_STRUCTURES_REFERENCES):
+        es.indices.create(index=SV_STRUCTURES_REFERENCES,
+                          mappings=init_sovisu_static.structures_mapping())
 
     search_filter = "idref_s"
     struct_type = "*"
@@ -76,12 +79,12 @@ def set_elastic_structures(search_value):
     for structure in structures_entities:
         structure["_id"] = structure["docid"]
 
-    helpers.bulk(es, structures_entities, index="structures_directory", refresh="wait_for")
+    helpers.bulk(es, structures_entities, index=SV_STRUCTURES_REFERENCES, refresh="wait_for")
 
     return f"{len(structures_entities)} structures added"
 
 
-def creeFiche(dom): # placée dans elasticHal.utils
+def creeFiche(dom):  # placée dans elasticHal.utils
     fiche = dict()
     fiche['chemin'] = "domAurehal." + dom[
         'id']  # .replace('.',',')  # donnera le chemin d'accès de l'arborescence. i.e: chercher .shs
@@ -153,7 +156,7 @@ def indexe_expertises():
     """
     concept_list = GenereReferentiel(init_sovisu_static.concepts(), "")
 
-    res = helpers.bulk(es, concept_list, index="domaine_hal_referentiel", refresh="wait_for")
+    res = helpers.bulk(es, concept_list, index=SV_HAL_REFERENCES, refresh="wait_for")
     return str(res[0]), " Concepts added, in index domaine_hal_referentiel"
 
 
@@ -165,8 +168,7 @@ def collecte_docs(chercheur):  # self,
     À mettre à jour et renommer lorsque intégré dans le code.
     Le code a été séparé en modules afin de pouvoir gérer les erreurs plus facilement
     """
-    #doc_progress_recorder = ProgressRecorder(self)
-    index = settings.SOVISU_INDEX
+    # doc_progress_recorder = ProgressRecorder(self)
     new_documents = []
     idhal = chercheur["idhal"]
     # look hal.find_publication for full base list of keys
@@ -178,9 +180,9 @@ def collecte_docs(chercheur):  # self,
         # if not, it create the document, append it to new_documents and then helpers.bulk
         changements = False
         elastic_doc_id = f"{idhal}.{doc['halId_s']}"
-        document_exist = es.exists(index=index, id=elastic_doc_id)
+        document_exist = es.exists(index=SV_INDEX, id=elastic_doc_id)
         if document_exist:
-            existing_document = es.get(index=index, id=elastic_doc_id)
+            existing_document = es.get(index=SV_INDEX, id=elastic_doc_id)
             existing_document = existing_document["_source"]
 
             doc["MDS"] = utils.calculate_mds(doc)
@@ -235,25 +237,26 @@ def collecte_docs(chercheur):  # self,
             doc["Created"] = datetime.datetime.now().isoformat()
 
         # on recalcule à chaque collecte... pour màj
-        doc["postprint_embargo"], doc["preprint_embargo"] = elastichal.should_be_open(doc)
+        doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
 
         if document_exist:
-            es.update(index=index, id=elastic_doc_id, doc=doc, refresh="wait_for")
+            es.update(index=SV_INDEX, id=elastic_doc_id, doc=doc, refresh="wait_for")
         else:
             doc["_id"] = elastic_doc_id
             new_documents.append(doc)
-        #doc_progress_recorder.set_progress(num,len(docs), str(num) + " sur " + str(len(docs)) + " documents")
+        # doc_progress_recorder.set_progress(num,len(docs), str(num) + " sur " + str(len(docs)) + " documents")
 
     for indi in range(int(len(new_documents) // 50) + 1):
         boutdeDoc = new_documents[indi * 50: indi * 50 + 50]
         helpers.bulk(
             es,
             boutdeDoc,
-            index=index,
+            index=SV_INDEX,
         )
 
-    #doc_progress_recorder.set_progress( num, len(docs), str(num) + " sur " + str(len(docs)) + " indexés")
+    # doc_progress_recorder.set_progress( num, len(docs), str(num) + " sur " + str(len(docs)) + " indexés")
     return "add publications done"
+
 
 # Elasticsearch queries
 # the queries under are different from those already registered,
@@ -261,13 +264,11 @@ def collecte_docs(chercheur):  # self,
 
 
 if __name__ == "__main__":
-    settings.sovisu_index = "settings.sovisu_index"
     index_mapping = {
-        settings.sovisu_index : {**init_sovisu_static.document_mapping(), **init_sovisu_static.document_mapping()},
-        #settings.sovisu_index: init_sovisu_static.document_mapping(),
+        SV_INDEX: init_sovisu_static.document_mapping(),
         "sovisu_laboratories": init_sovisu_static.document_mapping(),
-        "domaine_hal_referentiel": init_sovisu_static.expertises_mapping(),
-        "structures_directory": init_sovisu_static.structures_mapping(),
+        SV_HAL_REFERENCES: init_sovisu_static.expertises_mapping(),
+        SV_STRUCTURES_REFERENCES: init_sovisu_static.structures_mapping(),
     }
     for index, mapping_func in index_mapping.items():
         if not es.indices.exists(index=index):

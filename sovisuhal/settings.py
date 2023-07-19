@@ -14,7 +14,6 @@ import os
 from pathlib import Path
 import django
 from decouple import config
-SOVISU_INDEX = "sovisu_index"
 
  # peut être que si on le met que là ?
 mode = config("mode")

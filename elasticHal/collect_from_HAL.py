@@ -20,7 +20,6 @@ from elasticHal.models import Laboratory, Researcher
 
 # Custom libs
 from sovisuhal.libs import esActions
-from django.conf import settings
 # Global variables
 structIdlist = None
 

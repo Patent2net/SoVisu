@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from uniauth.decorators import login_required
 
+from constants import SV_INDEX
 from elasticHal.libs import utils
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 from sovisuhal.libs.elastichal import creeFichesExpertise
@@ -50,9 +51,9 @@ def admin_access_login(request):
 
             field = "ldapId"
             scope_param = esActions.scope_p(field, auth_user)
-            count = es.count(index=settings.SOVISU_INDEX, query=scope_param)["count"]
+            count = es.count(index=SV_INDEX, query=scope_param)["count"]
             if count > 0:
-                res = es.search(index=settings.SOVISU_INDEX, query=scope_param, size=count)
+                res = es.search(index=SV_INDEX, query=scope_param, size=count)
                 entity = res["hits"]["hits"][0]["_source"]
                 struct = entity["structSirene"]
                 user_token = entity["halId_s"]
@@ -116,7 +117,7 @@ def validate_references(request):
 
     # Get scope information
     if i_type == "rsr":
-        index_name = settings.SOVISU_INDEX
+        index_name = SV_INDEX
     elif i_type == "lab":
         index_name = "sovisu_laboratories"
     else:
@@ -174,9 +175,9 @@ def validate_guiding_domains(request):
         query = {"bool": {"must": [{"match": {"sovisu_category": "expertise"}}, {"match": {"idhal": p_id}}, ]}}
 
         if i_type == "rsr":
-            elastic_index = settings.SOVISU_INDEX
-            count = es.count(index=settings.SOVISU_INDEX, query=query)["count"]
-            fichesExpertise = es.search(index=settings.SOVISU_INDEX, query=query, size=count)
+            elastic_index = SV_INDEX
+            count = es.count(index=SV_INDEX, query=query)["count"]
+            fichesExpertise = es.search(index=SV_INDEX, query=query, size=count)
             if fichesExpertise['_shards']['successful']>0:
                 fichesExpertise =fichesExpertise ['hits']['hits']
 
@@ -192,14 +193,14 @@ def validate_guiding_domains(request):
                         if fiche["_source"]['origin'] != "datagouv":
                             fiche["_source"]['origin'] = "datagouv"
                             fiche["_source"]['validated'] = True
-                            es.update(index=settings.SOVISU_INDEX, id=fiche["_id"], body=fiche["_source"])
+                            es.update(index=SV_INDEX, id=fiche["_id"], body=fiche["_source"])
                         to_validate.remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
 
-                    creeFichesExpertise(idx=settings.SOVISU_INDEX, idHal=p_id, aureHal=aurehal, lstDom= [fic for fic in to_validate if fic not in dejaLa and fic not in dejaLaPasValid])
+                    creeFichesExpertise(idx=SV_INDEX, idHal=p_id, aureHal=aurehal, lstDom= [fic for fic in to_validate if fic not in dejaLa and fic not in dejaLaPasValid])
                 #fichesExpertise ["_source"]["validated"]
             else:
 
-                creeFichesExpertise(idx=settings.SOVISU_INDEX, idHal=p_id, aureHal=aurehal, lstDom=to_validate)
+                creeFichesExpertise(idx=SV_INDEX, idHal=p_id, aureHal=aurehal, lstDom=to_validate)
         elif i_type == "lab":
 
             elastic_index = "test_laboratories"
@@ -272,7 +273,7 @@ def validate_expertise(request):
         concepts_to_update = request.POST.get("toInvalidate", "").split(",")
 
         for concept in concepts_to_update:
-            es.update(index=settings.SOVISU_INDEX, refresh="wait_for", id=concept, doc=update_doc)
+            es.update(index=SV_INDEX, refresh="wait_for", id=concept, doc=update_doc)
 
     return redirect(
         f"/check/?struct={struct}&type={i_type}"
@@ -318,7 +319,7 @@ def validate_credentials(request):
             orcid = request.POST.get("f_orcId")
             function = request.POST.get("f_status")
 
-            res = es.get(index=settings.SOVISU_INDEX, id=p_id)
+            res = es.get(index=SV_INDEX, id=p_id)
             try:
                 entity = res["_source"]
             except IndexError:
@@ -336,7 +337,7 @@ def validate_credentials(request):
             # TODO: supprimer Concepts sur le long terme dans la fonction.
             #  Doit passer dans SearcherProfile. Et principalement géré par test_expertises
             es.update(
-                index=settings.SOVISU_INDEX,
+                index=SV_INDEX,
                 refresh="wait_for",
                 id=p_id,
                 doc={
@@ -600,7 +601,7 @@ def update_authorship(request):
             }
 
             es.update(
-                index=settings.SOVISU_INDEX,
+                index=SV_INDEX,
                 refresh="wait_for",
                 id=doc["sovisu_id"],
                 doc=update_doc,

@@ -6,7 +6,6 @@ from elasticsearch import Elasticsearch
 
 mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
-from django.conf import settings
 # To call es_connector function: es = esActions.es_connector()
 def es_connector(mode=mode):
     """
