@@ -13,7 +13,7 @@ from sovisuhal.libs.elastichal import should_be_open, indexe_chercheur
 from sovisuhal.viewsActions import idhal_checkout
 
 # Import constants
-from constants import SV_INDEX, SV_HAL_REFERENCES, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX
+from constants import SV_INDEX, SV_HAL_REFERENCES, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX, TIMEZONE
 
 es = esActions.es_connector()
 
@@ -234,7 +234,7 @@ def collecte_docs(chercheur):  # self,
                         doc["en_abstract_s"], "en")
             # Nouveau aussi ci dessous
             doc["MDS"] = utils.calculate_mds(doc)
-            doc["Created"] = datetime.datetime.now().isoformat()
+            doc["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
 
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)

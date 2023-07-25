@@ -4,6 +4,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import datetime
 
+from constants import TIMEZONE
 from elasticHal.libs import utils
 
 retry_strategy = Retry(
@@ -164,7 +165,7 @@ def find_structures_entities(search_filter="parentIdref_s", search_value="031122
             for entity in entities_data["docs"]:
                 entity["sovisu_category"] = entity["type_s"]
                 entity["sovisu_referentiel"] = "hal"
-                entity["sovisu_created"] = datetime.datetime.now().isoformat()
+                entity["sovisu_created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
                 structures_entities.append(entity)
 
     return structures_entities

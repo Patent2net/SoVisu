@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from constants import TIMEZONE
 from sovisuhal.libs import esActions
 
 # Connect to DB
@@ -45,7 +46,7 @@ for ind, doudou in enumerate(doublons):
             if doub["_source"]["ldapId"] == doudou["_source"]["ldapId"]
         ]
         if len(Autres) == 0:
-            doudou["_source"]["Created"] = datetime.now().isoformat()
+            doudou["_source"]["Created"] = datetime.now(tz=TIMEZONE).isoformat()
             lstRetenus.append(doudou)
 print(
     len(lstRetenus),

@@ -7,6 +7,8 @@ from dateutil.relativedelta import relativedelta
 from nested_lookup import nested_lookup
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
+from constants import TIMEZONE
+
 
 def creeFiche(dom):
     fiche = dict()
@@ -69,7 +71,7 @@ def should_be_open(doc):
                     p_date = dateutil.parser.parse(doc["publicationDate_tdate"]).replace(
                         tzinfo=None
                     )
-                    curr_date = datetime.now()
+                    curr_date = datetime.now(tz=TIMEZONE)
                     diff = relativedelta(curr_date, p_date)
 
                     diff_months = diff.years * 12 + diff.months

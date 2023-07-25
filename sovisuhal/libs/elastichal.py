@@ -11,7 +11,7 @@ from decouple import config
 from elasticsearch import helpers
 from ldap3 import ALL, Connection, Server
 
-from constants import SV_INDEX
+from constants import SV_INDEX, TIMEZONE
 # probablement le num établissement à terme
 from elasticHal.libs import (
     doi_enrichissement,
@@ -134,7 +134,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         "labHalId": labhalid,
         "validated": False,
         "ldapId": ldapid,
-        "Created": datetime.datetime.now().isoformat(),
+        "Created": datetime.datetime.now(tz=TIMEZONE).isoformat(),
         "idhal": idhal,
         # sert de clé pivot entre les docs, il faut être sûr que ce champ n'existe dans aucune des docs que l'on pourrait indexer
         "halId_s": idhal,
@@ -238,7 +238,7 @@ def collecte_docs(self, entite):  # self,
                         doc["en_abstract_s"], "en")
             # Nouveau aussi ci dessous
             doc["MDS"] = utils.calculate_mds(doc)
-            doc["Created"] = datetime.datetime.now().isoformat()
+            doc["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
 
         # on recalcule à chaque collecte... pour màj
         doc["postprint_embargo"], doc["preprint_embargo"] = should_be_open(doc)
@@ -296,7 +296,7 @@ def should_be_open(notice):
                             notice["publicationDate_tdate"]
                         ).replace(tzinfo=None)
 
-                        curr_date = datetime.datetime.now()
+                        curr_date = datetime.datetime.now(tz=TIMEZONE).date()
                         age = relativedelta(curr_date, publication_date)
                         age_in_months = age.years * 12 + age.months
 

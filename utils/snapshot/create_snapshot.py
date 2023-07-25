@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
 
+from constants import TIMEZONE
 from sovisuhal.libs import esActions
 
 path = "backup"
-snapshot_name = f"snapshot_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+snapshot_name = f"snapshot_{datetime.now(tz=TIMEZONE).strftime('%Y-%m-%d_%H-%M-%S')}"
 print(snapshot_name)
 is_exist = os.path.exists(path)
 print(is_exist)

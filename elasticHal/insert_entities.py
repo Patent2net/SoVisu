@@ -8,6 +8,7 @@ from celery import shared_task
 # Celery-progress
 from celery_progress.backend import ProgressRecorder
 
+from constants import TIMEZONE
 from elasticHal.libs import StructAcronym, utils
 from elasticHal.models import Laboratory, Structure
 
@@ -215,7 +216,7 @@ def create_laboratories_index(pg):
                                             child2, rsr["_source"], tree, "validated"
                                         )
 
-        row["Created"] = datetime.datetime.now().isoformat()
+        row["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
         row["concepts"] = tree
 
         # Insert laboratory data

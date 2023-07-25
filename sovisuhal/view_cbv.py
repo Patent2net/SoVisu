@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from elasticsearch import BadRequestError
 from uniauth.decorators import login_required
 
-from constants import SV_INDEX, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX
+from constants import SV_INDEX, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX, TIMEZONE
 
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
@@ -64,7 +64,7 @@ class CommonContextMixin:
         if "to" in request.GET:
             date_to = request.GET["to"]
         else:
-            date_to = datetime.today().strftime("%Y-%m-%d")
+            date_to = datetime.now(tz=TIMEZONE).date()
 
         return date_from, date_to
 
@@ -177,7 +177,7 @@ class CreateView(TemplateView):
                 entity = entity["_source"]
                 struct = entity["structSirene"]
                 user_token = entity["halId_s"]
-                date_to = datetime.today().strftime("%Y-%m-%d")
+                date_to = datetime.now(tz=TIMEZONE).date()
                 return redirect(
                     f"/check/?struct={struct}&type=rsr"
                     + f"&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"

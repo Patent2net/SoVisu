@@ -9,6 +9,7 @@ from celery_progress.backend import ProgressRecorder
 from decouple import config
 from elasticsearch import helpers
 
+from constants import TIMEZONE
 from elasticHal.libs import (
     doi_enrichissement,
     hal,
@@ -177,7 +178,7 @@ def collect_laboratories_data2(self, labo, update=True):
                         doc["harvested_from_label"] = []
                         doc["harvested_from_label"].append(lab["acronym"])
                         if "Created" not in doc:
-                            doc["Created"] = datetime.datetime.now().isoformat()
+                            doc["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
 
                         doc["authorship"] = []
 
@@ -473,7 +474,7 @@ def collect_researchers_data(self, struct):
                         #                 {"authorship": "lastAuthor", "halId_s": auth}
                         #             )
                         if "Created" not in doc:
-                            doc["Created"] = datetime.datetime.now().isoformat()
+                            doc["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
 
                         doc["harvested_from_ids"].append(searcher["halId_s"])
                         # historique d'appartenance du docId
@@ -668,7 +669,7 @@ def collect_laboratories_data(self):
                         doc["harvested_from_label"] = []
                         doc["harvested_from_label"].append(lab["acronym"])
                         if "Created" not in doc:
-                            doc["Created"] = datetime.datetime.now().isoformat()
+                            doc["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
 
                         doc["authorship"] = []
 
@@ -889,7 +890,7 @@ def collect_researchers_data2(self, struct, idx):
                     else:
                         doc["authorship"] = []
                     if "Created" not in doc:
-                        doc["Created"] = datetime.datetime.now().isoformat()
+                        doc["Created"] = datetime.datetime.now(tz=TIMEZONE).isoformat()
 
                     doc["harvested_from_ids"].append(searcher["halId_s"])
                     # historique d'appartenance du docId
