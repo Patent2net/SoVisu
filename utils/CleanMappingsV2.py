@@ -1,6 +1,3 @@
-import random
-import time
-
 from elasticsearch import helpers
 
 from sovisuhal.libs import esActions

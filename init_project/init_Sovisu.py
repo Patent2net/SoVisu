@@ -13,7 +13,7 @@ from sovisuhal.libs.elastichal import should_be_open, indexe_chercheur
 from sovisuhal.viewsActions import idhal_checkout
 
 # Import constants
-from constants import SV_INDEX, SV_HAL_REFERENCES, SV_STRUCTURES_REFERENCES
+from constants import SV_INDEX, SV_HAL_REFERENCES, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX
 
 es = esActions.es_connector()
 
@@ -266,7 +266,7 @@ def collecte_docs(chercheur):  # self,
 if __name__ == "__main__":
     index_mapping = {
         SV_INDEX: init_sovisu_static.document_mapping(),
-        "sovisu_laboratories": init_sovisu_static.document_mapping(),
+        SV_LAB_INDEX: init_sovisu_static.document_mapping(),
         SV_HAL_REFERENCES: init_sovisu_static.expertises_mapping(),
         SV_STRUCTURES_REFERENCES: init_sovisu_static.structures_mapping(),
     }

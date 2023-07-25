@@ -1,6 +1,3 @@
-import random
-import time
-
 from elasticsearch import helpers
 
 from sovisuhal.libs import esActions
@@ -63,19 +60,19 @@ docmap = {
             "fields": {"keyword": {"type": "keyword", "ignore_above": 5000}},
         },
         "SearcherProfile": {
-                "type": "nested",
-                "properties": {
-                    "ldapId": {
-                        "type": "keyword"
-                    },
-                    "halId_s": {
-                        "type": "keyword"
-                    },
-                    "validated_concepts": {
-                        "type": "text"
-                    }
-                    }
+            "type": "nested",
+            "properties": {
+                "ldapId": {
+                    "type": "keyword"
+                },
+                "halId_s": {
+                    "type": "keyword"
+                },
+                "validated_concepts": {
+                    "type": "text"
                 }
+            }
+        }
     }
 }
 
@@ -126,7 +123,7 @@ for ind, doudou in enumerate(chercheurs):
                 for doc in docu:
                     doc["_source"]["docid"] = int(doc["_source"]["docid"])
                 for indi in range(int(len(docu) // 50) + 1):
-                    boutdeDoc = docu[indi * 50 : indi * 50 + 50]
+                    boutdeDoc = docu[indi * 50: indi * 50 + 50]
 
                     helpers.bulk(es, boutdeDoc, index="test_publications")
                 resp = str(len(docu)) + " indexés "

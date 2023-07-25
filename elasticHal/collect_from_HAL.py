@@ -20,12 +20,12 @@ from elasticHal.models import Laboratory, Researcher
 
 # Custom libs
 from sovisuhal.libs import esActions
-# Global variables
-structIdlist = None
 
 # Global variables
 structIdlist = None
 
+# Global variables
+structIdlist = None
 
 # if True, check all the existing data in ES index
 # to compare with those gathered to keep part of totality of data persistence
@@ -39,12 +39,10 @@ force_doc_validated = eval(config("ForceValidation"))
 # for all the docs existing in ES (work only if Check_existing_docs = True)
 force_doc_authorship = eval(config("ForceAutorat"))
 
-
 # If djangodb_open = True script will use django Db to generate index for ES.
 # Default Value is False vhen used as a script and True when called by SoVisu.
 # (check the code at the bottom of the file)
 djangodb_open = None
-
 
 harvet_history = []
 
@@ -101,7 +99,8 @@ def collect_laboratories_data2(self, labo, update=True):
         if laboratories_list:
             for lab in djangolab:
                 if any(
-                    dictlist["halStructId"] != lab["halStructId"] for dictlist in laboratories_list
+                        dictlist["halStructId"] != lab["halStructId"] for dictlist in
+                        laboratories_list
                 ):
                     laboratories_list.append(lab)
         else:
@@ -248,30 +247,30 @@ def collect_laboratories_data2(self, labo, update=True):
                             for doc in docs:
                                 doc_param = esActions.scope_p("_id", doc["_id"])
                                 if not es.indices.exists(
-                                    index=lab["structSirene"]
-                                    + "-"
-                                    + lab["halStructId"]
-                                    + "-laboratories-documents"
+                                        index=lab["structSirene"]
+                                              + "-"
+                                              + lab["halStructId"]
+                                              + "-laboratories-documents"
                                 ):
                                     es.indices.create(
                                         index=lab["structSirene"]
-                                        + "-"
-                                        + lab["halStructId"]
-                                        + "-laboratories-documents"
+                                              + "-"
+                                              + lab["halStructId"]
+                                              + "-laboratories-documents"
                                     )
                                     res = es.search(
                                         index=lab["structSirene"]
-                                        + "-"
-                                        + lab["halStructId"]
-                                        + "-laboratories-documents",
+                                              + "-"
+                                              + lab["halStructId"]
+                                              + "-laboratories-documents",
                                         body=doc_param,
                                         request_timeout=50,
                                     )
 
                                 if len(res["hits"]["hits"]) > 0:
                                     if (
-                                        "authorship" in res["hits"]["hits"][0]["_source"]
-                                        and not force_doc_authorship
+                                            "authorship" in res["hits"]["hits"][0]["_source"]
+                                            and not force_doc_authorship
                                     ):
                                         doc["authorship"] = res["hits"]["hits"][0]["_source"][
                                             "authorship"
@@ -284,12 +283,13 @@ def collect_laboratories_data2(self, labo, update=True):
                                         doc["validated"] = True
 
                                     if (
-                                        "modifiedDate_tdate"
-                                        in res["hits"]["hits"][0]["_source"].keys()
+                                            "modifiedDate_tdate"
+                                            in res["hits"]["hits"][0]["_source"].keys()
                                     ):
                                         if (
-                                            res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                                            != doc["modifiedDate_tdate"]
+                                                res["hits"]["hits"][0]["_source"][
+                                                    "modifiedDate_tdate"]
+                                                != doc["modifiedDate_tdate"]
                                         ):
                                             doc["records"].append(
                                                 {
@@ -305,14 +305,14 @@ def collect_laboratories_data2(self, labo, update=True):
                                     doc["validated"] = True
 
                         for indi in range(int(len(docs) // 50) + 1):
-                            boutdeDoc = docs[indi * 50 : indi * 50 + 50]
+                            boutdeDoc = docs[indi * 50: indi * 50 + 50]
                             helpers.bulk(
                                 es,
                                 boutdeDoc,
                                 index=lab["structSirene"]
-                                + "-"
-                                + lab["halStructId"]
-                                + "-laboratories-documents",
+                                      + "-"
+                                      + lab["halStructId"]
+                                      + "-laboratories-documents",
                             )
                             # time.sleep(1)
                             doc_progress_recorder.set_progress(
@@ -506,12 +506,12 @@ def collect_researchers_data(self, struct):
                             doc_param = esActions.scope_p("_id", doc["_id"])
 
                             if not es.indices.exists(
-                                index=searcher["structSirene"]
-                                + "-"
-                                + searcher["labHalId"]
-                                + "-researchers-"
-                                + searcher["ldapId"]
-                                + "-documents"
+                                    index=searcher["structSirene"]
+                                          + "-"
+                                          + searcher["labHalId"]
+                                          + "-researchers-"
+                                          + searcher["ldapId"]
+                                          + "-documents"
                             ):  # -researchers" + searcher["ldapId"] + "-documents
                                 print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
                                 res = dict()
@@ -520,19 +520,19 @@ def collect_researchers_data(self, struct):
                             else:
                                 res = es.search(
                                     index=searcher["structSirene"]
-                                    + "-"
-                                    + searcher["labHalId"]
-                                    + "-researchers-"
-                                    + searcher["ldapId"]
-                                    + "-documents",
+                                          + "-"
+                                          + searcher["labHalId"]
+                                          + "-researchers-"
+                                          + searcher["ldapId"]
+                                          + "-documents",
                                     body=doc_param,
                                     request_timeout=50,
                                 )  # -researchers" + searcher["ldapId"] + "-documents
 
                             if len(res["hits"]["hits"]) > 0:
                                 if (
-                                    "authorship" in res["hits"]["hits"][0]["_source"]
-                                    and not force_doc_authorship
+                                        "authorship" in res["hits"]["hits"][0]["_source"]
+                                        and not force_doc_authorship
                                 ):
                                     doc["authorship"] = res["hits"]["hits"][0]["_source"][
                                         "authorship"
@@ -545,8 +545,8 @@ def collect_researchers_data(self, struct):
                                     doc["validated"] = True
 
                                 if (
-                                    res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                                    != doc["modifiedDate_tdate"]
+                                        res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
+                                        != doc["modifiedDate_tdate"]
                                 ):
                                     doc["records"].append(
                                         {
@@ -558,17 +558,17 @@ def collect_researchers_data(self, struct):
                             else:
                                 doc["validated"] = True
                     for indi in range(int(len(docs) // 50) + 1):
-                        boutdeDoc = docs[indi * 50 : indi * 50 + 50]
+                        boutdeDoc = docs[indi * 50: indi * 50 + 50]
                         helpers.bulk(
                             es,
                             boutdeDoc,
                             request_timeout=100,
                             index=searcher["structSirene"]
-                            + "-"
-                            + searcher["labHalId"]
-                            + "-researchers-"
-                            + searcher["ldapId"]
-                            + "-documents",
+                                  + "-"
+                                  + searcher["labHalId"]
+                                  + "-researchers-"
+                                  + searcher["ldapId"]
+                                  + "-documents",
                             # -researchers" + searcher["ldapId"] + "-documents
                         )
                         print(str(len(boutdeDoc)) + " indexés " + searcher["ldapId"])
@@ -617,7 +617,8 @@ def collect_laboratories_data(self):
             print("\u00A0 \u21D2 checking DjangoDb laboratory list:")
             for lab in djangolab:
                 if any(
-                    dictlist["halStructId"] != lab["halStructId"] for dictlist in laboratories_list
+                        dictlist["halStructId"] != lab["halStructId"] for dictlist in
+                        laboratories_list
                 ):
                     laboratories_list.append(lab)
         else:
@@ -698,30 +699,30 @@ def collect_laboratories_data(self):
                             doc_param = esActions.scope_p("_id", doc["_id"])
 
                             if not es.indices.exists(
-                                index=lab["structSirene"]
-                                + "-"
-                                + lab["halStructId"]
-                                + "-laboratories-documents"
+                                    index=lab["structSirene"]
+                                          + "-"
+                                          + lab["halStructId"]
+                                          + "-laboratories-documents"
                             ):
                                 es.indices.create(
                                     index=lab["structSirene"]
-                                    + "-"
-                                    + lab["halStructId"]
-                                    + "-laboratories-documents"
+                                          + "-"
+                                          + lab["halStructId"]
+                                          + "-laboratories-documents"
                                 )
                             res = es.search(
                                 index=lab["structSirene"]
-                                + "-"
-                                + lab["halStructId"]
-                                + "-laboratories-documents",
+                                      + "-"
+                                      + lab["halStructId"]
+                                      + "-laboratories-documents",
                                 body=doc_param,
                                 request_timeout=50,
                             )
 
                             if len(res["hits"]["hits"]) > 0:
                                 if (
-                                    "authorship" in res["hits"]["hits"][0]["_source"]
-                                    and not force_doc_authorship
+                                        "authorship" in res["hits"]["hits"][0]["_source"]
+                                        and not force_doc_authorship
                                 ):
                                     doc["authorship"] = res["hits"]["hits"][0]["_source"][
                                         "authorship"
@@ -734,8 +735,8 @@ def collect_laboratories_data(self):
                                     doc["validated"] = True
 
                                 if (
-                                    res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                                    != doc["modifiedDate_tdate"]
+                                        res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
+                                        != doc["modifiedDate_tdate"]
                                 ):
                                     doc["records"].append(
                                         {
@@ -747,14 +748,14 @@ def collect_laboratories_data(self):
                                 doc["validated"] = True
 
                 for indi in range(int(len(docs) // 50) + 1):
-                    boutdeDoc = docs[indi * 50 : indi * 50 + 50]
+                    boutdeDoc = docs[indi * 50: indi * 50 + 50]
                     helpers.bulk(
                         es,
                         boutdeDoc,
                         index=lab["structSirene"]
-                        + "-"
-                        + lab["halStructId"]
-                        + "-laboratories-documents",
+                              + "-"
+                              + lab["halStructId"]
+                              + "-laboratories-documents",
                     )
                     # time.sleep(1)
                     doc_progress_recorder.set_progress(
@@ -879,8 +880,8 @@ def collect_researchers_data2(self, struct, idx):
                             ]  # pas voulu casser le modele de données ici
                             # mais first, last ou rien suffirait non ?
                         elif (
-                            lstAut.index(searcher["lastName"].title())
-                            == len(doc["authLastName_s"]) - 1
+                                lstAut.index(searcher["lastName"].title())
+                                == len(doc["authLastName_s"]) - 1
                         ):
                             doc["authorship"] = [
                                 {"authorship": "lastAuthor", "authIdHal_s": searcher["halId_s"]}
@@ -925,12 +926,12 @@ def collect_researchers_data2(self, struct, idx):
                         doc_param = esActions.scope_p("_id", doc["_id"])
 
                         if not es.indices.exists(
-                            index=searcher["structSirene"]
-                            + "-"
-                            + searcher["labHalId"]
-                            + "-researchers-"
-                            + searcher["ldapId"]
-                            + "-documents"
+                                index=searcher["structSirene"]
+                                      + "-"
+                                      + searcher["labHalId"]
+                                      + "-researchers-"
+                                      + searcher["ldapId"]
+                                      + "-documents"
                         ):  # -researchers" + searcher["ldapId"] + "-documents
                             # print(f'exception {searcher["labHalId"]}, {searcher["ldapId"]}')
                             res = dict()
@@ -939,27 +940,27 @@ def collect_researchers_data2(self, struct, idx):
                         else:
                             res = es.search(
                                 index=searcher["structSirene"]
-                                + "-"
-                                + searcher["labHalId"]
-                                + "-researchers-"
-                                + searcher["ldapId"]
-                                + "-documents",
+                                      + "-"
+                                      + searcher["labHalId"]
+                                      + "-researchers-"
+                                      + searcher["ldapId"]
+                                      + "-documents",
                                 body=doc_param,
                                 request_timeout=50,
                             )  # -researchers" + searcher["ldapId"] + "-documents
 
                         if len(res["hits"]["hits"]) > 0:
                             if (
-                                "authorship" in res["hits"]["hits"][0]["_source"]
-                                and not force_doc_authorship
+                                    "authorship" in res["hits"]["hits"][0]["_source"]
+                                    and not force_doc_authorship
                             ):
                                 doc["authorship"] = res["hits"]["hits"][0]["_source"]["authorship"]
                             if "validated" in res["hits"]["hits"][0]["_source"]:
                                 doc["validated"] = res["hits"]["hits"][0]["_source"]["validated"]
                                 if doc["validated"] and (
-                                    doc["authorship"] == "firstAuthor"
-                                    or doc["authorship"] == "lastAuthor"
-                                    or doc["authorship"] == "correspondingAuthor"
+                                        doc["authorship"] == "firstAuthor"
+                                        or doc["authorship"] == "lastAuthor"
+                                        or doc["authorship"] == "correspondingAuthor"
                                 ):
                                     for cle, val in searcher.items():
                                         doc[cle] = val
@@ -973,8 +974,8 @@ def collect_researchers_data2(self, struct, idx):
                                     doc["validated"] = True
 
                                 if (
-                                    res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
-                                    != doc["modifiedDate_tdate"]
+                                        res["hits"]["hits"][0]["_source"]["modifiedDate_tdate"]
+                                        != doc["modifiedDate_tdate"]
                                 ):
                                     doc["records"].append(
                                         {
@@ -994,16 +995,16 @@ def collect_researchers_data2(self, struct, idx):
         if isinstance(docs, list):
             if len(docs) > 0:
                 for indi in range(int(len(docs) // 50) + 1):
-                    boutdeDoc = docs[indi * 50 : (indi * 50) + 50]
+                    boutdeDoc = docs[indi * 50: (indi * 50) + 50]
                     helpers.bulk(
                         es,
                         boutdeDoc,
                         index=searcher["structSirene"]
-                        + "-"
-                        + searcher["labHalId"]
-                        + "-researchers-"
-                        + searcher["ldapId"]
-                        + "-documents"
+                              + "-"
+                              + searcher["labHalId"]
+                              + "-researchers-"
+                              + searcher["ldapId"]
+                              + "-documents"
                         # -researchers" + searcher["ldapId"] + "-documents
                     )
                     # time.sleep(1)

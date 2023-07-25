@@ -77,7 +77,7 @@ for ind, doudou in enumerate(chercheurs):
             #           body=json.dumps(docu))
             if len(docu) > 50:
                 for indi in range(int(len(docu) // 50) + 1):
-                    boutdeDoc = docu[indi * 50 : indi * 50 + 50]
+                    boutdeDoc = docu[indi * 50: indi * 50 + 50]
                     helpers.bulk(es, boutdeDoc, index=idxDocs)
             else:
                 for doc in docu:
@@ -131,7 +131,7 @@ for ind, lab in enumerate(labos):
         print("màj fr ", len(docu), " docs")
         if len(docu) > 0:
             for indi in range(int(len(docu) // 50) + 1):
-                boutdeDoc = docu[indi * 50 : indi * 50 + 50]
+                boutdeDoc = docu[indi * 50: indi * 50 + 50]
                 helpers.bulk(es, boutdeDoc, index=idxDocs)
         else:
             for doc in docu:

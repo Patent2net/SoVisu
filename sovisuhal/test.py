@@ -1,7 +1,6 @@
 from elasticsearch import Elasticsearch
 from decouple import config
 
-
 Mode = config("mode")
 secret = config("ELASTIC_PASSWORD")
 struct = "198307662"
@@ -47,36 +46,35 @@ scope_param = {"query": {"match_all": {}}}
 count = es.count(index=struct + "*-researchers", body=scope_param)["count"]
 scope_param = {"query": {"match": {"labHalId": id}}}
 
-
 res = es.search(index=struct + "*-researchers", body=scope_param, size=count)
 entities = res["hits"]["hits"]
 
 res = es.search(
     request_timeout=50,
     index=searcher["structSirene"]
-    + "-"
-    + searcher["labHalId"]
-    + "-researchers-"
-    + searcher["ldapId"]
-    + "-documents",
+          + "-"
+          + searcher["labHalId"]
+          + "-researchers-"
+          + searcher["ldapId"]
+          + "-documents",
     # -researchers" + searcher["ldapId"] + "-documents
 )
 
-query_param =  {
-        "match_all": {}
-    }
+query_param = {
+    "match_all": {}
+}
 
 count = es.count(index=struct + "*-researchers", query=query_param)['count']
-query_param =  {
-        "match": {
-            "labHalId": "108098"
-        }
+query_param = {
+    "match": {
+        "labHalId": "108098"
     }
+}
 
 print(count)
 res = es.search(index=struct + "*-researchers", query=query_param, size=count)
 entities = res['hits']['hits']
 
-print (Mode)
+print(Mode)
 
 print(entities)

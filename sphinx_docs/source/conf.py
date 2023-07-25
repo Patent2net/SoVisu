@@ -17,7 +17,6 @@ import django
 
 sys.path.insert(0, os.path.abspath("../../"))
 
-
 # import django
 # os.environ['DJANGO_SETTINGS_MODULE'] = 'SoVisu.settings'
 
@@ -32,7 +31,6 @@ author = "David Reymond, Alaric Tabariès, Lena Bara"
 
 # The full version, including alpha/beta/rc tags
 release = "1.0.2"
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -66,7 +64,7 @@ source_suffix = {
     '.md': 'markdown',
 }
 
- # conf https://myst-parser.readthedocs.io/en/latest/syntax/optional.html par défaut
+# conf https://myst-parser.readthedocs.io/en/latest/syntax/optional.html par défaut
 myst_enable_extensions = [
     # "amsmath",
     "attrs_inline",

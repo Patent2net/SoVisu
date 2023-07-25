@@ -15,7 +15,7 @@ from pathlib import Path
 import django
 from decouple import config
 
- # peut être que si on le met que là ?
+# peut être que si on le met que là ?
 mode = config("mode")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,12 +46,12 @@ if mode == "Prod":
     UNIAUTH_LOGOUT_REDIRECT_URL = None
     UNIAUTH_MAX_LINKED_EMAILS = 20
     UNIAUTH_PERFORM_RECURSIVE_MERGING = True
-    LOGPATH=config("LOGPATH")
-    IP=config("IP")
-    DNS=config("DNS")
+    LOGPATH = config("LOGPATH")
+    IP = config("IP")
+    DNS = config("DNS")
 
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # '/data/SoVisu/staticfiles/
-    #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+    # STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
     CELERY_BROKER_URL = "redis://sovisu.univ-tln.fr:6379/0"
     CELERY_RESULT_BACKEND = "redis://sovisu.univ-tln.fr:6379/0"
 else:
@@ -63,49 +63,48 @@ else:
     CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
     IP = "192.168.35.65"
     DNS = "univ-tln.fr"
-    LOGPATH ="./utils/logs/"
-
+    LOGPATH = "./utils/logs/"
 
 LOGGING = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-                'style': '{',
-            },
-            'simple': {
-                'format': '{levelname} {message}',
-                'style': '{',
-            },
+    "version": 1,
+    "disable_existing_loggers": False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
         },
-        "handlers": {
-            "filedeb": {
-                "level": "DEBUG",
-                "class": "logging.FileHandler",
-                "filename": os.path.join(BASE_DIR, LOGPATH + "debug.log"),
-                "formatter":"verbose"
-            },
-            "fileinf": {
-                "level": "INFO",
-                "class": "logging.FileHandler",
-                "filename":os.path.join(BASE_DIR, LOGPATH + "debuginf.log"),
-                "formatter" : "simple"
-            },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
         },
-        "loggers": {
-            "django": {
-                "handlers": ["filedeb"],
-                "level": "DEBUG",
-                "propagate": True,
-            },
-            "django.template": {
-                "handlers": ["fileinf"],
-                "level": "INFO",
-                "propagate": True,
-            },
+    },
+    "handlers": {
+        "filedeb": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, LOGPATH + "debug.log"),
+            "formatter": "verbose"
         },
-    }
+        "fileinf": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, LOGPATH + "debuginf.log"),
+            "formatter": "simple"
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["filedeb"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "django.template": {
+            "handlers": ["fileinf"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # Application definition
@@ -127,7 +126,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    #'csp.middleware.CSPMiddleware',
+    # 'csp.middleware.CSPMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -138,11 +137,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://"+DNS,
-    "http://"+DNS+":9200",
-    "http://"+DNS+":5601",
-    "http://"+DNS+":6379",
-    "http://"+IP+":*",
+    "http://" + DNS,
+    "http://" + DNS + ":9200",
+    "http://" + DNS + ":5601",
+    "http://" + DNS + ":6379",
+    "http://" + IP + ":*",
     "http://localhost:*",
     "http://localhost:9200",
     "http://localhost:5601",
@@ -155,7 +154,7 @@ CORS_ALLOWED_ORIGINS = [
 
 # ALLOWED_HOSTS = ["sovisu.univ-tln.fr", "localhost"]
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", IP, DNS]
-CSRF_TRUSTED_ORIGINS = ["http://"+IP, "https://localhost"]
+CSRF_TRUSTED_ORIGINS = ["http://" + IP, "https://localhost"]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -176,7 +175,6 @@ Dns = [
 ]
 
 X_FRAME_OPTIONS = "sameorigin"
-
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -271,5 +269,3 @@ MANAGERS = (("BU", "dreymond@univ-tln.fr"), ("BU_1", ""))  # changer l'adresse
 # Attention ! La liste Admin a besoin d'avoir un minimum de 2 profils renseignés.
 # Dans le cas où un seul admin est présent pour le système,
 # merci de laisser le 2e profil sans adresse mail renseignée.
-
-

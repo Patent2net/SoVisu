@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from nested_lookup import nested_lookup
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
+
 def creeFiche(dom):
     fiche = dict()
     fiche['chemin'] = "domAurehal." + dom[

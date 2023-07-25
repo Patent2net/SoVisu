@@ -6,12 +6,12 @@ from elasticsearch import Elasticsearch
 
 mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 
+
 # To call es_connector function: es = esActions.es_connector()
 def es_connector(mode=mode):
     """
     Assure la connexion de SoVisu à l'instance ElasticSearch
     """
-
 
     if mode == "Prod":
         secret = config("ELASTIC_PASSWORD_SOVISU")
@@ -62,9 +62,10 @@ def scope_p(scope_field, scope_value):
     """
     Retourne un ensemble de documents spécifique en fonction d'un filtre
     """
-    scope = { "match": {scope_field: scope_value}}
+    scope = {"match": {scope_field: scope_value}}
 
     return scope
+
 
 def scope_term(scope_field, scope_value):
     """
@@ -73,6 +74,7 @@ def scope_term(scope_field, scope_value):
     """
     scope = {"term": {scope_field: scope_value}}
     return scope
+
 
 def scope_term_multi(list_scope_field_value):
     """
@@ -83,8 +85,9 @@ def scope_term_multi(list_scope_field_value):
     """
     temp = []
     for match in list_scope_field_value:
-        temp .append(scope_term(match[0], match[1]))
+        temp.append(scope_term(match[0], match[1]))
     return {'bool': {'should': temp}}
+
 
 def scope_match(scope_field, scope_value):
     """
@@ -94,6 +97,7 @@ def scope_match(scope_field, scope_value):
     scope = {"match": {scope_field: scope_value}}
     return scope
 
+
 def scope_match_multi(list_scope_field_value):
     """
     Retourne un ensemble de documents spécifiques en fonction d'un filtre
@@ -101,8 +105,10 @@ def scope_match_multi(list_scope_field_value):
     """
     temp = []
     for match in list_scope_field_value:
-        temp .append(scope_match(match[0], match[1]))
+        temp.append(scope_match(match[0], match[1]))
     return {'bool': {'must': temp}}
+
+
 # To call date_all function: variable_name = esActions.date_all()
 def date_all():
     """
@@ -135,13 +141,13 @@ def date_p(scope_field, scope_value):
 # To call ref_p function: variable_name = esActions.ref_p(scope_bool_type, ext_key,
 # entity[key], validate, date_range_type, dateFrom, dateTo)
 def ref_p(
-    scope_bool_type,
-    scope_field,
-    scope_value,
-    validate,
-    date_range_type,
-    scope_date_from,
-    scope_date_to,
+        scope_bool_type,
+        scope_field,
+        scope_value,
+        validate,
+        date_range_type,
+        scope_date_from,
+        scope_date_to,
 ):
     """
     Retourne un ensemble de documents spécifique en fonction de différents filtres,
@@ -171,11 +177,11 @@ def ref_p(
 
 
 def ref_p_filter(
-    p_filter,
-    scope_value,
-    validate,
-    scope_date_from,
-    scope_date_to,
+        p_filter,
+        scope_value,
+        validate,
+        scope_date_from,
+        scope_date_to,
 ):
     """
     Retourne un ensemble de documents spécifique en fonction de différents filtres,
@@ -226,31 +232,31 @@ def confirm_p(scope_field, scope_value, validate):
 
 def validated_searcherprofile_p(p_id, validate, date_range_type, date_from, date_to):
     validated_searcherprofile = {
-            "bool": {
-                "must": [
-                     {
-                         "nested": {
-                             "path": "SearcherProfile",
-                             "query": {
-                                 "bool": {
-                                     "must": [
-                                         {"term": {"SearcherProfile.ldapId.keyword": p_id}},
-                                         {"term": {"SearcherProfile.validated": validate}}
-                                     ]
-                                 }
-                             },
-                             "inner_hits": {}  # Include only the matched nested documents
-                         }
-                     },
-                    {
-                        "range": {
-                            date_range_type: {
-                                "gte": date_from,
-                                "lt": date_to
+        "bool": {
+            "must": [
+                {
+                    "nested": {
+                        "path": "SearcherProfile",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {"term": {"SearcherProfile.ldapId.keyword": p_id}},
+                                    {"term": {"SearcherProfile.validated": validate}}
+                                ]
                             }
+                        },
+                        "inner_hits": {}  # Include only the matched nested documents
+                    }
+                },
+                {
+                    "range": {
+                        date_range_type: {
+                            "gte": date_from,
+                            "lt": date_to
                         }
                     }
-                ]
-            }
+                }
+            ]
         }
+    }
     return validated_searcherprofile

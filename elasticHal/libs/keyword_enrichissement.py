@@ -1,5 +1,3 @@
-from spacy.lang.fr.stop_words import STOP_WORDS
-import spacy
 import requests
 import spacy
 import re
@@ -108,5 +106,5 @@ def return_entities(txt, lang):
         ]
         entities_en = [re.sub(r"[0-9]", "", mot) for mot in entities_en]
         entities_en = [re.sub(r"[%$£€]", "", mot) for mot in entities_en]
-        entities_en = [mot for mot in entities_en if len(mot.replace(' ','')) >2]
+        entities_en = [mot for mot in entities_en if len(mot.replace(' ', '')) > 2]
         return entities_en

@@ -2419,10 +2419,10 @@ def expertises_mapping():
             "chemin": {
                 "type": "text",
                 "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
                 }
             },
             "label_en": {
@@ -2446,10 +2446,10 @@ def expertises_mapping():
             "referentiel": {
                 "type": "text",
                 "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
                 }
             },
         }
@@ -2814,6 +2814,7 @@ def institutions_mapping():
     }
 
     return mapping
+
 
 def document_mapping():
     mapping = {
@@ -3568,10 +3569,10 @@ def document_mapping():
                     "mapping": {
                         "type": "text",
                         "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 5000
-                          }
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 5000
+                            }
                         }
                     }
                 }

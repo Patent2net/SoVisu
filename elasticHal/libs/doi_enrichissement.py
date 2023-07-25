@@ -31,20 +31,22 @@ def check_doi(doi):
     connect_timeout = 6
     read_timeout = 10
     try:
-        res = requests.get(url, timeout=(connect_timeout, read_timeout), verify=False) #TRES MAUVAIS CHOIX ICI...
+        res = requests.get(url, timeout=(connect_timeout, read_timeout),
+                           verify=False)  # TRES MAUVAIS CHOIX ICI...
     except TimeoutError:
 
         return True
     except MaxRetryError:
         return True
     except ReadTimeoutError as e:
-        print (url, e)
+        print(url, e)
         return True
     else:
         if str(res) == "<Response [200]>":
             return False
         else:
             return True
+
 
 def docs_enrichissement_doi(doc):
     """
@@ -68,21 +70,21 @@ def docs_enrichissement_doi(doc):
                 doc["oa_status"] = data["oa_status"]
             if "is_oa" in data.keys():
                 if (
-                    data["is_oa"] == True
+                        data["is_oa"] == True
                 ):  # Test si le doi est en open access sur l'api Unpaywall
                     doc["is_oa"] = "open access"
-                    if data["first_oa_location"]["oa_date"] != None:
+                    if data["first_oa_location"]["oa_date"] is not None:
                         doc["date_depot_oa"] = data["first_oa_location"]["oa_date"]
-                    elif data["first_oa_location"]["updated"] != None:
+                    elif data["first_oa_location"]["updated"] is not None:
                         doc["date_depot_oa"] = data["first_oa_location"]["updated"]
                     else:
                         pass  # doc["date_depot_oa"] = ""   : elastic aime pas le changement de type
                 else:
                     doc["is_oa"] = "closed access"
 
-        elif "doiId_sPasCorrect" in doc .keys(): # Faudra Virer çà un jour ou remettre en route la collecte
-            doc .pop('doiId_sPasCorrect', None)
-            #doc["doiId_sPasCorrect"] = check_doi(doc["doiId_s"])
+        elif "doiId_sPasCorrect" in doc.keys():  # Faudra Virer çà un jour ou remettre en route la collecte
+            doc.pop('doiId_sPasCorrect', None)
+            # doc["doiId_sPasCorrect"] = check_doi(doc["doiId_s"])
 
         if "publisher" not in data:
             doc["oa_host_type"] = "open archive"

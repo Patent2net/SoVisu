@@ -27,7 +27,7 @@ for ind, doudou in enumerate(doublons):
             if ind < len(doublons) - 1:
                 Autres = [
                     doub
-                    for doub in doublons[ind + 1 :]
+                    for doub in doublons[ind + 1:]
                     if doub["_source"]["ldapId"] == doudou["_source"]["ldapId"]
                 ]
                 for dub in Autres:
@@ -41,7 +41,7 @@ for ind, doudou in enumerate(doublons):
         # pas venu depuis changement de mode avec Created
         Autres = [
             doub
-            for doub in doublons[ind + 1 :]
+            for doub in doublons[ind + 1:]
             if doub["_source"]["ldapId"] == doudou["_source"]["ldapId"]
         ]
         if len(Autres) == 0:

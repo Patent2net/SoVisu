@@ -70,8 +70,8 @@ def sort_references(articles, halstructid):
 
                 if len(res["hits"]["hits"]) > 0:
                     if (
-                        "function" in res["hits"]["hits"][0]["_source"]
-                        and res["hits"]["hits"][0]["_source"]["function"] == "Doctorant"
+                            "function" in res["hits"]["hits"][0]["_source"]
+                            and res["hits"]["hits"][0]["_source"]["function"] == "Doctorant"
                     ):
                         has_phd_candidate = True
 
@@ -110,8 +110,8 @@ def sort_references(articles, halstructid):
                 }
                 res = es.search(index="*-researchers", body=doc_param)
                 if (
-                    len(res["hits"]["hits"]) > 0
-                    and res["hits"]["hits"][0]["_source"]["labHalId"] == halstructid
+                        len(res["hits"]["hits"]) > 0
+                        and res["hits"]["hits"][0]["_source"]["labHalId"] == halstructid
                 ):
                     has_authorship = True
 
@@ -135,8 +135,8 @@ def sort_references(articles, halstructid):
 
         if "openAccess_bool" in article:
             if (
-                article["openAccess_bool"] == "true"
-                or article["openAccess_bool"] == True
+                    article["openAccess_bool"] == "true"
+                    or article["openAccess_bool"] == True
             ):
                 article["openAccess_bool_s"] = "O"
             else:
@@ -147,17 +147,17 @@ def sort_references(articles, halstructid):
             if "conferenceEndDate_tdate" in article:
                 tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
                 article["conferenceDate_s"] = (
-                    tmp_start[2]
-                    + "-"
-                    + tmp_start[1]
-                    + "-"
-                    + tmp_start[0]
-                    + ", "
-                    + tmp_end[2]
-                    + "-"
-                    + tmp_end[1]
-                    + "-"
-                    + tmp_end[0]
+                        tmp_start[2]
+                        + "-"
+                        + tmp_start[1]
+                        + "-"
+                        + tmp_start[0]
+                        + ", "
+                        + tmp_end[2]
+                        + "-"
+                        + tmp_end[1]
+                        + "-"
+                        + tmp_end[0]
                 )
             else:
                 article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
@@ -174,10 +174,10 @@ def sort_references(articles, halstructid):
             if len(article["authFirstName_s"]) > 0:
                 for i in range(len(article["authFirstName_s"])):
                     article["authfullName_s"] += (
-                        article["authLastName_s"][i].upper()
-                        + " "
-                        + article["authFirstName_s"][i]
-                        + ", "
+                            article["authLastName_s"][i].upper()
+                            + " "
+                            + article["authFirstName_s"][i]
+                            + ", "
                     )
             else:
                 article["authfullName_s"] = ", ".join(article["authFullName_s"])
@@ -186,7 +186,7 @@ def sort_references(articles, halstructid):
 
         article["authfullName_s"] = article["authfullName_s"][:-2]
         if (
-            "docType_s" not in article.keys()
+                "docType_s" not in article.keys()
         ):  # Encore des exeptions... Est que c'est ponctuel le temps que la base mouline ????
             if "journalTitle_s" in article.keys():
                 article["docType_s"] = "ART"
@@ -201,9 +201,9 @@ def sort_references(articles, halstructid):
                         hceres_art.append(article)
                     # ouvrages, chapitres d'ouvrages et directions d'ouvrages
                     if (
-                        article["docType_s"] == "COUV"
-                        or article["docType_s"] == "DOUV"
-                        or article["docType_s"] == "OUV"
+                            article["docType_s"] == "COUV"
+                            or article["docType_s"] == "DOUV"
+                            or article["docType_s"] == "OUV"
                     ):
                         hceres_book.append(article)
                     # hdr
@@ -219,9 +219,9 @@ def sort_references(articles, halstructid):
                 hceres_art.append(article)
             # ouvrages, chapitres d'ouvrages et directions d'ouvrages
             if (
-                article["docType_s"] == "COUV"
-                or article["docType_s"] == "DOUV"
-                or article["docType_s"] == "OUV"
+                    article["docType_s"] == "COUV"
+                    or article["docType_s"] == "DOUV"
+                    or article["docType_s"] == "OUV"
             ):
                 hceres_book.append(article)
             # hdr
