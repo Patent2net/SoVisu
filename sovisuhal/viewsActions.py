@@ -56,7 +56,7 @@ def admin_access_login(request):
                 entity = res["hits"]["hits"][0]["_source"]
                 struct = entity["structSirene"]
                 user_token = entity["halId_s"]
-                date_to = datetime.now(tz=TIMEZONE).date()
+                date_to = datetime.now(tz=TIMEZONE).date().isoformat()
                 return redirect(
                     f"check/?struct={struct}&type=rsr&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"
                 )
@@ -101,7 +101,7 @@ def validate_references(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     if int(validation) == 0:
         validate = True
@@ -166,7 +166,7 @@ def validate_guiding_domains(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     if request.method == "POST":
         to_validate = request.POST.get("toValidate", "").split(",")
@@ -258,7 +258,7 @@ def validate_expertise(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     if int(validation) == 0:  # validation is at 0 when page show unvalidated concepts
         update_doc = {
@@ -314,7 +314,7 @@ def validate_credentials(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     if request.method == "POST":
         if i_type == "rsr":
@@ -473,7 +473,7 @@ def refresh_aurehal_id(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     scope_param = esActions.scope_p("_id", p_id)
 
@@ -530,7 +530,7 @@ def update_members(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     if request.method == "POST":
         to_update = request.POST.get("toUpdate", "").split(",")
@@ -591,7 +591,7 @@ def update_authorship(request):
     if "to" in request.GET:
         date_to = request.GET["to"]
     else:
-        date_to = datetime.now(tz=TIMEZONE).date()
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     try:
         to_process = json.loads(request.POST.get("toProcess", ""))
