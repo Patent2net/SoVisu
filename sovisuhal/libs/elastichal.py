@@ -296,7 +296,7 @@ def should_be_open(notice):
                             notice["publicationDate_tdate"]
                         ).replace(tzinfo=None)
 
-                        curr_date = datetime.datetime.now(tz=TIMEZONE).date()
+                        curr_date = datetime.datetime.now(tz=TIMEZONE).date().isoformat()
                         age = relativedelta(curr_date, publication_date)
                         age_in_months = age.years * 12 + age.months
 
