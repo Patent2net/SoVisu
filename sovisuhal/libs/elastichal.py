@@ -136,12 +136,16 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         "ldapId": ldapid,
         "Created": datetime.datetime.now(tz=TIMEZONE).isoformat(),
         "idhal": idhal,
-        # sert de clé pivot entre les docs, il faut être sûr que ce champ n'existe dans aucune des docs que l'on pourrait indexer
+        # sert de clé pivot entre les docs,
+        # il faut être sûr que ce champ n'existe dans aucune des docs que l'on pourrait indexer
         "halId_s": idhal,
         "aurehalId": aurehal,
         "idRef": idref,
         "axis": labo_accro,  # TODO: INTERET DE CETTE KEY? contient la même chose que lab
-        "sovisu_category": "searcher"
+        "sovisu_category": "searcher",
+
+        "sv_affiliation": searcher_data["affPref_i"]
+        # AffPref_i recense les halid de tous les laboratoires affiliés au chercheur
     }
 
     res = es.index(
@@ -200,7 +204,7 @@ def collecte_docs(self, entite):  # self,
             doc["records"] = []
             doc["sovisu_category"] = "notice"
             doc["sovisu_referentiel"] = "hal"
-            doc["idhal"] = idhal,  # l'Astuce du
+            doc["idhal"] = idhal
             doc["sovisu_id"] = f'{idhal}.{doc["halId_s"]}'
             doc["sovisu_validated"] = True
 
