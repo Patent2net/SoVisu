@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django.http import JsonResponse
@@ -283,8 +284,15 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         if context["data"] == "affiliations":
             structurelist = self.get_affiliations_case(context["id"])
-
             context["structurelist"] = structurelist
+
+            non_affiliated_structures = self.get_non_affiliated_structures(context["id"])
+            context["non_affiliated_structures"] = json.dumps(
+                [
+                    {"id": structure["docid"], "label": structure["label_s"]}
+                    for structure in non_affiliated_structures
+                ]
+            )
 
         return context
 
@@ -506,6 +514,28 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         print(affiliates_detail)
         return affiliates_detail
 
+    def get_non_affiliated_structures(self, p_id):
+        # Fetch all available structures
+        all_structures = es.search(
+            index=SV_STRUCTURES_REFERENCES,
+            body={"query": {"match_all": {}}},
+            size=200,  # set the number of structures to fetch
+        )
+        all_structures_list = [record["_source"] for record in all_structures["hits"]["hits"]]
+        # Fetch already affiliated structures
+        affiliated_structures = self.get_affiliations_case(p_id)
+
+        # Create a set of affiliated structure ids
+        affiliated_structure_ids = set(structure["docid"] for structure in affiliated_structures)
+
+        # Filter to get non-affiliated structures
+        non_affiliated_structures = [
+            structure
+            for structure in all_structures_list
+            if structure["docid"] not in affiliated_structure_ids
+        ]
+        return non_affiliated_structures
+
     def post(self, request, *args, **kwargs):
         if "update_reference" in request.POST:
             i_type = request.POST.get("type")
@@ -516,11 +546,20 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             response["X-Frame-Options"] = self.get_xframe_options_value()
             return response
 
+        if "add_affiliation" in request.POST:
+            print("add affiliation sent")
+            p_id = request.POST.get("entity_id")
+            affiliate_id = request.POST.get("docid")
+            response = self.add_affiliation(p_id, affiliate_id)
+            print(f"user id: {p_id}, affiliate_id: {affiliate_id}")
+            return JsonResponse({'status': response})
+
         if "remove_affiliation" in request.POST:
             p_id = request.POST.get("entity_id")
             affiliate_id = request.POST.get("docid")
             response = self.remove_affiliation(p_id, affiliate_id)
             return JsonResponse({'status': response})
+
 
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
@@ -567,6 +606,20 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         else:
             return ""
+
+    def add_affiliation(self, p_id, affiliate_id):
+        chercheur = es.get(index=SV_INDEX, id=p_id)
+        chercheur_affiliations = chercheur["_source"]["sv_affiliation"]
+
+        if affiliate_id not in chercheur_affiliations:
+            chercheur_affiliations.append(affiliate_id)
+        else:
+            return "value already exist"
+
+        doc = {"sv_affiliation": chercheur_affiliations}
+        es.update(index=SV_INDEX, id=p_id, doc=doc)
+
+        return "success"
 
     def remove_affiliation(self, p_id, affiliate_id):
         chercheur = es.get(index=SV_INDEX, id=p_id)

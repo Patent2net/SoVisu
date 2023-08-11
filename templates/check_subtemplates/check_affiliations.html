@@ -11,7 +11,13 @@
     </ul>
 </div>
 
-  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+<div class="form-group">
+    <label for="structureAffiliation">Chercher une structure:</label>
+    <input type="text" id="structureAffiliation" class="form-control">
+    <button id="addAffiliation" class="btn btn-primary">rajouter l'affiliation</button>
+</div>
+
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 {% for structure in structurelist %}
     <div class="relative overflow-hidden shadow-lg rounded-lg h-90 w-60 md:w-80 m-auto flex flex-col">
         <div class="p-8 flex-grow">
@@ -23,12 +29,46 @@
                 id="removeAffiliationButton-{{ structure.docid }}" data-struct="{{ structure.docid }}">supprimer l'affiliation</button>
     </div>
 {% empty %}
-    <p>Pas de structures connues</p>
+    <p>Pas de structures affiliées connues</p>
 {% endfor %}
 </div>
 
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-    $(function() {
+    var structureData = {{ non_affiliated_structures|safe }};
+
+    $(document).ready(function () {
+        $("#structureAffiliation").autocomplete({
+            minLength: 2,
+            source: structureData,
+            select: function (event, ui) {
+                // save selected item's id in a data attribute
+                $(this).attr('data-selected-id', ui.item.id);
+            }
+        });
+
+        $('#addAffiliation').click(function() {
+            var docid = $('#structureAffiliation').attr('data-selected-id');
+
+            $.ajax({
+                url: "{% url 'check' %}",
+                type: "POST",
+                data: {
+                    'add_affiliation':'True',
+                    'entity_id': '{{id}}',
+                    'docid': docid,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                success: function(data) {
+                    if (data.status === 'success') {
+                        location.reload();
+                    } else {
+                        // Handle error
+                    }
+                }
+            });
+        });
+
         $(".removeAffiliation").click(function() {
             var buttonId = $(this).attr('id');
             var docid = $('#'+buttonId).data('struct');
