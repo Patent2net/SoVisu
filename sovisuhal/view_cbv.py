@@ -209,6 +209,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         "guiding-domains",
         "state",
         "research-description",
+        "affiliations"
     ]
     data_check_default = "credentials"
 
@@ -267,6 +268,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["guidingDomains"] = guiding_domains
             context["aurehal"] = context["entity"][
                 'aurehalId']  # pas sûr que ce soit pas un hack pas bô
+
         if context["data"] == "references":
             validation, references = self.get_references_case(
                 context["type"],
@@ -278,6 +280,11 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["references"] = references
             if "taches" in self.request.GET:
                 context["taches"] = self.request.GET["taches"]
+
+        if context["data"] == "affiliations":
+            structurelist = self.get_affiliations_case(context["id"])
+
+            context["structurelist"] = structurelist
 
         return context
 
@@ -481,6 +488,24 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         # /
         return validation, references_cleaned
 
+    def get_affiliations_case(self, p_id):
+        chercheur = es.get(index=SV_INDEX, id=p_id)
+        chercheur = chercheur["_source"]
+
+        affiliates = chercheur["sv_affiliation"]
+        print(affiliates)
+
+        affiliates_detail = []
+        for affiliate in affiliates:
+            affiliate_exist = es.exists(index=SV_STRUCTURES_REFERENCES, id=affiliate)
+            if affiliate_exist:
+                affiliates_content = es.get(index=SV_STRUCTURES_REFERENCES, id=affiliate)
+                affiliates_content = affiliates_content["_source"]
+                affiliates_detail.append(affiliates_content)
+
+        print(affiliates_detail)
+        return affiliates_detail
+
     def post(self, request, *args, **kwargs):
         if "update_reference" in request.POST:
             i_type = request.POST.get("type")
@@ -490,6 +515,12 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             response = JsonResponse(response_data)
             response["X-Frame-Options"] = self.get_xframe_options_value()
             return response
+
+        if "remove_affiliation" in request.POST:
+            p_id = request.POST.get("entity_id")
+            affiliate_id = request.POST.get("docid")
+            response = self.remove_affiliation(p_id, affiliate_id)
+            return JsonResponse({'status': response})
 
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
@@ -536,6 +567,19 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         else:
             return ""
+
+    def remove_affiliation(self, p_id, affiliate_id):
+        chercheur = es.get(index=SV_INDEX, id=p_id)
+        chercheur_affiliations = chercheur["_source"]["sv_affiliation"]
+        print(f"affiliate to remove: {affiliate_id}")
+        print(f"chercheur_affiliations: {chercheur_affiliations}")
+        affiliate_id = int(affiliate_id)  # TODO: TEMPORARY.
+        # Need to declare sv_affiliations as string in elastic mapping
+        chercheur_affiliations.remove(affiliate_id)
+        print(f"updated chercheur_affiliations: {chercheur_affiliations}")
+        doc = {"sv_affiliation": chercheur_affiliations}
+        es.update(index=SV_INDEX, id=p_id, doc=doc)
+        return "success"
 
 
 class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
