@@ -29,9 +29,9 @@
                 <div class="flex justify-between items-start">
 
                     <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1 pt-2">
-                        <a class="px-2 pb-1 text-gray-600 {% if indexstruct == "*" %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/searchers_index/?indexstruct=*{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> Tous les chercheurs</a>
+                        <a class="px-2 pb-1 text-gray-600 {% if indexstruct == "*" %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/searchers_index/?indexstruct=*{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}"> Tous les chercheurs</a>
                         {% for tab in struct_tab %}
-                           <a class="px-2 pb-1 text-gray-600 {% if tab.docid == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/searchers_index/?indexstruct={{ tab.docid }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> {{ tab.acronym_s }}</a>
+                           <a class="px-2 pb-1 text-gray-600 {% if tab.docid == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/searchers_index/?indexstruct={{ tab.docid }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}"> {{ tab.acronym_s }}</a>
                         {% endfor %}
                     </div>
 
