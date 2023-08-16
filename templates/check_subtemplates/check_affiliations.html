@@ -11,10 +11,10 @@
     </ul>
 </div>
 
-<div class="form-group">
-    <label for="structureAffiliation">Chercher une structure:</label>
-    <input type="text" id="structureAffiliation" class="form-control">
-    <button id="addAffiliation" class="btn btn-primary">rajouter l'affiliation</button>
+<div class="form-group text-xs my-3 mt-1 flex w-full border border-grey-300 rounded p-4 items-center">
+    <label for="structureAffiliation" class="text-gray-600 mr-3">Rechercher une structure:</label>
+    <input type="text" id="structureAffiliation" class="form-control border border-gray-400 rounded-lg mr-3">
+    <button id="addAffiliation" class="font-semibold py-1 px-2 rounded bg-blue-600 my-2 text-white cursor-pointer expertise_field outline-none whitespace-nowrap">rajouter l'affiliation</button>
 </div>
 
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -44,6 +44,13 @@
             select: function (event, ui) {
                 // save selected item's id in a data attribute
                 $(this).attr('data-selected-id', ui.item.id);
+            },
+            open: function() {
+                $(this).autocomplete("widget").css({
+               'width': 'auto', // automatically adjust width
+               'max-width': '700px' // feel free to adjust this value
+            });
+                $(this).autocomplete("widget").addClass("bg-white shadow-lg rounded-lg");
             }
         });
 
