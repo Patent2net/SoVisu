@@ -1035,6 +1035,7 @@ class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return entity
 
+
 # TODO: Review StructuresIndexView and adjust code to new needs
 class StructuresIndexView(CommonContextMixin, TemplateView):
     """
@@ -1064,25 +1065,26 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
 
     def get_elastic_data(self, index_category):
         struct_tab = self.get_struct_category()
+
         indextype = SV_LAB_INDEX
         category_type = index_category
-
-        query = {
-            "bool": {
-                "must": [
-                    {"match": {"sovisu_category": category_type}},
-                ]
-            }
-        }
-        count = es.count(index=f"{indextype}")["count"]
-        res = es.search(index=f"{indextype}", query=query, size=count)
-        cleaned_entities = [hit["_source"] for hit in res["hits"]["hits"]]
-
-        cleaned_entities = sorted(cleaned_entities, key=lambda k: k["acronym_s"])
+        cleaned_entities = self.get_struct_list(indextype, category_type)
 
         return cleaned_entities, struct_tab
 
     def get_struct_category(self):
+        """
+            This method is used to retrieve the unique categories of structures from the SV_LAB_INDEX in Elasticsearch.
+
+            Parameters:
+                None
+
+            Returns:
+                unique_categories (list): A list containing the unique categories of structures.
+
+            Example Usage:
+                unique_categories = StructuresIndexView().get_struct_category()
+        """
         body = {
             "size": 0,
             "aggs": {"unique_categories": {"terms": {"field": "sovisu_category.keyword"}}},
@@ -1096,6 +1098,22 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
         ]
 
         return unique_categories
+
+    def get_struct_list(self, indextype, category_type):
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": category_type}},
+                ]
+            }
+        }
+        count = es.count(index=f"{indextype}")["count"]
+        res = es.search(index=f"{indextype}", query=query, size=count)
+        struct_list = [hit["_source"] for hit in res["hits"]["hits"]]
+
+        struct_list = sorted(struct_list, key=lambda k: k["acronym_s"])
+
+        return struct_list
 
 
 class SearchersIndexView(CommonContextMixin, TemplateView):
@@ -1128,25 +1146,22 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
         structure_type = "laboratory"
         struct_tab = self.get_structure_type_list(structure_type)
 
-        category_type = "searcher"
-        query = {
-            "bool": {
-                "must": [
-                    {"match": {"sovisu_category": category_type}},
-                ]
-            }
-        }
-
-        indextype = SV_INDEX
-        count = es.count(index=f"{indextype}")["count"]
-        res = es.search(index=f"{indextype}", query=query, size=count)
-        cleaned_entities = [hit["_source"] for hit in res["hits"]["hits"]]
-
-        cleaned_entities = sorted(cleaned_entities, key=lambda k: k["lastName"])
+        cleaned_entities = self.get_searcher_list()
 
         return cleaned_entities, struct_tab
 
     def get_structure_type_list(self, type):
+        """
+        Method: get_structure_type_list(type)
+
+        This method retrieves a list of structure based on the specified type.
+
+        Parameters:
+        - type (str): The type of structure to retrieve.
+
+        Returns:
+        - struct_tab (list): A list of structures that match the specified type.
+        """
         get_institution_query = {
             "bool": {
                 "must": [
@@ -1164,6 +1179,32 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
         )
         struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
         return struct_tab
+
+    def get_searcher_list(self):
+        """
+        Retrieve the list of searchers.
+
+        Returns:
+            list: A list of dictionaries representing the searchers.
+
+        """
+        category_type = "searcher"
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": category_type}},
+                ]
+            }
+        }
+
+        indextype = SV_INDEX
+        count = es.count(index=f"{indextype}")["count"]
+        res = es.search(index=f"{indextype}", query=query, size=count)
+        searcher_list = [hit["_source"] for hit in res["hits"]["hits"]]
+
+        searcher_list = sorted(searcher_list, key=lambda k: k["lastName"])
+
+        return searcher_list
 
 
 class SearchView(CommonContextMixin, TemplateView):
