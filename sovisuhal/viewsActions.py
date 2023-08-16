@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from uniauth.decorators import login_required
 
-from constants import SV_INDEX, TIMEZONE
+from constants import SV_INDEX, TIMEZONE, SV_LAB_INDEX
 from elasticHal.libs import utils
 from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
 from sovisuhal.libs.elastichal import creeFichesExpertise
@@ -118,7 +118,7 @@ def validate_references(request):
     if i_type == "rsr":
         index_name = SV_INDEX
     elif i_type == "lab":
-        index_name = "sovisu_laboratories"
+        index_name = SV_LAB_INDEX
     else:
         return redirect("unknown")
 
