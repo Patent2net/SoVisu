@@ -10,7 +10,6 @@ from elasticsearch import BadRequestError
 from uniauth.decorators import login_required
 
 from constants import SV_INDEX, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX, TIMEZONE
-
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
 from .libs.elastichal import collecte_docs, indexe_chercheur
@@ -1074,16 +1073,16 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
 
     def get_struct_category(self):
         """
-            This method is used to retrieve the unique categories of structures from the SV_LAB_INDEX in Elasticsearch.
+        This method is used to retrieve the unique categories of structures from the SV_LAB_INDEX in Elasticsearch.
 
-            Parameters:
-                None
+        Parameters:
+            None
 
-            Returns:
-                unique_categories (list): A list containing the unique categories of structures.
+        Returns:
+            unique_categories (list): A list containing the unique categories of structures.
 
-            Example Usage:
-                unique_categories = StructuresIndexView().get_struct_category()
+        Example Usage:
+            unique_categories = StructuresIndexView().get_struct_category()
         """
         body = {
             "size": 0,
@@ -1130,7 +1129,7 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
         context["indexcat"] = self.request.GET.get("indexcat")
         context["indexstruct"] = self.request.GET.get("indexstruct")
 
-        entities, struct_tab = self.get_elastic_data()
+        entities, struct_tab = self.get_elastic_data(context["indexstruct"])
 
         context["entities"] = entities
         context["struct_tab"] = struct_tab
@@ -1142,11 +1141,11 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(self):
+    def get_elastic_data(self, sv_affiliation):
         structure_type = "laboratory"
         struct_tab = self.get_structure_type_list(structure_type)
 
-        cleaned_entities = self.get_searcher_list()
+        cleaned_entities = self.get_searcher_list(sv_affiliation)
 
         return cleaned_entities, struct_tab
 
@@ -1180,13 +1179,26 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
         struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
         return struct_tab
 
-    def get_searcher_list(self):
+    def get_searcher_list(self, sv_affiliation):
         """
-        Retrieve the list of searchers.
-
-        Returns:
-            list: A list of dictionaries representing the searchers.
-
+            Fetches a list of searchers sorted by their last name from ElasticSearch,
+             based on the provided affiliation value.
+ 
+            Parameters
+            ----------
+            sv_affiliation : str
+                The affiliation value used to filter the search results from the ElasticSearch
+                Index.
+                It uses 'match' (in ElasticSearch terms) to filter results where 'sv_affiliation'
+                 is equal to provided value. If the value is '*', it will take all affiliations.
+ 
+            Returns
+            -------
+            list
+                List of searchers as a dictionary including their details.
+                Each 'hit' from ElasticSearch results is extracted as a dictionary using
+                 its '_source' attribute.
+                The list is sorted by the 'lastName' key of these dictionaries, in ascending order.
         """
         category_type = "searcher"
         query = {
@@ -1196,6 +1208,8 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
                 ]
             }
         }
+        if sv_affiliation is not "*":
+            query["bool"]["must"].append({"term": {"sv_affiliation": sv_affiliation}})
 
         indextype = SV_INDEX
         count = es.count(index=f"{indextype}")["count"]
