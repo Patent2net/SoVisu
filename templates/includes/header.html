@@ -8,7 +8,7 @@
     <meta name="google-site-verification" content="tWOEM_g9-lB_hXbgHVWrOMOlrSeEwfGwi3yKTj1jY0s" />
     <meta name="robots" content="noindex">
 
-    <title>{{title}} {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" %}:{%  endif %} {% if entity.ldapId %}
+    <title>{{title}} {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des structures" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" %}:{%  endif %} {% if entity.ldapId %}
         {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
     {%  endif %}
         {% if entity.halStructId %}
@@ -68,7 +68,7 @@
 
                     <div class="flex items-center text-xs text-gray-200 pl-4">
                         {{ title }}
-                        {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée" and title != "Foire aux questions"  and title != "Nous contacter" and title != "Ressources" and title != "Outils & services"%}
+                        {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des structures" and title != "Aucune ressource sélectionnée" and title != "Foire aux questions"  and title != "Nous contacter" and title != "Ressources" and title != "Outils & services"%}
                             <svg class="fill-current w-3 h-3 ml-1 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>
@@ -89,7 +89,7 @@
 
             </div>
 
-            {% if halId_s != 'nullNone' and title != "Expertise" and title != "Aide" and title != "Index des chercheurs" and title != "Terminologie" and title != "Index des laboratoires" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" and title != "Vérification des données" %}
+            {% if halId_s != 'nullNone' and title != "Expertise" and title != "Aide" and title != "Index des chercheurs" and title != "Terminologie" and title != "Index des structures" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" and title != "Vérification des données" %}
 
             <script>
 

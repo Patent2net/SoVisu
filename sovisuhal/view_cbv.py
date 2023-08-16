@@ -172,8 +172,9 @@ class CreateView(TemplateView):
             if idhal_test > 0:
                 labo_data = es.get(index=SV_STRUCTURES_REFERENCES, id=labHalId)
                 labo_data = labo_data["_source"]
-                indexe_chercheur(structid, ldapid, labo_data["acronym_s"], labHalId, idhal, idref,
-                                 orcid)
+                indexe_chercheur(
+                    structid, ldapid, labo_data["acronym_s"], labHalId, idhal, idref, orcid
+                )
                 entity = es.get(index=SV_INDEX, id=idhal)
                 entity = entity["_source"]
                 struct = entity["structSirene"]
@@ -210,12 +211,12 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         "guiding-domains",
         "state",
         "research-description",
-        "affiliations"
+        "affiliations",
     ]
     data_check_default = "credentials"
 
     def countPoint(self):
-        return self.chemin.count('.')
+        return self.chemin.count(".")
 
     def get_xframe_options_value(self):
         return "ALLOW-FROM http://localhost:8000/"
@@ -268,7 +269,8 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["domains"] = domains
             context["guidingDomains"] = guiding_domains
             context["aurehal"] = context["entity"][
-                'aurehalId']  # pas sûr que ce soit pas un hack pas bô
+                "aurehalId"
+            ]  # pas sûr que ce soit pas un hack pas bô
 
         if context["data"] == "references":
             validation, references = self.get_references_case(
@@ -405,24 +407,23 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             }
         }
         expertises_count = es.count(index=SV_INDEX, query=query)["count"]
-        searcher_expertises = es.search(index=SV_INDEX, query=query,
-                                        size=expertises_count)
+        searcher_expertises = es.search(index=SV_INDEX, query=query, size=expertises_count)
         searcher_expertises = searcher_expertises["hits"]["hits"]
 
         if validation == "1":  # show the expertises validated by searcher
             for expertise in searcher_expertises:
-                if expertise["_source"]['validated']:
+                if expertise["_source"]["validated"]:
                     expertise_cleaned.append(expertise["_source"])
 
         elif validation == "0":  # show the expertises invalidated by searcher
             for expertise in searcher_expertises:
-                if not expertise["_source"]['validated']:
+                if not expertise["_source"]["validated"]:
                     expertise_cleaned.append(expertise["_source"])
         else:
             return redirect("unknown")
         # print(expertise_cleaned)
 
-        return validation, sorted(expertise_cleaned, key=lambda x: x['chemin'])
+        return validation, sorted(expertise_cleaned, key=lambda x: x["chemin"])
 
     def get_guiding_domains_case(self, entity):
         domains = halConcepts.concepts()
@@ -431,22 +432,23 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 "must": [
                     {"match": {"sovisu_category": "expertise"}},
                     {"match": {"validated": True}},
-                    {"match": {"idhal": entity['idhal']}},
+                    {"match": {"idhal": entity["idhal"]}},
                 ]
             }
         }
         expertises_count = es.count(index=SV_INDEX, query=query)["count"]
-        searcher_expertises = es.search(index=SV_INDEX, query=query,
-                                        size=expertises_count)
-        searcher_expertises = [exp['_source']['chemin'].replace("domAurehal.", "") for exp in
-                               searcher_expertises["hits"]["hits"]]
+        searcher_expertises = es.search(index=SV_INDEX, query=query, size=expertises_count)
+        searcher_expertises = [
+            exp["_source"]["chemin"].replace("domAurehal.", "")
+            for exp in searcher_expertises["hits"]["hits"]
+        ]
 
         guiding_domains = []
         guiding_domains = searcher_expertises
         aurehal = ""
         if "guidingDomains" in entity:  # Plus sûr qu'il y ait besoin de çà
             guiding_domains = entity["guidingDomains"]
-        if 'aurehalId' in entity:
+        if "aurehalId" in entity:
             aurehal = entity["aurehalId"]
         return domains, guiding_domains, aurehal
 
@@ -471,14 +473,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                     {"match": {"sovisu_category": "notice"}},
                     {"match": {"sovisu_id": f"{p_id}.*"}},
                     {"match": {"sovisu_validated": validate}},
-                    {
-                        "range": {
-                            date_range_type: {
-                                "gte": date_from,
-                                "lte": date_to
-                            }
-                        }
-                    }
+                    {"range": {date_range_type: {"gte": date_from, "lte": date_to}}},
                 ]
             }
         }
@@ -552,14 +547,13 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             affiliate_id = request.POST.get("docid")
             response = self.add_affiliation(p_id, affiliate_id)
             print(f"user id: {p_id}, affiliate_id: {affiliate_id}")
-            return JsonResponse({'status': response})
+            return JsonResponse({"status": response})
 
         if "remove_affiliation" in request.POST:
             p_id = request.POST.get("entity_id")
             affiliate_id = request.POST.get("docid")
             response = self.remove_affiliation(p_id, affiliate_id)
-            return JsonResponse({'status': response})
-
+            return JsonResponse({"status": response})
 
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
@@ -801,8 +795,9 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
             }
         }
         expertise_count = es.count(index=index_pattern, query=query)["count"]
-        searcher_expertises = \
-            es.search(index=index_pattern, query=query, size=expertise_count)["hits"]["hits"]
+        searcher_expertises = es.search(index=index_pattern, query=query, size=expertise_count)[
+            "hits"
+        ]["hits"]
         # on pointe sur index générique, car pas de LabHalId ?
         for expertise in searcher_expertises:
             entity.append(expertise["_source"])
@@ -1040,22 +1035,22 @@ class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return entity
 
-
-class IndexView(CommonContextMixin, TemplateView):
+# TODO: Review StructuresIndexView and adjust code to new needs
+class StructuresIndexView(CommonContextMixin, TemplateView):
     """
     Gestion des pages d'indexation des profils chercheurs et laboratoires
     """
 
-    template_name = "index.html"
+    template_name = "structures_index.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         # Get parameters
         context["indexcat"] = self.request.GET.get("indexcat")
-        context["indexstruct"] = self.request.GET.get("indexstruct")
+        context["indexcategory"] = self.request.GET.get("indexcategory")
 
-        entities, struct_tab = self.get_elastic_data(context["indexcat"])
+        entities, struct_tab = self.get_elastic_data(context["indexcategory"])
 
         context["entities"] = entities
         context["struct_tab"] = struct_tab
@@ -1067,33 +1062,10 @@ class IndexView(CommonContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(self, indexcat):
-        # TODO: Revoir le filtre pour ne retourner que les institutions
-        get_institution_query = {
-            "bool": {
-                "must": [
-                    {"match": {"sovisu_category": "institution"}},
-                ]
-            }
-        }
-        # création dynamique des tabs sur la page à partir de struct_tab
-        # TODO: Revoir le système d'index chercheur pour le structsirene (n'existe plus dans les labos/institutions indexées) dans elasticindextest2.
-        #  remplacer par idref? Bloque actuellement un élément de l'affichage d'index (appartenance structure)
-        struct_tab = es.search(
-            index= SV_STRUCTURES_REFERENCES,
-            query=get_institution_query,
-            filter_path=[
-                "hits.hits._source.idref_s, hits.hits._source.acronym_s, hits.hits._source.label_s, hits.hits._source.sovisu_category"],
-        )
-        struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
-        if indexcat == "lab":
-            indextype = SV_LAB_INDEX
-            category_type = "laboratory"
-        elif indexcat == "rsr":
-            indextype = SV_INDEX
-            category_type = "searcher"
-        else:
-            return redirect("unknown")
+    def get_elastic_data(self, index_category):
+        struct_tab = self.get_struct_category()
+        indextype = SV_LAB_INDEX
+        category_type = index_category
 
         query = {
             "bool": {
@@ -1106,12 +1078,92 @@ class IndexView(CommonContextMixin, TemplateView):
         res = es.search(index=f"{indextype}", query=query, size=count)
         cleaned_entities = [hit["_source"] for hit in res["hits"]["hits"]]
 
-        if indexcat == "lab":
-            cleaned_entities = sorted(cleaned_entities, key=lambda k: k["acronym"])
-        elif indexcat == "rsr":
-            cleaned_entities = sorted(cleaned_entities, key=lambda k: k["lastName"])
+        cleaned_entities = sorted(cleaned_entities, key=lambda k: k["acronym_s"])
 
         return cleaned_entities, struct_tab
+
+    def get_struct_category(self):
+        body = {
+            "size": 0,
+            "aggs": {"unique_categories": {"terms": {"field": "sovisu_category.keyword"}}},
+        }
+
+        response = es.search(index=SV_LAB_INDEX, body=body)
+
+        # Get the unique categories from the response
+        unique_categories = [
+            bucket["key"] for bucket in response["aggregations"]["unique_categories"]["buckets"]
+        ]
+
+        return unique_categories
+
+
+class SearchersIndexView(CommonContextMixin, TemplateView):
+    """
+    Gestion des pages d'indexation des profils chercheurs et laboratoires
+    """
+
+    template_name = "searchers_index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get parameters
+        context["indexcat"] = self.request.GET.get("indexcat")
+        context["indexstruct"] = self.request.GET.get("indexstruct")
+
+        entities, struct_tab = self.get_elastic_data()
+
+        context["entities"] = entities
+        context["struct_tab"] = struct_tab
+
+        if context["type"] == -1 and context["id"] == -1:
+            del context["type"]
+            del context["id"]
+            del context["struct"]
+
+        return context
+
+    def get_elastic_data(self):
+        structure_type = "laboratory"
+        struct_tab = self.get_structure_type_list(structure_type)
+
+        category_type = "searcher"
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": category_type}},
+                ]
+            }
+        }
+
+        indextype = SV_INDEX
+        count = es.count(index=f"{indextype}")["count"]
+        res = es.search(index=f"{indextype}", query=query, size=count)
+        cleaned_entities = [hit["_source"] for hit in res["hits"]["hits"]]
+
+        cleaned_entities = sorted(cleaned_entities, key=lambda k: k["lastName"])
+
+        return cleaned_entities, struct_tab
+
+    def get_structure_type_list(self, type):
+        get_institution_query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": type}},
+                ]
+            }
+        }
+        # création dynamique des tabs sur la page à partir de struct_tab
+        count = es.count(
+            index=SV_STRUCTURES_REFERENCES,
+            query=get_institution_query,
+        )["count"]
+        struct_tab = es.search(
+            index=SV_STRUCTURES_REFERENCES, query=get_institution_query, size=count
+        )
+        struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
+        return struct_tab
 
 
 class SearchView(CommonContextMixin, TemplateView):

@@ -1,18 +1,8 @@
-{% if indexcat == "lab" %}
-    {% include "includes/header.html" with title="Index des laboratoires" %}
-{%  endif %}
-{% if indexcat == "rsr" %}
-    {% include "includes/header.html" with title="Index des chercheurs" %}
-{%  endif %}
+ {% include "includes/header.html" with title="Index des chercheurs" %}
 
 <div class="w-full flex" style="height:calc(100% - 48px)">
 
-    {% if indexcat == "lab" %}
-        {% include "includes/menu.html" with title="Index des laboratoires" %}
-    {%  endif %}
-    {% if indexcat == "rsr" %}
-        {% include "includes/menu.html" with title="Index des chercheurs" %}
-    {%  endif %}
+    {% include "includes/menu.html" with title="Index des chercheurs" %}
 
     <div class="w-full relative p-3" style="background: #fafbfd;">
 
@@ -32,31 +22,17 @@
             <div class="flex flex-col justify-between items-start">
 
                     <h1 class="font-semibold text-xs">
-                        {% if indexcat == "lab" %}
-                            Laboratoires référencés
-                        {%  endif %}
-                        {% if indexcat == "rsr" %}
-                            Chercheurs référencés
-                        {%  endif %}
+                        Chercheurs référencés
                     </h1>
 
             </div>
                 <div class="flex justify-between items-start">
 
                     <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1 pt-2">
-                        {% if indexcat == "rsr" %}
-                            {% for tab in struct_tab %}
-                               <a class="px-2 pb-1 text-gray-600 {% if tab.structSirene == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/index/?indexcat=rsr&indexstruct={{ tab.structSirene }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> {{ tab.acronym_s }}</a> {% endfor %}
-                        {% endif %}
-
-                        {% if indexcat == "lab" %}
-                            {% for tab in struct_tab %}
-                                  <a class="px-2 pb-1 text-gray-600
-                                     {% if tab.structSirene == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}"
-                                     href="/index/?indexcat=lab&indexstruct={{ tab.structSirene }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}" >
-                                      {{ tab.acronym_s }}</a>
-                            {% endfor %}
-                        {% endif %}
+                        <a class="px-2 pb-1 text-gray-600 {% if indexstruct == "*" %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/searchers_index/?indexstruct=*{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> Tous les chercheurs</a>
+                        {% for tab in struct_tab %}
+                           <a class="px-2 pb-1 text-gray-600 {% if tab.docid == indexstruct %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}" href="/searchers_index/?indexstruct={{ tab.docid }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}"> {{ tab.acronym_s }}</a>
+                        {% endfor %}
                     </div>
 
                 </div>
@@ -65,10 +41,10 @@
                 <ul class="pt-2 index-list">
                     {% for entity in entities %}
 
-                        {% if  indexstruct in entity.structSirene %}
+                        {% if indexstruct in entity.sv_affiliation or indexstruct == "*" %}
                             <li class="leading-4 w-full bg-gray-50 py-1 px-2">
                                 <a class="text-blue-700 text-sm"
-                                   href="/dashboard/?struct={{ indexstruct }}&type={% if entity.halId_s %}rsr&id={{ entity.halId_s }}{%  endif %}{% if entity.halStructId %}lab&id={{ entity.halStructId }}{%  endif %}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
+                                   href="/dashboard/?struct={{ indexstruct }}&type=rsr&id={{ entity.halId_s }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
                                 >
                                     <span class="">
                                         {% if entity.ldapId %}

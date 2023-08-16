@@ -1,0 +1,67 @@
+ {% include "includes/header.html" with title="Index des structures" %}
+
+<div class="w-full flex" style="height:calc(100% - 48px)">
+
+    {% include "includes/menu.html" with title="Index des structures" %}
+
+    <div class="w-full relative p-3" style="background: #fafbfd;">
+
+        <div class="loading-div z-10 absolute left-0 top-0 bottom-0 right-0" style="background: #fafbfd;">
+            <div class="absolute inset-center text-sm flex">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Chargement des données
+            </div>
+        </div>
+
+
+        <div class="flex flex-col bg-white rounded h-full relative w-full" style="border: 1px solid rgb(211, 218, 230); padding: 6px 8px">
+
+            <div class="flex flex-col justify-between items-start">
+
+                    <h1 class="font-semibold text-xs">
+                        Structures référencées
+                    </h1>
+
+            </div>
+                <div class="flex justify-between items-start">
+
+                    <div class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1 pt-2">
+                        {% for tab in struct_tab %}
+                              <a class="px-2 pb-1 text-gray-600
+                                 {% if tab == indexcategory %}text-blue-600 border-b-2 border-blue-400{% else %} text-gray-600 {% endif %}"
+                                 href="/structures_index/?indexcategory={{ tab }}{%  if struct and struct != '-1' %}&struct={{ struct }}{% endif %}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}" >
+                                  {{ tab }}</a>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            <div class="flex-1 overflow-y-scroll dataTables_scrollBody">
+
+                <ul class="pt-2 index-list">
+                    {% for entity in entities %}
+
+                        {% if  indexcategory == entity.sovisu_category %}
+                            <li class="leading-4 w-full bg-gray-50 py-1 px-2">
+                                <a class="text-blue-700 text-sm"
+                                   href="/dashboard/?struct={{ indexstruct }}&type=lab&id={{ entity.halStructId }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
+                                >
+                                    <span class="">
+                                        {{ entity.label_s }}
+                                    </span>
+
+                                </a>
+                            </li>
+                        {% endif %}
+
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
+
+{% include "includes/footer.html" %}
