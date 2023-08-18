@@ -658,16 +658,6 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return context
 
     def get_elastic_data(self, i_type, p_id):
-        # Get scope data
-        _, _, scope_param = self.get_scope_data(i_type, p_id)
-
-        res = es.search(index=SV_INDEX, query=scope_param)
-        # on pointe sur index générique, car pas de LabHalId ?
-        try:
-            entity = res["hits"]["hits"][0]["_source"]
-        except (IndexError, BadRequestError):
-            return redirect("unknown")
-        # /
 
         dash = ""
         if i_type == "rsr":
@@ -676,6 +666,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
             filtre_lab_a = ""
             filtre_lab_b = ""
         elif i_type == "lab":
+            indexsearch = SV_LAB_INDEX
             if "dash" in self.request.GET:
                 dash = self.request.GET["dash"]
             else:
@@ -685,6 +676,14 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
             filtre_lab_b = f'labHalId.keyword: "{p_id}"'
         else:
             return redirect("unknown")
+
+        res = es.get(index=indexsearch, id=p_id)
+        # on pointe sur index générique, car pas de LabHalId ?
+        try:
+            entity = res["_source"]
+        except (IndexError, BadRequestError):
+            return redirect("unknown")
+        # /
 
         url = viewsActions.vizualisation_url()
 
