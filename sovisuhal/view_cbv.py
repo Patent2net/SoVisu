@@ -68,24 +68,7 @@ class CommonContextMixin:
 
         return date_from, date_to
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        (
-            context["struct"],
-            context["type"],
-            context["id"],
-            context["ldapid"],
-        ) = self.get_regular_parameters(self.request)
-        context["from"], context["to"] = self.get_date(self.request)
-
-        return context
-
-
-class ElasticContextMixin:
-    """
-    Gestion des fonctions communes aux vues utilisant elastic
-    """
-    def validated_notices_state(self, i_type, entity):  # TODO: Revoir la fonction et son utilité
+    def validated_notices_state(self, i_type, p_id):  # TODO: Revoir la fonction
         """
         Check if at least one notice is in the state setup of the "validate" variable.
         If not, a ping gonna appear next to check in the menu.
@@ -96,12 +79,12 @@ class ElasticContextMixin:
         if i_type == "rsr":
             index = SV_INDEX
             field = "authIdHal_s"
-            hastoconfirm_param = esActions.confirm_p(field, entity["halId_s"], validate)
+            hastoconfirm_param = esActions.confirm_p(field, p_id, validate)
 
         elif i_type == "lab":
             index = SV_LAB_INDEX
             field = "labStructId_i"
-            hastoconfirm_param = esActions.confirm_p(field, entity["docid"], validate)
+            hastoconfirm_param = esActions.confirm_p(field, p_id, validate)
         else:
             return redirect("unknown")
 
@@ -109,6 +92,18 @@ class ElasticContextMixin:
             hastoconfirm = True
 
         return hastoconfirm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        (
+            context["struct"],
+            context["type"],
+            context["id"],
+            context["ldapid"],
+        ) = self.get_regular_parameters(self.request)
+        context["from"], context["to"] = self.get_date(self.request)
+        context["hasToConfirm"] = self.validated_notices_state(context["type"], context["id"])
+        return context
 
 
 class CreateView(TemplateView):
@@ -172,7 +167,7 @@ class CreateView(TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
+class CheckView(CommonContextMixin, TemplateView):
     """
     Gestion de la page gérant "vérification des données"
     """
@@ -209,8 +204,6 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["data"] = self.data_check_default
 
         context["entity"] = self.get_entity_data(context["type"], context["id"])
-
-        context["hasToConfirm"] = self.validated_notices_state(context["type"], context["entity"])
 
         if context["data"] == "state":
             researchers = self.get_state_case(context["id"])
@@ -609,7 +602,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return "success"
 
 
-class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
+class DashboardView(CommonContextMixin, TemplateView):
     """
     Gestion de la page affichant les tableaux de bord sous Kibana
     """
@@ -671,7 +664,7 @@ class DashboardView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return entity, filtrechercheur, filtre_lab_a, filtre_lab_b, url, dash
 
 
-class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
+class ReferencesView(CommonContextMixin, TemplateView):
     """
     Gestion de la page affichant les références du profil sélectionné
     """
@@ -727,7 +720,7 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 
 @method_decorator(xframe_options_exempt, name="dispatch")
-class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
+class TerminologyView(CommonContextMixin, TemplateView):
     """
     Gestion de la page affichant les domaines d'expertise du profil sélectionné
     """
@@ -836,7 +829,7 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return entity
 
 
-class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
+class LexiconView(CommonContextMixin, TemplateView):
     """
     Gestion de la page "lexiques extraits"
     """
@@ -891,7 +884,7 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
 
 @method_decorator(login_required, name="dispatch")
-class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
+class ToolsView(CommonContextMixin, TemplateView):
     """
     Gestion de la page "Outils", proposant des fonctionnalités pour les profils laboratoires.
     (Export HCERES, Cohésion des données)
