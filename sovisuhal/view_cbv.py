@@ -284,10 +284,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
                 context["taches"] = self.request.GET["taches"]
 
         if context["data"] == "affiliations":
-            structurelist = self.get_affiliations_case(context["id"])
+            structurelist = self.get_affiliations_case(context["id"], context["type"])
             context["structurelist"] = structurelist
 
-            non_affiliated_structures = self.get_non_affiliated_structures(context["id"])
+            non_affiliated_structures = self.get_non_affiliated_structures(context["id"], context["type"])
             context["non_affiliated_structures"] = json.dumps(
                 [
                     {"id": structure["docid"], "label": structure["label_s"]}
@@ -500,12 +500,22 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         # /
         return validation, references_cleaned
 
-    def get_affiliations_case(self, p_id):
-        chercheur = es.get(index=SV_INDEX, id=p_id)
-        chercheur = chercheur["_source"]
+    def get_affiliations_case(self, p_id, i_type):
 
-        affiliates = chercheur["sv_affiliation"]
-        print(affiliates)
+        if i_type == "rsr":
+            chercheur = es.get(index=SV_INDEX, id=p_id)
+            chercheur = chercheur["_source"]
+
+            affiliates = chercheur["sv_affiliation"]
+            print(affiliates)
+        elif i_type == "lab":
+            structure = es.get(index=SV_LAB_INDEX, id=p_id)
+            structure = structure["_source"]
+
+            affiliates = structure["parentDocid_i"]
+            print(affiliates)
+        else:
+            return redirect("unknown")
 
         affiliates_detail = []
         for affiliate in affiliates:
@@ -518,7 +528,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         print(affiliates_detail)
         return affiliates_detail
 
-    def get_non_affiliated_structures(self, p_id):
+    def get_non_affiliated_structures(self, p_id, i_type):
         # Fetch all available structures
         all_structures = es.search(
             index=SV_STRUCTURES_REFERENCES,
@@ -527,7 +537,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         )
         all_structures_list = [record["_source"] for record in all_structures["hits"]["hits"]]
         # Fetch already affiliated structures
-        affiliated_structures = self.get_affiliations_case(p_id)
+        affiliated_structures = self.get_affiliations_case(p_id, i_type)
 
         # Create a set of affiliated structure ids
         affiliated_structure_ids = set(structure["docid"] for structure in affiliated_structures)
@@ -567,18 +577,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
     def update_references(self, i_type, p_id):
         if i_type == "rsr":
             print("type rsr")
-            query = {
-                "bool": {
-                    "must": [
-                        {"match": {"sovisu_category": "searcher"}},
-                        {"match": {"idhal": p_id}},
-                    ]
-                }
-            }
-
-            res = es.search(index=SV_INDEX, query=query)
+            res = es.get(index=SV_INDEX, id=p_id)
             try:
-                entity = res["hits"]["hits"][0]["_source"]
+                entity = res["_source"]
             except IndexError:
                 return redirect("unknown")
 
@@ -588,18 +589,10 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         if i_type == "lab":
             print("type lab")
-            query = {
-                "bool": {
-                    "must": [
-                        {"match": {"sovisu_category": "laboratory"}},
-                        {"match": {"idhal": p_id}},
-                    ]
-                }
-            }
 
-            res = es.search(index="sovisu", query=query)
+            res = es.get(index=SV_LAB_INDEX, id=p_id)
             try:
-                entity = res["hits"]["hits"][0]["_source"]
+                entity = res["_source"]
             except IndexError:
                 return redirect("unknown")
 
