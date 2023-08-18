@@ -50,6 +50,11 @@
                         {% if data == "expertise" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
                            href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=expertise&validation=1"
                         >Expertises identifiées</a>
+
+                        <a class="px-2 pb-1
+                        {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
+                        href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
+                        >Domaines d'expertise</a>
                     {% endif %}
                     {% if type == "lab" %}
                         <a class="px-2 pb-1
@@ -58,10 +63,6 @@
                         >Notices HAL du labo</a>
                     {% endif %}
 
-                    <a class="px-2 pb-1
-                        {% if data == "guiding-domains" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                       href="/check/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}&data=guiding-domains"
-                    >Domaines d'expertise</a>
 
                     <a class="px-2 pb-1
                         {% if data == "affiliations" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
