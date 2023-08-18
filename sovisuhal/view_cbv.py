@@ -125,7 +125,7 @@ class ElasticContextMixin:
         elif i_type == "lab":
             index = SV_LAB_INDEX
             field = "labStructId_i"
-            hastoconfirm_param = esActions.confirm_p(field, entity["halStructId"], validate)
+            hastoconfirm_param = esActions.confirm_p(field, entity["docid"], validate)
         else:
             return redirect("unknown")
 
@@ -298,10 +298,20 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
         return context
 
     def get_entity_data(self, i_type, p_id):
-        _, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
-        res = es.search(index=f"{index_pattern}", query=scope_param)
 
-        entity = res["hits"]["hits"][0]["_source"]
+        if i_type == "lab":
+            indexsearch = SV_LAB_INDEX
+        elif i_type == "rsr":
+            indexsearch = SV_INDEX
+        else:
+            return redirect("unknown")
+
+        res = es.get(index=indexsearch, id=p_id)
+        # on pointe sur index générique, car pas de LabHalId ?
+        try:
+            entity = res["_source"]
+        except (IndexError, BadRequestError):
+            return redirect("unknown")
 
         return entity
 
@@ -344,9 +354,9 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         if i_type == "lab":
             form = forms.ValidLabCredentials(
-                halStructId=entity["halStructId"],
-                rsnr=entity["rsnr"],
-                idRef=entity["idRef"],
+                halStructId=entity["docid"],
+                rsnr=entity.get("rnsr_s"),
+                idRef=entity.get("idref_s"),
             )
 
         return form

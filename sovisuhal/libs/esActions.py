@@ -223,7 +223,7 @@ def confirm_p(scope_field, scope_value, validate):
         "bool": {
             "must": [
                 {"match_phrase": {scope_field: scope_value}},
-                {"match": {"validated": validate}},
+                {"match": {"sovisu_validated": validate}},
             ]
         }
     }
