@@ -85,30 +85,6 @@ class ElasticContextMixin:
     """
     Gestion des fonctions communes aux vues utilisant elastic
     """
-
-    def get_scope_data(self, i_type, p_id):
-        """
-        Retourne des valeurs de variable en fonction du profil (chercheur,labo)
-        """
-        # utiliser cette fonction pour call get_scope_data
-        # key, index_pattern, scope_param = get_scope_data(i_type, p_id)
-
-        if i_type == "rsr":
-            field = "halId_s"
-            key = "halId_s"
-            index_pattern = SV_INDEX
-
-        elif i_type == "lab":
-            field = "halStructId"
-            key = "halStructId"
-            index_pattern = SV_LAB_INDEX
-        else:
-            return redirect("unknown")
-
-        scope_param = esActions.scope_p(field, p_id)
-
-        return key, index_pattern, scope_param
-
     def validated_notices_state(self, i_type, entity):  # TODO: Revoir la fonction et son utilité
         """
         Check if at least one notice is in the state setup of the "validate" variable.
@@ -264,7 +240,7 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["expertises"] = expertises
 
         if context["data"] == "guiding-domains":
-            domains, guiding_domains, _ = self.get_guiding_domains_case(context["entity"])
+            domains, guiding_domains = self.get_guiding_domains_case(context["entity"], context["type"])
             context["domains"] = domains
             context["guidingDomains"] = guiding_domains
             context["aurehal"] = context["entity"][
@@ -434,17 +410,22 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return validation, sorted(expertise_cleaned, key=lambda x: x["chemin"])
 
-    def get_guiding_domains_case(self, entity):
+    def get_guiding_domains_case(self, entity, i_type):
         domains = halConcepts.concepts()
         query = {
             "bool": {
                 "must": [
                     {"match": {"sovisu_category": "expertise"}},
                     {"match": {"validated": True}},
-                    {"match": {"idhal": entity["idhal"]}},
                 ]
             }
         }
+
+        if i_type == 'rsr':
+            query["bool"]["must"].append({"match": {"idhal": entity["idhal"]}})
+        if i_type == 'lab':
+            query["bool"]["must"].append({"match": {"idhal": entity["docid"]}})
+
         expertises_count = es.count(index=SV_INDEX, query=query)["count"]
         searcher_expertises = es.search(index=SV_INDEX, query=query, size=expertises_count)
         searcher_expertises = [
@@ -452,14 +433,11 @@ class CheckView(CommonContextMixin, ElasticContextMixin, TemplateView):
             for exp in searcher_expertises["hits"]["hits"]
         ]
 
-        guiding_domains = []
         guiding_domains = searcher_expertises
-        aurehal = ""
-        if "guidingDomains" in entity:  # Plus sûr qu'il y ait besoin de çà
+        if "guidingDomains" in entity:
             guiding_domains = entity["guidingDomains"]
-        if "aurehalId" in entity:
-            aurehal = entity["aurehalId"]
-        return domains, guiding_domains, aurehal
+
+        return domains, guiding_domains
 
     def get_references_case(self, i_type, p_id, date_from, date_to):
         if "validation" in self.request.GET:
@@ -708,7 +686,7 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         else:
             context["filter"] = -1
 
-        entity, references_cleaned = self.get_elastic_data(
+        references_cleaned = self.get_elastic_data(
             context["type"],
             context["id"],
             context["filter"],
@@ -716,25 +694,17 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
             context["to"],
         )
 
-        context["entity"] = entity
+
         context["references"] = references_cleaned
         return context
 
     def get_elastic_data(self, i_type, p_id, i_filter, date_from, date_to):
-        # Get scope data
-        key, _, scope_param = self.get_scope_data(i_type, p_id)
-        res = es.search(index="sovisu_*", query=scope_param)
-
-        try:
-            entity = res["hits"]["hits"][0]["_source"]
-        except IndexError:
-            return redirect("unknown")
 
         # Get references
         validate = True
         ref_param = esActions.ref_p_filter(
             i_filter,
-            entity[key],
+            p_id,
             validate,
             date_from,
             date_to,
@@ -753,7 +723,7 @@ class ReferencesView(CommonContextMixin, ElasticContextMixin, TemplateView):
         for ref in references["hits"]["hits"]:
             references_cleaned.append(ref["_source"])
 
-        return entity, references_cleaned
+        return references_cleaned
 
 
 @method_decorator(xframe_options_exempt, name="dispatch")
@@ -784,8 +754,12 @@ class TerminologyView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
     def get_elastic_data(self, i_type, p_id):
         entity = []
-        # Get scope data
-        _, index_pattern, _ = self.get_scope_data(i_type, p_id)
+        if i_type == "lab":
+            index_pattern = SV_LAB_INDEX
+        elif i_type == "rsr":
+            index_pattern = SV_INDEX
+        else:
+            return redirect("unknown")
 
         query = {
             "bool": {
@@ -885,11 +859,9 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
         else:
             langue = self.lang
 
-        entity, filtrechercheur, filtrelab, url = self.get_elastic_data(
-            context["type"], context["id"]
-        )
+        filtrechercheur, filtrelab, url = self.get_elastic_data(
+            context["type"])
 
-        context["entity"] = entity
         context["filterRsr"] = filtrechercheur
         context["filterLab"] = filtrelab
         context["url"] = url
@@ -899,20 +871,10 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
         return context
 
-    def get_elastic_data(self, i_type, p_id):
-        # Get scope data
-        _, _, scope_param = self.get_scope_data(i_type, p_id)
-
-        res = es.search(index="sovisu_*", query=scope_param)
-
-        try:
-            entity = res["hits"]["hits"][0]["_source"]
-        except IndexError:
-            return redirect("unknown")
+    def get_elastic_data(self, i_type):
         # /
         if i_type == "rsr":
             indexsearch = SV_INDEX
-
         elif i_type == "lab":
             indexsearch = SV_LAB_INDEX
         else:
@@ -925,7 +887,7 @@ class LexiconView(CommonContextMixin, ElasticContextMixin, TemplateView):
             viewsActions.vizualisation_url()
         )  # permet d'ajuster l'url des visualisations en fonction du build
 
-        return entity, filtrechercheur, filtrelab, url
+        return filtrechercheur, filtrelab, url
 
 
 @method_decorator(login_required, name="dispatch")
@@ -953,7 +915,7 @@ class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
         else:
             context["data"] = self.data_tool_default
 
-        context["entity"] = self.get_entity_data(context["struct"], context["type"], context["id"])
+        context["entity"] = self.get_entity_data(context["id"])
 
         if context["data"] == "consistency":
             context["consistency"] = self.get_consistency_data(
@@ -1027,13 +989,9 @@ class ToolsView(CommonContextMixin, ElasticContextMixin, TemplateView):
 
             return consistencyvalues
 
-    # TODO: Revoir cette fonction
-    def get_entity_data(self, struct, i_type, p_id):
-        _, search_id, index_pattern, scope_param = self.get_scope_data(i_type, p_id)
-        res = es.search(index=f"{struct}-{search_id}{index_pattern}", query=scope_param)
-
-        entity = res["hits"]["hits"][0]["_source"]
-
+    def get_entity_data(self, p_id):
+        res = es.get(index=SV_LAB_INDEX, id=p_id)
+        entity = res["_source"]
         return entity
 
 
