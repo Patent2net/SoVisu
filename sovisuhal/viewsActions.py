@@ -34,17 +34,12 @@ def admin_access_login(request):
         return redirect("{}?next={}".format(settings.LOGIN_URL, "/"))
     else:
         auth_user = request.user.get_username().lower()
+        default_redirect = "/structures_index/?indexcategory=laboratory"
 
-        if auth_user == "admin":
-            return redirect("/index/?indexcat=lab&indexstruct=198307662")
-        elif auth_user == "adminlab":
-            return redirect("/index/?indexcat=lab&indexstruct=198307662")
-        elif auth_user == "invitamu":
-            return redirect("/index/?indexcat=rsr&indexstruct=130015332")
-        elif auth_user == "visiteur":
-            return redirect("/index/?indexcat=rsr&indexstruct=198307662")
-        elif auth_user == "guestutln" or auth_user == "guestUtln":
-            return redirect("/index/?indexcat=rsr&indexstruct=198307662")
+        default_profiles = ["admin", "adminlab", "invitamu", "visiteur"]
+
+        if auth_user in default_profiles:
+            return redirect(default_redirect)
         else:
             auth_user = auth_user.replace(patternCas, "").lower()
 
@@ -54,11 +49,10 @@ def admin_access_login(request):
             if count > 0:
                 res = es.search(index=SV_INDEX, query=scope_param, size=count)
                 entity = res["hits"]["hits"][0]["_source"]
-                struct = entity["structSirene"]
                 user_token = entity["halId_s"]
                 date_to = datetime.now(tz=TIMEZONE).date().isoformat()
                 return redirect(
-                    f"check/?struct={struct}&type=rsr&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"
+                    f"check/?type=rsr&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"
                 )
             else:
                 return redirect(
@@ -72,10 +66,6 @@ def validate_references(request):
     Validation des références HAL
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
 
     if "type" in request.GET:
         i_type = request.GET["type"]
@@ -132,7 +122,7 @@ def validate_references(request):
                 doc=update_doc,
             )
     return redirect(
-        f"/check/?struct={struct}&type={i_type}"
+        f"/check/?type={i_type}"
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
 
@@ -142,10 +132,6 @@ def validate_guiding_domains(request):
     Validation des domaines de guidance
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
 
     if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
@@ -219,7 +205,7 @@ def validate_guiding_domains(request):
         # )
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+        f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
     )
 
 
@@ -229,10 +215,6 @@ def validate_expertise(request):
     Validation des domaines d'expertise
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
 
     if "type" in request.GET:
         i_type = request.GET["type"]
@@ -279,7 +261,7 @@ def validate_expertise(request):
             es.update(index=SV_INDEX, refresh="wait_for", id=concept, doc=update_doc)
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}"
+        f"/check/?type={i_type}"
         + f"&id={p_id}&from={date_from}&to={date_to}&data={data}&validation={validation}"
     )
 
@@ -290,10 +272,6 @@ def validate_credentials(request):
     Validation des identifiants
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
 
     if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
@@ -364,7 +342,7 @@ def validate_credentials(request):
             )
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+        f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
     )
 
 
@@ -373,11 +351,7 @@ def validate_credentials(request):
 #     Validation de la description de recherche
 #     """
 #     # Get parameters
-#     if "struct" in request.GET:
-#         struct = request.GET["struct"]
-#     else:
-#         return redirect("unknown")
-#
+
 #     if "type" in request.GET and "id" in request.GET:
 #         i_type = request.GET["type"]
 #         p_id = request.GET["id"]
@@ -440,7 +414,7 @@ def validate_credentials(request):
 #             )
 #
 #     return redirect(
-#         f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+#         f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
 #     )
 #
 
@@ -449,10 +423,6 @@ def refresh_aurehal_id(request):
     Mise à jour de l'id aurehal
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
 
     if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
@@ -497,7 +467,7 @@ def refresh_aurehal_id(request):
     )
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+        f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
     )
 
 
@@ -506,10 +476,6 @@ def update_members(request):
     Permet la mise à jour du profil utilisateur
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
 
     if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
@@ -545,8 +511,7 @@ def update_members(request):
                 entity = res["hits"]["hits"][0]["_source"]
             except IndexError:
                 return redirect(
-                    f"/check/?struct={struct}"
-                    + f"&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+                    f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
                 )
 
             es.update(
@@ -557,7 +522,7 @@ def update_members(request):
             )
 
     return redirect(
-        f"/check/?struct={struct}&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
+        f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
     )
 
 
@@ -567,11 +532,6 @@ def update_authorship(request):
     Met à jour l'autorat des documents d'un utlisateur après vérification de ce dernier
     """
     # Get parameters
-    if "struct" in request.GET:
-        struct = request.GET["struct"]
-    else:
-        return redirect("unknown")
-
     if "type" in request.GET and "id" in request.GET:
         i_type = request.GET["type"]
         p_id = request.GET["id"]
@@ -614,8 +574,7 @@ def update_authorship(request):
         pass
 
     return redirect(
-        f"/check/?struct={struct}"
-        + f"&type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation=1"
+        f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}&validation=1"
     )
 
 

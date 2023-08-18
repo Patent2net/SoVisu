@@ -46,7 +46,7 @@
                         {% if  indexcategory == entity.sovisu_category %}
                             <li class="leading-4 w-full bg-gray-50 py-1 px-2">
                                 <a class="text-blue-700 text-sm"
-                                   href="/dashboard/?struct={{ indexstruct }}&type=lab&id={{ entity.docid }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
+                                   href="/dashboard/?struct=*&type=lab&id={{ entity.docid }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
                                 >
                                     <span class="">
                                         {{ entity.label_s }}

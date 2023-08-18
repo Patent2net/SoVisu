@@ -34,11 +34,6 @@ class CommonContextMixin:
         """
         Get the regular GET parameters from the request
         """
-        if "struct" in request.GET:
-            struct = request.GET["struct"]
-        else:
-            struct = -1
-
         if "type" in request.GET:
             i_type = request.GET["type"]
         else:
@@ -51,7 +46,7 @@ class CommonContextMixin:
 
         ldapid = request.GET.get("ldapid")
 
-        return struct, i_type, p_id, ldapid
+        return i_type, p_id, ldapid
 
     def get_date(self, request):
         start_date = "2000"
@@ -96,7 +91,6 @@ class CommonContextMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         (
-            context["struct"],
             context["type"],
             context["id"],
             context["ldapid"],
@@ -151,7 +145,7 @@ class CreateView(TemplateView):
                 user_token = entity["halId_s"]
                 date_to = datetime.now(tz=TIMEZONE).date().isoformat()
                 return redirect(
-                    f"/check/?struct={struct}&type=rsr"
+                    f"/check/?type=rsr"
                     + f"&id={user_token}&from=1990-01-01&to={date_to}&data=credentials"
                 )
             else:
@@ -236,6 +230,7 @@ class CheckView(CommonContextMixin, TemplateView):
             domains, guiding_domains = self.get_guiding_domains_case(context["entity"], context["type"])
             context["domains"] = domains
             context["guidingDomains"] = guiding_domains
+            # TODO: Trouver une alternative à aurehalId si usage structures
             context["aurehal"] = context["entity"][
                 "aurehalId"
             ]  # pas sûr que ce soit pas un hack pas bô
@@ -1011,7 +1006,6 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
         if context["type"] == -1 and context["id"] == -1:
             del context["type"]
             del context["id"]
-            del context["struct"]
 
         return context
 
@@ -1097,7 +1091,6 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
         if context["type"] == -1 and context["id"] == -1:
             del context["type"]
             del context["id"]
-            del context["struct"]
 
         return context
 
