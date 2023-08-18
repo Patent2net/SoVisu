@@ -1073,7 +1073,8 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
 
     def get_struct_category(self):
         """
-        This method is used to retrieve the unique categories of structures from the SV_LAB_INDEX in Elasticsearch.
+        This method is used to retrieve the unique categories of structures
+        from the SV_LAB_INDEX in Elasticsearch.
 
         Parameters:
             None
@@ -1086,6 +1087,11 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
         """
         body = {
             "size": 0,
+            "query": {
+                "match": {
+                    "sv_parent_type": "structure"
+                }
+            },
             "aggs": {"unique_categories": {"terms": {"field": "sovisu_category.keyword"}}},
         }
 
@@ -1103,6 +1109,7 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
             "bool": {
                 "must": [
                     {"match": {"sovisu_category": category_type}},
+                    {"match": {"sv_parent_type": "structure"}},
                 ]
             }
         }
@@ -1165,16 +1172,17 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
             "bool": {
                 "must": [
                     {"match": {"sovisu_category": type}},
+                    {"match": {"sv_parent_type": "structure"}},
                 ]
             }
         }
         # création dynamique des tabs sur la page à partir de struct_tab
         count = es.count(
-            index=SV_STRUCTURES_REFERENCES,
+            index=SV_LAB_INDEX,
             query=get_institution_query,
         )["count"]
         struct_tab = es.search(
-            index=SV_STRUCTURES_REFERENCES, query=get_institution_query, size=count
+            index=SV_LAB_INDEX, query=get_institution_query, size=count
         )
         struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
         return struct_tab
@@ -1205,10 +1213,11 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
             "bool": {
                 "must": [
                     {"match": {"sovisu_category": category_type}},
+                    {"match": {"sv_parent_type": "searcher"}},
                 ]
             }
         }
-        if sv_affiliation is not "*":
+        if sv_affiliation != "*":
             query["bool"]["must"].append({"term": {"sv_affiliation": sv_affiliation}})
 
         indextype = SV_INDEX

@@ -143,7 +143,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         "idRef": idref,
         "axis": labo_accro,  # TODO: INTERET DE CETTE KEY? contient la même chose que lab
         "sovisu_category": "searcher",
-
+        "sv_parent_type": "searcher",
         "sv_affiliation": searcher_data["affPref_i"]
         # AffPref_i recense les halid de tous les laboratoires affiliés au chercheur
     }

@@ -22,17 +22,23 @@ def create_test_context():
     # Variables à automatiser plus tard
     idhal = "david-reymond"
     orcid = ""
-    labo_accro = "IMSIC"  # TODO: Faire sauter cette clé, remplacer par systeme qui créé fiche labo par chercheur
+    # TODO: Faire sauter labo_accro, remplacer par systeme qui créé fiche labo par chercheur
+    labo_accro = "IMSIC"
     idref = "test"
     labhalid = "527028"
     ldapid = "dreymond"
     structid = "198307662"
-    """end of temp values"""
     # remplissage index structures
     struct_idref = "031122337"  # UTLN IDREF
 
-    structure_message = set_elastic_structures(struct_idref)
-    print(structure_message)
+    create_elastic_index()
+
+    # TODO: est il utile de garde l'index structure_directory? (referentiel des structures)
+    structure_referential_message = set_structures_referential(struct_idref)
+    print(structure_referential_message)
+
+    structure_index_message = set_structure_index(struct_idref)
+    print(structure_index_message)
 
     # remplissage index de reference concepts
     concepts_message = indexe_expertises()
@@ -47,7 +53,6 @@ def create_test_context():
     # scope_param = scope_p("idhal", researcher_id) # ne renvoit rien, idhal est le bon champ
     # On retrouve le chercheur
 
-    # scope_param = esActions.scope_term_multi([("idhal", idhal), ('sovisu_category', "searcher")])
     chercheur = es.get(index=SV_INDEX, id=idhal)
     chercheur = chercheur["_source"]
     print("______________")
@@ -59,10 +64,19 @@ def create_test_context():
     # Remplissage de l'index sovisu_laboratories
 
 
-def set_elastic_structures(search_value):
-    if not es.indices.exists(index=SV_STRUCTURES_REFERENCES):
-        es.indices.create(index=SV_STRUCTURES_REFERENCES,
-                          mappings=init_sovisu_static.structures_mapping())
+def create_elastic_index():
+    index_mapping = {
+        SV_INDEX: init_sovisu_static.document_mapping(),
+        SV_LAB_INDEX: init_sovisu_static.document_mapping(),
+        SV_HAL_REFERENCES: init_sovisu_static.expertises_mapping(),
+        SV_STRUCTURES_REFERENCES: init_sovisu_static.structures_mapping(),
+    }
+    for index, mapping_func in index_mapping.items():
+        if not es.indices.exists(index=index):
+            es.indices.create(index=index, mappings=mapping_func)
+
+
+def get_elastic_structures(search_value):
 
     search_filter = "idref_s"
     struct_type = "*"
@@ -76,18 +90,36 @@ def set_elastic_structures(search_value):
 
     structures_entities.extend(child_entities)
 
+    return structures_entities
+
+
+def set_structures_referential(search_value):
+
+    structures_entities = get_elastic_structures(search_value)
+
     for structure in structures_entities:
         structure["_id"] = structure["docid"]
 
     helpers.bulk(es, structures_entities, index=SV_STRUCTURES_REFERENCES, refresh="wait_for")
 
-    return f"{len(structures_entities)} structures added"
+    return f"{len(structures_entities)} structures added in {SV_STRUCTURES_REFERENCES} index"
 
+
+def set_structure_index(search_value):
+    structures_entities = get_elastic_structures(search_value)
+    
+    for structure in structures_entities:
+        structure["_id"] = structure["docid"]
+        structure["sv_parent_type"] = "structure"
+
+    helpers.bulk(es, structures_entities, index=SV_LAB_INDEX, refresh="wait_for")
+
+    return f"{len(structures_entities)} structures added in {SV_LAB_INDEX} index"
 
 def creeFiche(dom):  # placée dans elasticHal.utils
     fiche = dict()
-    fiche['chemin'] = "domAurehal." + dom[
-        'id']  # .replace('.',',')  # donnera le chemin d'accès de l'arborescence. i.e: chercher .shs
+    fiche['chemin'] = "domAurehal." + dom['id']
+    # .replace('.',',')  # donnera le chemin d'accès de l'arborescence. i.e: chercher .shs
 
     # https://www.mongodb.com/docs/manual/tutorial/model-tree-structures-with-materialized-paths/
 
@@ -104,7 +136,6 @@ def GenereReferentiel(arbre, par):
     fiches = []
     if isinstance(arbre, list):
         for dom in arbre:
-            fiche = dict()
             if "children" in dom.keys():
                 # {'id': 'chim.anal', 'label_en': 'Analytical chemistry', 'label_fr': 'Chimie analytique', 'children': []}
                 if len(dom['children']) != 0:
@@ -118,13 +149,10 @@ def GenereReferentiel(arbre, par):
                                 fiches.append(truc)
                         else:
                             pass
-
                 else:
                     fiches.append(creeFiche(dom, par))
             else:
-
                 fiches.append(creeFiche(dom))
-        fiches.append(creeFiche(dom))
     else:
         fiches.append(creeFiche(arbre))
         if "children" in arbre.keys():
@@ -150,9 +178,10 @@ def GenereReferentiel(arbre, par):
 
 
 def indexe_expertises():
-    """Les compétences issues d'Aurehal sont indexées en tant que document dans l'index domaine_hal_referentiel.
-      Les chercheurs valident ou pas celle issues de HAL, en rajoutent éventuellement. Cette action, copie la fiche
-      et l'estampille à son idhal.
+    """Les compétences issues d'Aurehal sont indexées en tant que document
+    dans l'index domaine_hal_referentiel.
+    Les chercheurs valident ou pas celle issues de HAL, en rajoutent éventuellement. Cette action,
+    copie la fiche et l'estampille à son idhal.
     """
     concept_list = GenereReferentiel(init_sovisu_static.concepts(), "")
 
@@ -264,48 +293,7 @@ def collecte_docs(chercheur):  # self,
 
 
 if __name__ == "__main__":
-    index_mapping = {
-        SV_INDEX: init_sovisu_static.document_mapping(),
-        SV_LAB_INDEX: init_sovisu_static.document_mapping(),
-        SV_HAL_REFERENCES: init_sovisu_static.expertises_mapping(),
-        SV_STRUCTURES_REFERENCES: init_sovisu_static.structures_mapping(),
-    }
-    for index, mapping_func in index_mapping.items():
-        if not es.indices.exists(index=index):
-            es.indices.create(index=index, mappings=mapping_func)
 
     # Faudra sur le même modèle rajouter les labos et les structures.
     # Cela permet de générer autant d'axes ou sous groupes que nécessaires ;-)
     create_test_context()
-    # #
-    # print("#################################")
-    # print("Tests : trouver un chercheur")
-    # scope_searcher = esActions.scope_match_multi(
-    #     [("idhal", "david-reymond"), ('category', "searcher")])
-    # cpt = es.count(index=settings.SOVISU_INDEX, query=scope_searcher)['count']
-    # print("normalement 1 doc :", cpt)
-    # gugusse = es.search(index=settings.SOVISU_INDEX, query=scope_searcher, size=cpt)["hits"]["hits"]
-    # for gu in gugusse:
-    #     print(gu)
-    # print("#################################")
-    # print("Tests : trouver les notices d'un chercheur")
-    #
-    # scope_notices = esActions.scope_match_multi(
-    #     [("idhal", "david-reymond"), ('category', "notice")])
-    # cpt = es.count(index=settings.SOVISU_INDEX, query=scope_notices)['count']
-    # print("à ce jour 106 doc :", cpt)
-    # doc_gugusse = es.search(index=settings.SOVISU_INDEX, query=scope_notices, size=cpt)["hits"]["hits"]
-    # for doc in doc_gugusse:
-    #     print(doc)
-    # print("#################################")
-    #
-    # scope_exp = esActions.scope_match_multi([("idhal", "david-reymond"), ('category', "expertise")])
-    # cpt = es.count(index=settings.SOVISU_INDEX, query=scope_exp)['count']
-    #
-    # exp_gugusse = es.search(index=settings.SOVISU_INDEX, query=scope_exp, size=cpt)["hits"]["hits"]
-    # print(
-    #     "normalement 10 docs (MAIS c'est pas bon cf. infra remarques sur les expertises (çà sort d'où ???) !!!",
-    #     cpt)
-    # for exp in exp_gugusse:
-    #     print(exp)
-    # print("#################################")
