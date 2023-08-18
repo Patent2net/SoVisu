@@ -179,7 +179,7 @@ def collecte_docs(self, entite):  # self,
         docs = hal.find_publications(idhal, "authIdHal_s")
 
     else:
-        idhal = entite["idhal"]
+        idhal = entite["docid"]
         docs = hal.find_publications(idhal, "labStructId_i")
     for num, doc in enumerate(docs):
         # Check if the document already exist in elastic for the searcher.
