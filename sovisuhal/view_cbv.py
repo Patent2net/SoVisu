@@ -141,7 +141,6 @@ class CreateView(TemplateView):
                 )
                 entity = es.get(index=SV_INDEX, id=idhal)
                 entity = entity["_source"]
-                struct = entity["structSirene"]
                 user_token = entity["halId_s"]
                 date_to = datetime.now(tz=TIMEZONE).date().isoformat()
                 return redirect(
@@ -452,12 +451,17 @@ class CheckView(CommonContextMixin, TemplateView):
                 ]
             }
         }
-        if i_type == "rsr" or i_type == "lab":  # TODO: séparer RSR et LAB
-            count = es.count(index=SV_INDEX, query=query)["count"]
-            print(f"count: {count}")
-            references = es.search(index=SV_INDEX, query=query, size=count)
+
+        if i_type == "rsr":
+            index = SV_INDEX
+        elif i_type == "lab":  # TODO: séparer RSR et LAB
+            index = SV_LAB_INDEX
         else:
             return redirect("unknown")
+
+        count = es.count(index=index, query=query)["count"]
+
+        references = es.search(index=SV_INDEX, query=query, size=count)
 
         references_cleaned = []
 
@@ -469,19 +473,17 @@ class CheckView(CommonContextMixin, TemplateView):
     def get_affiliations_case(self, p_id, i_type):
 
         if i_type == "rsr":
-            chercheur = es.get(index=SV_INDEX, id=p_id)
-            chercheur = chercheur["_source"]
-
-            affiliates = chercheur["sv_affiliation"]
-            print(affiliates)
+            index = SV_INDEX
+            key = "sv_affiliation"
         elif i_type == "lab":
-            structure = es.get(index=SV_LAB_INDEX, id=p_id)
-            structure = structure["_source"]
-
-            affiliates = structure["parentDocid_i"]
-            print(affiliates)
+            index = SV_LAB_INDEX
+            key = "parentDocid_i"
         else:
             return redirect("unknown")
+
+        content = es.get(index=index, id=p_id)
+        content = content["_source"]
+        affiliates = content[key]
 
         affiliates_detail = []
         for affiliate in affiliates:
@@ -491,7 +493,6 @@ class CheckView(CommonContextMixin, TemplateView):
                 affiliates_content = affiliates_content["_source"]
                 affiliates_detail.append(affiliates_content)
 
-        print(affiliates_detail)
         return affiliates_detail
 
     def get_non_affiliated_structures(self, p_id, i_type):
