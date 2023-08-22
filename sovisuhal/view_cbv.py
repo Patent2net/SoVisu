@@ -611,18 +611,16 @@ class DashboardView(CommonContextMixin, TemplateView):
 
         (
             entity,
-            filtrechercheur,
-            filtre_lab_a,
-            filtre_lab_b,
+            filtre_idhal,
+            filtre_affiliation,
             url,
             dash,
         ) = self.get_elastic_data(context["type"], context["id"])
 
         context["dash"] = dash
         context["entity"] = entity
-        context["filterRsr"] = filtrechercheur
-        context["filterlabA"] = filtre_lab_a
-        context["filterlabB"] = filtre_lab_b
+        context["filter_idhal"] = filtre_idhal
+        context["filter_affiliation"] = filtre_affiliation
         context["url"] = url
 
         return context
@@ -630,20 +628,17 @@ class DashboardView(CommonContextMixin, TemplateView):
     def get_elastic_data(self, i_type, p_id):
 
         dash = ""
+        filtre_idhal = f'idhal.keyword: "{p_id}"'
+        filtre_affiliation = f'sv_affiliation: "{p_id}"'
+
         if i_type == "rsr":
             indexsearch = SV_INDEX
-            filtrechercheur = f'idhal.keyword: "{p_id}"'
-            filtre_lab_a = ""
-            filtre_lab_b = ""
         elif i_type == "lab":
             indexsearch = SV_LAB_INDEX
             if "dash" in self.request.GET:
                 dash = self.request.GET["dash"]
             else:
                 dash = "membres"
-            filtrechercheur = ""
-            filtre_lab_a = f'idhal.keyword: "{p_id}"'
-            filtre_lab_b = f'sv_affiliation: "{p_id}"'
         else:
             return redirect("unknown")
 
@@ -657,7 +652,7 @@ class DashboardView(CommonContextMixin, TemplateView):
 
         url = viewsActions.vizualisation_url()
 
-        return entity, filtrechercheur, filtre_lab_a, filtre_lab_b, url, dash
+        return entity, filtre_idhal, filtre_affiliation, url, dash
 
 
 class ReferencesView(CommonContextMixin, TemplateView):
