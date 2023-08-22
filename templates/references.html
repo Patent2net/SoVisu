@@ -170,131 +170,68 @@
 
         init = 1;
 
-        if (getUrlParameter('type') == 'lab') {
-            if (getUrlParameter('filter') == 'uncomplete') {
-                v_columnDefs = [
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                            }
-                            return data;
-                        },
-                        "className": "text-center",
-                        "orderable": false
+        if (getUrlParameter('filter') == 'uncomplete') {
+            v_columnDefs = [
+                {
+                    "targets": [ 0 ],
+                    "render": function(data, type, row, meta){
+                        if(type === 'display'){
+                            data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                        }
+                        return data;
                     },
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [ 1 ],
+                    "className": "text-center",
+                },
+                {
+                    "targets": {% if type == "lab" %} [ 6 ]  {% else %} [ 5 ] {% endif %},
+                    "render": function(data, type, row, meta){
+                        if (data == 'True') {
+                            data = 'À ajouter'
+                        } else if (data == 'False') {
+                            data = 'Sous embargo'
+                        } else {
+                            data = ''
+                        }
+                        return data;
                     },
-                    {
-                        "targets": [ 6 ],
-                        "render": function(data, type, row, meta){
-                            if (data == 'True') {
-                                data = 'À ajouter'
-                            } else if (data == 'False') {
-                                data = 'Sous embargo'
-                            } else {
-                                data = ''
-                            }
-                            return data;
-                        },
-						"visible": true,
-                        "className": "text-center",
-                        "orderable": false
-                    },
-					{
-                        "targets": [ 7 ],
-                        "visible": false,
-                    }
-                ]
-            } else {
-                v_columnDefs = [
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                            }
-                            return data;
-                        },
-                        "className": "text-center",
-                        "orderable": false
-                    },
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
-                    },
-					{
-                        "targets": [ 6 ],
-                        "visible": false,
-                    }
-                ]
-            }
+                    "visible": true,
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": {% if type == "lab" %} [ 7 ]  {% else %} [ 6 ] {% endif %},
+                    "visible": false,
+                }
+            ]
         } else {
-            if (getUrlParameter('filter') == 'uncomplete') {
-                v_columnDefs = [
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                            }
-                            return data;
-                        },
-                        "className": "text-center",
-                        "orderable": false
+            v_columnDefs = [
+                {
+                    "targets": [ 0 ],
+                    "render": function(data, type, row, meta){
+                        if(type === 'display'){
+                            data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
+                        }
+                        return data;
                     },
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
-                    },
-                    {
-                        "targets": [ 5 ],
-                        "render": function(data, type, row, meta){
-                            if (data == 'True') {
-                                data = 'À ajouter'
-                            } else if (data == 'False') {
-                                data = 'Sous embargo'
-                            } else {
-                                data = ''
-                            }
-                            return data;
-                        },
-						"visible": true,
-                        "className": "text-center",
-                        "orderable": false
-                    },
-					{
-                        "targets": [ 6 ],
-                        "visible": false,
-                    }
-                ]
-            } else {
-                v_columnDefs = [
-                    {
-                        "targets": [ 0 ],
-                        "render": function(data, type, row, meta){
-                            if(type === 'display'){
-                                data = '<a class="underline text-blue-700" target="_blank" href="https://hal.archives-ouvertes.fr/' + data + '">' + data + '</a>';
-                            }
-                            return data;
-                        },
-                        "className": "text-center",
-                        "orderable": false
-                    },
-                    {
-                        "targets": [ 1 ],
-                        "className": "text-center",
-                    },
-					{
-                        "targets": [ 5 ],
-                        "visible": false,
-                    }
-                ]
-            }
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [ 1 ],
+                    "className": "text-center",
+                },
+                {
+                    "targets": {% if type == "lab" %} [ 6 ]  {% else %} [ 5 ] {% endif %},
+                    "visible": false,
+                }
+            ]
         }
+
 
 
         var table = $('#references').DataTable(
