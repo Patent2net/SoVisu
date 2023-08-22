@@ -55,7 +55,7 @@
 
                         <th>Titre</th>
 
-                        {% if entity.halStructId %}
+                        {% if type == "lab" %}
                             <th>Auteurs</th>
                         {% endif %}
 
@@ -79,7 +79,7 @@
                             <td>{{ ref.publicationDate_tdate|slice:":4" }}</td>
 
                             <td>
-                                    {% if entity.halStructId %}
+                                    {% if type == "lab" %}
                                         {{ ref.times_cited }}
                                     {% else %}
                                         -
@@ -89,7 +89,7 @@
 
                             <td>{{ ref.title_s.0 | safe }}</td>
 
-                            {% if entity.halStructId %}
+                            {% if type == "lab" %}
                                 <td>{{ ref.authFullName_s | join:", " }}</td>
                             {% endif %}
 
