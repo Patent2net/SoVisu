@@ -693,13 +693,14 @@ class ReferencesView(CommonContextMixin, TemplateView):
             date_to,
         )
         if i_type == "rsr":
-            count = es.count(index=SV_INDEX, query=ref_param)["count"]
-            references = es.search(index=SV_INDEX, query=ref_param, size=count)
+            indextype = SV_INDEX
         elif i_type == "lab":
-            count = es.count(index=SV_LAB_INDEX, query=ref_param)["count"]
-            references = es.search(index=SV_LAB_INDEX, query=ref_param, size=count)
+            indextype = SV_LAB_INDEX
         else:
             return redirect("unknown")
+
+        count = es.count(index=indextype, query=ref_param)["count"]
+        references = es.search(index=indextype, query=ref_param, size=count)
 
         references_cleaned = []
 
