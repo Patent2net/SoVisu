@@ -642,8 +642,8 @@ class DashboardView(CommonContextMixin, TemplateView):
             else:
                 dash = "membres"
             filtrechercheur = ""
-            filtre_lab_a = f'harvested_from_ids: "{p_id}"'
-            filtre_lab_b = f'labHalId.keyword: "{p_id}"'
+            filtre_lab_a = f'idhal.keyword: "{p_id}"'
+            filtre_lab_b = f'sv_affiliation: "{p_id}"'
         else:
             return redirect("unknown")
 
@@ -682,7 +682,6 @@ class ReferencesView(CommonContextMixin, TemplateView):
             context["from"],
             context["to"],
         )
-
 
         context["references"] = references_cleaned
         return context
