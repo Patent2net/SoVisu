@@ -632,7 +632,7 @@ class DashboardView(CommonContextMixin, TemplateView):
         dash = ""
         if i_type == "rsr":
             indexsearch = SV_INDEX
-            filtrechercheur = f'_index: "{indexsearch}"'
+            filtrechercheur = f'idhal.keyword: "{p_id}"'
             filtre_lab_a = ""
             filtre_lab_b = ""
         elif i_type == "lab":
