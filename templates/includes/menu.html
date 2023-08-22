@@ -109,16 +109,16 @@
                             x-transition:leave-end="transform opacity-0 scale-95"
                         >
                             <li class="flex w-full h-8 ">
-                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold {% if title == 'Membres' %} text-white {% else %} text-gray-300 {% endif %}"
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold {% if dash == 'membres' %} text-white {% else %} text-gray-300 {% endif %}"
                                    href="/dashboard/?{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&dash=membres"
                                 >Membres</a></li>
 
                             <li class="flex w-full h-8 ">
-                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Synthèse OA' %} text-white {% else %} text-gray-300 {% endif %}"
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if dash == 'OA' %} text-white {% else %} text-gray-300 {% endif %}"
                                    href="/dashboard/?{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&dash=OA"
                                 >Synthèse OA</a></li>
                             <li class="flex w-full h-8 ">
-                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if title == 'Projets' %} text-white {% else %} text-gray-300 {% endif %}"
+                                <a class="whitespace-nowrap px-4 pr-4 flex items-center text-xs font-semibold  {% if dash == 'projets' %} text-white {% else %} text-gray-300 {% endif %}"
                                    href="/dashboard/?{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{ id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&dash=projets"
                                 >Projets</a></li>
                         </ul>
