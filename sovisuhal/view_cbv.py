@@ -461,7 +461,7 @@ class CheckView(CommonContextMixin, TemplateView):
 
         count = es.count(index=index, query=query)["count"]
 
-        references = es.search(index=SV_INDEX, query=query, size=count)
+        references = es.search(index=index, query=query, size=count)
 
         references_cleaned = []
 
@@ -979,7 +979,6 @@ class ToolsView(CommonContextMixin, TemplateView):
         return entity
 
 
-# TODO: Review StructuresIndexView and adjust code to new needs
 class StructuresIndexView(CommonContextMixin, TemplateView):
     """
     Gestion des pages d'indexation des profils chercheurs et laboratoires
