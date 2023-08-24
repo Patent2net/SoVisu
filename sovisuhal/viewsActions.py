@@ -4,8 +4,7 @@ from io import BytesIO as B_io
 from urllib.request import urlopen
 
 import pandas as pd
-from bs4 import BeautifulSoup
-from decouple import config
+
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from uniauth.decorators import login_required
@@ -18,7 +17,6 @@ from sovisuhal.libs.elastichal import creeFichesExpertise
 from . import settings
 from .libs import esActions, hceres
 
-mode = config("mode")  # Prod --> mode = 'Prod' en env Var
 patternCas = "cas-universite-de-toulon-"  # motif à enlever aux identifiants CAS
 
 # Connect to DB
