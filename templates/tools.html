@@ -25,12 +25,12 @@
                 <h1 class="font-semibold text-xs mb-2 border-b border-gray-300 w-full pb-1">
                         <a class="px-2 pb-1
                         {% if data == "hceres" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=hceres"
+                           href="/tools/?{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=hceres"
                         >Export HCERES</a>
 
                         <a class="px-2 pb-1
                         {% if data == "consistency" %}text-blue-600 border-b-2 border-blue-400 {% else %} text-gray-600 {% endif %}"
-                           href="/tools/?struct={{ struct }}{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=consistency"
+                           href="/tools/?{% if type %}&type={{ type }}{% endif %}{% if id %}&id={{  id }}{% endif %}{% if from %}&from={{ from }}{% endif %}{% if to %}&to={{ to }}{% endif %}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}&data=consistency"
                         >Cohésion des données</a>
                 </h1>
             </div>
@@ -50,7 +50,7 @@
 
                         </div>
 
-                        <form action="/export_hceres_xls/?struct={{ struct }}&type={{ type }}&id={{ id }}&data={{ data }}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}" method="post">
+                        <form action="/export_hceres_xls/?type={{ type }}&id={{ id }}&data={{ data }}{% if ldapid %}&ldapid={{ ldapid }}{% endif %}" method="post">
                             {% csrf_token %}
                             {% for hidden in form.hidden_fields %}
                                 {{ hidden }}
@@ -99,7 +99,7 @@
                                 <tr class="text-gray-500">
                                     <td class="hidden ldapId">{{ cons.ldapId }}</td>
                                     <td>
-                                         <a class="text-blue-700 text-sm underline" target="_blank" href="/dashboard/?struct={{ struct }}&type=rsr&id={{cons.ldapId}}">
+                                         <a class="text-blue-700 text-sm underline" target="_blank" href="/dashboard/?type=rsr&id={{cons.ldapId}}">
                                          <span class=""> {{ cons.name }} </span>
                                         </a>
                                     </td>
