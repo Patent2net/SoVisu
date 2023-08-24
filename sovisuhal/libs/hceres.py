@@ -1,5 +1,6 @@
 import pandas as pd
 
+from constants import SV_LAB_INDEX, SV_INDEX
 from . import esActions
 
 es = esActions.es_connector()
@@ -23,24 +24,31 @@ def common_data(list1, list2):
     return result
 
 
-def sort_references(articles, halstructid):
+def sort_references(articles, struct_docid):
     """
     Classe les références récupérées dans un ordre défini pour le HCERES
     """
     # sort by lab
-    utln_rsr = []
-    amu_rsr = []
+    # TODO: Add a way to filter by institution, in case where lab is affiliated to X institutions
+    researchers_list = []
 
-    universities = ["198307662", "130015332"]
+    query = {
+        "bool": {
+            "must": [
+                {"match": {"sovisu_category": "searcher"}},
+            ]
+        }
+    }
 
-    sort_param = esActions.scope_p("labHalId", halstructid)
-    for univ in universities:
-        res = es.search(index=univ + "-*-researchers", body=sort_param)
-        for rsr in res["hits"]["hits"]:
-            if univ == "198307662":
-                utln_rsr.append(rsr["_source"]["halId_s"])
-            elif univ == "130015332":
-                amu_rsr.append(rsr["_source"]["halId_s"])
+    res = es.search(index=SV_LAB_INDEX, query=query)
+
+    res_cleaned = []
+    for res in res["hits"]["hits"]:
+        res_cleaned.append(res["_source"])
+    print(res_cleaned)
+    for rsr in res_cleaned:
+        if struct_docid in rsr["sv_affiliation"]:
+            researchers_list.append(rsr["halId_s"])
 
     sort_trigger = False
 
@@ -50,75 +58,11 @@ def sort_references(articles, halstructid):
     hceres_hdr = []
 
     for article in articles:
-        article["team"] = ""
 
-        has_phd_candidate = False
-        if "authIdHal_s" in article:
-            for authIdHal_s in article["authIdHal_s"]:
-                doc_param = {
-                    "query": {
-                        "bool": {
-                            "must": [
-                                {"match_phrase": {"halId_s": authIdHal_s}},
-                                {"match": {"labHalId": halstructid}},
-                            ]
-                        }
-                    }
-                }
+        article["hasPhDCandidate"], article["team"] = article_has_phd_candidate_and_team(article)
 
-                res = es.search(index="*-researchers", body=doc_param)
-
-                if len(res["hits"]["hits"]) > 0:
-                    if (
-                            "function" in res["hits"]["hits"][0]["_source"]
-                            and res["hits"]["hits"][0]["_source"]["function"] == "Doctorant"
-                    ):
-                        has_phd_candidate = True
-
-                    if "axis" in res["hits"]["hits"][0]["_source"]:
-                        axis = res["hits"]["hits"][0]["_source"]["axis"].replace("axis", "")
-                        article["team"] = article["team"] + axis + " ; "
-
-            if len(article["team"]) > 2:
-                article["team"] = article["team"][:-2]
-
-        if has_phd_candidate:
-            article["hasPhDCandidate"] = "O"
-        else:
-            article["hasPhDCandidate"] = "N"
-
-        has_authorship = False
-
-        if "authorship" in article:
-            for authorship in article["authorship"]:
-                # authFullName_s qui est en fait halId_s mais pas toujours
-                try:
-                    halid_s = authorship["authFullName_s"]
-
-                except IndexError:
-                    halid_s = authorship["halId_s"]
-
-                doc_param = {
-                    "query": {
-                        "bool": {
-                            "must": [
-                                {"match_phrase": {"halId_s": halid_s}},
-                                {"match": {"labHalId": halstructid}},
-                            ]
-                        }
-                    }
-                }
-                res = es.search(index="*-researchers", body=doc_param)
-                if (
-                        len(res["hits"]["hits"]) > 0
-                        and res["hits"]["hits"][0]["_source"]["labHalId"] == halstructid
-                ):
-                    has_authorship = True
-
-        if has_authorship:
-            article["hasAuthorship"] = "O"
-        else:
-            article["hasAuthorship"] = "N"
+        # TODO: Documents linked to laboratories don't have authorship field. Only searchers have it
+        article["hasAuthorship"] = article_has_authorship_hceres(struct_docid, article)
 
         article["authfullName_s"] = ""
 
@@ -192,7 +136,7 @@ def sort_references(articles, halstructid):
                 article["docType_s"] = "ART"
         if sort_trigger:
             if "authIdHal_s" in article:
-                if common_data(utln_rsr, article["authIdHal_s"]):
+                if common_data(researchers_list, article["authIdHal_s"]):
                     # colloque et posters
                     if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
                         hceres_conf.append(article)
@@ -229,20 +173,70 @@ def sort_references(articles, halstructid):
                 print(article)
                 hceres_hdr.append(article)
 
-    art_df = pd.DataFrame(hceres_art)
-    if len(art_df.index) > 0:
-        art_df = art_df.sort_values(by=["publicationDateY_i"])
-
-    book_df = pd.DataFrame(hceres_book)
-    if len(book_df.index) > 0:
-        book_df = book_df.sort_values(by=["publicationDateY_i"])
-
-    conf_df = pd.DataFrame(hceres_conf)
-    if len(conf_df.index) > 0:
-        conf_df = conf_df.sort_values(by=["publicationDateY_i"])
-
-    hceres_df = pd.DataFrame(hceres_hdr)
-    if len(hceres_df.index) > 0:
-        hceres_df = hceres_df.sort_values(by=["publicationDateY_i"])
+    art_df = create_sorted_dataframe(hceres_art)
+    book_df = create_sorted_dataframe(hceres_book)
+    conf_df = create_sorted_dataframe(hceres_conf)
+    hceres_df = create_sorted_dataframe(hceres_hdr)
 
     return art_df, book_df, conf_df, hceres_df
+
+
+def article_has_phd_candidate_and_team(article):
+    has_phd_candidate = False
+    team = ""
+    if "authIdHal_s" in article:
+        for authIdHal_s in article["authIdHal_s"]:
+            exist = es.exists(index=SV_INDEX, id=authIdHal_s)
+
+            if exist:
+                res = es.get(index=SV_INDEX, id=authIdHal_s)
+                res = res["_source"]
+
+                if res.get("function") == "Doctorant":
+                    has_phd_candidate = True
+
+                if "axis" in res:
+                    axis = res["axis"].replace("axis", "")
+                    team = team + axis + " ; "
+
+        if len(team) > 2:
+            team = team[:-2]
+
+    if has_phd_candidate:
+        phd_candidate_value = "O"
+    else:
+        phd_candidate_value = "N"
+
+    return phd_candidate_value, team
+
+
+def article_has_authorship_hceres(struct_docid, article):
+
+    has_authorship = False
+
+    if "authorship" in article:
+        for authorship in article["authorship"]:
+            # authFullName_s qui est en fait halId_s mais pas toujours
+            try:
+                halid_s = authorship["authFullName_s"]
+
+            except IndexError:
+                halid_s = authorship["halId_s"]
+
+            res = es.get(index=SV_INDEX, id=halid_s)
+            if len(res["source"]) > 0 and res["_source"]["docid"] == struct_docid:
+                has_authorship = True
+
+    if has_authorship:
+        authorship_value = "O"
+    else:
+        authorship_value = "N"
+
+    return authorship_value
+
+
+def create_sorted_dataframe(data):
+    dataframe = pd.DataFrame(data)
+    if len(dataframe.index) > 0:
+        dataframe = dataframe.sort_values(by=["publicationDateY_i"])
+    return dataframe

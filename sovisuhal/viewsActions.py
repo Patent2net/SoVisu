@@ -588,14 +588,12 @@ def export_hceres_xls(request):
     else:
         return redirect("unknown")
 
-    scope_param = esActions.scope_p("halStructId", p_id)
-
     key = "halStructId"
     ext_key = "harvested_from_ids"
 
-    res = es.search(index="test_laboratories", query=scope_param)
+    res = es.get(index=SV_LAB_INDEX, id=p_id)
     try:
-        entity = res["hits"]["hits"][0]["_source"]
+        entity = res["_source"]
     except IndexError:
         return redirect("unknown")
 
@@ -609,31 +607,47 @@ def export_hceres_xls(request):
     #     "function": values[2], "scope": values[3]})
     #
     # toProcess.extend(toProcess_extra_cleaned)
-    scope_bool_type = "filter"
+    # scope_bool_type = "filter"
     validate = True
     date_range_type = "publicationDate_tdate"
+    # TODO: DATE DYNAMIQUE
     date_from = "2016-01-01"
     date_to = "2021-12-31"
-    ref_param = esActions.ref_p(
-        scope_bool_type,
-        ext_key,
-        entity[key],
-        validate,
-        date_range_type,
-        date_from,
-        date_to,
-    )
+    # ref_param = esActions.ref_p(
+    #     scope_bool_type,
+    #     ext_key,
+    #     entity[key],
+    #     validate,
+    #     date_range_type,
+    #     date_from,
+    #     date_to,
+    # )
+    #
+    # count = es.count(index="test_publications", query=ref_param)["count"]
+    #
+    # references = es.search(index="test_publications", query=ref_param, size=count)
 
-    count = es.count(index="test_publications", query=ref_param)["count"]
+    query = {
+        "bool": {
+            "must": [
+                {"match": {"sovisu_category": "notice"}},
+                {"match": {"sovisu_id": f"{p_id}.*"}},
+                {"match": {"sovisu_validated": validate}},
+                {"range": {date_range_type: {"gte": date_from, "lte": date_to}}},
+            ]
+        }
+    }
+    count = es.count(index=SV_LAB_INDEX, query=query)["count"]
 
-    references = es.search(index="test_publications", query=ref_param, size=count)
+    references = es.search(index=SV_LAB_INDEX, query=query, size=count)
 
     references_cleaned = []
 
     for ref in references["hits"]["hits"]:
         references_cleaned.append(ref["_source"])
-
-    sort_results = hceres.sort_references(references_cleaned, entity["halStructId"])
+        #TODO: verification du champs halstructid
+    # sort_results = hceres.sort_references(references_cleaned, entity["halStructId"])
+    sort_results = hceres.sort_references(references_cleaned, entity["docid"])
 
     art_df = sort_results[0]
     book_df = sort_results[1]
@@ -737,7 +751,7 @@ def export_hceres_xls(request):
 
     output.seek(0)
 
-    filename = f"hceres_{entity['acronym']}.xlsx"
+    filename = f"hceres_{entity['acronym_s']}.xlsx"
     response = HttpResponse(
         output,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -766,7 +780,7 @@ def idhal_checkout(idhal):
         confirmation = 1
     return confirmation
 
-
+#TODO: Transformer vizualisation_url en constante, la fonction n'est plus nécessaire
 def vizualisation_url():
     """
     Permet d'ajuster l'affichage des visualisations Kibana
