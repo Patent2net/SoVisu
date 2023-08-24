@@ -240,23 +240,3 @@ def append_to_tree(scope, rsr, tree, state):
                             child1["children"].append(scope_data)
 
     return tree
-
-
-def filter_concepts(concepts, validated_ids):
-    """
-    Filtre les concepts qui ne sont pas dans la liste des concepts validés
-    """
-    if len(concepts) > 0:
-        for children in concepts["children"]:
-            if children["id"] in validated_ids:
-                children["state"] = "validated"
-            if "children" in children:
-                for children1 in children["children"]:
-                    if children1["id"] in validated_ids:
-                        children1["state"] = "validated"
-                    if "children" in children1:
-                        for children2 in children1["children"]:
-                            if children2["id"] in validated_ids:
-                                children2["state"] = "validated"
-
-    return concepts

@@ -10,9 +10,8 @@ from django.shortcuts import redirect
 from uniauth.decorators import login_required
 
 from constants import SV_INDEX, TIMEZONE, SV_LAB_INDEX
-from elasticHal.libs import utils
-from elasticHal.libs.archivesOuvertes import get_aurehalId, get_concepts_and_keywords
-from sovisuhal.libs.elastichal import creeFichesExpertise
+from elasticHal.libs.archivesOuvertes import get_aurehalId
+from sovisuhal.libs.elastichal import creeFichesExpertise, create_searcher_concept_notices
 
 from . import settings
 from .libs import esActions, hceres
@@ -371,25 +370,22 @@ def refresh_aurehal_id(request):
     else:
         date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
-    scope_param = esActions.scope_p("_id", p_id)
-
-    res = es.search(index="test_researchers", query=scope_param)
+    res = es.get(index=SV_INDEX, id=p_id)
     try:
-        entity = res["hits"]["hits"][0]["_source"]
+        entity = res["_source"]
     except IndexError:
         return redirect("unknown")
 
     aurehal_id = get_aurehalId(entity["halId_s"])
-    concepts = []
+
     if aurehal_id != -1:
-        archives_ouvertes_data = get_concepts_and_keywords(aurehal_id)
-        concepts = utils.filter_concepts(archives_ouvertes_data["concepts"], validated_ids=[])
+        create_searcher_concept_notices(p_id, aurehal_id)
 
     es.update(
-        index="test_researchers",
+        index=SV_INDEX,
         refresh="wait_for",
         id=p_id,
-        doc={"aurehalId": aurehal_id, "concepts": concepts},
+        doc={"aurehalId": aurehal_id},
     )
 
     return redirect(
@@ -686,5 +682,3 @@ def idhal_checkout(idhal):
     return confirmation
 
 
-# TODO: Faire une fonction pour gérer les status validated de manière générale:
-#  (passage "validated" de true à false)
