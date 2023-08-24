@@ -46,12 +46,7 @@
                                href="/dashboard/?type=rsr&id={{ entity.halId_s }}&{% if ldapid %}ldapid={{ ldapid }}{% endif%}"
                             >
                                 <span class="">
-                                    {% if entity.ldapId %}
-                                        {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
-                                    {%  endif %}
-                                    {% if entity.halStructId %}
-                                        {{ entity.acronym }}
-                                    {%  endif %}
+                                    {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
                                 </span>
 
                             </a>
