@@ -279,17 +279,28 @@ class CheckView(CommonContextMixin, TemplateView):
         return entity
 
     def get_state_case(self, p_id):
-        field = "labHalId"
-        rsr_param = esActions.scope_p(field, p_id)
-
-        count = es.count(index="test_researchers", query=rsr_param)["count"]
-
-        rsrs = es.search(index="test_researchers", query=rsr_param, size=count)
 
         rsrs_cleaned = []
 
-        for result in rsrs["hits"]["hits"]:
-            rsrs_cleaned.append(result["_source"])
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": "searcher"}},
+                ]
+            }
+        }
+
+        count = es.count(index=SV_INDEX, query=query)["count"]
+        if count > 0:
+            res = es.search(index=SV_INDEX, query=query, size=count)
+
+            res_cleaned = []
+            for res in res["hits"]["hits"]:
+                res_cleaned.append(res["_source"])
+
+            for searcher in res_cleaned:
+                if int(p_id) in searcher["sv_affiliation"]:
+                    rsrs_cleaned.append(searcher)
 
         return rsrs_cleaned
 
