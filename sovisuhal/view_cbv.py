@@ -879,7 +879,6 @@ class ToolsView(CommonContextMixin, TemplateView):
     (Export HCERES, Cohésion des données)
     """
 
-    # TODO: A revoir lorsque la partie chercheur est réglée.
     template_name = "tools.html"
 
     data_tools_options = ["hceres", "consistency"]
@@ -900,76 +899,70 @@ class ToolsView(CommonContextMixin, TemplateView):
         context["entity"] = self.get_entity_data(context["id"])
 
         if context["data"] == "consistency":
-            context["consistency"] = self.get_consistency_data(
-                context["id"], context["from"], context["to"]
-            )
+            context["consistency"] = self.get_consistency_data(context["id"])
 
         return context
 
-    def get_consistency_data(self, p_id, date_from, date_to):
-        # parametres fixes pour la recherche dans les bases Elastic
-        scope_bool_type = "filter"
-        scope_field = "harvested_from_ids"
-        validate = True
-        date_range_type = "submittedDate_tdate"
-
-        # récupere les infos sur les chercheurs attachés au laboratoire
-        field = "labHalId"
-        rsr_param = esActions.scope_p(field, p_id)
-
-        count = es.count(index="test_researchers", query=rsr_param)["count"]
-
-        rsrs = es.search(index="test_researchers", query=rsr_param, size=count)
+    def get_consistency_data(self, p_id):
         rsrs_cleaned = []
-
-        for result in rsrs["hits"]["hits"]:
-            rsrs_cleaned.append(result["_source"])
-
         consistencyvalues = []
 
-        for x in range(len(rsrs_cleaned)):
-            ldapid = rsrs_cleaned[x]["ldapId"]
-            hal_id_s = rsrs_cleaned[x]["halId_s"]
-            name = rsrs_cleaned[x]["name"]
-            validated = rsrs_cleaned[x]["validated"]
-
-            # nombre de documents de l'auteur coté lab
-            ref_lab = esActions.ref_p(
-                scope_bool_type,
-                "authIdHal_s",
-                hal_id_s,
-                validate,
-                date_range_type,
-                date_from,
-                date_to,
-            )
-            raw_lab_doc_count = es.count(index="test_publications", query=ref_lab)["count"]
-
-            # nombre de documents de l'auteur dans son index
-            ref_param = esActions.ref_p(
-                scope_bool_type,
-                scope_field,
-                hal_id_s,
-                validate,
-                date_range_type,
-                date_from,
-                date_to,
-            )
-            raw_searcher_doc_count = es.count(index="test_publications", query=ref_param)["count"]
-
-            # création du dict à rajouter dans la liste
-            profiledict = {
-                "name": name,
-                "ldapId": ldapid,
-                "validated": validated,
-                "labcount": raw_lab_doc_count,
-                "searchercount": raw_searcher_doc_count,
+        # récupère les infos sur les chercheurs attachés au laboratoire
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": "searcher"}},
+                ]
             }
+        }
 
-            # rajout à la liste
-            consistencyvalues.append(profiledict)
+        count = es.count(index=SV_INDEX, query=query)["count"]
+        if count > 0:
+            res = es.search(index=SV_INDEX, query=query, size=count)
 
-            return consistencyvalues
+            res_cleaned = []
+            for res in res["hits"]["hits"]:
+                res_cleaned.append(res["_source"])
+
+            for searcher in res_cleaned:
+                if int(p_id) in searcher["sv_affiliation"]:
+                    rsrs_cleaned.append(searcher)
+
+            for searcher in rsrs_cleaned:
+                # nombre de documents de l'auteur coté labo
+                query = {
+                        "bool": {
+                            "must": [
+                                {"match": {"sovisu_category": "notice"}},
+                                {"match": {"idhal": p_id}},
+                                {"terms": {"authIdHal_s.keyword": [searcher["halId_s"]]}},
+                            ]
+                        }
+                    }
+                raw_lab_doc_count = es.count(index=SV_LAB_INDEX, query=query)["count"]
+                # nombre de documents de l'auteur dans son index
+                query = {
+                        "bool": {
+                            "must": [
+                                {"match": {"sovisu_category": "notice"}},
+                                {"match": {"idhal": searcher["halId_s"]}},
+                            ]
+                        }
+                    }
+                raw_searcher_doc_count = es.count(index=SV_INDEX, query=query)["count"]
+                # création du dict à rajouter dans la liste
+                profiledict = {
+                    "name": searcher["name"],
+                    "ldapId": searcher["ldapId"],
+                    "validated": searcher["validated"],
+                    "labcount": raw_lab_doc_count,
+                    "searchercount": raw_searcher_doc_count,
+                }
+
+                # rajout à la liste
+                consistencyvalues.append(profiledict)
+
+        return consistencyvalues
 
     def get_entity_data(self, p_id):
         res = es.get(index=SV_LAB_INDEX, id=p_id)
