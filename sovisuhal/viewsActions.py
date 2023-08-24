@@ -588,8 +588,15 @@ def export_hceres_xls(request):
     else:
         return redirect("unknown")
 
-    key = "halStructId"
-    ext_key = "harvested_from_ids"
+    if "from" in request.GET:
+        date_from = request.GET["from"]
+    else:
+        date_from = "2000-01-01"
+
+    if "to" in request.GET:
+        date_to = request.GET["to"]
+    else:
+        date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     res = es.get(index=SV_LAB_INDEX, id=p_id)
     try:
@@ -597,35 +604,8 @@ def export_hceres_xls(request):
     except IndexError:
         return redirect("unknown")
 
-    # Acquisition des chercheurs à traiter
-    # toProcess = json.loads(request.POST.get("toProcess", ""))
-    # toProcess_extra_cleaned = []
-    # toProcess_extra = request.POST.get("toProcess_extra", "").splitlines()
-    # for line in toProcess_extra:
-    #     values = line.split(";")
-    #     toProcess_extra_cleaned.append({"halId": values[0], "axis": values[1],
-    #     "function": values[2], "scope": values[3]})
-    #
-    # toProcess.extend(toProcess_extra_cleaned)
-    # scope_bool_type = "filter"
     validate = True
     date_range_type = "publicationDate_tdate"
-    # TODO: DATE DYNAMIQUE
-    date_from = "2016-01-01"
-    date_to = "2021-12-31"
-    # ref_param = esActions.ref_p(
-    #     scope_bool_type,
-    #     ext_key,
-    #     entity[key],
-    #     validate,
-    #     date_range_type,
-    #     date_from,
-    #     date_to,
-    # )
-    #
-    # count = es.count(index="test_publications", query=ref_param)["count"]
-    #
-    # references = es.search(index="test_publications", query=ref_param, size=count)
 
     query = {
         "bool": {
@@ -645,8 +625,7 @@ def export_hceres_xls(request):
 
     for ref in references["hits"]["hits"]:
         references_cleaned.append(ref["_source"])
-        #TODO: verification du champs halstructid
-    # sort_results = hceres.sort_references(references_cleaned, entity["halStructId"])
+
     sort_results = hceres.sort_references(references_cleaned, entity["docid"])
 
     art_df = sort_results[0]
@@ -756,7 +735,7 @@ def export_hceres_xls(request):
         output,
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-    response["Content-Disposition"] = "attachment; filename=%s" % filename
+    response["Content-Disposition"] = f"attachment; filename={filename}"
 
     return response
 
@@ -779,6 +758,7 @@ def idhal_checkout(idhal):
     else:
         confirmation = 1
     return confirmation
+
 
 #TODO: Transformer vizualisation_url en constante, la fonction n'est plus nécessaire
 def vizualisation_url():
