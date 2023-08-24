@@ -1,5 +1,7 @@
 from dateutil import tz
 
+KIBANA_URL = "/kibana"
+
 SV_INDEX = "sovisu_index"
 
 SV_LAB_INDEX = "sovisu_index"

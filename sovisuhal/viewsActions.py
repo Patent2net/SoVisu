@@ -760,14 +760,5 @@ def idhal_checkout(idhal):
     return confirmation
 
 
-#TODO: Transformer vizualisation_url en constante, la fonction n'est plus nécessaire
-def vizualisation_url():
-    """
-    Permet d'ajuster l'affichage des visualisations Kibana
-    À intégrer dans les consts
-    """
-    url = "/kibana"
-    return url
-
 # TODO: Faire une fonction pour gérer les status validated de manière générale:
 #  (passage "validated" de true à false)

@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from elasticsearch import BadRequestError
 from uniauth.decorators import login_required
 
-from constants import SV_INDEX, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX, TIMEZONE
+from constants import SV_INDEX, SV_STRUCTURES_REFERENCES, SV_LAB_INDEX, TIMEZONE, KIBANA_URL
 from . import forms, viewsActions
 from .libs import esActions, halConcepts
 from .libs.elastichal import collecte_docs, indexe_chercheur
@@ -650,7 +650,7 @@ class DashboardView(CommonContextMixin, TemplateView):
             return redirect("unknown")
         # /
 
-        url = viewsActions.vizualisation_url()
+        url = KIBANA_URL
 
         return entity, filtre_idhal, filtre_affiliation, url, dash
 
@@ -867,9 +867,7 @@ class LexiconView(CommonContextMixin, TemplateView):
         filtrechercheur = f'_index: "{indexsearch}"'
         filtrelab = f'_index: "{indexsearch}"'
 
-        url = (
-            viewsActions.vizualisation_url()
-        )  # permet d'ajuster l'url des visualisations en fonction du build
+        url = KIBANA_URL
 
         return filtrechercheur, filtrelab, url
 
