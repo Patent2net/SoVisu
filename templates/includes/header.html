@@ -8,11 +8,11 @@
     <meta name="google-site-verification" content="tWOEM_g9-lB_hXbgHVWrOMOlrSeEwfGwi3yKTj1jY0s" />
     <meta name="robots" content="noindex">
 
-    <title>{{title}} {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des structures" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" %}:{%  endif %} {% if entity.ldapId %}
+    <title>{{title}} {% if halId_s != 'nullNone' and title != "Aide" and title != "Index des chercheurs" and title != "Présentation" and title != "Nous contacter" and title != "Recherche" and title != "Index des structures" and title != "Aucune ressource sélectionnée"  and title != "Foire aux questions" and title != "Nous contacter" and title != "Ressources" and title != "Outils & services" %}:{%  endif %} {% if type == "rsr" %}
         {{ entity.firstName|make_list|first }}. {{ entity.lastName }}
     {%  endif %}
-        {% if entity.halStructId %}
-            {{ entity.acronym }}
+        {% if type == "lab" %}
+            {{ entity.acronym_s }}
         {%  endif %}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,11 +73,11 @@
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>
                         {%  endif %}
-                        {% if entity.ldapId %}
+                        {% if type == "rsr" %}
                             <span class="font-semibold">{{ entity.firstName|make_list|first }}. {{ entity.lastName }}</span>
                         {%  endif %}
-                        {% if entity.halStructId %}
-                            <span class="font-semibold">{{ entity.acronym }}</span>
+                        {% if type == "lab" %}
+                            <span class="font-semibold">{{ entity.acronym_s }}</span>
                         {%  endif %}
                     </div>
 
