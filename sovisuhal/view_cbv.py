@@ -233,7 +233,8 @@ class CheckView(CommonContextMixin, TemplateView):
             context["expertises"] = expertises
 
         if context["data"] == "guiding-domains":
-            domains, guiding_domains = self.get_guiding_domains_case(context["entity"], context["type"])
+            domains, guiding_domains = self.get_guiding_domains_case(
+                context["entity"], context["type"])
             context["domains"] = domains
             context["guidingDomains"] = guiding_domains
             # TODO: Trouver une alternative à aurehalId si usage structures
@@ -427,9 +428,13 @@ class CheckView(CommonContextMixin, TemplateView):
         }
 
         if i_type == 'rsr':
-            query["bool"]["must"].append({"match": {"idhal": entity["idhal"]}})
-        if i_type == 'lab':
-            query["bool"]["must"].append({"match": {"idhal": entity["docid"]}})
+            entity_id = entity["idhal"]
+        elif i_type == 'lab':
+            entity_id = entity["docid"]
+        else:
+            return redirect("unknown")
+
+        query["bool"]["must"].append({"match": {"idhal": entity_id}})
 
         expertises_count = es.count(index=SV_INDEX, query=query)["count"]
         searcher_expertises = es.search(index=SV_INDEX, query=query, size=expertises_count)
@@ -774,8 +779,7 @@ class TerminologyView(CommonContextMixin, TemplateView):
         }
         expertise_count = es.count(index=index_pattern, query=query)["count"]
         expertise_list = es.search(index=index_pattern, query=query, size=expertise_count)[
-            "hits"
-        ]["hits"]
+            "hits"]["hits"]
         print(expertise_list)
         # on pointe sur index générique, car pas de LabHalId ?
         for expertise in expertise_list:
