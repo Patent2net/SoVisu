@@ -68,23 +68,30 @@ class CommonContextMixin:
         Check if at least one notice is in the state setup of the "validate" variable.
         If not, a ping gonna appear next to check in the menu.
         """
-        hastoconfirm = False
+        hastoconfirm = True
 
         validate = True
+
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"sovisu_category": "notice"}},
+                    {"match": {"idhal": p_id}},
+                    {"match": {"sovisu_validated": validate}}
+                ]
+            }
+        }
+
         if i_type == "rsr":
             index = SV_INDEX
-            field = "authIdHal_s"
-            hastoconfirm_param = esActions.confirm_p(field, p_id, validate)
-
         elif i_type == "lab":
             index = SV_LAB_INDEX
-            field = "labStructId_i"
-            hastoconfirm_param = esActions.confirm_p(field, p_id, validate)
         else:
             return redirect("unknown")
 
-        if es.count(index=index, query=hastoconfirm_param)["count"] == 0:
-            hastoconfirm = True
+        es_count = es.count(index=index, query=query)["count"]
+        if es_count > 0:
+            hastoconfirm = False
 
         return hastoconfirm
 
