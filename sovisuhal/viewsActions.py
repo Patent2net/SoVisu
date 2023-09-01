@@ -158,7 +158,6 @@ def validate_guiding_domains(request):
             "must": [{"match": {"sovisu_category": "expertise"}}, {"match": {"idhal": p_id}}, ]}}
 
         if i_type == "rsr":
-            elastic_index = SV_INDEX
             count = es.count(index=SV_INDEX, query=query)["count"]
             fichesExpertise = es.search(index=SV_INDEX, query=query, size=count)
             if fichesExpertise['_shards']['successful'] > 0:
@@ -188,18 +187,8 @@ def validate_guiding_domains(request):
             else:
 
                 creeFichesExpertise(idx=SV_INDEX, idHal=p_id, aureHal=aurehal, lstDom=to_validate)
-        elif i_type == "lab":
-
-            elastic_index = "test_laboratories"
         else:
             return redirect("unknown")
-
-        # es.update(
-        #     index=elastic_index,
-        #     refresh="wait_for",
-        #     id=p_id,
-        #     doc={"guidingDomains": to_validate},
-        # )
 
     return redirect(
         f"/check/?type={i_type}&id={p_id}&from={date_from}&to={date_to}&data={data}"
@@ -332,10 +321,10 @@ def validate_credentials(request):
             idref = request.POST.get("f_IdRef")
 
             es.update(
-                index="test_laboratories",
+                index=SV_LAB_INDEX,
                 refresh="wait_for",
                 id=p_id,
-                doc={"rsnr": rsnr, "idRef": idref, "validated": True},
+                doc={"rsnr_s": rsnr, "idRef_s": idref, "validated": True},
             )
 
     return redirect(
@@ -427,7 +416,6 @@ def update_members(request):
             element = element.split(":")
             scope_param = esActions.scope_p("_id", element[0])
 
-            # attention multi univ la...
             res = es.search(index="test_researchers", query=scope_param)
             try:
                 entity = res["hits"]["hits"][0]["_source"]
