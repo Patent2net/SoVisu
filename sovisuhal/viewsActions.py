@@ -229,15 +229,13 @@ def validate_expertise(request):
         date_to = datetime.now(tz=TIMEZONE).date().isoformat()
 
     if int(validation) == 0:  # validation is at 0 when page show unvalidated concepts
-        update_doc = {
-            "validated": True
-        }
+        state = True
     elif int(validation) == 1:  # validation is at 1 when page show validated concepts
-        update_doc = {
-            "validated": False
-        }
+        state = False
     else:
         return redirect("unknown")
+
+    update_doc = {"sovisu_validated": state}
 
     if request.method == "POST":
         # get values sent via the form

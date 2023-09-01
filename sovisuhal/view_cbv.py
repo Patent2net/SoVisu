@@ -402,12 +402,12 @@ class CheckView(CommonContextMixin, TemplateView):
 
         if validation == "1":  # show the expertises validated by searcher
             for expertise in searcher_expertises:
-                if expertise["_source"]["validated"]:
+                if expertise["_source"]["sovisu_validated"]:
                     expertise_cleaned.append(expertise["_source"])
 
         elif validation == "0":  # show the expertises invalidated by searcher
             for expertise in searcher_expertises:
-                if not expertise["_source"]["validated"]:
+                if not expertise["_source"]["sovisu_validated"]:
                     expertise_cleaned.append(expertise["_source"])
         else:
             return redirect("unknown")
@@ -421,7 +421,7 @@ class CheckView(CommonContextMixin, TemplateView):
             "bool": {
                 "must": [
                     {"match": {"sovisu_category": "expertise"}},
-                    {"match": {"validated": True}},
+                    {"match": {"sovisu_validated": True}},
                 ]
             }
         }
@@ -768,15 +768,17 @@ class TerminologyView(CommonContextMixin, TemplateView):
                 "must": [
                     {"match": {"sovisu_category": "expertise"}},
                     {"match": {"idhal": p_id}},
+                    {"match": {"sovisu_validated": True}}
                 ]
             }
         }
         expertise_count = es.count(index=index_pattern, query=query)["count"]
-        searcher_expertises = es.search(index=index_pattern, query=query, size=expertise_count)[
+        expertise_list = es.search(index=index_pattern, query=query, size=expertise_count)[
             "hits"
         ]["hits"]
+        print(expertise_list)
         # on pointe sur index générique, car pas de LabHalId ?
-        for expertise in searcher_expertises:
+        for expertise in expertise_list:
             entity.append(expertise["_source"])
 
         # TODO: Find a way to order with expertise["chemin"]
