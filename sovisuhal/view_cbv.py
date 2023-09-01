@@ -220,7 +220,7 @@ class CheckView(CommonContextMixin, TemplateView):
             context["research_projects_and_fundings"] = research_projects_and_fundings
             context["form"] = form
 
-        if context["data"] == "expertise":  # TODO: Doit fonctionner avec test_expertises
+        if context["data"] == "expertise":
             validation, expertises = self.get_expertise_case(context["id"])
             context["validation"] = validation
             context["expertises"] = expertises
@@ -854,33 +854,15 @@ class LexiconView(CommonContextMixin, TemplateView):
         else:
             langue = self.lang
 
-        filtrechercheur, filtrelab, url = self.get_elastic_data(
-            context["type"])
+        filtre_idhal = f'idhal.keyword: "{context["id"]}"'
 
-        context["filterRsr"] = filtrechercheur
-        context["filterLab"] = filtrelab
-        context["url"] = url
+        context["filtre_idhal"] = filtre_idhal
+        context["url"] = KIBANA_URL
 
         context["lang_options"] = self.lang_options
         context["lang"] = langue
 
         return context
-
-    def get_elastic_data(self, i_type):
-        # /
-        if i_type == "rsr":
-            indexsearch = SV_INDEX
-        elif i_type == "lab":
-            indexsearch = SV_LAB_INDEX
-        else:
-            return redirect("unknown")
-
-        filtrechercheur = f'_index: "{indexsearch}"'
-        filtrelab = f'_index: "{indexsearch}"'
-
-        url = KIBANA_URL
-
-        return filtrechercheur, filtrelab, url
 
 
 @method_decorator(login_required, name="dispatch")

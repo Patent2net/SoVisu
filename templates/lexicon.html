@@ -39,11 +39,11 @@
                     </div>
                 {% if type == "lab" %}
                     <div class="w-full h-full">
-                        <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/e2e130a0-d051-11ec-9593-851110e50703?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')),viewMode:view,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
+                        <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/8d5eb600-4316-11ee-99e1-6df301ab9f80?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(viewMode:edit,query:(query_string:(analyze_wildcard:!t,query:'{{ filtre_idhal }}')),viewMode:view,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
                     </div>
                 {%  else %}
                     <div class="w-full h-full">
-                        <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/8c338430-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:view,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
+                        <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/8c338430-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtre_idhal }}')),viewMode:view,fullScreenMode:!f,options:(hidePanelTitles:!t,syncColors:!t,useMargins:!f))" height="100%" width="100%"></iframe>
                     </div>
                 {%  endif %}
 
@@ -51,7 +51,7 @@
 
                 {% if type == "lab" %}
                     <div class="w-full h-full">
-                        <iframe src="{{ url }}/app/dashboards#/view/db8a8f80-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))" height="100%" width="100%" id="dashkib"></iframe>
+                        <iframe src="{{ url }}/app/dashboards#/view/6339c2f0-4318-11ee-99e1-6df301ab9f80?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtre_idhal }}')))" height="100%" width="100%" id="dashkib"></iframe>
                     </div>
 
                 {%  else %}
@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="w-full h-full">
-                    <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/934e9630-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:view)" height="100%" width="100%" id="dashkib">
+                    <iframe Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/934e9630-fc35-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtre_idhal }}')),viewMode:view)" height="100%" width="100%" id="dashkib">
 
                     </iframe></div>
                 {%  endif %}
@@ -86,14 +86,12 @@
                     </div>
                 {% if type == "lab" %}
                     <div class="w-full h-full">
-                        <iframe  id="dashkib" src="{{ url }}/app/dashboards#/view/c0feaf00-fc37-11ec-8b3e-b123ba76fd27?embed=true&_g=(
-                        refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterLab }}')))&show-top-menu=false&show-query-input=true&show-time-filter=true" height="100%" width="100%">
+                        <iframe src="{{ url }}/app/dashboards#/view/08e5fb70-4318-11ee-99e1-6df301ab9f80?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtre_idhal }}')))" height="100%" width="100%" id="dashkib"></iframe>
 
-                        </iframe>
                     </div>
                 {%  else %}
                       <div class="w-full h-full">
-                      <iframe  id="dashkib"  Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filterRsr }}')),viewMode:view)" height="100%" width="100%" >
+                      <iframe  id="dashkib"  Sec-Fetch-Dest="iframe" src="{{ url }}/app/dashboards#/view/1d2e4d50-fc36-11ec-8b3e-b123ba76fd27?embed=true&_g=(refreshInterval:(pause:!t,value:0),time:(from:'{{ from }}',to:'{{ to }}'))&_a=(query:(query_string:(analyze_wildcard:!t,query:'{{ filtre_idhal }}')),viewMode:view)" height="100%" width="100%" >
 
                     </iframe></div>
                 {%  endif %}

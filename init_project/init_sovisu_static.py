@@ -3556,6 +3556,10 @@ def document_mapping():
                         "ignore_above": 256
                     }
                 }
+            },
+
+            "sv_affiliation": {
+                "type": "keyword"
             }
         },
         # Create mapping dynamically when the condition path_match is met
