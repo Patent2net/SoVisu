@@ -1169,6 +1169,12 @@ class SearchView(CommonContextMixin, TemplateView):
 
     template_name = "search2.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["url"] = KIBANA_URL
+
+        return context
 
 class FAQView(CommonContextMixin, TemplateView):
     """
