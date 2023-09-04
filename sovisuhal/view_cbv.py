@@ -77,7 +77,7 @@ class CommonContextMixin:
                 "must": [
                     {"match": {"sovisu_category": "notice"}},
                     {"match": {"idhal": p_id}},
-                    {"match": {"sovisu_validated": validate}}
+                    {"match": {"sovisu_validated": validate}},
                 ]
             }
         }
@@ -234,7 +234,8 @@ class CheckView(CommonContextMixin, TemplateView):
 
         if context["data"] == "guiding-domains":
             domains, guiding_domains = self.get_guiding_domains_case(
-                context["entity"], context["type"])
+                context["entity"], context["type"]
+            )
             context["domains"] = domains
             context["guidingDomains"] = guiding_domains
             # TODO: Trouver une alternative à aurehalId si usage structures
@@ -258,7 +259,9 @@ class CheckView(CommonContextMixin, TemplateView):
             structurelist = self.get_affiliations_case(context["id"], context["type"])
             context["structurelist"] = structurelist
 
-            non_affiliated_structures = self.get_non_affiliated_structures(context["id"], context["type"])
+            non_affiliated_structures = self.get_non_affiliated_structures(
+                context["id"], context["type"]
+            )
             context["non_affiliated_structures"] = json.dumps(
                 [
                     {"id": structure["docid"], "label": structure["label_s"]}
@@ -269,7 +272,6 @@ class CheckView(CommonContextMixin, TemplateView):
         return context
 
     def get_entity_data(self, i_type, p_id):
-
         if i_type == "lab":
             indexsearch = SV_LAB_INDEX
         elif i_type == "rsr":
@@ -287,7 +289,6 @@ class CheckView(CommonContextMixin, TemplateView):
         return entity
 
     def get_state_case(self, p_id):
-
         rsrs_cleaned = []
 
         query = {
@@ -427,9 +428,9 @@ class CheckView(CommonContextMixin, TemplateView):
             }
         }
 
-        if i_type == 'rsr':
+        if i_type == "rsr":
             entity_id = entity["idhal"]
-        elif i_type == 'lab':
+        elif i_type == "lab":
             entity_id = entity["docid"]
         else:
             return redirect("unknown")
@@ -494,7 +495,6 @@ class CheckView(CommonContextMixin, TemplateView):
         return validation, references_cleaned
 
     def get_affiliations_case(self, p_id, i_type):
-
         if i_type == "rsr":
             index = SV_INDEX
             key = "sv_affiliation"
@@ -649,7 +649,6 @@ class DashboardView(CommonContextMixin, TemplateView):
         return context
 
     def get_elastic_data(self, i_type, p_id):
-
         dash = ""
         filtre_idhal = f'idhal.keyword: "{p_id}"'
         filtre_affiliation = f'sv_affiliation: "{p_id}"'
@@ -705,7 +704,6 @@ class ReferencesView(CommonContextMixin, TemplateView):
         return context
 
     def get_elastic_data(self, i_type, p_id, i_filter, date_from, date_to):
-
         # Get references
         validate = True
         ref_param = esActions.ref_p_filter(
@@ -753,14 +751,13 @@ class TerminologyView(CommonContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        entity = self.get_elastic_data(context["type"], context["id"])
+        concepts = self.get_elastic_data(context["type"], context["id"])
 
-        context["entity"] = entity
-
+        context["concepts"] = json.dumps(concepts)
         return context
 
     def get_elastic_data(self, i_type, p_id):
-        entity = []
+        concepts = {"children": []}
         if i_type == "lab":
             index_pattern = SV_LAB_INDEX
         elif i_type == "rsr":
@@ -773,75 +770,55 @@ class TerminologyView(CommonContextMixin, TemplateView):
                 "must": [
                     {"match": {"sovisu_category": "expertise"}},
                     {"match": {"idhal": p_id}},
-                    {"match": {"sovisu_validated": True}}
+                    {"match": {"sovisu_validated": True}},
                 ]
             }
         }
         expertise_count = es.count(index=index_pattern, query=query)["count"]
-        expertise_list = es.search(index=index_pattern, query=query, size=expertise_count)[
-            "hits"]["hits"]
-        print(expertise_list)
+        expertise_list = es.search(index=index_pattern, query=query, size=expertise_count)["hits"][
+            "hits"
+        ]
+        cleaned_expertise_list = [entity["_source"] for entity in expertise_list]
+        print(f"cleaned list: {cleaned_expertise_list}")
         # on pointe sur index générique, car pas de LabHalId ?
-        for expertise in expertise_list:
-            entity.append(expertise["_source"])
 
-        # TODO: Find a way to order with expertise["chemin"]
-        # try:
-        #     entity = res["hits"]["hits"][0]["_source"]
-        # except IndexError:
-        #     return redirect("unknown")
-        # # /
-        #
-        # if i_type == "lab" or i_type == "rsr":
-        #     entity["concepts"] = json.dumps(entity["concepts"])
-        #
-        # entity["concepts"] = json.loads(entity["concepts"])
-        #
-        # if i_type == "rsr" and "children" in entity["concepts"]:
-        #     for children in list(entity["concepts"]["children"]):
-        #         if children["state"] == "invalidated":
-        #             entity["concepts"]["children"].remove(children)
-        #
-        #         if "children" in children:
-        #             for children1 in list(children["children"]):
-        #                 if children1["state"] == "invalidated":
-        #                     children["children"].remove(children1)
-        #
-        #                 if "children" in children1:
-        #                     for children2 in list(children1["children"]):
-        #                         if children2["state"] == "invalidated":
-        #                             children1["children"].remove(children2)
-        #
-        # if i_type == "lab" and "children" in entity["concepts"]:
-        #     for children in list(entity["concepts"]["children"]):
-        #         state = "invalidated"
-        #         if "researchers" in children:
-        #             for rsr in children["researchers"]:
-        #                 if rsr["state"] == "validated":
-        #                     state = "validated"
-        #             if state == "invalidated":
-        #                 entity["concepts"]["children"].remove(children)
-        #
-        #         if "children" in children:
-        #             for children1 in list(children["children"]):
-        #                 state = "invalidated"
-        #                 if "researchers" in children1:
-        #                     for rsr in children1["researchers"]:
-        #                         if rsr["state"] == "validated":
-        #                             state = "validated"
-        #                     if state == "invalidated":
-        #                         children["children"].remove(children1)
-        #
-        #                 if "children" in children1:
-        #                     for children2 in list(children1["children"]):
-        #                         state = "invalidated"
-        #                         if "researchers" in children2:
-        #                             for rsr in children2["researchers"]:
-        #                                 if rsr["state"] == "validated":
-        #                                     state = "validated"
-        #                             if state == "invalidated":
-        #                                 children1["children"].remove(children2)
-        return entity
+        for expertise in cleaned_expertise_list:
+            expertise["children"] = []
+            expertise["researchers"] = []
+            concepts["children"].append(expertise)
+        print(f"concepts: {concepts}")
+
+        # TODO: transform the fixed example as dynamic one
+        #  1: get the validated values from expertise.
+        #  2: check the level of the content, if level > 1 a parent exist.
+        #  3: if level >1 get the parent with elastic. Put the children in the parent in the field "children"
+        #  4: check if parent is level 1, if not repeat up to part 2
+        #  5: when done, add the parent to entity.
+        #  6: check if parent is not already in entity, if yes merge with existing. no duplicates allowed
+
+        tree_list, remaining_items = self.get_level_one_items(cleaned_expertise_list)
+        print(f"tree_list: {tree_list}")
+        print(f"remaining_list: {remaining_items}")
+        return concepts
+
+    def get_level_one_items(self, concept_list):
+        print(concept_list)
+        filtered_data = {"children": list(filter(lambda x: x["level"] == 1, concept_list))}
+        remaining_items = list(filter(lambda x: x["level"] != 1, concept_list))
+
+        return filtered_data, remaining_items
+
+    def add_remaining_level_to_filtered(self, filtered_data, remaining_items):
+        level_two_items = list(filter(lambda x: x['level'] == 2, remaining_items))
+
+        for item in level_two_items:
+            parent_id = item["parent_id"]  # assuming that items have a "parent_id" field
+
+            for child in filtered_data["children"]:
+                if child["id"] == parent_id:  # assuming that items have an "id" field
+                    child.setdefault("children", []).append(item)
+
+        return filtered_data
 
 
 class LexiconView(CommonContextMixin, TemplateView):
@@ -937,24 +914,24 @@ class ToolsView(CommonContextMixin, TemplateView):
             for searcher in rsrs_cleaned:
                 # nombre de documents de l'auteur coté labo
                 query = {
-                        "bool": {
-                            "must": [
-                                {"match": {"sovisu_category": "notice"}},
-                                {"match": {"idhal": p_id}},
-                                {"terms": {"authIdHal_s.keyword": [searcher["halId_s"]]}},
-                            ]
-                        }
+                    "bool": {
+                        "must": [
+                            {"match": {"sovisu_category": "notice"}},
+                            {"match": {"idhal": p_id}},
+                            {"terms": {"authIdHal_s.keyword": [searcher["halId_s"]]}},
+                        ]
                     }
+                }
                 raw_lab_doc_count = es.count(index=SV_LAB_INDEX, query=query)["count"]
                 # nombre de documents de l'auteur dans son index
                 query = {
-                        "bool": {
-                            "must": [
-                                {"match": {"sovisu_category": "notice"}},
-                                {"match": {"idhal": searcher["halId_s"]}},
-                            ]
-                        }
+                    "bool": {
+                        "must": [
+                            {"match": {"sovisu_category": "notice"}},
+                            {"match": {"idhal": searcher["halId_s"]}},
+                        ]
                     }
+                }
                 raw_searcher_doc_count = es.count(index=SV_INDEX, query=query)["count"]
                 # création du dict à rajouter dans la liste
                 profiledict = {
@@ -1026,11 +1003,7 @@ class StructuresIndexView(CommonContextMixin, TemplateView):
         """
         body = {
             "size": 0,
-            "query": {
-                "match": {
-                    "sv_parent_type": "structure"
-                }
-            },
+            "query": {"match": {"sv_parent_type": "structure"}},
             "aggs": {"unique_categories": {"terms": {"field": "sovisu_category.keyword"}}},
         }
 
@@ -1119,32 +1092,30 @@ class SearchersIndexView(CommonContextMixin, TemplateView):
             index=SV_LAB_INDEX,
             query=get_institution_query,
         )["count"]
-        struct_tab = es.search(
-            index=SV_LAB_INDEX, query=get_institution_query, size=count
-        )
+        struct_tab = es.search(index=SV_LAB_INDEX, query=get_institution_query, size=count)
         struct_tab = [hit["_source"] for hit in struct_tab["hits"]["hits"]]
         return struct_tab
 
     def get_searcher_list(self, sv_affiliation):
         """
-            Fetches a list of searchers sorted by their last name from ElasticSearch,
-             based on the provided affiliation value.
- 
-            Parameters
-            ----------
-            sv_affiliation : str
-                The affiliation value used to filter the search results from the ElasticSearch
-                Index.
-                It uses 'match' (in ElasticSearch terms) to filter results where 'sv_affiliation'
-                 is equal to provided value. If the value is '*', it will take all affiliations.
- 
-            Returns
-            -------
-            list
-                List of searchers as a dictionary including their details.
-                Each 'hit' from ElasticSearch results is extracted as a dictionary using
-                 its '_source' attribute.
-                The list is sorted by the 'lastName' key of these dictionaries, in ascending order.
+        Fetches a list of searchers sorted by their last name from ElasticSearch,
+         based on the provided affiliation value.
+
+        Parameters
+        ----------
+        sv_affiliation : str
+            The affiliation value used to filter the search results from the ElasticSearch
+            Index.
+            It uses 'match' (in ElasticSearch terms) to filter results where 'sv_affiliation'
+             is equal to provided value. If the value is '*', it will take all affiliations.
+
+        Returns
+        -------
+        list
+            List of searchers as a dictionary including their details.
+            Each 'hit' from ElasticSearch results is extracted as a dictionary using
+             its '_source' attribute.
+            The list is sorted by the 'lastName' key of these dictionaries, in ascending order.
         """
         category_type = "searcher"
         query = {
@@ -1181,6 +1152,7 @@ class SearchView(CommonContextMixin, TemplateView):
         context["url"] = KIBANA_URL
 
         return context
+
 
 class FAQView(CommonContextMixin, TemplateView):
     """

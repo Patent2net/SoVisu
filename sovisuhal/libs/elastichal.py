@@ -130,6 +130,7 @@ def indexe_chercheur(structid, ldapid, labo_accro, labhalid, idhal, idref, orcid
         # TODO: faire sauter pour créer un document structure à la place?
         "firstName": searcher_data["firstName_s"],
         "lastName": searcher_data["lastName_s"],
+        # TODO: FAIRE SAUTER STRUCTSIRENE, rajouter la valeur structid à sv_affiliation
         "structSirene": structid,
         "labHalId": labhalid,
         "validated": False,
@@ -369,7 +370,7 @@ def creeFichesExpertise(idx, idHal, aureHal, lstDom):
         newFiche = utils.creeFiche(domaine)
         newFiche['idhal'] = idHal
         newFiche['aurehal'] = aureHal
-        newFiche['validated'] = False
+        newFiche['sovisu_validated'] = False
         elastic_id = f"{idHal}.{newFiche['chemin']}"
         newFiche['sovisu_id'] = elastic_id
         newFiche['refOk'] = False
@@ -405,7 +406,7 @@ def creeFichesExpertise(idx, idHal, aureHal, lstDom):
             if fiche['_source'][
                 'chemin'] == dom:  # si la req pouvait donner un match exact, on se passerait de çà
                 newFiche = fiche['_source']
-                newFiche['validated'] = False  # domaines pas validés par défaut
+                newFiche['sovisu_validated'] = False  # domaines pas validés par défaut
                 # Id proposition : valider les domaines par défaut et laisser la possibilité d'en valider d'autres par explorateur d'arbre ?
                 newFiche['idhal'] = idHal  # taggage, l'idhal sert de clé
                 newFiche['aurehal'] = aureHal  # un domaine est attaché à l'aurehalId
@@ -458,7 +459,6 @@ def create_searcher_concept_notices(idhal, aurehal):
         for fiche in dejaLa:
             if fiche["_source"]['origin'] != "datagouv":
                 fiche["_source"]['origin'] = "datagouv"
-                # fiche["_source"]['validated'] = True
                 es.update(index=SV_INDEX, id=fiche["_id"], body=fiche["_source"])
             idDomainChecheur.remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
         # les autres on les créé

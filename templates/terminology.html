@@ -41,7 +41,7 @@
 </div>
 
 <script>
-
+// create the iframe given to the user when clicking on the "exporter" button
    function copy() {
        url =  window.location.href;
        if(getUrlParameter('id') === undefined) {
@@ -60,17 +60,20 @@
       document.body.removeChild(copyText);
     }
 
+    // give the iframe to the user when the "exporter" button is clicked
     $(document).ready(function() {
         document.querySelector("#export").addEventListener("click", copy);
     });
-
+//
 
 
     function displayDetails(details) {
-        console.log(details);
         $('#tree-details').empty();
-        for (const e of details) {
-            if ((e['state'] == "validated")) {
+        if ("{{ type }}" === 'lab') {
+            console.log(details);
+            for (const e of details) {
+            // TODO: edit the if [state] for new version of data when everything is fixed
+            //if ((e['state'] == "validated")) {
                 $('#tree-details').append('<li class="leading-4 w-full bg-gray-50 py-1 px-2">'+
                     ' <a class="text-blue-700 text-sm" href="#">' +
                     e.firstName + " " + e.lastName +
@@ -79,6 +82,10 @@
             }
 
         }
+        $('#tree-details').append("<li>Test</li>");
+        console.log("New content of #tree-details: ", $('#tree-details').html());
+        //}
+
     }
 
     function graph(rootData = root) {
@@ -155,10 +162,9 @@
                 .attr("fill-opacity", 0)
                 .attr("stroke-opacity", 0)
                 .on("click", d => {
-
                     $('path[stroke=green]').attr("stroke", "#BFDBFE")
 
-                    path = d.data.id.split('.');
+                    path = d.data.chemin.split('.');
 
 
                     $('path.to-' + path[0]).attr("stroke", "green")
@@ -223,7 +229,7 @@
                 .enter()
                 .append("path")
                 .attr("class", d => {
-                    return('to-' + d.target.data.id.split('.').join('_'))
+                    return('to-' + d.target.data.chemin.split('.').join('_'))
                 })
                 .attr("d", d => {
                     const o = { x: source.x0, y: source.y0 };
@@ -260,7 +266,7 @@
 
     width = $('#tree').width();
 
-    data = {% autoescape off %}{{ entity.concepts }}{% endautoescape %};
+    data = {% autoescape off %}{{ concepts }}{% endautoescape %};
     data["label"] = "Concepts"
 
     if(data.length == 1) {
