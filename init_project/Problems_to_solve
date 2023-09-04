@@ -1,0 +1,21 @@
+DANS INIT_SOVISU
+
+
+DASHBOARD: pour dashboard labo membres, trouver une solution pour afficher les expertises avec le filtre sv_affiliation actif
+
+Part #:
+Revoir le mapping des index (réduire le mapping donné au minimum, avec uniquement une spécification pour les champs particuliers utilisés (type keyword etc)
+
+
+
+
+PART HCERES:
+dans sovisuhal/libs/hceres.py:
+Résoudre le problème suivant: les documents provenant/liés à un laboratoire n'ont pas d'authorship calculé.
+Ce bloc de code, renvoie donc quoi qu'il arrive Authorship: N qui est la réponse par défaut.
+
+
+
+PART edit:
+Se pencher sur viewsActions.py > update_members
+Est utilisé dans check type lab, dans la page membres du laboratoire.
