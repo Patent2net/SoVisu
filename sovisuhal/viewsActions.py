@@ -166,17 +166,17 @@ def validate_guiding_domains(request):
                 dejaLa = [fiche["_source"]['chemin'].replace("domAurehal.", "") for fiche in
                           fichesExpertise if
                           fiche["_source"]['chemin'].replace("domAurehal.", "") in to_validate
-                          and fiche["_source"]['validated']]
+                          and fiche["_source"]['sovisu_validated']]
                 if len(to_validate) != len(dejaLa):
                     dejaLaPasValid = [fiche for fiche in fichesExpertise if
                                       fiche["_source"]['chemin'].replace("domAurehal.",
                                                                          "") in to_validate
-                                      and not fiche["_source"]['validated']]
+                                      and not fiche["_source"]['sovisu_validated']]
                     # Mise à jour
                     for fiche in dejaLaPasValid:
                         if fiche["_source"]['origin'] != "datagouv":
                             fiche["_source"]['origin'] = "datagouv"
-                            fiche["_source"]['validated'] = True
+                            fiche["_source"]['sovisu_validated'] = True
                             es.update(index=SV_INDEX, id=fiche["_id"], body=fiche["_source"])
                         to_validate.remove(fiche["_source"]['chemin'].replace("domAurehal.", ""))
 
@@ -242,7 +242,11 @@ def validate_expertise(request):
         concepts_to_update = request.POST.get("toInvalidate", "").split(",")
 
         for concept in concepts_to_update:
-            es.update(index=SV_INDEX, refresh="wait_for", id=concept, doc=update_doc)
+            tempo = concept .split('.')
+            chaine = tempo[0] + '.' + tempo[1]
+            for nbConcepts in range(len(tempo)-2): # profondeur de l'arbre
+                chaine += "." +  tempo [2 + nbConcepts]
+                es.update(index=SV_INDEX, refresh="wait_for", id= chaine, doc=update_doc)
 
     return redirect(
         f"/check/?type={i_type}"
